@@ -28,9 +28,25 @@ Before studying this problem, you should be comfortable with:
 
 ## The Problem (Intuitively)
 
-Imagine you are a cashier and need to give a customer **$6 in change** using coins worth **$1, $3, and $4**. What is the **fewest coins** you can use?
+Imagine you are a cashier and need to give a customer **\$6 in change** using coins worth **\$1, \$3, and \$4**. What is the **fewest coins** you can use?
 
 This question—trivial in familiar monetary systems—turns out to be surprisingly hard to solve *correctly* for arbitrary sets of coin denominations. A quick guess might give you the wrong answer.
+
+![Introduction to the Coin Change Problem](/algorithms/dp-coin-change-problem.png)
+
+### The Mental Trap
+Most people's brains are wired to be **Greedy**. In a split second, you might think:
+1. "Okay, give them the biggest coin first: a **\$4** coin."
+2. "I still owe them \$2. I'll give them two **\$1** coins."
+3. **Total: 3 coins.** (\$4 + \$1 + \$1)
+
+**Wait!** If you stop for a second and look closer, you'll see a better way:
+* Two **\$3** coins also make \$6.
+* **Total: 2 coins.** (\$3 + \$3)
+
+:::info The "Aha!" Moment
+This gap between the **Greedy** choice (3 coins) and the **Optimal** choice (2 coins) is exactly why this problem is famous. In familiar systems like Euros or US Dollars, the greedy choice is always optimal. But for arbitrary sets of coins, we need **Computational Intelligence** to find the truth.
+:::
 
 ---
 
