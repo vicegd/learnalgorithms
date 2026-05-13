@@ -1,0 +1,333 @@
+import GithubCode from '@site/src/components/GithubCode';
+import DPVisualizer from '@site/src/components/DPVisualizer';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Coin Change Problem
+
+:::tip What You Will Learn
+- Why a greedy approach fails on arbitrary coin sets
+- How to identify **optimal substructure** and **overlapping subproblems**
+- How to derive the Bellman recurrence equation from scratch
+- How to trace a DP table step by step on a concrete example
+- Time and space complexity analysis, and how DP compares to brute force
+:::
+
+## Prerequisites
+
+Before studying this problem, you should be comfortable with:
+
+| Topic | Why It Matters |
+|---|---|
+| Recursion | Understanding the brute-force approach and its cost |
+| Arrays | Building and indexing the `dp[]` table |
+| Big-O Notation | Comparing brute force vs. DP efficiency |
+| Basic combinatorics | Reasoning about "combinations of coins" |
+
+---
+
+## The Problem (Intuitively)
+
+Imagine you are a cashier and need to give a customer **$6 in change** using coins worth **$1, $3, and $4**. What is the **fewest coins** you can use?
+
+This question—trivial in familiar monetary systems—turns out to be surprisingly hard to solve *correctly* for arbitrary sets of coin denominations. A quick guess might give you the wrong answer.
+
+---
+
+## Formal Problem Statement
+
+**Given:**
+- A set of $n$ distinct coin denominations $C = \{c_1, c_2, \dots, c_n\}$
+- A target amount $S$
+- An **infinite supply** of each coin denomination
+
+**Objective:** Find the minimum number of coins that sum exactly to $S$.
+
+$$\text{minimize} \sum_{i=1}^{n} x_i \quad \text{subject to} \quad \sum_{i=1}^{n} c_i \cdot x_i = S, \quad x_i \in \mathbb{Z}_{\geq 0}$$
+
+If no valid combination exists, the algorithm must return $-1$.
+
+---
+
+## Historical Context
+
+The Coin Change Problem is a classic in combinatorial optimization. It is a special case of the **unbounded knapsack problem** and gained mathematical rigor with the development of **Dynamic Programming** by **Richard Bellman** in the 1950s.
+
+> *"The 1950s were not good years for mathematical research... I used the word 'programming' to hide what I was actually doing, which was mathematical research."*  
+> — Richard Bellman
+
+- **Reference:** Bellman, R. (1957). *Dynamic Programming*. Princeton University Press.
+- **Further reading:** [Dynamic Programming (Wikipedia)](https://en.wikipedia.org/wiki/Dynamic_programming)
+
+---
+
+## Brute Force: Why Is It Slow?
+
+The most natural approach is to recursively try every possible coin at each step.
+
+**Pseudocode (recursive brute force):**
+```
+function minCoins(coins, amount):
+    if amount == 0:  return 0
+    if amount < 0:   return ∞
+
+    best = ∞
+    for each coin c in coins:
+        result = minCoins(coins, amount - c)
+        best = min(best, result + 1)
+    return best
+```
+
+Each call branches into $n$ sub-calls. The recursion tree has depth up to $S$ (when the smallest coin has value 1), giving:
+
+$$T(S) = O(n^S)$$
+
+This **exponential** time complexity is completely impractical for even moderate values of $S$. The root cause is that the same sub-amounts are recomputed countless times — this is exactly where Dynamic Programming helps.
+
+---
+
+## Why Greedy Fails
+
+A common first instinct is the **greedy strategy**: always pick the largest coin denomination that fits in the remaining amount. While this works for *canonical* systems like US Dollars or Euros, it **fails for arbitrary denominations**.
+
+**Counterexample** — $C = \{1, 3, 4\}$, $S = 6$:
+
+| Strategy | Coins Used | Total Coins |
+|---|---|:---:|
+| **Greedy** | $4 + 1 + 1$ | **3** |
+| **Optimal** | $3 + 3$ | **2** ✓ |
+
+Greedy commits to a local choice without considering future implications. It never "looks back" to try a different coin that leads to a better global solution. We must explore the full solution space — efficiently, with DP.
+
+---
+
+## Dynamic Programming Solution
+
+### Two Key DP Properties
+
+A problem is solvable with DP when it has both:
+
+1. **Optimal Substructure:** The optimal solution to amount $S$ is built from optimal solutions to smaller amounts $S - c_i$.
+2. **Overlapping Subproblems:** The same sub-amounts appear repeatedly in the brute-force recursion tree — caching them eliminates redundant work.
+
+### State Definition
+
+$$dp[i] = \text{minimum number of coins needed to reach amount } i$$
+
+### Base Case and Initialization
+
+$$dp[0] = 0 \quad \text{(zero coins needed to make zero amount)}$$
+
+$$dp[i] = \infty \quad \text{for all } i > 0 \quad \text{(unreachable until updated)}$$
+
+### Recurrence (Bellman Equation)
+
+For each amount $i$ from $1$ to $S$, and for each coin $c \in C$ with $c \leq i$:
+
+$$dp[i] = \min_{c \,\in\, C,\; c \leq i}\bigl(dp[i - c] + 1\bigr)$$
+
+In words: *"to reach amount $i$, try adding one coin $c$ on top of the best solution for amount $i - c$."*
+
+### Pseudocode (Bottom-Up Tabulation)
+
+```
+function coinChange(coins, S):
+    dp = array of size (S + 1), initialized to ∞
+    dp[0] = 0
+
+    for i from 1 to S:
+        for each coin c in coins:
+            if c ≤ i:
+                dp[i] = min(dp[i], dp[i - c] + 1)
+
+    return dp[S] if dp[S] ≠ ∞ else -1
+```
+
+### Step-by-Step Table Trace
+
+**Input:** $C = \{1, 3, 4\}$, $S = 6$
+
+| $i$ | Best via coin 1 | Best via coin 3 | Best via coin 4 | $dp[i]$ |
+|:---:|:---:|:---:|:---:|:---:|
+| 0 | — | — | — | **0** |
+| 1 | $dp[0]+1 = 1$ | $1 < i$, skip | $1 < i$, skip | **1** |
+| 2 | $dp[1]+1 = 2$ | $3 > i$, skip | $3 > i$, skip | **2** |
+| 3 | $dp[2]+1 = 3$ | $dp[0]+1 = 1$ | $4 > i$, skip | **1** |
+| 4 | $dp[3]+1 = 2$ | $dp[1]+1 = 2$ | $dp[0]+1 = 1$ | **1** |
+| 5 | $dp[4]+1 = 2$ | $dp[2]+1 = 3$ | $dp[1]+1 = 2$ | **2** |
+| 6 | $dp[5]+1 = 3$ | $dp[3]+1 = 2$ | $dp[2]+1 = 3$ | **2** ✓ |
+
+**Answer:** $dp[6] = 2$ — two coins of denomination 3.
+
+### Interactive Trace
+
+Use the widget below to step through the algorithm visually. You can change the coin denominations and the target amount to see how the DP table adapts in real-time:
+
+<DPVisualizer />
+
+---
+
+## Complexity Analysis
+
+:::info Summary
+
+| | Value | Explanation |
+|---|---|---|
+| **Time** | $O(S \times n)$ | Two nested loops: amounts (0 to S) × coins (n denominations) |
+| **Space** | $O(S)$ | Single `dp[]` array of size $S + 1$ |
+
+For comparison:
+
+| Approach | Time Complexity | $n=3,\ S=30$ |
+|---|---|---|
+| Brute Force | $O(n^S)$ | $3^{30} \approx 2 \times 10^{14}$ ops |
+| Dynamic Programming | $O(S \times n)$ | $30 \times 3 = 90$ ops |
+
+:::
+
+---
+
+## Edge Cases
+
+:::caution Watch Out For These
+
+| Scenario | Input | Expected Output |
+|---|---|:---:|
+| Target is zero | $C = \{1,3,4\}$, $S = 0$ | $0$ |
+| No solution exists | $C = \{3, 5\}$, $S = 7$ | $-1$ |
+| Single coin equals target | $C = \{6\}$, $S = 6$ | $1$ |
+| All coins larger than target | $C = \{5, 10\}$, $S = 3$ | $-1$ |
+| Only coin of value 1 | $C = \{1\}$, $S = 10000$ | $10000$ |
+
+:::
+
+---
+
+## Implementation
+
+<Tabs>
+  <TabItem value="java" label="Java" default>
+    <GithubCode
+      user="vicegd"
+      repo="algorithms"
+      branch="master"
+      path="src/main/java/topics/dynamic/Change.java"
+      language="java"
+    />
+  </TabItem>
+  <TabItem value="python" label="Python">
+
+```python
+def coin_change(coins: list[int], amount: int) -> int:
+    dp = [float('inf')] * (amount + 1)
+    dp[0] = 0
+    for i in range(1, amount + 1):
+        for coin in coins:
+            if coin <= i:
+                dp[i] = min(dp[i], dp[i - coin] + 1)
+    return dp[amount] if dp[amount] != float('inf') else -1
+```
+
+  </TabItem>
+  <TabItem value="js" label="JavaScript">
+
+```js
+function coinChange(coins, amount) {
+    const dp = new Array(amount + 1).fill(Infinity);
+    dp[0] = 0;
+    for (let i = 1; i <= amount; i++) {
+        for (const coin of coins) {
+            if (coin <= i && dp[i - coin] + 1 < dp[i]) {
+                dp[i] = dp[i - coin] + 1;
+            }
+        }
+    }
+    return dp[amount] === Infinity ? -1 : dp[amount];
+}
+```
+
+  </TabItem>
+</Tabs>
+
+---
+
+## Variants
+
+### Variant A — Count the Number of Ways
+
+Instead of minimizing, count **how many distinct combinations** sum to $S$ (order does not matter).
+
+Change the recurrence and base case:
+
+$$dp[i] = \sum_{c \in C,\; c \leq i} dp[i - c], \quad dp[0] = 1$$
+
+This corresponds to [LeetCode 518 — Coin Change II](https://leetcode.com/problems/coin-change-ii/).
+
+### Variant B — Top-Down with Memoization
+
+The same minimum-coins problem solved via recursion + a cache. Mathematically equivalent to the bottom-up approach; some students find it easier to derive.
+
+```
+memo = {}
+function minCoins(coins, amount):
+    if amount == 0:         return 0
+    if amount < 0:          return ∞
+    if amount in memo:      return memo[amount]
+
+    best = ∞
+    for each coin c in coins:
+        best = min(best, minCoins(coins, amount - c) + 1)
+    memo[amount] = best
+    return best
+```
+
+### Variant C — Bounded Supply (0/1 Knapsack)
+
+Each denomination $c_i$ may be used **at most $k_i$ times**. This requires a modified recurrence and is an instance of the bounded knapsack problem.
+
+---
+
+## Common Mistakes
+
+:::danger Avoid These Pitfalls
+
+1. **Initializing `dp[0] = ∞` instead of `0`.** The base case `dp[0] = 0` is the seed from which every solution is built. Getting it wrong corrupts the entire table.
+
+2. **Array size `S` instead of `S+1`.** You need indices `0` through `S` inclusive, so the array must have size `S + 1`.
+
+3. **Forgetting to check `c ≤ i`.** Accessing `dp[i - c]` when `c > i` means accessing a negative index — undefined behavior or a runtime error.
+
+4. **Returning `dp[S]` without checking for `∞`.** If $S$ is unreachable, `dp[S]` stays at its initial `∞`. Always check and return `-1` in that case.
+
+5. **Confusing "minimum coins" with "number of ways."** Both are DP problems on the same structure but with **different recurrences and different base cases**. The state `dp[i]` means something entirely different in each variant.
+
+:::
+
+---
+
+## Practice Problems
+
+Solidify your understanding with these related problems:
+
+| Problem | Difficulty | Key Twist |
+|---|:---:|---|
+| [322. Coin Change](https://leetcode.com/problems/coin-change/) | Medium | Exact problem from this page |
+| [518. Coin Change II](https://leetcode.com/problems/coin-change-ii/) | Medium | Count combinations instead of minimizing |
+| [279. Perfect Squares](https://leetcode.com/problems/perfect-squares/) | Medium | Coin denominations are perfect squares |
+| [983. Minimum Cost For Tickets](https://leetcode.com/problems/minimum-cost-for-tickets/) | Medium | Non-uniform cost steps |
+| [139. Word Break](https://leetcode.com/problems/word-break/) | Medium | Same DP pattern applied to strings |
+
+---
+
+## Key Takeaways
+
+:::tip Summary
+
+- Coin Change is a **canonical unbounded knapsack** problem — the go-to example for learning DP.
+- **Greedy fails** for arbitrary coin sets. Never assume greedy works without a proof.
+- The two pillars of DP applicability: **optimal substructure** and **overlapping subproblems**.
+- The entire solution is two lines of logic: the base case $dp[0] = 0$ and the recurrence $dp[i] = \min_{c \leq i}(dp[i - c] + 1)$.
+- DP reduces the time complexity from **exponential** $O(n^S)$ to **polynomial** $O(S \times n)$.
+- Always handle the "no solution" case: check if $dp[S] = \infty$ before returning.
+
+:::

@@ -1,23 +1,281 @@
-/**
- * CSS files with the .module.css suffix will be treated as CSS modules
- * and scoped locally.
- */
-
-.heroBanner {
-  padding: 4rem 0;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-}
-
-@media screen and (max-width: 996px) {
-  .heroBanner {
-    padding: 2rem;
-  }
-}
-
-.buttons {
+/* ── Hero ──────────────────────────────────────────────── */
+.hero {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 4rem;
+  padding: 6rem 3rem 5rem;
+  background: linear-gradient(135deg, #0d1f14 0%, #0f172a 55%, #12263a 100%);
+  min-height: 62vh;
+  overflow: hidden;
+}
+
+.heroContent {
+  flex: 1;
+  max-width: 560px;
+}
+
+.heroEyebrow {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #3cad6e;
+  margin-bottom: 1.1rem;
+}
+
+.heroTitle {
+  font-size: clamp(2.4rem, 5vw, 3.6rem);
+  font-weight: 800;
+  line-height: 1.1;
+  color: #f1f5f9;
+  margin-bottom: 1.25rem;
+  letter-spacing: -0.02em;
+}
+
+.heroAccent {
+  color: #3cad6e;
+}
+
+.heroSubtitle {
+  font-size: 1.05rem;
+  line-height: 1.75;
+  color: #94a3b8;
+  margin-bottom: 2.25rem;
+  max-width: 480px;
+}
+
+.heroButtons {
+  display: flex;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+}
+
+.btnPrimary {
+  background: #2e8555 !important;
+  border-color: #2e8555 !important;
+  color: #fff !important;
+  font-weight: 600;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.btnPrimary:hover {
+  background: #3cad6e !important;
+  border-color: #3cad6e !important;
+  color: #fff !important;
+}
+
+.btnGhost {
+  background: transparent !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  color: #cbd5e1 !important;
+  font-weight: 500;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.btnGhost:hover {
+  border-color: rgba(255, 255, 255, 0.5) !important;
+  color: #f1f5f9 !important;
+}
+
+/* ── Hero code card ── */
+.heroVisual {
+  flex-shrink: 0;
+}
+
+.codeCard {
+  background: #0f1e14;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  overflow: hidden;
+  width: 340px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.codeCardDots {
+  display: flex;
+  gap: 6px;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.codeCardDots span {
+  display: block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.codeCardPre {
+  margin: 0 !important;
+  padding: 1.25rem 1.5rem !important;
+  background: transparent !important;
+  color: #6bba8c !important;
+  font-size: 0.82rem !important;
+  line-height: 1.75 !important;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace !important;
+  white-space: pre !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+@media (max-width: 900px) {
+  .hero {
+    flex-direction: column;
+    text-align: center;
+    padding: 4rem 1.5rem;
+    gap: 2.5rem;
+  }
+
+  .heroSubtitle {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .heroButtons {
+    justify-content: center;
+  }
+
+  .codeCard {
+    width: 100%;
+    max-width: 380px;
+  }
+}
+
+/* ── Main sections ──────────────────────────────────────── */
+.main {
+  padding: 5rem 2rem;
+  max-width: 1080px;
+  margin: 0 auto;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: 1fr;
+    max-width: 480px;
+  }
+}
+
+/* ── Card ──────────────────────────────────────────────── */
+.card {
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+  border-radius: 12px;
+  border: 1px solid var(--ifm-color-emphasis-200);
+  background: var(--ifm-background-surface-color);
+  border-top: 4px solid transparent;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+}
+
+.accentGreen { border-top-color: #2e8555; }
+.accentBlue  { border-top-color: #3b82f6; }
+.accentPurple{ border-top-color: #8b5cf6; }
+
+.cardIcon {
+  margin-bottom: 1rem;
+}
+
+.accentGreen  .cardIcon { color: #2e8555; }
+.accentBlue   .cardIcon { color: #3b82f6; }
+.accentPurple .cardIcon { color: #8b5cf6; }
+
+.cardEyebrow {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--ifm-color-emphasis-600);
+  margin: 0 0 0.35rem;
+}
+
+.cardTitle {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin: 0 0 0.85rem;
+  counter-increment: none !important;
+}
+
+.cardTitle::before {
+  content: none !important;
+}
+
+.cardDescription {
+  font-size: 0.93rem;
+  line-height: 1.75;
+  color: var(--ifm-color-emphasis-700);
+  margin-bottom: 1.25rem;
+}
+
+.cardTopics {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  flex: 1;
+  align-content: flex-start;
+}
+
+.cardTopic {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.22rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+}
+
+.accentPurple .cardTopic {
+  background: rgba(139, 92, 246, 0.07);
+  border-color: rgba(139, 92, 246, 0.25);
+  color: #7c3aed;
+}
+
+.accentGreen .cardTopic {
+  background: rgba(46, 133, 85, 0.07);
+  border-color: rgba(46, 133, 85, 0.3);
+  color: #2e8555;
+}
+
+.cardFooter {
+  margin-top: auto;
+}
+
+.cardLink {
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: opacity 0.15s;
+}
+
+.cardLink:hover {
+  opacity: 0.75;
+  text-decoration: none;
+}
+
+.accentGreen  .cardLink { color: #2e8555; }
+.accentBlue   .cardLink { color: #3b82f6; }
+.accentPurple .cardLink { color: #8b5cf6; }
+
+.cardComingSoon {
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--ifm-color-emphasis-400);
 }
