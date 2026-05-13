@@ -17,9 +17,13 @@ import CONCEPT_LINKS from './concept-links.js';
 // Helpers
 // ---------------------------------------------------------------------------
 
-/** '06-Dynamic Programming' → 'Dynamic Programming' */
+/** '06-dynamic-programming' → 'Dynamic Programming' */
 function toLabel(name) {
-  return name.replace(/^\d+-/, '').trim();
+  return name
+    .replace(/^\d+-/, '')
+    .replace(/-/g, ' ')
+    .replace(/\b\w/g, (c) => c.toUpperCase())
+    .trim();
 }
 
 /** 'Dynamic Programming' → 'dynamic-programming' */

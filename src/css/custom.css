@@ -22,6 +22,12 @@
   --ifm-navbar-link-hover-color: #3cad6e;
 }
 
+/* ── Suppress counters inside components that render their own headings ── */
+.theme-doc-markdown .no-numbering h2::before,
+.theme-doc-markdown .no-numbering h3::before {
+  content: none;
+}
+
 /* ── Auto-numbering for doc page headings ── */
 .theme-doc-markdown {
   counter-reset: h2counter;

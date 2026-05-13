@@ -13,7 +13,6 @@
  */
 
 const CONCEPT_LINKS = {
-  'bellman recurrence equation':  '/concepts/design-paradigms/dsfsdfsdf',
   'brute force':  '/concepts/design-paradigms/brute-force',
   'brute-force':  '/concepts/design-paradigms/brute-force',
 };

@@ -2,6 +2,12 @@ import React from 'react';
 import Link from '@docusaurus/Link';
 import { usePluginData } from '@docusaurus/useGlobalData';
 
+function toTitle(str) {
+  return str
+    .replace(/-/g, ' ')
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 export default function Roadmap() {
   const { concepts } = usePluginData('docusaurus-plugin-site-data');
   const pending = concepts
@@ -19,10 +25,10 @@ export default function Roadmap() {
   }
 
   return (
-    <div>
+    <div className="no-numbering">
       {Object.entries(groups).map(([category, entries]) => (
         <div key={category}>
-          <h3>{category}</h3>
+          <h3>{toTitle(category)}</h3>
           <ul>
             {entries.map(({ title, url }) => (
               <li key={url}>
