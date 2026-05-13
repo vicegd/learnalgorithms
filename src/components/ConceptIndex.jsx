@@ -52,7 +52,7 @@ export default function ConceptIndex() {
   const { crossRef } = usePluginData('docusaurus-plugin-site-data');
 
   return (
-    <div>
+    <div className="no-numbering">
       {index.map(({ category, label, entries }) => (
         <div key={category}>
           <h3>{label}</h3>
