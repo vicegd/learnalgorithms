@@ -7,6 +7,7 @@
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import {themes as prismThemes} from 'prism-react-renderer';
+import remarkAutolinkConcepts from './src/plugins/remark-autolink-concepts.js';
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
@@ -110,7 +111,7 @@ const config = {
         path: './algorithms',
         routeBasePath: 'algorithms',
         sidebarPath: './sidebarsAlgorithms.js',
-        remarkPlugins: [remarkMath],
+        remarkPlugins: [remarkMath, remarkAutolinkConcepts],
         rehypePlugins: [rehypeKatex],
       },
     ],
