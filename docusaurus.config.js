@@ -8,6 +8,7 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import {themes as prismThemes} from 'prism-react-renderer';
 import remarkAutolinkConcepts from './src/plugins/remark-autolink-concepts.js';
+import pluginSiteData from './src/plugins/docusaurus-plugin-site-data.js';
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
@@ -87,6 +88,11 @@ const config = {
             label: 'Algorithms',
           },
           {
+            to: '/stats',
+            position: 'left',
+            label: 'Stats',
+          },
+          {
             href: 'https://github.com/vicegd/learnalgorithms',
             label: 'GitHub',
             position: 'right',
@@ -104,6 +110,7 @@ const config = {
     }),
 
   plugins: [
+    pluginSiteData,
     [
       '@docusaurus/plugin-content-docs',
       {

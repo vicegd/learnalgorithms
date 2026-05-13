@@ -4,12 +4,8 @@
  * Automatically links the FIRST occurrence of each known concept term
  * in algorithm pages to its definition in the Concepts section.
  *
- * To add a new concept, add an entry to CONCEPT_LINKS:
- *   key   → term to search for (case-insensitive exact string)
- *   value → URL of the concept page
- *
- * Terms that share the same URL are treated as aliases: only one link
- * is inserted per URL per page (whichever alias appears first).
+ * Terms and their target URLs are defined in concept-links.js.
+ * Edit that file to add or remove concepts — no changes needed here.
  *
  * Safe zones — the plugin NEVER inserts links inside:
  *   • code blocks / inline code
@@ -19,13 +15,7 @@
  *   • raw HTML / MDX JSX elements / MDX expressions
  */
 
-// ---------------------------------------------------------------------------
-// Dictionary: term (case-insensitive) → concept URL
-// ---------------------------------------------------------------------------
-const CONCEPT_LINKS = {
-  'brute force':  '/concepts/design-paradigms/brute-force',
-  'brute-force':  '/concepts/design-paradigms/brute-force',
-};
+import CONCEPT_LINKS from './concept-links.js';
 
 // ---------------------------------------------------------------------------
 // Internal: build regex and sorted term list
