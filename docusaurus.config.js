@@ -109,13 +109,14 @@ const config = {
       },
     }),
 
+  clientModules: ['./src/matomo.js'],
+
   headTags: [
     {
       tagName: 'script',
       attributes: {},
       innerHTML: `
         var _paq = window._paq = window._paq || [];
-        _paq.push(['trackPageView']);
         _paq.push(['enableLinkTracking']);
         (function() {
           var u="//stats.garcia.at/";
