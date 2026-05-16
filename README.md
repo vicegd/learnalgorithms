@@ -1,41 +1,141 @@
-# Website
+# learnalgorithms.dev
 
-This website is built using [Docusaurus](https://docusaurus.io/), a modern static website generator.
+> **From intuition to proof.** Structured algorithm sheets, theoretical foundations, and interactive visualizations.
 
-## Installation
+Live site: [https://learnalgorithms.dev](https://learnalgorithms.dev)
 
-```bash
-yarn
+---
+
+## About
+
+**learnalgorithms.dev** is an open educational resource for learning data structures and algorithms from first principles. It combines rigorous theoretical content with interactive React components and visual demonstrations — going beyond rote memorization to build deep understanding.
+
+The site is organized into two parallel tracks:
+
+| Track | Path | Description |
+|---|---|---|
+| **Concepts** | `/concepts` | Theory, paradigms, and complexity analysis |
+| **Algorithms** | `/algorithms` | Concrete problems with interactive visualizations |
+
+---
+
+## Content Structure
+
+### Concepts
+
+```
+01 — Foundations
+     ├── Algorithmic Thinking
+     ├── Case Study: Pairwise Problem
+     ├── Complexity Analysis
+     ├── Asymptotic Notation
+     └── Searching Case Studies
+
+02 — Fundamental Problem Domains
+     └── Sorting
+
+03 — Algorithm Design Paradigms
+     ├── Brute Force
+     ├── Divide and Conquer
+     ├── Greedy Algorithms
+     └── Dynamic Programming
+
+04 — State-Space Search & Optimization
+     ├── Backtracking
+     └── Branch and Bound
+
+05 — Advanced Execution Models
+     └── Parallel Algorithms
 ```
 
-## Local Development
+Also included: [Glossary](/concepts/glossary) · [Learning Roadmap](/concepts/roadmap)
 
-```bash
-yarn start
+### Algorithms
+
+```
+06 — Dynamic Programming
+     └── Coin Change
+
+07 — Backtracking
 ```
 
-This command starts a local development server and opens up a browser window. Most changes are reflected live without having to restart the server.
+---
 
-## Build
+## Tech Stack
+
+- **[Docusaurus 3](https://docusaurus.io/)** — static site framework (MDX, React)
+- **[KaTeX](https://katex.org/)** — math rendering via `remark-math` + `rehype-katex`
+- **React 19** — interactive algorithm visualizers
+- **Custom plugins**
+  - `remark-autolink-concepts` — auto-links concept terms across pages
+  - `docusaurus-plugin-site-data` — aggregates site-wide metadata at build time
+
+---
+
+## Getting Started
+
+**Prerequisites:** Node.js ≥ 18, npm or yarn.
 
 ```bash
-yarn build
+# Install dependencies
+npm install
+
+# Start local dev server (http://localhost:3000)
+npm start
+
+# Production build
+npm run build
+
+# Preview the production build locally
+npm run serve
+
+# Clear Docusaurus cache
+npm run clear
 ```
 
-This command generates static content into the `build` directory and can be served using any static contents hosting service.
+---
 
 ## Deployment
 
-Using SSH:
+The site deploys automatically to GitHub Pages via CI on every push to `main`.
+
+To deploy manually:
 
 ```bash
-USE_SSH=true yarn deploy
+GIT_USER=vicegd npm run deploy
 ```
 
-Not using SSH:
+This builds the site and pushes the output to the `gh-pages` branch, which is served at [https://learnalgorithms.dev](https://learnalgorithms.dev).
 
-```bash
-GIT_USER=<Your GitHub username> yarn deploy
+---
+
+## Project Structure
+
+```
+├── concepts/          # MDX content — theory and paradigms
+├── algorithms/        # MDX content — concrete algorithm problems
+├── src/
+│   ├── components/    # React components (visualizers, indexes, roadmap)
+│   ├── css/           # Global styles
+│   ├── pages/         # Standalone pages (home, stats, glossary)
+│   └── plugins/       # Custom Docusaurus/remark plugins
+├── static/            # Static assets (images, algorithm data)
+├── docusaurus.config.js
+├── sidebars.js        # Concepts sidebar
+└── sidebarsAlgorithms.js
 ```
 
-If you are using GitHub pages for hosting, this command is a convenient way to build the website and push to the `gh-pages` branch.
+---
+
+## 👨‍💼 Author
+
+[Vicente García Díaz](http://www.vicentegarciadiaz.com)  
+School of Computer Science    
+University of Oviedo
+
+---
+
+## 📜 License
+
+MIT License — Copyright (c) 2026 Vicente García Díaz  
+See [LICENSE](LICENSE) file for details
