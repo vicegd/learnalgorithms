@@ -1,8 +1,239 @@
 ---
+title: Foundational Sorting Algorithms
 sidebar_position: 1
-title: Sorting Algorithms
+tags: [Sorting, Fundamental Domains, Java, Complexity]
 ---
 
-# Sorting Algorithms
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
-*Coming soon.*
+# Foundations of Sorting Algorithms
+
+Sorting is one of the most thoroughly studied problems in Computer Science[cite: 1]. At its core, given a structured set of $n$ elements $[a_1, a_2, a_3, \dots, a_n]$ and a strict total order relation ($\le$), the objective of a sorting algorithm is to rearrange the elements into an increasingly ordered sequence[cite: 9].
+
+While sorting a small list of items may seem trivial, the underlying mechanics are highly sensitive to systemic and environmental variables[cite: 18]. In enterprise infrastructure, three primary vectors influence the performance and selection of a sorting strategy:
+* **The Data Type:** Sorting primitive integers differs fundamentally from sorting massive, nested object registries[cite: 11, 18].
+* **The Dataset Size ($n$):** Algorithms that perform exceptionally well with small arrays degrade catastrophically when scaled to billions of records[cite: 12].
+* **The Underlying Hardware Medium:** Performance changes drastically depending on the physical device where the elements reside (e.g., CPU Cache, high-speed RAM, or slower non-volatile external drives)[cite: 13, 30].
+
+---
+
+## Abstracting Data to Integer Vectors
+
+In production systems, data objects are typically complex, multi-field structures (e.g., database records holding strings, dates, and nested entities)[cite: 18]. However, software engineers routinely reduce these complex entities to a simplified model where they are treated as arrays of integers[cite: 14, 19]. 
+
+This abstraction is achieved by isolating a **Registry Key** or an **Index**—a numerically quantifiable property of the object (such as a unique user ID, a timestamp hash, or a vectorized category value). Consequently, mastering the sorting of integer arrays provides the direct logical foundation required to sort any complex real-world data structure[cite: 20, 36].
+
+---
+
+## Technical Classification Criteria
+
+To evaluate whether a sorting algorithm is appropriate for a specific hardware architecture or software constraint, we rely on three structural criteria[cite: 24, 35]:
+
+### Memory Allocation: Internal vs. External Algorithms
+Algorithms are categorized based on where the data manipulation physically occurs:
+* **Internal Algorithms:** The entire dataset fits comfortably within the system's volatile random-access memory (RAM)[cite: 31]. All comparisons and memory pointer swaps happen instantly via the CPU cache and registers.
+* **External Algorithms:** The dataset is too massive to fit into RAM and must reside on secondary storage devices (e.g., SSDs, network-attached storage)[cite: 32, 983]. These strategies (such as Direct, Natural, Balanced, or Polyphasic mixtures) rely on sequential streaming and partitioning techniques to sort data blocks without exhausting main memory[cite: 985, 986, 987, 988, 989, 990].
+
+### Operational Cost Metrics
+When performing runtime complexity analysis on sorting code, calculating absolute CPU cycles is highly unpredictable due to modern hardware variations[cite: 25]. Instead, we track two deterministic, architecture-invariant structural metrics:
+* **Number of Comparisons ($C(n)$):** The absolute frequency of execution of logical conditional statements (e.g., `if (A[i] > A[j])`) required to determine the order[cite: 26].
+* **Number of Interchanges/Swaps ($M(n)$):** The absolute frequency of data movements inside memory registers[cite: 27]. In physical architecture, an interchange is significantly more expensive than a comparison because it requires three separate read-write operations to move raw bytes across memory addresses.
+
+### Algorithmic Stability
+A sorting algorithm is classified as **Stable** if it preserves the original relative order of elements that possess identical sorting keys[cite: 29]. For instance, if an array contains two records with the same value, $A[i] = A[j]$ where $i < j$, a stable algorithm guarantees that after sorting, the element originally at index $i$ will still appear before the element originally at index $j$[cite: 29].
+
+---
+
+## Foundational Utility Mechanics
+
+To maximize readability and ensure modular code structure, our Java implementations decouple the sorting loops from low-level data manipulation[cite: 37]. We introduce three foundational utility methods that handle pointer exchanges and linear bounds-scanning[cite: 37, 40, 43]:
+
+```java
+public class Util {
+
+    /**
+     * Atomically interchanges element i and element j within an array.
+     * Requires 3 physical write operations.
+     */
+    public static void interchange(int[] elements, int i, int j) {
+        int temp = elements[i];
+        elements[i] = elements[j];
+        elements[j] = temp;
+    }
+
+    /**
+     * Scans the array linearly from a starting index to locate
+     * the exact memory index holding the absolute minimum value.
+     */
+    public static int findPosMin(int[] elements, int firstElement) {
+        int value = Integer.MAX_VALUE;
+        int pos = Integer.MAX_VALUE;
+        for (int i = firstElement; i < elements.length; i++) {
+            if (elements[i] < value) {
+                value = elements[i];
+                pos = i;
+            }
+        }
+        return pos;
+    }
+
+    /**
+     * Scans the array linearly from a starting index to locate
+     * the exact memory index holding the absolute maximum value.
+     */
+    public static int findPosMax(int[] elements, int firstElement) {
+        int value = Integer.MIN_VALUE;
+        int pos = Integer.MIN_VALUE;
+        for (int i = firstElement; i < elements.length; i++) {
+            if (elements[i] > value) {
+                value = elements[i];
+                pos = i;
+            }
+        }
+        return pos;
+    }
+}
+```
+
+---
+
+## Elementary Sorting Paradigms
+
+We begin our exploration with **Simple Algorithms**[cite: 60]. These strategies rely on intuitive, nested iterative structures[cite: 147, 426, 537]. While highly performant for small datasets ($n \le 20$), they scale poorly due to their quadratic asymptotic growth curves[cite: 153, 433, 544, 897].
+
+<Tabs>
+  <TabItem value="bubble" label="Direct Exchange (Bubble Sort)" default>
+
+### Core Mechanism
+Bubble Sort operates by performing successive comparisons and exchanges of immediately adjacent elements[cite: 46]. During each pass, the algorithm steps through the array: if adjacent elements are out of order, they are instantly interchanged[cite: 47]. This process forces smaller elements to gradually "bubble up" to the left, while the largest unsorted element sinks to its correct position on the rightmost edge[cite: 48].
+
+```java
+public void bubbleSort(int[] elements) {
+    for (int i = 1; i < elements.length; i++) {
+        for (int j = elements.length - 1; j >= i; j--) {
+            if (elements[j - 1] > elements[j]) {
+                Util.interchange(elements, j - 1, j);
+            }
+        }
+    }
+}
+```
+
+### Analytical Breakdown
+* **The Inefficiency:** The standard implementation is completely blind to the state of the data[cite: 158]. Even if the array becomes perfectly sorted on the very first pass, the outer loop stubbornly forces the inner loop to continue executing all subsequent passes, repeating redundant comparisons across already ordered sequences[cite: 158].
+* **Asymptotic Profile:** $O(n^2)$ across **all** cases (Best, Worst, and Average)[cite: 153, 154, 155]. It suffers from an extremely high volume of memory interchanges and comparisons[cite: 156, 157].
+
+  </TabItem>
+  <TabItem value="bubble-sentinel" label="Optimized Bubble Sort">
+
+### Core Mechanism
+To rectify the architectural blindness of standard Bubble Sort, we introduce a stop condition using a boolean flag (`hasChange`)[cite: 159, 163]. If the algorithm performs a complete inner pass across the unsorted sequence without executing a single interchange, it mathematically proves that the collection is already fully sorted[cite: 160]. The algorithm intercepts the outer loop and terminates early[cite: 159, 160].
+
+```java
+public void bubbleSortWithSentinel(int[] elements) {
+    int i = 1;
+    boolean hasChange = true;
+    
+    while (hasChange && (i < elements.length)) {
+        hasChange = false;
+        for (int j = elements.length - 1; j >= i; j--) {
+            if (elements[j - 1] > elements[j]) {
+                Util.interchange(elements, j - 1, j);
+                hasChange = true;
+            }
+        }
+        i++;
+    }
+}
+```
+
+### Analytical Breakdown
+* **Best Case Improvement:** If given an array that is already completely sorted, the algorithm executes the inner loop exactly once, performs $n-1$ comparisons, detects zero changes, and terminates[cite: 160]. This drops the Best Case complexity down to a perfectly linear **$O(n)$**[cite: 238].
+* **Worst/Average Case:** If the array is inversely sorted, the sentinel provides zero benefit[cite: 239, 240]. The algorithm continues to scale quadratically at **$O(n^2)$**[cite: 239, 240].
+
+  </TabItem>
+  <TabItem value="insertion" label="Direct Insertion Sort">
+
+### Core Mechanism
+Direct Insertion divides the array into two distinct, virtual sub-sequences: an **ordered sequence** on the left and an **unordered sequence** on the right[cite: 242]. At each sequential step, the algorithm takes the first element of the unordered sequence and scans backwards into the ordered section, shifting larger elements to the right to make room, and inserting the item into its corresponding position[cite: 243].
+
+```java
+public void insertionSort(int[] elements) {
+    int j;
+    int pivot;
+
+    for (int i = 1; i < elements.length; i++) {
+        pivot = elements[i];
+        j = i - 1;
+
+        while (j >= 0 && pivot < elements[j]) {
+            elements[j + 1] = elements[j]; // Shift elements right
+            j--;
+        }
+        elements[j + 1] = pivot;
+    }
+}
+```
+
+### Analytical Breakdown
+* **Operational Profile:** Best Case is **$O(n)$** when the input is pre-sorted[cite: 432]. Worst and Average cases scale quadratically at **$O(n^2)$**[cite: 433, 434].
+* **Mechanical Efficiency:** Although it shares the quadratic complexity class with Bubble Sort, Insertion Sort is substantially more efficient in absolute terms[cite: 436]. Instead of executing expensive three-step pointer swaps via `interchange()`, it utilizes a single variable holder (`pivot`) and performs fast, single-step memory shifts[cite: 436]. It performs significantly fewer raw read/write operations[cite: 436].
+
+  </TabItem>
+  <TabItem value="selection" label="Direct Selection Sort">
+
+### Core Mechanism
+Direct Selection shifts the sorting focus from data movement to position guarantees[cite: 437]. The algorithm scans the array linearly to locate the absolute lowest element, and then interchanges it directly with the first element of the sequence[cite: 437]. It then steps the boundary forward and repeats the scan on the remaining unsorted sub-array until the collection is ordered[cite: 438].
+
+```java
+public void selectionSort(int[] elements) {
+    int posMin;
+
+    for (int i = 0; i < elements.length - 1; i++) {
+        posMin = Util.findPosMin(elements, i); // Linearly locates index of lowest value
+        Util.interchange(elements, i, posMin);
+    }
+}
+```
+
+### Analytical Breakdown
+* **The Predictability Asset:** Direct Selection is entirely deterministic and predictable[cite: 547]. Its comparison loop depends strictly on the size $n$ of the array, meaning it executes exactly $\frac{n(n-1)}{2}$ comparisons regardless of whether the initial input data was sorted, random, or inverted[cite: 547, 548]. Its complexity remains locked at **$O(n^2)$** across all execution states[cite: 543, 544, 545].
+* **The Exchange Advantage:** Because it isolates the absolute lowest element *before* executing a swap, it performs a maximum of exactly $n-1$ interchanges[cite: 546]. This exceptionally low volume of memory operations makes Selection Sort highly valuable on legacy embedded systems or flash hardware where writing bytes to memory is vastly more expensive or damaging than reading them[cite: 28, 546].
+
+  </TabItem>
+</Tabs>
+
+---
+
+## Performance Disparity under Scaled Inputs
+
+To illustrate the physical variance between these elementary approaches under varying initial data states, let's examine the raw execution metrics (tracked via total structural steps) recorded when sorting arrays of sizes $n = 256$ and $n = 512$:
+
+### Benchmark Metrics ($n = 256$ elements) [cite: 902]
+
+| Algorithm | Input: Perfectly Sorted [cite: 903] | Input: Uniformly Random [cite: 904] | Input: Inversely Sorted [cite: 905] |
+| :--- | :--- | :--- | :--- |
+| **Standard Bubble Sort** [cite: 906] | $540 \text{ operations}$ [cite: 907] | $1,026 \text{ operations}$ [cite: 908] | $1,492 \text{ operations}$ [cite: 909] |
+| **Bubble Sort with Sentinel** [cite: 910] | **$5 \text{ operations}$** [cite: 911] | $1,104 \text{ operations}$ [cite: 912] | $1,645 \text{ operations}$ [cite: 913] |
+| **Direct Insertion Sort** [cite: 918] | $12 \text{ operations}$ [cite: 919] | **$366 \text{ operations}$** [cite: 920] | $704 \text{ operations}$ [cite: 921] |
+| **Direct Selection Sort** [cite: 926] | $489 \text{ operations}$ [cite: 927] | $509 \text{ operations}$ [cite: 928] | **$695 \text{ operations}$** [cite: 929] |
+
+### Benchmark Metrics ($n = 512$ elements) [cite: 942]
+
+| Algorithm | Input: Perfectly Sorted [cite: 943] | Input: Uniformly Random [cite: 944] | Input: Inversely Sorted [cite: 945] |
+| :--- | :--- | :--- | :--- |
+| **Standard Bubble Sort** [cite: 946] | $2,165 \text{ operations}$ [cite: 947] | $4,054 \text{ operations}$ [cite: 948] | $5,931 \text{ operations}$ [cite: 949] |
+| **Bubble Sort with Sentinel** [cite: 950] | **$8 \text{ operations}$** [cite: 951] | $4,270 \text{ operations}$ [cite: 952] | $6,542 \text{ operations}$ [cite: 953] |
+| **Direct Insertion Sort** [cite: 959] | $23 \text{ operations}$ [cite: 959] | **$1,444 \text{ operations}$** [cite: 960] | $2,836 \text{ operations}$ [cite: 961] |
+| **Direct Selection Sort** [cite: 966] | $1,907 \text{ operations}$ [cite: 967] | $1,956 \text{ operations}$ [cite: 968] | **$2,675 \text{ operations}$** [cite: 969] |
+
+---
+
+## Ecosystem Integration & Active Review
+
+:::tip Active Learning Checkpoint
+* **💻 Technical Lab Session:** Access the course source structure and locate the `Sorting` package[cite: 1]. Compile the provided array generators to run a real-time profiling analysis comparing the `bubbleSortWithSentinel` execution path against `insertionSort` using randomized arrays[cite: 163, 246].
+* **🤖 Query Your AI Assistant:** Open your curated **NotebookLM** workspace and execute the following targeted interactive query:  
+  > *"Based on the course benchmark data for $n=512$, explain why Direct Selection Sort maintains a nearly identical operational count between sorted ($1907$) and random ($1956$) configurations, whereas Bubble Sort with Sentinel leaps from $8$ to $4270$ operations under the same conditions."* [cite: 951, 952, 967, 968]
+:::
