@@ -1,0 +1,7 @@
+{
+  "label": "1. Foundations",
+  "link": {
+    "type": "generated-index",
+    "description": "Master the core principles of algorithmics. Learn to analyze computational complexity, understand mathematical limits using asymptotic notation, and evaluate resource efficiency through real-world case studies."
+  }
+}

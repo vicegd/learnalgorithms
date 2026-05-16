@@ -1,0 +1,135 @@
+---
+title: Algorithmic Thinking
+sidebar_position: 1
+tags: [Foundations, Introduction]
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Algorithmic Thinking
+
+Algorithmics is the heart of Computer Science. It is the art of solving problems not just by writing lines of code, but by designing **rigorous, efficient, and robust strategies**. 
+
+Before we dive into mathematical complexity analysis or advanced data structures, we must first understand what differentiates a simple program from a true "algorithm" and why this discipline defines modern software engineering.
+
+---
+
+## 1. Defining the "Algorithm"
+
+While a layperson might simplify an algorithm as a "recipe," computer science demands a much higher level of precision. Let's contrast these two perspectives to understand the requirement of determinism:
+
+| Perspective | Definition | Key Focus |
+| :--- | :--- | :--- |
+| **General (RAE)** | An ordered and finite set of operations that allows us to find the solution to a problem. | Sequential steps. |
+| **Computer Science** | A **finite sequence** of unambiguous instructions to reach the solution of a given problem in a **finite time**, for any valid set of input values. | **Universality and predictability.** |
+
+:::info The "Unambiguous" Requirement
+Unlike a cooking recipe where instructions like *"add a pinch of salt"* or *"cook until tender"* are highly subjective, a computational algorithm must be strictly deterministic. Every single step must be clear enough for a machine to execute without any room for interpretation.
+:::
+
+---
+
+## 2. Robustness and Finiteness: The Factorial Case
+
+An algorithm cannot be considered correct if it fails to guarantee a deterministic result for **every possible input** within its defined data type. 
+
+To explore this concept, let's analyze a classic mathematical problem: calculating the **Factorial of a number** ($n!$).
+
+$$n! = 1 \cdot 2 \cdot 3 \cdot \dots \cdot n$$
+
+Below, we compare two different approaches implemented in Java using Docusaurus tabs to isolate their logic.
+
+<Tabs>
+  <TabItem value="naive" label="❌ Naive Implementation" default>
+
+```java
+public static int factorial(int n) {
+    if (n == 0) return 1;
+    return n * factorial(n - 1);
+}
+```
+
+### The Pitfall
+What happens if a user passes `-1` as an argument? The function will trigger `factorial(-2)`, then `factorial(-3)`, and so on. It traps the execution in an infinite recursive loop until the system runs out of stack memory, crashing the application with a `StackOverflowError`.
+
+:::danger Execution Failure
+Since it fails to terminate for negative integers, this code does not strictly satisfy the definition of an algorithm for the entire domain of the `int` data type.
+:::
+
+  </TabItem>
+  <TabItem value="robust" label="✅ Robust Algorithm">
+
+```java
+public static int factorial(int n) {
+    if (n < 0) return -1; // Explicit error handling for invalid domains
+    if (n == 0) return 1;
+    return n * factorial(n - 1);
+}
+```
+
+### Why it works
+By explicitly controlling the boundaries of the input, we ensure that the execution path is always **finite**, predictable, and safe, regardless of what integer the user provides.
+
+:::tip Architectural Robustness
+A true engineer does not just code for the "happy path" (positive numbers). Robustness means protecting the algorithm against invalid inputs, ensuring execution stability under any circumstance.
+:::
+
+  </TabItem>
+</Tabs>
+
+<details>
+  <summary>🧠 <strong>Pedagogical Reflection: Active Retrieval</strong></summary>
+  
+  **Question:** Based on the strict definition of computer science, can a program that causes a `StackOverflowError` due to unhandled inputs be considered a proper algorithm?
+  
+  **Answer:** No. An algorithm must be a universal solution for *any* valid set of input values of its type. If it can be trapped in an infinite loop or cause an uncontrolled crash within its type domain, it is an incomplete implementation, not a robust algorithm.
+</details>
+
+---
+
+## 3. Shifting Your Paradigm: Our Main Objectives
+
+In your introductory programming courses, your primary goals were likely focused on implementation:
+* Understanding syntax and control structures.
+* Designing code that is easy to read, test, and debug.
+
+In **Algorithmics**, we shift our focus toward the core of software engineering: **optimizing resource consumption**. We design strategies that make the most efficient use of the computer's **Time** (CPU cycles) and **Memory** (RAM).
+
+As systems scale to millions of entries, the way we organize and process data becomes critical. This is why we rely on the classic computational axiom:
+
+$$\text{Program} = \text{Data Structures} + \text{Algorithms}$$
+
+---
+
+## 4. Algorithms in the Real World
+
+Algorithmics is not an abstract, purely academic exercise. It is a powerful tool that directly shapes our society, economy, and safety.
+
+:::note Case Studies of Algorithmic Impact
+* **Scientific Breakthroughs:** DeepMind’s *AlphaFold* algorithm successfully solved the 50-year-old "protein folding problem," accelerating structural biology and drug discovery by decades.
+* **Ethics and Bias:** Early machine learning models frequently inherited historical human biases. For instance, translation algorithms often associated specific professions with gender (e.g., assuming "doctor" was masculine and "nurse" was feminine). Modern algorithmic design requires active mitigation of these biases.
+* **Mission-Critical Safety:** In safety-critical hardware, a minor software oversight can be catastrophic. A famous example is the crash of the *Thales Watchkeeper WK006* military drone, where an unhandled state in the control software caused a £1m loss. In engineering, "almost correct" is still a failure.
+:::
+
+---
+
+## 5. Why We Study This
+
+1. **Universal Principles:** Frameworks and syntax trends change constantly (Java, Python, C++, Rust), but the mathematical efficiency of a well-designed algorithm remains completely unchanged across paradigms.
+2. **Cognitive Training:** It refines your ability to perform **Abstraction**—breaking down massive, complex architectural challenges into a series of smaller, independent, and solvable sub-problems.
+3. **Technical Interviews:** Elite technology firms evaluate candidates based on their algorithmic problem-solving capacity, not on their familiarity with a specific framework API.
+
+---
+
+## 🔧 Ecosystem Integration & Next Steps
+
+:::tip Workshop & AI Interaction
+* **💻 Technical Workshop:** Clone our [Official GitHub Repository](https://vicegd.github.io/algorithms/) to compile and experiment with the robust and naive versions of these foundational exercises.
+* **🤖 Interact with your AI Tutor:** Open your **NotebookLM** space and test your understanding with the following prompt:  
+  > *"Based on our course definitions, explain why the naive factorial implementation fails as a proper computer science algorithm, and propose an alternative way to handle errors without returning a negative value."*
+:::
+
+---
+
+**Next Lesson:** **[Case Study: The Max Pairwise Product](./02-case-study-pairwise.mdx)**
