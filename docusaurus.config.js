@@ -49,6 +49,8 @@ const config = {
           path: './concepts',
           routeBasePath: 'concepts',
           sidebarPath: './sidebars.js',
+          remarkPlugins: [remarkMath, remarkAutolinkConcepts],
+          rehypePlugins: [rehypeKatex],
         },
         blog: false, // hidden — content preserved in blog/ folder
         theme: {
