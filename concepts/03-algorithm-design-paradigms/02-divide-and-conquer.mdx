@@ -319,7 +319,7 @@ private int sumBySubtraction(int i, int[] v) {
 * **Complexity:** $O(n^{k+1}) = O(n^1) = O(n)$[cite: 382]. 
 * **Drawback:** It creates a deep, linear call stack that can trigger a `StackOverflowError` for large arrays.
 
-  </TabItem>
+</TabItem>
   <TabItem value="div-sum" label="Geometric Division (sum3)">
 
 ```java
@@ -339,7 +339,7 @@ private int sumByDivision(int left, int right, int[] v) {
 * **Complexity:** Since $a > b^k \implies 2 > 2^0$, it follows the leaf-dominated class: $O(n^{\log_2 2}) = O(n^1) = O(n)$[cite: 58].
 * **Advantage:** By dividing the array in half, the maximum call stack depth is strictly bounded to a safe **$O(\log n)$** layers.
 
-  </TabItem>
+</TabItem>
 </Tabs>
 
 ### Advanced Statistical Vector Reduction: Median vs. Quickselect
