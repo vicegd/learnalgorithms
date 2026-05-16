@@ -1,4 +1,4 @@
----
+﻿---
 title: Algorithmic Thinking
 sidebar_position: 1
 tags: [Foundations, Introduction, Theory]
@@ -9,7 +9,7 @@ import TabItem from '@theme/TabItem';
 
 # Introduction to Algorithmic Thinking
 
-In computational sciences, programming syntax is merely a vehicle for execution. The true engineering core lies in **Algorithmics**—the systematic study, design, and analysis of robust and efficient computational strategies. 
+In computational sciences, programming syntax is merely a vehicle for execution. The true engineering core lies in **Algorithmics**â€”the systematic study, design, and analysis of robust and efficient computational strategies. 
 
 As software engineers, our primary challenge shifts from making a program "just work" to mathematically ensuring that a strategy executes correctly and optimizes the consumption of hardware resources under arbitrary scalability.
 
@@ -46,13 +46,13 @@ A classical characterization, widely attributed to Donald Knuth, states that a p
 
 The execution must terminate after a finite number of steps for every valid input in its domain. An algorithm that can enter an endless loop for some admissible input is not complete from a formal standpoint, even if it appears to work for many test cases.[web:18][web:23]
 
-This property is stronger than simply “having a base case” in code. It requires a mathematical guarantee that the execution always progresses toward termination. In later topics, this idea will connect directly with loop invariants, recursive well-foundedness, and proofs of termination.
+This property is stronger than simply â€œhaving a base caseâ€ in code. It requires a mathematical guarantee that the execution always progresses toward termination. In later topics, this idea will connect directly with loop invariants, recursive well-foundedness, and proofs of termination.
 
 #### 2. Definiteness
 
 Every step must be specified clearly and without ambiguity. At any point during execution, the next action must be fully determined by the current state and the instruction sequence.[web:18][web:21]
 
-Instructions such as *“repeat several times”*, *“sort efficiently”*, or *“stop when the result looks reasonable”* are not algorithmic statements; they are vague intentions. A formal algorithm replaces such expressions with exact control conditions, explicit comparisons, and precisely defined state transitions.
+Instructions such as *â€œrepeat several timesâ€*, *â€œsort efficientlyâ€*, or *â€œstop when the result looks reasonableâ€* are not algorithmic statements; they are vague intentions. A formal algorithm replaces such expressions with exact control conditions, explicit comparisons, and precisely defined state transitions.
 
 #### 3. Input
 
@@ -70,7 +70,7 @@ This is why printing arbitrary values, returning sentinel values without documen
 
 Each step must be elementary enough to be carried out exactly, in finite time, by a mechanical executor. Traditionally, this means that every instruction should be basic enough that a human could perform it with paper and pencil, provided sufficient time.[web:18][web:23]
 
-The point of this property is not human practicality, but computational realism. A valid algorithm cannot contain magical steps such as *“guess the optimum solution instantly”* or *“inspect all future states at once”*. Every operation must be reducible to basic executable actions.
+The point of this property is not human practicality, but computational realism. A valid algorithm cannot contain magical steps such as *â€œguess the optimum solution instantlyâ€* or *â€œinspect all future states at onceâ€*. Every operation must be reducible to basic executable actions.
 
 ---
 
@@ -79,7 +79,7 @@ The point of this property is not human practicality, but computational realism.
 These five properties are not merely historical definitions. Together, they form the minimal contract that allows algorithmic reasoning.[web:23][web:25]
 
 - Without **finiteness**, we cannot guarantee that execution ever completes.  
-- Without **definiteness**, two programmers could implement the “same” algorithm and obtain different behaviors.  
+- Without **definiteness**, two programmers could implement the â€œsameâ€ algorithm and obtain different behaviors.  
 - Without a clear **input** domain, correctness becomes impossible to define.  
 - Without a specified **output**, success cannot be measured.  
 - Without **effectiveness**, the procedure may be a mathematical fantasy rather than a realizable computation.
@@ -103,7 +103,7 @@ A code fragment may fail to terminate on some inputs, may omit edge cases, may r
 This distinction becomes especially important in software engineering because many failures do not come from syntax errors, but from incomplete formalization. A program can compile, run, and even pass several examples while still violating one of the foundational properties above. In that sense, algorithm design begins *before* coding: it begins when we define the computational problem precisely enough to make correctness and analysis possible.[web:20][web:25]
 
 <details>
-  <summary>🧠 <strong>Pedagogical Checkpoint: Formal reasoning</strong></summary>
+  <summary>ðŸ§  <strong>Pedagogical Checkpoint: Formal reasoning</strong></summary>
 
   **Question:** Why is the statement *"compute the factorial of an integer"* not yet a complete algorithmic specification?
 
@@ -116,24 +116,24 @@ This distinction becomes especially important in software engineering because ma
 
 An implementation that functions correctly under ideal conditions but crashes when confronted with boundary inputs is not a robust algorithm. It is a partial program that works only inside a narrow comfort zone. In engineering terms, robustness requires that the algorithm preserves its formal properties (finiteness, definiteness, correctness) across the entire declared input domain and under realistic execution constraints.[web:18][web:23]
 
-To make this notion concrete, consider again the classical mathematical definition of the factorial of a non-negative integer \(n\):
+To make this notion concrete, consider again the classical mathematical definition of the factorial of a non-negative integer $n$:
 
-\[
+$$
 n! = \prod_{i=1}^{n} i = 1 \cdot 2 \cdot 3 \cdot \dots \cdot n
-\]
+$$
 
 This definition already encodes several important facts:
 
 - The domain of the function is typically taken to be the set of non-negative integers.  
-- The base case is \(0! = 1\).  
-- The value \(n!\) grows rapidly as \(n\) increases, which has implications for overflow and resource usage.  
+- The base case is $0! = 1$.  
+- The value $n!$ grows rapidly as $n$ increases, which has implications for overflow and resource usage.  
 
 When we translate this mathematical object into code, the goal is not merely to obtain *some* implementation that returns correct values for a few test cases. The goal is to implement an algorithm whose behavior is well-defined for every input in the chosen domain, and whose interaction with the underlying machine respects the constraints of the execution environment.[web:20][web:23]
 
 ---
 
 <Tabs>
-  <TabItem value="naive" label="❌ Naive Implementation" default>
+  <TabItem value="naive" label="âŒ Naive Implementation" default>
 
 ```java
 public static int factorial(int n) {
@@ -144,7 +144,7 @@ public static int factorial(int n) {
 
 ### Where the naive version fails
 
-At first glance, this implementation appears correct: it encodes the recurrence \(n! = n \cdot (n - 1)!\) with the standard base case \(0! = 1\), and it terminates cleanly for all non-negative integers \(n\) that are small enough to avoid overflow in the `int` type.[web:20][web:23]
+At first glance, this implementation appears correct: it encodes the recurrence $n! = n \cdot (n - 1)!$ with the standard base case $0! = 1$, and it terminates cleanly for all non-negative integers $n$ that are small enough to avoid overflow in the `int` type.[web:20][web:23]
 
 However, notice what happens when the method is called with a negative argument, for example `n = -1`:
 
@@ -166,11 +166,11 @@ Since the recursion depth grows without bound when `n < 0`, the number of active
 Although the code looks simple, it violates the **finiteness** property on part of its input domain. There exist valid values of the Java primitive type `int` for which the execution does not terminate in a finite number of steps, and instead triggers a low-level runtime failure. In other words, what appears to be an algorithm is, in fact, only a partial procedure.[web:18][web:23]
 :::
 
-This example illustrates an important engineering lesson: *correctness on a few “nice” inputs is not enough*. Without explicit domain handling and guard conditions, a seemingly harmless function can destabilize the entire process by exhausting stack memory.
+This example illustrates an important engineering lesson: *correctness on a few â€œniceâ€ inputs is not enough*. Without explicit domain handling and guard conditions, a seemingly harmless function can destabilize the entire process by exhausting stack memory.
 
   </TabItem>
 
-  <TabItem value="robust" label="✅ Robust Algorithm">
+  <TabItem value="robust" label="âœ… Robust Algorithm">
 
 ```java
 public static int factorial(int n) {
@@ -188,13 +188,13 @@ This revised implementation introduces an explicit guard for negative inputs and
 - **Guaranteed progress:** For every `n >= 0`, the recursive calls systematically decrease the argument until the base case `n == 0` is reached, ensuring termination.
 - **Controlled failure mode:** Instead of allowing the runtime to crash with a `StackOverflowError` after arbitrarily many nested calls, the algorithm fails fast with a meaningful, high-level error that can be handled by the caller.
 
-From the perspective of Knuth’s properties, this version restores finiteness and definiteness across the entire input domain:
+From the perspective of Knuthâ€™s properties, this version restores finiteness and definiteness across the entire input domain:
 
 - The control flow is unambiguous for every integer value of `n`.  
 - For all admissible inputs (`n >= 0`), the algorithm terminates after a finite number of steps.  
 - For inadmissible inputs (`n < 0`), the behavior is specified: an exception is thrown immediately.[web:18][web:23]
 
-This is what is meant by **structural robustness** at the algorithmic level: the execution lifecycle remains well-defined and under control, even in the presence of hostile or unexpected inputs. The algorithm does not rely on “good behavior” from users or clients; instead, it defends the integrity of the runtime stack and the rest of the system by enforcing its contract proactively.
+This is what is meant by **structural robustness** at the algorithmic level: the execution lifecycle remains well-defined and under control, even in the presence of hostile or unexpected inputs. The algorithm does not rely on â€œgood behaviorâ€ from users or clients; instead, it defends the integrity of the runtime stack and the rest of the system by enforcing its contract proactively.
 
 :::tip Architectural Robustness
 In practice, robust software is not built by assuming that invalid inputs will never happen. It is built by designing algorithms whose execution lifecycle is explicitly guarded, whose domains are clearly stated, and whose failure modes are predictable and bounded. This approach reduces the probability that a local bug or an unhandled edge case escalates into a crash or a security vulnerability at system level.[web:20][web:25]
@@ -204,7 +204,7 @@ In practice, robust software is not built by assuming that invalid inputs will n
 </Tabs>
 
 <details>
-  <summary>🧠 <strong>Pedagogical Checkpoint: Tail calls and finiteness</strong></summary>
+  <summary>ðŸ§  <strong>Pedagogical Checkpoint: Tail calls and finiteness</strong></summary>
 
   **Question:** Suppose we implement `factorial` in a language with Tail Call Optimization (TCO), where recursive calls in tail position do not allocate new stack frames. Would TCO alone make the naive implementation correct for negative inputs?
 
@@ -219,8 +219,8 @@ The factorial function is not only a good example of structural robustness; it i
 
 We are interested in two basic measures:
 
-- **Time complexity \(T(n)\):** how many basic operations are executed as a function of the input size \(n\).  
-- **Space complexity \(S(n)\):** how much additional memory (beyond the input and output) is required during execution, in particular on the call stack.[web:38][web:50]
+- **Time complexity $T(n)$:** how many basic operations are executed as a function of the input size $n$.  
+- **Space complexity $S(n)$:** how much additional memory (beyond the input and output) is required during execution, in particular on the call stack.[web:38][web:50]
 
 To keep the model simple at this point in the course, we assume a **RAM model** where:
 
@@ -241,25 +241,25 @@ public static int factorial(int n) {
 }
 ```
 
-For the purpose of time analysis, we focus on the behavior for admissible inputs \(n \geq 0\), and we treat the exception for \(n < 0\) as a constant-time guard.[web:37][web:40]
+For the purpose of time analysis, we focus on the behavior for admissible inputs $n \geq 0$, and we treat the exception for $n < 0$ as a constant-time guard.[web:37][web:40]
 
-If \(T(n)\) denotes the time cost of `factorial(n)` (measured in units of basic operations), then:
+If $T(n)$ denotes the time cost of `factorial(n)` (measured in units of basic operations), then:
 
-- When \(n = 0\), the method performs one comparison and returns immediately. This is a constant amount of work: \(T(0) = \Theta(1)\).[web:37][web:44]
-- When \(n > 0\), the method performs:
+- When $n = 0$, the method performs one comparison and returns immediately. This is a constant amount of work: $T(0) = \Theta(1)$.[web:37][web:44]
+- When $n > 0$, the method performs:
   - a comparison `n == 0`,  
   - a recursive call `factorial(n - 1)`,  
   - one multiplication `n * ...`.  
 
-Each of these steps, except the recursive call, has constant cost. Therefore, \(T(n)\) satisfies the recurrence:
+Each of these steps, except the recursive call, has constant cost. Therefore, $T(n)$ satisfies the recurrence:
 
-\[
+$$
 T(0) = \Theta(1), \quad T(n) = T(n - 1) + \Theta(1) \text{ for } n > 0.
-\]
+$$
 
 Expanding this recurrence:
 
-\[
+$$
 \begin{aligned}
 T(n) &= T(n - 1) + \Theta(1) \\
      &= T(n - 2) + \Theta(1) + \Theta(1) \\
@@ -267,15 +267,15 @@ T(n) &= T(n - 1) + \Theta(1) \\
      &\dots \\
      &= T(0) + n \cdot \Theta(1).
 \end{aligned}
-\]
+$$
 
-Since \(T(0)\) is constant, the dominant term is linear in \(n\). Thus:
+Since $T(0)$ is constant, the dominant term is linear in $n$. Thus:
 
-\[
+$$
 T(n) = \Theta(n),
-\]
+$$
 
-which means that the time complexity of the recursive factorial is **linear** in the value of \(n\). Intuitively, this matches the control flow: the function performs exactly one recursive call per unit decrement of \(n\) until reaching 0.[web:37][web:40][web:44]
+which means that the time complexity of the recursive factorial is **linear** in the value of $n$. Intuitively, this matches the control flow: the function performs exactly one recursive call per unit decrement of $n$ until reaching 0.[web:37][web:40][web:44]
 
 ---
 
@@ -291,23 +291,23 @@ In this implementation of factorial:
 - The method does not allocate additional data structures beyond its parameter and local variables, so auxiliary space is constant.  
 - However, each recursive call adds one activation record to the stack until the base case is reached.[web:41][web:50]
 
-For \(n \geq 0\):
+For $n \geq 0$:
 
 - The call sequence is `factorial(n)`, `factorial(n-1)`, `factorial(n-2)`, ..., `factorial(0)`.  
-- The maximum recursion depth is therefore \(n + 1\) (including the base case).[web:41][web:47]
+- The maximum recursion depth is therefore $n + 1$ (including the base case).[web:41][web:47]
 - Each frame has constant size (fixed set of parameters, locals, and return address).
 
-If \(S(n)\) denotes the stack space used by `factorial(n)`, we obtain:
+If $S(n)$ denotes the stack space used by `factorial(n)`, we obtain:
 
-\[
+$$
 S(n) = \Theta(n),
-\]
+$$
 
-that is, the space complexity due to recursion is **linear** in \(n\). The deeper the recursion, the more stack frames are held simultaneously before unwinding.[web:41][web:50]
+that is, the space complexity due to recursion is **linear** in $n$. The deeper the recursion, the more stack frames are held simultaneously before unwinding.[web:41][web:50]
 
 This observation connects directly with the robustness discussion:
 
-- For valid inputs, the stack height grows linearly with \(n\), which is acceptable for moderate values but may hit limits for very large \(n\).  
+- For valid inputs, the stack height grows linearly with $n$, which is acceptable for moderate values but may hit limits for very large $n$.  
 - For invalid negative inputs in the naive implementation, the recursion depth was unbounded, leading to a stack overflow. The robust version avoids this by rejecting invalid inputs immediately.[web:11][web:47]
 
 ---
@@ -327,20 +327,20 @@ public static int factorialIterative(int n) {
 }
 ```
 
-- The loop executes exactly \(n\) iterations, each performing a constant amount of work. The time complexity is again \(T(n) = \Theta(n)\).[web:37][web:47]
-- However, the stack usage is now constant: there is only one activation record for the method, regardless of \(n\), and the loop body reuses the same local variables in each iteration.[web:49][web:50]
+- The loop executes exactly $n$ iterations, each performing a constant amount of work. The time complexity is again $T(n) = \Theta(n)$.[web:37][web:47]
+- However, the stack usage is now constant: there is only one activation record for the method, regardless of $n$, and the loop body reuses the same local variables in each iteration.[web:49][web:50]
 
 In other words:
 
-- **Recursive factorial:** \(T(n) = \Theta(n)\), \(S(n) = \Theta(n)\).  
-- **Iterative factorial:** \(T(n) = \Theta(n)\), \(S(n) = \Theta(1)\).
+- **Recursive factorial:** $T(n) = \Theta(n)$, $S(n) = \Theta(n)$.  
+- **Iterative factorial:** $T(n) = \Theta(n)$, $S(n) = \Theta(1)$.
 
 This contrast shows why algorithm design must consider both **time** and **space**. Two implementations can have the same asymptotic time complexity but very different memory footprints and failure modes. In later topics, this distinction will become critical when working with large input sizes and limited hardware resources.[web:38][web:45]
 
 <details>
-  <summary>🧠 <strong>Pedagogical Checkpoint: Complexity intuition</strong></summary>
+  <summary>ðŸ§  <strong>Pedagogical Checkpoint: Complexity intuition</strong></summary>
 
-  **Question:** Why is it not enough to say that “both versions of factorial take linear time”, without looking at their space usage?
+  **Question:** Why is it not enough to say that â€œboth versions of factorial take linear timeâ€, without looking at their space usage?
 
   **Answer:** Because, although the number of operations grows linearly in both cases, the recursive version also consumes linear stack space, which may cause runtime failures (stack overflows) for large inputs. The iterative version keeps stack usage constant, making it more robust in environments with strict memory limits. Time complexity captures only one dimension of efficiency; in practice, engineers must evaluate both time and space behavior.[web:41][web:50]
 </details>
@@ -351,7 +351,7 @@ This contrast shows why algorithm design must consider both **time** and **space
 
 In early programming courses, success is often measured by a simple criterion: *does the program work on the given examples?* Once syntax errors are fixed and the output looks correct, the task is considered complete. In professional software engineering, this standard is dangerously low.[web:38][web:45]
 
-As soon as systems grow beyond toy problems, the central question shifts from *“does the code run?”* to *“how does the code scale?”*. A solution that processes ten elements comfortably may fail catastrophically, or become economically unviable, when confronted with millions of inputs, concurrent users, or strict latency constraints.[web:38]
+As soon as systems grow beyond toy problems, the central question shifts from *â€œdoes the code run?â€* to *â€œhow does the code scale?â€*. A solution that processes ten elements comfortably may fail catastrophically, or become economically unviable, when confronted with millions of inputs, concurrent users, or strict latency constraints.[web:38]
 
 ---
 
@@ -359,10 +359,10 @@ As soon as systems grow beyond toy problems, the central question shifts from *�
 
 To reason about scalability, algorithmics introduces two fundamental measures:
 
-- **Time complexity \(T(n)\):** how the running time grows as a function of the input size \(n\).  
-- **Space complexity \(S(n)\):** how the memory usage grows as a function of the input size \(n\).[web:38][web:50]
+- **Time complexity $T(n)$:** how the running time grows as a function of the input size $n$.  
+- **Space complexity $S(n)$:** how the memory usage grows as a function of the input size $n$.[web:38][web:50]
 
-The exact units (milliseconds, megabytes) depend on the platform, but the asymptotic behavior is platform-independent. If one algorithm has time complexity \(\Theta(n)\) and another \(\Theta(n^2)\), the quadratic one will eventually lose by orders of magnitude, no matter how fast the hardware or how optimized the compiler.[web:38][web:45]
+The exact units (milliseconds, megabytes) depend on the platform, but the asymptotic behavior is platform-independent. If one algorithm has time complexity $\Theta(n)$ and another $\Theta(n^2)$, the quadratic one will eventually lose by orders of magnitude, no matter how fast the hardware or how optimized the compiler.[web:38][web:45]
 
 To study this behavior systematically, algorithmics typically assumes a simple **RAM model**:
 
@@ -376,23 +376,23 @@ This abstraction allows us to focus on structural growth patterns (linear, quadr
 
 ### Asymptotic notation: focusing on growth
 
-To compare algorithms at scale, we use **asymptotic notation** such as \(O(\cdot)\), \(\Theta(\cdot)\), and \(\Omega(\cdot)\).[web:38][web:48]
+To compare algorithms at scale, we use **asymptotic notation** such as $O(\cdot)$, $\Theta(\cdot)$, and $\Omega(\cdot)$.[web:38][web:48]
 
-- \(O(f(n))\) describes an **upper bound** (time or space grows at most like \(f(n)\) up to constant factors).  
-- \(\Omega(f(n))\) describes a **lower bound** (it grows at least like \(f(n)\)).  
-- \(\Theta(f(n))\) means that the growth is both \(O(f(n))\) and \(\Omega(f(n))\): tightly bounded, up to constant factors.[web:38]
+- $O(f(n))$ describes an **upper bound** (time or space grows at most like $f(n)$ up to constant factors).  
+- $\Omega(f(n))$ describes a **lower bound** (it grows at least like $f(n)$).  
+- $\Theta(f(n))$ means that the growth is both $O(f(n))$ and $\Omega(f(n))$: tightly bounded, up to constant factors.[web:38]
 
 For example:
 
-- A simple loop that scans an array once has time complexity \(\Theta(n)\).  
-- A nested loop that scans all pairs of elements in an array of size \(n\) has time complexity \(\Theta(n^2)\).  
-- Binary search on a sorted array runs in \(\Theta(\log n)\) time by repeatedly halving the search space.[web:45][web:48]
+- A simple loop that scans an array once has time complexity $\Theta(n)$.  
+- A nested loop that scans all pairs of elements in an array of size $n$ has time complexity $\Theta(n^2)$.  
+- Binary search on a sorted array runs in $\Theta(\log n)$ time by repeatedly halving the search space.[web:45][web:48]
 
 These asymptotic classes are not just mathematical curiosities. They determine whether a program that runs in 1 second on 1,000 elements will still be usable on 10 million elements, or whether it will take hours.
 
 ---
 
-### Beyond “working code”: design as resource management
+### Beyond â€œworking codeâ€: design as resource management
 
 From this point on in the course, algorithmic design will be approached as **resource management** rather than mere syntax manipulation.[web:38][web:50]
 
@@ -413,9 +413,9 @@ In subsequent topics, similar trade-offs will appear in more complex settings: s
 
 A classical maxim in computer science states that:
 
-\[
+$$
 \text{Program} = \text{Data Structures} + \text{Algorithms}.
-\]
+$$
 
 This equation, often attributed to Niklaus Wirth, captures a deep design principle: efficient software emerges from the **interaction** between the way data is organized and the way operations are defined on that data.[web:45][web:48]
 
@@ -430,8 +430,8 @@ This equation, often attributed to Niklaus Wirth, captures a deep design princip
 Consider three simple scenarios:
 
 - **Searching:**  
-  - Linear search on an unsorted array: \(\Theta(n)\) time, \(\Theta(1)\) extra space.  
-  - Binary search on a sorted array: \(\Theta(\log n)\) time, but requires maintaining the array in sorted order.  
+  - Linear search on an unsorted array: $\Theta(n)$ time, $\Theta(1)$ extra space.  
+  - Binary search on a sorted array: $\Theta(\log n)$ time, but requires maintaining the array in sorted order.  
   Here, the algorithm (search strategy) and the data structure (sorted vs. unsorted) jointly determine performance.[web:45][web:48]
 
 - **Dynamic collections:**  
@@ -440,11 +440,11 @@ Consider three simple scenarios:
   Choosing between them depends on which operations are frequent in the target application.[web:45]
 
 - **Maps and dictionaries:**  
-  - Hash tables offer average-case \(\Theta(1)\) lookups but no inherent ordering.  
-  - Balanced search trees offer \(\Theta(\log n)\) lookups and maintain elements in sorted order.  
+  - Hash tables offer average-case $\Theta(1)$ lookups but no inherent ordering.  
+  - Balanced search trees offer $\Theta(\log n)$ lookups and maintain elements in sorted order.  
   Again, the right choice depends on whether ordering, worst-case guarantees, or average-case speed is more important.[web:45][web:48]
 
-The key point is that **algorithmics never studies algorithms in a vacuum**. It always assumes a data model and a set of operations of interest. The “best” algorithm is always relative to a particular combination of data, operations, and constraints.
+The key point is that **algorithmics never studies algorithms in a vacuum**. It always assumes a data model and a set of operations of interest. The â€œbestâ€ algorithm is always relative to a particular combination of data, operations, and constraints.
 
 ---
 
@@ -458,14 +458,14 @@ Several contemporary case studies illustrate this vividly.
 
 ### Scientific breakthroughs: AlphaFold and protein folding
 
-The **protein folding problem**—predicting the three-dimensional structure of a protein from its amino-acid sequence—was considered an open challenge for decades because of the astronomical number of possible conformations.[web:7][web:13]
+The **protein folding problem**â€”predicting the three-dimensional structure of a protein from its amino-acid sequenceâ€”was considered an open challenge for decades because of the astronomical number of possible conformations.[web:7][web:13]
 
-DeepMind’s **AlphaFold** combined advanced learning architectures, attention mechanisms, and algorithmic tricks for representing spatial constraints to approximate these structures with high accuracy in hours or minutes.[web:7][web:10][web:13]
+DeepMindâ€™s **AlphaFold** combined advanced learning architectures, attention mechanisms, and algorithmic tricks for representing spatial constraints to approximate these structures with high accuracy in hours or minutes.[web:7][web:10][web:13]
 
 - What previously required years of experimental work for a single protein can now be approximated at unprecedented scale.  
 - The result is a transformative acceleration in areas such as structural biology and drug discovery, where structural predictions guide experimental design.[web:7][web:10]
 
-This is a prime example of how better algorithms—not just faster hardware—can redefine what problems are practically solvable.
+This is a prime example of how better algorithmsâ€”not just faster hardwareâ€”can redefine what problems are practically solvable.
 
 ---
 
@@ -490,7 +490,7 @@ From a formal perspective, this means expanding the specification of an algorith
 
 ### Mission-critical systems and safety
 
-In mission-critical domains—such as aerospace, medical devices, and industrial control—algorithmic failures can cause physical damage, financial loss, or loss of life.[web:30][web:35]
+In mission-critical domainsâ€”such as aerospace, medical devices, and industrial controlâ€”algorithmic failures can cause physical damage, financial loss, or loss of life.[web:30][web:35]
 
 Real-world incidents highlight this risk:
 
@@ -504,7 +504,7 @@ To mitigate these risks, high-assurance sectors rely on:
 - formal verification techniques to prove properties such as bounded response time or absence of certain failure modes;  
 - defensive design patterns that ensure local failures are contained and do not propagate as catastrophic system-wide faults.[web:29][web:30]
 
-In such contexts, an algorithm that is “99% correct” is not acceptable. The remaining 1% of unhandled cases can correspond precisely to the rare combinations of inputs that trigger catastrophic failures.
+In such contexts, an algorithm that is â€œ99% correctâ€ is not acceptable. The remaining 1% of unhandled cases can correspond precisely to the rare combinations of inputs that trigger catastrophic failures.
 
 ---
 
@@ -516,7 +516,7 @@ These examples illustrate why algorithmic thinking is central to modern software
 - It exposes **trade-offs** between time, space, correctness, fairness, and safety.  
 - It connects abstract reasoning with tangible impact in science, industry, and society.[web:38][web:45]
 
-In the remainder of this course, each new data structure or algorithmic technique—divide-and-conquer, greedy strategies, dynamic programming, graph algorithms—will be presented not only as a coding pattern, but as a way to shape the resource and correctness profile of complex systems.
+In the remainder of this course, each new data structure or algorithmic techniqueâ€”divide-and-conquer, greedy strategies, dynamic programming, graph algorithmsâ€”will be presented not only as a coding pattern, but as a way to shape the resource and correctness profile of complex systems.
 
 ---
 
@@ -525,10 +525,10 @@ In the remainder of this course, each new data structure or algorithmic techniqu
 Studying algorithmics is not about memorizing a catalog of tricks. It is about internalizing a way of thinking that remains valuable even as languages, frameworks, and platforms change.
 
 1. **Language and framework invariance**  
-   Programming ecosystems evolve constantly: today’s Java, Python, C++ or Rust will eventually be replaced or reshaped by new technologies. By contrast, the asymptotic behavior of an \(O(n \log n)\) sorting algorithm, or an \(O(\log n)\) search strategy, is a mathematical property that does not depend on syntax or APIs. Once you understand why a particular strategy scales better, that insight remains valid across languages, compilers, and hardware generations.
+   Programming ecosystems evolve constantly: todayâ€™s Java, Python, C++ or Rust will eventually be replaced or reshaped by new technologies. By contrast, the asymptotic behavior of an $O(n \log n)$ sorting algorithm, or an $O(\log n)$ search strategy, is a mathematical property that does not depend on syntax or APIs. Once you understand why a particular strategy scales better, that insight remains valid across languages, compilers, and hardware generations.
 
 2. **Mathematical abstraction**  
-   Algorithmic thinking trains you to look past the surface details of code—variable names, library calls, syntactic sugar—and focus on the underlying structure of the problem. You learn to see patterns such as “divide and conquer”, “greedy choice”, or “dynamic programming” in very different domains, from text processing to networking to machine learning. This abstraction layer separates *architecture* (what needs to be computed and how it scales) from *implementation details* (how a particular language expresses it).
+   Algorithmic thinking trains you to look past the surface details of codeâ€”variable names, library calls, syntactic sugarâ€”and focus on the underlying structure of the problem. You learn to see patterns such as â€œdivide and conquerâ€, â€œgreedy choiceâ€, or â€œdynamic programmingâ€ in very different domains, from text processing to networking to machine learning. This abstraction layer separates *architecture* (what needs to be computed and how it scales) from *implementation details* (how a particular language expresses it).
 
 3. **Architectural evaluation**  
    Algorithmics provides tools to evaluate whether a proposed design can scale *before* committing to a full implementation. By analyzing how time and space requirements grow with input size, you can detect potential bottlenecks early, compare alternative designs on paper, and avoid investing months in architectures that will not meet performance or resilience goals once deployed. In this sense, algorithmic analysis plays a similar role to structural analysis in civil engineering: it lets you test the design before building the bridge.
@@ -540,12 +540,12 @@ Algorithmic thinking becomes much more powerful when it is connected with practi
 
 :::tip Practical Application
 
-- **💻 Technical Lab:** Clone our [Official Course GitHub Repository](https://vicegd.github.io/algorithms/) and run the provided projects. Use these labs to:
+- **ðŸ’» Technical Lab:** Clone our [Official Course GitHub Repository](https://vicegd.github.io/algorithms/) and run the provided projects. Use these labs to:
   - compile and execute both recursive and iterative factorial implementations,  
   - manipulate the stack size (for example, via the `-Xss` flag in the JVM),  
   - observe empirically how recursion depth and stack limits interact, and relate these observations to the finiteness and space complexity analyses developed in this chapter.
 
-- **🤖 Query your AI assistant:** Open your **NotebookLM** (or equivalent) workspace, load the curated course materials, and use it as a sandbox for active retrieval. For example, you can ask:
+- **ðŸ¤– Query your AI assistant:** Open your **NotebookLM** (or equivalent) workspace, load the curated course materials, and use it as a sandbox for active retrieval. For example, you can ask:
 
   > *"Based on Knuth's properties of an algorithm, perform a rigorous analysis explaining how the naive factorial method breaks the rules of computational design when given a negative integer."*
 
