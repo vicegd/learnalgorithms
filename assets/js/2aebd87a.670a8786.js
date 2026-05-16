@@ -1,1 +1,0 @@
-"use strict";(globalThis.webpackChunklearnalgorithms=globalThis.webpackChunklearnalgorithms||[]).push([[609],{3844(a){a.exports=JSON.parse('{"tags":[{"label":"Foundations","permalink":"/concepts/tags/foundations","count":1},{"label":"Introduction","permalink":"/concepts/tags/introduction","count":1}]}')}}]);
