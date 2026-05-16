@@ -1,8 +1,203 @@
 ---
-sidebar_position: 3
 title: Greedy Algorithms
+sidebar_position: 3
+tags: [Paradigms, Greedy, Optimization, Heuristics]
 ---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 # Greedy Algorithms
 
-*Coming soon.*
+Unlike general programming strategies that explore multiple alternative paths, **Greedy Algorithms** are designed strictly for optimization problems where the goal is to maximize or minimize a specific objective function. 
+
+The core operational philosophy of a greedy strategy is short-sighted and immediate: **at each sequential step, the algorithm locks in the decision that appears to be locally optimal at that exact moment, hoping that these choices will ultimately culminate in a globally optimal solution.**
+
+---
+
+## Formal Mathematical Structure of a Greedy Strategy
+
+To design a mathematically rigorous greedy algorithm, we abstract the problem environment into a systematic framework composed of five core functional components:
+
+* **The Candidate Set ($C$):** The complete collection of initial elements, resources, or decisions out of which a final solution must be constructed.
+* **The Selection Function (Heuristic Rule):** The core criterion or weight metric used to evaluate the remaining candidates. It identifies the most promising element to ingest at the current step.
+* **The Feasibility Function:** A validation check that evaluates whether a selected candidate can be safely added to the partial solution without violating any structural constraints of the problem.
+* **The Objective Function:** The underlying optimization metric (the cost, profit, distance, or weight) that the system is attempting to maximize or minimize.
+* **The Solution Function:** A boolean control check that determines when a valid, complete solution has been successfully constructed from the selected elements.
+
+### The Mathematical Optimization Goal
+Given a candidate selection path, a greedy algorithm attempts to build a subset of elements $S \subseteq C$ that satisfies the constraints of the feasibility function while optimally driving the value of the objective function:
+
+$$\text{Maximize or Minimize } z = f(S)$$
+
+---
+
+## The Irreversibility Principle & The State Space Tree
+
+The most defining architectural feature of a greedy algorithm is its absolute **irreversibility**. 
+
+When looking at a problem through a **State Space Tree** (a virtual or fictitious tree representing every possible sequence of decisions), alternative paradigms like Backtracking explore a branch, detect a dead-end, and perform expensive memory monitoring operations to undo choices and backtrack up the tree.
+
+```text
+               [ Root: Initial State ]
+                         │
+                 Greedy Selection
+                         ▼
+                [ Local Optimum 1 ]
+                         │
+                 Greedy Selection
+                         ▼
+                [ Local Optimum 2 ] ──► (No Backtracking Allowed!)
+                         │
+                         ▼
+                [ Final Leaf Solution ]
+```
+
+A greedy algorithm completely eliminates this monitoring overhead. It develops exactly **one single path** from the root to a leaf node. 
+* Once a candidate is chosen and integrated into the partial solution, that decision is permanent.
+* It is never reconsidered, re-evaluated, or undone. 
+
+:::danger The Heuristic Dependency
+Because greedy decisions are irreversible, the global correctness of the algorithm depends entirely on the quality of its underlying heuristic rule. If the heuristic is flawed or lacks specific mathematical properties, the algorithm will fall into a **Local Optimum trap**, yielding a sub-optimal or completely incorrect global result.
+:::
+
+---
+
+## Interactive Learning Checkpoint
+
+Let's evaluate your understanding of optimization limits using the live interactive scenarios from our Vevox lecture hall slides:
+
+<details>
+  <summary>📊 <strong>Vevox Interactive Case 1: Minimal Spanning Trees (Prim's Algorithm)</strong></summary>
+
+**Question:** Which algorithmic technique is guaranteed to obtain the absolute **globally optimal** solution for Prim's Minimum Spanning Tree problem?
+
+* **Option A:** Greedy Algorithms
+* **Option B:** Backtracking
+* **Option C:** Branch and Bound
+* **Option D:** All of them
+
+**Lecture Hall Analysis:** Prim's algorithm is a textbook example of a greedy triumph. 
+
+**Detailed Solution:**
+The correct answer is **Option D: All of them** (with Greedy being the most efficient). 
+* While exact methods like Backtracking or Branch and Bound *can* find the optimal solution by exhaustively searching the state space, **Prim's greedy strategy is mathematically proven to always achieve the global optimum directly**. 
+* This guarantee holds true because the problem of finding a Minimum Spanning Tree satisfies specific algebraic structures known as *Matroids*, where local optimal choices (choosing the cheapest edge connecting an unvisited vertex) are mathematically safe and never require backtracking.
+
+</details>
+
+<details>
+  <summary>📊 <strong>Vevox Interactive Case 2: The Agent Task Assignment Problem</strong></summary>
+
+**Question:** Consider the Generalized Assignment Problem, where you must allocate $n$ tasks to $m$ distinct agents under strict resource constraints. Which technique is guaranteed to secure the **globally optimal** solution?
+
+* **Option A:** Greedy Algorithms
+* **Option B:** Divide and Conquer
+* **Option C:** Backtracking and Branch and Bound
+
+**Detailed Solution:**
+The correct answer is **Option C: Backtracking and Branch and Bound**.
+* Task assignment under resource constraints is an NP-hard combinatorially explosive problem. 
+* A simple greedy heuristic (such as always assigning the remaining task to the cheapest available agent) will complete extremely quickly, but it **does not guarantee a globally optimal solution**. It will inevitably get trapped in a sub-optimal arrangement because early irreversible decisions leave later tasks stranded with highly inefficient options. To guarantee perfection, exact exploration techniques like Backtracking or Branch and Bound are required.
+
+</details>
+
+<details>
+  <summary>📊 <strong>Vevox Interactive Case 3: Execution Velocity vs. Solution Quality</strong></summary>
+
+**Question:** Which technique is the **fastest** to execute when solving the complex problem of assigning tasks to agents?
+
+* **Option A:** Greedy Algorithms
+* **Option B:** Divide and Conquer
+* **Option C:** Backtracking
+* **Option D:** Branch and Bound
+
+**Detailed Solution:**
+The correct answer is **Option A: Greedy Algorithms**.
+* Even though a greedy approach might yield a sub-optimal solution for the task assignment problem, its computational velocity is unmatched. 
+* Because it navigates exactly one path down the state space tree without ever backtracking or branching into sub-trees, a greedy algorithm operates within a safe polynomial runtime boundary (typically $O(n^2)$ or $O(n \log n)$). Exact methods like Backtracking exhibit exponential execution growth curves ($O(2^n)$ or $O(n!)$), rendering them unusable for massive live industrial datasets.
+
+</details>
+
+---
+
+## Algorithmic Case Study: The Fractional vs. Discrete Knapsack
+
+To contrast the absolute necessity of heuristic validation, let's explore the classic **Knapsack Problem** across two structural variants: the *Fractional Knapsack* (where greedy succeeds) and the *0/1 Discrete Knapsack* (where greedy fails).
+
+### Problem Blueprint
+You are an engineer configuring a cargo allocation pipeline. You have a container with a strict maximum weight capacity $W$, and a set of items, where each item $i$ has a weight $w_i$ and a profit value $p_i$. Your goal is to maximize the total profit value.
+
+### The Greedy Heuristic: Profit-to-Weight Ratio
+A highly reliable greedy heuristic is to calculate the **density value** or profit-per-unit-weight ratio ($\rho_i$) for every single candidate:
+
+$$\rho_i = \frac{p_i}{w_i}$$
+
+The algorithm sorts the candidates descending based on $\rho_i$ and ingests them sequentially.
+
+<Tabs>
+  <TabItem value="fractional" label="✅ Fractional Knapsack (Greedy Success)" default>
+
+In the fractional variant, you can break items into fractions (e.g., liquid cargo, raw minerals, grains). If the remaining capacity of the knapsack cannot hold the entire next item, you simply slice it and take exactly what fits to top off the weight limit.
+
+```java
+public class FractionalKnapsack {
+    public static double getMaxSizeGreedy(double capacity, Item[] items) {
+        // 1. Sort items descending based on their density ratio (p_i / w_i)
+        Arrays.sort(items, (a, b) -> Double.compare(b.getRatio(), a.getRatio()));
+
+        double totalProfit = 0.0;
+        
+        for (Item item : items) {
+            if (capacity - item.weight >= 0) {
+                // Ingest the entire item
+                capacity -= item.weight;
+                totalProfit += item.profit;
+            } else {
+                // Ingest the exact remaining fraction
+                double fraction = capacity / item.weight;
+                totalProfit += (item.profit * fraction);
+                break; // Knapsack is perfectly full
+            }
+        }
+        return totalProfit;
+    }
+}
+```
+
+#### Analytical Verdict
+Because item breaking is allowed, sorting by profit-to-weight ratio guarantees a globally optimal solution. The time complexity is dominated entirely by the sorting step, running in an efficient **$O(n \log n)$** linearithmic profile.
+
+  </TabItem>
+  <TabItem value="discrete" label="❌ 0/1 Discrete Knapsack (Greedy Failure)">
+
+In the 0/1 discrete variant, items are indivisible items (e.g., laptops, engines, art pieces). You must either take an item entirely ($1$) or leave it completely ($0$). Slicing is physically impossible.
+
+#### The Local Optimum Trap Example
+Imagine a knapsack with a maximum capacity of **$W = 100\text{ kg}$**, and three competing candidates:
+* **Item A:** $\text{Weight} = 20\text{ kg}$, $\text{Profit} = 100 \implies \rho_A = 5.0$
+* **Item B:** $\text{Weight} = 50\text{ kg}$, $\text{Profit} = 200 \implies \rho_B = 4.0$
+* **Item C:** $\text{Weight} = 50\text{ kg}$, $\text{Profit} = 200 \implies \rho_C = 4.0$
+
+Let's trace how the greedy selection path operates compared to the absolute mathematical global truth:
+
+* **The Greedy Path:** It targets the highest ratio first, taking **Item A** ($20\text{ kg}$, Profit $100$). The remaining capacity drops to $80\text{ kg}$. Next, it takes **Item B** ($50\text{ kg}$, Profit $200$). The capacity drops to $30\text{ kg}$. It looks at Item C, but it weighs $50\text{ kg}$, so it fails the feasibility test and is rejected. The algorithm terminates.
+  $$\text{Greedy Total Profit} = 100 + 200 = \mathbf{300}$$
+* **The Global Optimal Path:** If an exact algorithm rejects Item A entirely, it can ingest **Item B** and **Item C** concurrently ($50\text{ kg} + 50\text{ kg} = 100\text{ kg}$).
+  $$\text{Global Total Profit} = 200 + 200 = \mathbf{400}$$
+
+#### Analytical Verdict
+For the 0/1 Discrete variant, the greedy strategy **fails** to secure the global optimum. It gets trapped by its early irreversible choice. To solve this specific problem configuration optimally, engineers must pivot to **Dynamic Programming** or **Branch and Bound**.
+
+  </TabItem>
+</Tabs>
+
+---
+
+## Ecosystem Integration & Active Review
+
+:::tip Concept Consolidation
+* **💻 Technical Lab Session:** Access your local repository and open the `Paradigms/Greedy` package. Run the automated execution harness to benchmark how the fractional greedy solver processes a massive collection of $500,000$ pseudo-randomized items in milliseconds, and examine the code structure for custom element sorting.
+* **🤖 Query Your AI Assistant:** Open your **NotebookLM** interactive learning workspace and execute the following targeted verification prompt:  
+  > *"Based on the course taxonomy of algorithm design paradigms, contrast the concept of a State Space Tree as used in Greedy algorithms versus exact exploration techniques. Explain why the irreversibility of choices makes Greedy exceptionally fast but structurally vulnerable to local optima traps."*
+:::

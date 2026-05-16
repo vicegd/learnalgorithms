@@ -1,8 +1,225 @@
 ---
-sidebar_position: 4
 title: Dynamic Programming
+sidebar_position: 4
+tags: [Paradigms, Dynamic Programming, Optimization, Memoization, Tabulation]
 ---
 
-# Dynamic Programming
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
-*Coming soon.*
+# The Dynamic Programming Paradigm
+
+The **Dynamic Programming (DP)** paradigm stands as one of the most advanced and elegant optimization frameworks in Computer Science. Its core engineering philosophy can be summarized by a classic software axiom: *those who cannot remember the past are condemned to repeat it*. 
+
+This strategy was specifically engineered to overcome the structural limitations that the Divide and Conquer approach encounters when applied to complex problems where subproblems are heavily interdependent.
+
+---
+
+## The Structural Limits of Divide and Conquer
+
+The Divide and Conquer paradigm is exceptionally efficient when a problem can be decomposed into completely isolated, disjoint subproblems (such as sorting independent halves in *MergeSort*). However, it catastrophically collapses under two specific architectural conditions:
+
+* **Overlapping Subproblems:** This occurs when the recursive decomposition scheme repeatedly generates the exact same subproblem instances across different branches of the execution tree.
+* **Non-Polynomial Combinatorial Explosion:** Because the system blindly recalculates the same partial solutions over and over, the time complexity shifts from polynomial to exponential. This rapidly exhausts the thread stack and locks up the hardware environment indefinitely.
+
+Dynamic Programming bypasses this execution bottleneck by introducing a systematic storage rule: **each unique subproblem is solved exactly once, and its result is cached inside an indexed data structure (a table or matrix) for instant, constant-time ($O(1)$) retrieval.**
+
+---
+
+## Mathematical Prerequisites for DP
+
+To confidently classify an optimization problem as a candidate for Dynamic Programming, it must rigorously satisfy two fundamental mathematical properties:
+
+* **Optimal Substructure:** An optimal solution to the global problem instance must inherently contain within itself the absolute optimal solutions to each of its constituent subproblems.
+* **Overlapping Subproblems:** The execution tree must manifest severe structural redundancy, proving that the absolute catalog of unique subproblems is drastically smaller than the total volume of recursive calls.
+
+### Architectural Approaches: Top-Down vs. Bottom-Up
+
+Engineers rely on two distinct implementation strategies to deploy a Dynamic Programming pipeline:
+
+| Approach | Operational Mechanism | Engineering Trade-offs |
+| :--- | :--- | :--- |
+| **Top-Down (Memoization)** | Maintains the natural recursive structure of the problem. Before executing any state computation, it queries the lookup table; if the result is cached, it returns instantly; if not, it computes it recursively and updates the cache. | **Advantages:** Only computes the subproblems strictly necessary to reach the root solution. <br/>**Disadvantages:** Retains the high call-stack overhead of nested activation records. |
+| **Bottom-Up (Tabulation)** | Eliminates recursion entirely. The pipeline is built iteratively using nested loops, solving the smallest, trivial base-case subproblems first and progressively filling the table upward toward the target state. | **Advantages:** Highly efficient at the CPU level due to the removal of recursive stack-frame controls. <br/>**Disadvantages:** Forces the complete resolution of the state matrix, even if some cells do not influence the final root solution. |
+
+---
+
+## Case Study: The Fibonacci Sequence
+
+The Fibonacci recurrence relation perfectly showcases the performance disparity between pure recursive decomposition and a stabilized Dynamic Programming pipeline:
+
+$$F(n) = F(n-1) + F(n-2), \quad \forall n > 1$$
+
+When evaluating a moderate state like $n = 6$, a pure Divide and Conquer approach expands into a tree containing **18 total subproblem executions**. However, an analytical audit reveals that **only 7 of these are unique subproblems**. The remaining 11 calls are completely redundant calculations that waste CPU cycles.
+
+<Tabs>
+  <TabItem value="dv-fib" label="❌ Divide and Conquer Approach" default>
+
+```java
+public long fibonacciDV(int n) {
+    if (n == 0) return 0;
+    if (n == 1) return 1;
+    return fibonacciDV(n - 1) + fibonacciDV(n - 2);
+}
+```
+
+#### Performance Profile
+* **Time Complexity:** Exponential, bounded between $O(2^{n/2})$ and $O(2^n)$.
+* **System Impact:** Evaluating $n = 50$ requires days of continuous processing because the runtime tree duplicates billions of identical state computations.
+
+  </TabItem>
+  <TabItem value="pd-fib" label="✅ Dynamic Programming Approach">
+
+```java
+public long fibonacciPD(int n) {
+    if (n <= 1) return n;
+    
+    // Lookup table to store verified states and block duplication
+    long[] table = new long[n + 1];
+    table[0] = 0;
+    table[1] = 1;
+    
+    // Iterative incremental construction (Bottom-Up Tabulation)
+    for (int i = 2; i <= n; i++) {
+        table[i] = table[i - 1] + table[i - 2];
+    }
+    
+    return table[n];
+}
+```
+
+#### Performance Profile
+* **Time Complexity:** Perfectly linear, **$O(n)$**.
+* **Space Complexity:** **$O(n)$** to maintain the structural state table (which can be optimized down to $O(1)$ space by tracking only the two preceding states in scalar variables).
+* **System Impact:** Computes $n = 50$ and far beyond instantaneously in microseconds.
+
+  </TabItem>
+</Tabs>
+
+---
+
+## Case Study: The Combinations Problem
+
+Computing binomial coefficients—determining how many unique subsets of size $k$ can be formed from a total set of $n$ elements—relies on the recursive properties of Pascal's Triangle:
+
+$$C(n, k) = C(n-1, k-1) + C(n-1, k), \quad \text{where } 0 < k < n$$
+
+To map this problem to a Bottom-Up Dynamic Programming architecture, we construct a two-dimensional grid where rows represent the total set size ($n$) and columns represent the subset selection size ($k$).
+
+```java
+public class CombinationsDP {
+    public static long computeCoefficient(int n, int k) {
+        if (k == 0 || k == n) return 1;
+        
+        long[][] matrix = new long[n + 1][k + 1];
+        
+        // Populate boundary conditions of the state space
+        for (int i = 0; i <= n; i++) {
+            matrix[i][0] = 1;
+            if (i <= k) {
+                matrix[i][i] = 1;
+            }
+        }
+        
+        // Iteratively compute the matrix layers bottom-up
+        for (int i = 2; i <= n; i++) {
+            for (int j = 1; j <= Math.min(i - 1, k); j++) {
+                matrix[i][j] = matrix[i - 1][j - 1] + matrix[i - 1][j];
+            }
+        }
+        
+        return matrix[n][k];
+    }
+}
+```
+
+---
+
+## Case Study: The 0/1 Discrete Knapsack Problem
+
+In our previous module, we mathematically proved that Greedy Algorithms fail to solve the **Discrete (0/1) Knapsack Problem**, as early, irreversible choices trap the execution inside sub-optimal configurations. Dynamic Programming provides the definitive exact solver for this challenge.
+
+### Design of the Matrix Optimization Space
+Given a set of $n$ indivisible objects and a maximum weight boundary $W$, we construct a state matrix `M[i][w]`. This grid stores the maximum attainable profit value utilizing a subset of the first $i$ items under a transient, intermediate weight constraint $w$.
+
+For every single item encountered, the algorithm evaluates an optimal binary choice:
+1. **Exclude the Item:** The profit value is inherited directly from the cell immediately above it: `M[i-1][w]`.
+2. **Include the Item:** The profit of the current item is added to the optimal profit achievable with the remaining capacity: `profit[i] + M[i-1][w - weight[i]]`.
+
+The formal state transition equation is defined as:
+
+$$M[i][w] = \max\left(M[i-1][w], \text{profit}[i] + M[i-1][w - \text{weight}[i]]\right)$$
+
+```java
+public class KnapsackDP {
+    public static int solveKnapsack(int maxWeight, int[] weights, int[] profits, int objects) {
+        int[][] M = new int[objects + 1][maxWeight + 1];
+        
+        // Initialize base conditions with zero (trivial states)
+        for (int w = 0; w <= maxWeight; w++) M[0][w] = 0;
+        for (int i = 0; i <= objects; i++) M[i][0] = 0;
+        
+        // Systematic evaluation of the combinatorial space
+        for (int i = 1; i <= objects; i++) {
+            for (int w = 1; w <= maxWeight; w++) {
+                if (weights[i - 1] <= w) {
+                    // Evaluate opportunity cost: is inclusion superior?
+                    M[i][w] = Math.max(M[i - 1][w], profits[i - 1] + M[i - 1][w - weights[i - 1]]);
+                } else {
+                    // Item exceeds transient capacity, force exclusion
+                    M[i][w] = M[i - 1][w];
+                }
+            }
+        }
+        return M[objects][maxWeight];
+    }
+}
+```
+
+---
+
+## Lecture Hall Interactive Checkpoints
+
+Validate your analytical grasp using the actual interactive questions pulled directly from our Vevox lecture slides:
+
+<details>
+  <summary>📊 <strong>Vevox Slide Case 1: Complexity of the Combinations Grid</strong></summary>
+
+**Question:** What is the exact asymptotic time complexity for solving the Combinations problem (given $n$ elements taken $k$ at a time) using Tabulation-based Dynamic Programming?
+
+* **Option A:** $O(n \cdot \log n)$
+* **Option B:** $O(n^2)$
+* **Option C:** $O(n)$
+* **Option D:** $O(n \cdot k)$
+
+**Detailed Solution:**
+The correct answer is **Option D: $O(n \cdot k)$**. 
+When tabulating the state space of the binomial coefficient, the algorithm executes a nested double loop that systematically fills a matrix of dimensions $n \times k$. Because each cell computation executes an elementary scalar addition taking constant time ($O(1)$), the total execution scaling is strictly determined by the product of the structural dimensions of the matrix.
+
+</details>
+
+<details>
+  <summary>📊 <strong>Vevox Slide Case 2: The Discrete Knapsack Boundary</strong></summary>
+
+**Question:** What is the exact structural runtime complexity for solving the 0/1 Discrete Knapsack problem using a tabulated matrix approach?
+
+* **Option A:** $O(n)$
+* **Option B:** $O(n \cdot \log n)$
+* **Option C:** $O(n^3)$
+* **Option D:** $O(\text{maxWeight} \cdot \text{objects})$
+
+**Detailed Solution:**
+The correct answer is **Option D: $O(\text{maxWeight} \cdot \text{objects})$**.
+Unlike purely polynomial complexities, the Dynamic Programming solver for the 0/1 Knapsack depends directly on the magnitude of the numerical integer provided as the maximum capacity weight (`maxWeight`). This specific operational signature is classified as **Pseudo-polynomial time**. If the weight capacity scales to extreme proportions, the storage matrix scales along with it, highlighting the memory-for-time trade-off core to DP design.
+
+</details>
+
+---
+
+## Ecosystem Integration & Active Review
+
+:::tip Technical Lab Session
+* **💻 Profiling Cache Memory:** Navigate to the `Paradigms/DynamicProgramming` package inside the repository. Execute the `FibonacciBenchmark` harness and modify the thread stack boundaries (`-Xss`) to observe how Tabulation completely insulates the operating system from call-stack exhaustion while maintaining linear processing metrics.
+* **🤖 Query Your AI Tutor:** Open your **NotebookLM** environment and pass this precise verification prompt to test your architectural awareness:  
+  > *"Analyze the transition rule of the 0/1 Knapsack problem implemented via Tabulation. Explain how the historical records stored inside the matrix prevent the system from getting trapped by local optima, and discuss the architectural implications of pseudo-polynomial growth on RAM consumption."*
+:::

@@ -1,8 +1,197 @@
 ---
-sidebar_position: 61
-title: Parallel Algorithms
+title: Parallel Algorithms & Frameworks
+sidebar_position: 1
+tags: [Advanced Execution, Parallelism, Concurrency, Fork-Join, Java]
 ---
 
-# Parallel Algorithms
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
-*Coming soon.*
+# Parallel Algorithms and Execution Models
+
+Up to this point in our computer science curriculum, we have evaluated computational strategies under a **sequential execution model**, assuming a single central processing unit (CPU) running one machine instruction at a time. However, modern hardware architectures scale processing power by adding physical compute cores rather than raw clock speed. 
+
+To build enterprise-level, highly scalable infrastructure, software engineers must design algorithms capable of safely breaking a workload apart to execute across multiple hardware registers simultaneously.
+
+---
+
+## Concurrency vs. Parallelism
+
+A frequent point of confusion among software developers is the exact boundary between concurrent computing and parallel computing. While they appear similar, they represent completely different operational strategies:
+
+* **Concurrent Computing:** Focuses on managing the execution of two or more distinct tasks over a given timeframe on one or more CPUs. It represents the *logical structure* of the application. For instance, when an application handles a heavy file save operation in the background while keeping the user interface interactive, it is operating concurrently. Even on a single-core CPU, the operating system gives the illusion of simultaneous progress by rapidly switching between tasks (interleaving sentences).
+* **Parallel Computing:** Focuses on executing multiple instructions *at the exact same physical instant* across distinct processing blocks. It represents the *physical execution* of the application. True parallelism requires multi-core or multi-processor hardware environments, where instructions literally stream through separate silicon architectures synchronously.
+
+---
+
+## The Operating System Core Abstractions
+
+To bridge the gap between abstract parallel algorithms and physical silicon, modern operating systems expose three nested operational boundaries:
+
+* **Process:** An isolated execution environment created by the operating system. A process owns its private memory space, runtime environment, and environment variables. Because of this structural isolation, communicating between different processes requires heavy overhead (Inter-Process Communication - IPC).
+* **Thread:** A basic unit of execution that lives strictly within exactly one process. Multiple threads belonging to the same process run independently but share the process's allocated resources, system files, and heap memory space space. Threads are highly lightweight compared to processes, but sharing memory introduces synchronization hazards.
+* **Task:** An abstract, logical piece of business logic or small unit of execution designed to be processed by a thread.
+
+The operating system scheduler is responsible for mapping software threads onto physical CPU cores. When writing parallel code, engineers must synchronize thread interactions carefully to prevent catastrophic system state issues, such as **Race Conditions** or **Deadlocks** (where threads block each other indefinitely while attempting to access shared system resources).
+
+---
+
+## The Java Fork/Join Architecture
+
+Managing low-level raw native threads (`java.lang.Thread`) manually introduces major architectural complexities and optimization bottlenecks. To seamlessly align the **Divide and Conquer** paradigm with multi-core CPUs, Java introduces the **Fork/Join Framework**.
+
+The framework uses a specialized thread pool configuration called the **`ForkJoinPool`**. This architecture implements a **Work-Stealing Algorithm**: if a worker thread exhausts its assigned queue of subtasks, it actively reaches across the hardware grid to "steal" pending tasks from the queues of other busy threads, ensuring **100%** utilization of all available hardware cores.
+
+The execution model builds upon two core operations:
+* **`fork()`:** Launches a subtask asynchronously to run on a parallel thread.
+* **`join()`:** Halts the current thread execution until the targeted subtask completes, reading its result if one exists.
+
+---
+
+## Implementation Primitives
+
+When engineering parallel tasks using this framework, you extend custom structural classes based on whether your algorithmic process needs to yield an integrated value.
+
+<Tabs>
+  <TabItem value="action" label="⚡ No Return Value (RecursiveAction)" default>
+
+Extend **`RecursiveAction`** when your parallel algorithm performs an in-place transformation on a dataset or modifies memory directly without needing to return an aggregated computation value.
+
+```java
+import java.util.concurrent.RecursiveAction;
+
+public class ParallelVectorModifier extends RecursiveAction {
+    private final int[] vector;
+    private final int left, right;
+    private static final int THRESHOLD = 1000; // Structural grain size
+
+    public ParallelVectorModifier(int[] vector, int left, int right) {
+        this.vector = vector;
+        this.left = left;
+        this.right = right;
+    }
+
+    @Override
+    protected void compute() {
+        // Base Case: Task is small enough for simple sequential execution
+        if ((right - left) <= THRESHOLD) {
+            for (int i = left; i <= right; i++) {
+                vector[i] *= 2; // In-place transformation
+            }
+        } else {
+            // Divide Step
+            int mid = left + (right - left) / 2;
+            ParallelVectorModifier leftSubtask = new ParallelVectorModifier(vector, left, mid);
+            ParallelVectorModifier rightSubtask = new ParallelVectorModifier(vector, mid + 1, right);
+
+            // Conquer Step: Run the left subtask asynchronously on a parallel core
+            leftSubtask.fork(); 
+            
+            // Execute the right subtask right here on the current thread
+            rightSubtask.compute(); 
+
+            // Combine Step: Wait for the parallel fork to finish processing
+            leftSubtask.join(); 
+        }
+    }
+}
+```
+
+  </TabItem>
+  <TabItem value="task" label="📊 Returns a Value (RecursiveTask)">
+
+Extend **`RecursiveTask<V>`** when your parallel algorithm maps to a classic Divide and Conquer pipeline that must explicitly aggregate and synthesize subsols into an integrated result value.
+
+```java
+import java.util.concurrent.RecursiveTask;
+
+public class ParallelVectorAggregator extends RecursiveTask<Long> {
+    private final int[] vector;
+    private final int left, right;
+    private static final int THRESHOLD = 1000;
+
+    public ParallelVectorAggregator(int[] vector, int left, int right) {
+        this.vector = vector;
+        this.left = left;
+        this.right = right;
+    }
+
+    @Override
+    protected Long compute() {
+        // Base Case
+        if ((right - left) <= THRESHOLD) {
+            long localSum = 0;
+            for (int i = left; i <= right; i++) {
+                localSum += vector[i];
+            }
+            return localSum;
+        }
+
+        // Divide Step
+        int mid = left + (right - left) / 2;
+        ParallelVectorAggregator leftSubtask = new ParallelVectorAggregator(vector, left, mid);
+        ParallelVectorAggregator rightSubtask = new ParallelVectorAggregator(vector, mid + 1, right);
+
+        // Conquer Step
+        leftSubtask.fork(); // Asynchronous launch
+        long rightResult = rightSubtask.compute(); // Synchronous execution
+
+        // Combine Step: Retrieve the parallel result and merge the solutions
+        long leftResult = leftSubtask.join(); 
+        return leftResult + rightResult;
+    }
+}
+```
+
+  </TabItem>
+</Tabs>
+
+---
+
+## Lecture Hall Interactive Checkpoints
+
+Test your understanding of multi-core runtime architectures using these actual interactive questions pulled directly from our Vevox lecture slides:
+
+<details>
+  <summary> Neuromorphic Class Test 1: Fork/Join Without Values</summary>
+
+**Question:** Which class do we need to extend in order to work with the Fork/Join framework when we DO NOT expect to return a value?
+
+* **Option A:** `ForkJoinPool`
+* **Option B:** `RecursiveTask<V>`
+* **Option C:** `RecursiveAction`
+* **Option D:** `ForkJoinTask<V>`
+
+**Detailed Solution:**
+The correct answer is **Option C: `RecursiveAction`**. 
+* The Fork/Join architecture uses two distinct subclasses of `ForkJoinTask`. 
+* When your task represents a pure computational operation that alters state or data in-place without needing to return a value, you extend `RecursiveAction`. Its `compute()` method returns `void`.
+
+</details>
+
+<details>
+  <summary> Neuromorphic Class Test 2: Fork/Join Value Aggregation</summary>
+
+**Question:** Which class do we need to extend in order to work with the Fork/Join framework when we expect to return a value?
+
+* **Option A:** `ForkJoinPool`
+* **Option B:** `RecursiveTask<V>`
+* **Option C:** `RecursiveAction`
+* **Option D:** `ForkJoinTask<V>`
+
+**Detailed Solution:**
+The correct answer is **Option B: `RecursiveTask<V>`**.
+* When your parallel algorithm corresponds to an aggregation, reduction, or synthesis pipeline (like calculating a vector sum, matching keys, or building a structured tree), the task must pass a return object back up the stack. 
+* Extending `RecursiveTask<V>` forces you to define a type parameter `V`, changing the return signature of your `compute()` block to that specific object type.
+
+</details>
+
+---
+
+## Ecosystem Integration & Active Review
+
+:::tip Advanced Technical Challenge
+* **💻 Technical Lab Session:** Head to the `ExecutionModels/Parallel` package in your IDE workspace. Run the performance benchmark file `ParallelBenchmark.java`. Adjust the structural `THRESHOLD` value from $10$ up to $1,000,000$ to map out the exact performance point where the overhead of threading changes from an asset to a liability.
+* **🤖 Query Your AI Tutor:** Open your **NotebookLM** interactive classroom workspace and run this specific verification prompt:  
+  > *"Compare concurrency and parallelism using the definitions from our course foundations. Explain why executing a `RecursiveTask<V>` on a hardware layout with only one single core will provide zero physical speedup, and detail the workflow of Java's Work-Stealing algorithm inside the `ForkJoinPool`."*
+:::
