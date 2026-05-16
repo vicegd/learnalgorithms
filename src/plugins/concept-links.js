@@ -13,8 +13,8 @@
  */
 
 const CONCEPT_LINKS = {
-  'brute force':  '/concepts/design-paradigms/brute-force',
-  'brute-force':  '/concepts/design-paradigms/brute-force',
+  'brute force':  '/concepts/algorithm-design-paradigms/brute-force',
+  'brute-force':  '/concepts/algorithm-design-paradigms/brute-force',
 };
 
 export default CONCEPT_LINKS;

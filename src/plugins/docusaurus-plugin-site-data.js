@@ -146,7 +146,7 @@ export default function pluginSiteData(context) {
             scanConcepts(fullPath, toLabel(entry.name));
           } else if (entry.name.endsWith('.mdx') && !SKIP.has(entry.name)) {
             const content = fs.readFileSync(fullPath, 'utf-8');
-            const slug = path.basename(entry.name, '.mdx');
+            const slug = path.basename(entry.name, '.mdx').replace(/^\d+-/, '');
             const categorySlug = category ? toSlug(category) : null;
             const url = categorySlug
               ? `/concepts/${categorySlug}/${slug}`
