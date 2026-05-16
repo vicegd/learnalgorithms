@@ -1,0 +1,149 @@
+---
+title: Searching Case Studies
+sidebar_position: 5
+tags: [Searching, Algorithms, Binary Search, Big-O]
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Case Studies in Search Algorithms
+
+We have established the mathematical foundations of complexity analysis and asymptotic notation. Now, we will apply these engineering principles to one of the most fundamental operations in computer science: **Information Retrieval (Searching)**.
+
+In this section, we will analyze three different architectural approaches to finding an element within a dataset, counting their exact CPU instructions, and evaluating their Big-O efficiency.
+
+---
+
+## Standard Sequential Search
+
+The most intuitive way to find a target value in an unsorted collection is to inspect every single element from beginning to end. 
+
+```java showLineNumbers
+public static boolean sequentialSearch(int[] list, int target) {
+    int i = 0;
+    int n = list.length - 1;
+    
+    // highlight-next-line
+    while ((i <= n) && (list[i] != target)) {
+        i++;
+    }
+    
+    if (i == n + 1) return false;
+    else return true;
+}
+```
+
+### Analytical Breakdown
+Let's analyze the exact operations required for this algorithm. Notice line 6: the `while` loop condition contains **two logical evaluations** per iteration: checking if the index is within bounds (`i <= n`), and checking if the value matches (`list[i] != target`).
+
+<Tabs>
+  <TabItem value="best" label="🟢 Best Case" default>
+    **The target is at the very first position (`list[0]`).**
+    The loop evaluates its conditions once, finds the match instantly, and breaks.
+    * $T(n)_{best} = 6 \text{ operations}$ 
+    * **Asymptotic Class: $O(1)$**
+  </TabItem>
+  <TabItem value="worst" label="🔴 Worst Case">
+    **The target does not exist in the array.**
+    The algorithm is forced to traverse the entire array. The loop conditions and the `i++` increment execute $n$ times.
+    * $T(n)_{worst} = 3n + 5 \text{ operations}$
+    * **Asymptotic Class: $O(n)$**
+  </TabItem>
+</Tabs>
+
+---
+
+## The Sentinel Optimization
+
+In the standard search, the CPU spends a massive amount of time just checking if it has reached the end of the array (`i <= n`). What if we could mathematically guarantee that the loop will *always* find the target, thus eliminating the need for the bounds check?
+
+We can achieve this using a **Sentinel**: we artificially append the target value to the very end of our dataset before starting the search.
+
+```java showLineNumbers
+public static boolean sentinelSearch(List<Integer> list, int target) {
+    // highlight-next-line
+    list.add(target); // Place the Sentinel at index n
+    int i = 0;
+    
+    // highlight-next-line
+    while (list.get(i) != target) {
+        i++;
+    }
+    
+    // If we stopped exactly at the Sentinel, it wasn't in the original data
+    if (i == list.size() - 1) return false;
+    else return true;
+}
+```
+
+### The Power of Micro-Optimization
+Because the Sentinel guarantees a match, we completely removed the `(i <= n)` condition. Let's look at the new Worst Case scenario (when the item was not originally in the list):
+
+* $T(n)_{worst} = 2n + 5 \text{ operations}$
+* **Asymptotic Class: $O(n)$**
+
+:::info Asymptotic vs. Absolute Efficiency
+Both the Standard and Sentinel searches belong to the linear $O(n)$ complexity class. However, in a real-world hardware execution, **the Sentinel algorithm is roughly 33% faster**. This proves that while Big-O is vital for scaling architecture, constant factors ($2n$ vs. $3n$) still matter deeply in low-level CPU optimization.
+:::
+
+---
+
+## Binary (Dichotomous) Search
+
+Sequential searches are acceptable for small arrays, but catastrophic for databases with billions of records. If we enforce a strict **precondition**—the array must be sorted beforehand—we can unlock a vastly superior architectural strategy: **Divide and Conquer**.
+
+Instead of checking elements one by one, we inspect the middle element. If our target is smaller, we mathematically discard the entire right half of the array. We repeat this halving process until we find the target.
+
+```java
+public static boolean binarySearch(int[] sortedList, int target) {
+    int left = 0;
+    int right = sortedList.length - 1;
+    
+    while (left <= right) {
+        int mid = left + (right - left) / 2;
+        
+        if (sortedList[mid] == target) return true;
+        
+        // Discard half of the search space
+        if (sortedList[mid] < target) left = mid + 1;
+        else right = mid - 1;
+    }
+    return false;
+}
+```
+
+### Logarithmic Deduction
+In the worst-case scenario (the element doesn't exist), how many times can a loop execute if the search space is cut in half every iteration? 
+The progression of the search space size is: $n \rightarrow \frac{n}{2} \rightarrow \frac{n}{4} \rightarrow \dots \rightarrow 1$.
+
+Mathematically, the number of times you can divide $n$ by 2 until you reach 1 is the base-2 logarithm of $n$. 
+
+* $T(n)_{worst} = 5 + 5 \log_2 n \text{ operations}$
+* **Asymptotic Class: $O(\log n)$**
+
+:::tip The Scale of O(log n)
+If you have an array of **$1,000,000,000$ (1 billion) elements**, a sequential search takes 1 billion operations. A Binary Search will find the element (or prove it doesn't exist) in a maximum of **30 operations**. This is the zenith of algorithmic efficiency.
+:::
+
+---
+
+## Bridge to Sorting Algorithms
+
+As we have just proven with Binary Search, having a sorted dataset unlocks extreme performance gains. In the next section of this course, we will focus entirely on **Sorting Algorithms**. 
+
+To prepare for evaluating sorting strategies, you must familiarize yourself with three critical design properties:
+
+1. **Space Complexity (In-Place vs. Out-of-Place):** Does the algorithm sort the elements directly within the original array ($O(1)$ extra space), or does it require cloning the data into temporary auxiliary arrays ($O(n)$ space)?
+2. **Stability:** If two elements have the exact same sorting key (e.g., two students with a grade of `8.5`), does the algorithm preserve their original relative order? This is vital for multi-level database queries.
+3. **Adaptivity:** Is the algorithm smart enough to realize that an array is already partially sorted and finish early (yielding an $O(n)$ best case), or does it stubbornly execute $O(n^2)$ operations regardless of the initial state?
+
+---
+
+## Ecosystem Integration & Active Review
+
+:::note Workshop Preparation
+* **💻 Technical Lab:** Explore the `Searching` directory in our [Course GitHub Repository](https://vicegd.github.io/algorithms/) to see how the Sentinel pattern is implemented in different programming languages.
+* **🤖 Query Your AI Assistant:** Open **NotebookLM** and submit the following prompt to test your grasp on architectural trade-offs:  
+  > *"If Binary Search is so much faster ($O(\log n)$) than Sequential Search ($O(n)$), explain the architectural reasons why a software engineer might still choose to use Sequential Search in a specific system design."*
+:::
