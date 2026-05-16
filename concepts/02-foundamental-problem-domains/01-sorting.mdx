@@ -124,7 +124,7 @@ public void bubbleSort(int[] elements) {
 * **The Inefficiency:** The standard implementation is completely blind to the state of the data[cite: 158]. Even if the array becomes perfectly sorted on the very first pass, the outer loop stubbornly forces the inner loop to continue executing all subsequent passes, repeating redundant comparisons across already ordered sequences[cite: 158].
 * **Asymptotic Profile:** $O(n^2)$ across **all** cases (Best, Worst, and Average)[cite: 153, 154, 155]. It suffers from an extremely high volume of memory interchanges and comparisons[cite: 156, 157].
 
-  </TabItem>
+</TabItem>
   <TabItem value="bubble-sentinel" label="Optimized Bubble Sort">
 
 ### Core Mechanism
@@ -152,7 +152,7 @@ public void bubbleSortWithSentinel(int[] elements) {
 * **Best Case Improvement:** If given an array that is already completely sorted, the algorithm executes the inner loop exactly once, performs $n-1$ comparisons, detects zero changes, and terminates[cite: 160]. This drops the Best Case complexity down to a perfectly linear **$O(n)$**[cite: 238].
 * **Worst/Average Case:** If the array is inversely sorted, the sentinel provides zero benefit[cite: 239, 240]. The algorithm continues to scale quadratically at **$O(n^2)$**[cite: 239, 240].
 
-  </TabItem>
+</TabItem>
   <TabItem value="insertion" label="Direct Insertion Sort">
 
 ### Core Mechanism
@@ -180,7 +180,7 @@ public void insertionSort(int[] elements) {
 * **Operational Profile:** Best Case is **$O(n)$** when the input is pre-sorted[cite: 432]. Worst and Average cases scale quadratically at **$O(n^2)$**[cite: 433, 434].
 * **Mechanical Efficiency:** Although it shares the quadratic complexity class with Bubble Sort, Insertion Sort is substantially more efficient in absolute terms[cite: 436]. Instead of executing expensive three-step pointer swaps via `interchange()`, it utilizes a single variable holder (`pivot`) and performs fast, single-step memory shifts[cite: 436]. It performs significantly fewer raw read/write operations[cite: 436].
 
-  </TabItem>
+</TabItem>
   <TabItem value="selection" label="Direct Selection Sort">
 
 ### Core Mechanism
@@ -201,7 +201,7 @@ public void selectionSort(int[] elements) {
 * **The Predictability Asset:** Direct Selection is entirely deterministic and predictable[cite: 547]. Its comparison loop depends strictly on the size $n$ of the array, meaning it executes exactly $\frac{n(n-1)}{2}$ comparisons regardless of whether the initial input data was sorted, random, or inverted[cite: 547, 548]. Its complexity remains locked at **$O(n^2)$** across all execution states[cite: 543, 544, 545].
 * **The Exchange Advantage:** Because it isolates the absolute lowest element *before* executing a swap, it performs a maximum of exactly $n-1$ interchanges[cite: 546]. This exceptionally low volume of memory operations makes Selection Sort highly valuable on legacy embedded systems or flash hardware where writing bytes to memory is vastly more expensive or damaging than reading them[cite: 28, 546].
 
-  </TabItem>
+</TabItem>
 </Tabs>
 
 ---

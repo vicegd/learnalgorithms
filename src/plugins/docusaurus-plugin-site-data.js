@@ -137,7 +137,7 @@ export default function pluginSiteData(context) {
 
       // ── Concepts ───────────────────────────────────────────────────────────
       const conDir = path.join(siteDir, 'concepts');
-      const SKIP = new Set(['index.mdx', 'glossary.mdx', 'roadmap.mdx']);
+      const SKIP = new Set(['index.mdx', 'glossary.mdx']);
 
       function scanConcepts(dir, category) {
         for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
