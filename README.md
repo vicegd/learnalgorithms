@@ -137,5 +137,5 @@ University of Oviedo
 
 ## 📜 License
 
-MIT License — Copyright (c) 2026 Vicente García Díaz  
-See [LICENSE](LICENSE) file for details
+Copyright (c) 2026 Vicente García Díaz — All Rights Reserved.  
+See [LICENSE](LICENSE) file for details.
