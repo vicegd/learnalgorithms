@@ -524,7 +524,7 @@ One of the main strengths of backtracking is that it usually uses much less memo
 The main memory cost comes from the recursion stack and from the information associated with the current partial solution. If the maximum depth of the recursion tree is $h$ and each recursive frame uses constant memory, then the auxiliary space required by the stack is:
 
 $$
-M_{\text{stack}} = O(h)
+M_{\\text{stack}} = O(h)
 $$
 
 This happens because backtracking explores one branch at a time. It does not need to keep all branches in memory simultaneously; it only stores the active path from the root to the current node, together with the local data needed to undo decisions when necessary.
@@ -580,7 +580,7 @@ In short:
 
 Some classical problems where backtracking is taught and applied are:
 
-- **N-Queens:** place $n$ queens on an $n \times n$ board so that no two queens attack each other.
+- **N-Queens:** place $n$ queens on an $n \\times n$ board so that no two queens attack each other.
 - **Subset Sum:** determine whether a subset of numbers sums to a target value.
 - **Graph Coloring:** assign colors to the vertices of a graph using a limited number of colors without creating conflicts between adjacent vertices.
 - **Hamiltonian Cycle:** find a cycle that visits each vertex exactly once.
