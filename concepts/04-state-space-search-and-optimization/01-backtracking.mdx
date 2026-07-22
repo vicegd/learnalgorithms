@@ -7,7 +7,7 @@ tags: [Paradigms, State Space Search, Backtracking, Graphs, DFS]
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# The Backtracking Paradigm
+# Backtracking
 
 Backtracking is an algorithmic paradigm used to solve problems in which the number of possible candidate solutions is very large, but many of those candidates can be discarded early because they violate some constraint. The central idea is simple: **construct a solution step by step, and as soon as a partial solution cannot possibly lead to a valid complete solution, abandon it and return to the previous step**.
 
@@ -44,7 +44,7 @@ If we solve it by naive brute force:
 
 This means that even a moderately sized instance can generate a search space that is far beyond what can be explored exhaustively in practice. And this is only counting the number of arrangements; in real problems, each arrangement also has to be checked against the constraints, which adds even more work.
 
-The key idea is that **not every partial arrangement is worth exploring**. In a magic square, for example, once a row sum, column sum, or diagonal sum already makes a valid final solution impossible, there is no reason to continue extending that candidate. Backtracking takes advantage of exactly this fact: it detects impossible partial assignments as soon as they appear and stops exploring that branch immediately [1][3].
+The key idea is that **not every partial arrangement is worth exploring**. In a magic square, for example, once a row sum, column sum, or diagonal sum already makes a valid final solution impossible, there is no reason to continue extending that candidate. Backtracking takes advantage of exactly this fact: it detects impossible partial assignments as soon as they appear and stops exploring that branch immediately.
 
 So the main difference is:
 - **Brute force:** generate every complete candidate and check it at the end.
@@ -56,26 +56,32 @@ In other words, brute force wastes time exploring configurations that were doome
 
 ## State-space search
 
-Backtracking is usually understood as a **state-space search** technique. In this framework, each problem configuration is modeled as a state, and solving the problem means moving through a space of states until a goal state is found.
+To understand backtracking more precisely, it is useful to view the problem as a search through a space of states. This perspective makes it easier to formalize how the algorithm explores partial solutions, how it generates new candidates, and why invalid branches can be discarded early.
+
+Backtracking is usually understood as a **state-space search** technique. In this framework, each problem configuration is modeled as a state, and solving the problem means moving through a space of states until a goal state is found. A state can represent a complete solution, a partial solution, or an intermediate configuration that may still be extended.
 
 A state-space model can be interpreted as a graph:
 - **Nodes** represent states or partial configurations of the problem.
 - **Edges** represent valid transitions from one state to another.
 
-The algorithm begins at an initial state and explores possible transitions until it reaches one or more solution states [2][7].
+The algorithm begins at an initial state and explores possible transitions until it reaches one or more solution states. If a state violates the problem constraints, or if it is clear that no valid solution can be reached from it, that branch is abandoned and the search returns to the previous decision point.
 
 ### Explicit graph vs implicit graph
 
-For many real problems, it is impossible or inefficient to build the entire graph in memory before searching it. The graph may simply be too large.
+For many real problems, it is impossible or inefficient to build the entire graph in memory before searching it. The graph may simply be too large, or it may not even be practical to enumerate all its states in advance.
 
 That is why backtracking typically works on an **implicit graph**:
 - The graph is **not stored explicitly** in memory.
 - When the algorithm is at a state, it generates only the children of that state.
-- Once a branch has been explored, it can be discarded and the algorithm continues elsewhere [7][6].
+- Once a branch has been explored, it can be discarded and the algorithm continues elsewhere.
+
+This is different from an **explicit graph**, where all nodes and edges are constructed and stored before the search begins. In an explicit graph, the whole structure must exist in memory, which can be expensive or impossible for large combinatorial problems. In contrast, an implicit graph generates states only when they are needed, so the algorithm avoids storing branches that will never be explored.
 
 This gives two major advantages:
 1. **Lower memory usage**, because only the current path and its local information must be stored.
-2. **Potential time savings**, because many branches are never explored at all if they are pruned early [1][7].
+2. **Potential time savings**, because many branches are never explored at all if they are pruned early.
+
+This perspective is one of the reasons backtracking is so effective in combinatorial problems: instead of building the full search space, it explores it gradually and only keeps the parts that may still lead to a valid solution.
 
 ***
 
