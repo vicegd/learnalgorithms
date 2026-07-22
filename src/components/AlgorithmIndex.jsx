@@ -26,9 +26,26 @@ export default function AlgorithmIndex() {
         <div key={category}>
           <h3>{category}</h3>
           <ul>
-            {entries.map(({ title, url, hasVisualizer }) => (
+            {entries.map(({ title, url, hasVisualizer, comingSoon }) => (
               <li key={url}>
                 <Link to={url}>{title}</Link>
+                {comingSoon && (
+                  <span
+                    title="Coming soon"
+                    style={{
+                      marginLeft: '0.5rem',
+                      fontSize: '0.7em',
+                      fontWeight: 600,
+                      color: 'var(--ifm-color-warning-dark)',
+                      border: '1px solid var(--ifm-color-warning)',
+                      borderRadius: '4px',
+                      padding: '1px 6px',
+                      verticalAlign: 'middle',
+                    }}
+                  >
+                    coming soon
+                  </span>
+                )}
                 {hasVisualizer && (
                   <span
                     title="Has interactive visualizer"

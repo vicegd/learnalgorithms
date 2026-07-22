@@ -127,6 +127,7 @@ export default function pluginSiteData(context) {
               category,
               url,
               hasVisualizer: hasVisualizer(content),
+              comingSoon: isComingSoon(content),
               content, // kept temporarily for cross-ref, stripped below
             });
           }
@@ -174,7 +175,9 @@ export default function pluginSiteData(context) {
       const stats = {
         algorithms: algorithms.length,
         concepts: concepts.length,
-        comingSoon: concepts.filter((c) => c.comingSoon).length,
+        comingSoon:
+          concepts.filter((c) => c.comingSoon).length +
+          algorithms.filter((a) => a.comingSoon).length,
         withVisualizer: algorithms.filter((a) => a.hasVisualizer).length,
         linkedConceptTerms: [...new Set(Object.values(CONCEPT_LINKS))].length,
       };
