@@ -11,14 +11,14 @@ import TabItem from '@theme/TabItem';
 
 Backtracking is an algorithmic paradigm used to solve problems in which the number of possible candidate solutions is very large, but many of those candidates can be discarded early because they violate some constraint. The central idea is simple: **construct a solution step by step, and as soon as a partial solution cannot possibly lead to a valid complete solution, abandon it and return to the previous step**.
 
-This paradigm is especially important in **combinatorial problems**. In computer science, a combinatorial problem is one whose solutions are formed by selecting, arranging, assigning, or combining elements from a finite set, usually under constraints. What makes these problems difficult is not the cost of one single operation, but the fact that the number of possible configurations grows very quickly as the input size increases. In many cases, the search space becomes so large that checking every possibility is impractical. Typical examples include:
+This paradigm is especially important in **combinatorial problems**, where the number of possible configurations grows very quickly and brute force becomes impractical. In computer science, a combinatorial problem is one whose solutions are formed by selecting, arranging, assigning, or combining elements from a finite set, usually under constraints. What makes these problems difficult is not the cost of a single operation, but the explosive growth of the search space as the input size increases. Typical examples include:
 - N-Queens.
 - Sudoku.
 - Subset Sum.
 - Graph Coloring.
 - Hamiltonian Cycle.
 
-At first glance, backtracking may seem similar to brute force, because both techniques explore many possibilities. However, the key difference is in **when** they check validity and **how** they react to failure.
+At first glance, backtracking may seem similar to brute force, because both techniques explore many possibilities. However, brute force usually generates complete candidates first and checks them only at the end, while backtracking checks validity during construction and prunes invalid branches as soon as they appear.
 
 A **brute-force** algorithm usually generates complete candidates first and checks them only after construction is finished. In other words, it explores the search space almost blindly: it may spend a lot of time building full solutions that were already doomed to fail from the beginning.
 
@@ -72,7 +72,7 @@ For many real problems, it is impossible or inefficient to build the entire grap
 
 That is why backtracking typically works on an **implicit graph**:
 - The graph is **not stored explicitly** in memory.
-- When the algorithm is at a state, it generates only the children of that state.
+- When the algorithm is at a state, it generates only the child nodes of that state.
 - Once a branch has been explored, it can be discarded and the algorithm continues elsewhere.
 
 This is different from an **explicit graph**, where all nodes and edges are constructed and stored before the search begins. In an explicit graph, the whole structure must exist in memory, which can be expensive or impossible for large combinatorial problems. In contrast, an implicit graph generates states only when they are needed, so the algorithm avoids storing branches that will never be explored.
@@ -87,7 +87,15 @@ This perspective is one of the reasons backtracking is so effective in combinato
 
 ## Tree of states
 
-Although the search space may be seen abstractly as a graph, in most introductory algorithmic settings backtracking is visualized as a **tree of states**. Each level of the tree corresponds to one decision step.
+Backtracking can be understood as a search through a space of possible states. Although this space may be represented abstractly as a graph, in most introductory algorithmic settings it is more useful to visualize it as a **tree of states**. This tree is not a literal data structure stored in memory, but a conceptual model of how the algorithm explores the problem.
+
+Each node in the tree represents a state of the problem:
+- The **root** corresponds to the initial state.
+- Each **internal node** represents a partial solution.
+- Each **child** represents one valid choice or decision that extends the current partial solution.
+- A **leaf** may represent either a complete solution or a dead end.
+
+Each level of the tree corresponds to one decision step. In other words, the deeper the node is in the tree, the more decisions have already been fixed. This is why backtracking is often described as a constructive process: the algorithm does not jump directly to complete solutions, but builds them incrementally, one decision at a time.
 
 ```text
                      [ Root: Initial State ]
@@ -105,7 +113,53 @@ Although the search space may be seen abstractly as a graph, in most introductor
    [ Return Solution ]     [ Prune Branch ] ──────────┘
 ```
 
-The algorithm typically explores this tree with a **Depth-First Search (DFS)** strategy: it keeps extending the current branch until it either finds a solution or proves that the branch cannot succeed, and then it returns to the most recent decision point [1][6].
+The key idea is that the algorithm explores this tree **depth first**. It selects one branch, follows it as far as possible, and only when that branch can no longer lead to a valid solution does it return to the most recent decision point and try another alternative. This strategy is known as **Depth-First Search (DFS)**.
+
+### Why DFS fits backtracking
+
+DFS is particularly suitable for backtracking because the algorithm only needs to remember the current path from the root to the current node. This makes it natural to move forward when a choice is promising and to undo the last decision when that choice fails. The recursive call stack is usually enough to keep track of the current branch.
+
+This is also why backtracking is memory efficient:
+- it does not need to store the entire search tree,
+- it only keeps the active path,
+- and it discards branches as soon as they are proven invalid.
+
+### Partial solutions and decision levels
+
+At each level of the tree, the algorithm extends a **partial solution**. If the current partial assignment is written as:
+
+\[
+(x_1, x_2, \dots, x_k)
+\]
+
+then the next decision tries to produce:
+
+\[
+(x_1, x_2, \dots, x_k, x_{k+1})
+\]
+
+If this new candidate violates a constraint, the branch is immediately pruned. If it is still valid, the algorithm continues deeper into the tree. This process repeats until one of two things happens:
+- a complete valid solution is found, or
+- the branch is proven impossible and is abandoned.
+
+### Backtracking as “choose, explore, undo”
+
+This tree view also explains the classic backtracking pattern:
+1. **Choose** a candidate.
+2. **Explore** the consequences recursively.
+3. **Undo** the choice if it does not lead to a solution.
+
+The undo step is essential because it restores the previous state so that a different branch can be explored. Without this rollback mechanism, the algorithm would not be able to reuse the same search path to test multiple alternatives.
+
+### Solution leaves and dead ends
+
+Not every leaf in the tree represents a valid answer:
+- Some leaves correspond to **complete solutions**.
+- Others correspond to **dead ends**, where no further extension is possible.
+
+This distinction is important because backtracking does not wait until the end to detect failure. It tries to identify dead ends as early as possible, which is what makes pruning effective.
+
+In summary, the tree of states is the conceptual structure that explains how backtracking explores a combinatorial search space. The algorithm follows one branch at a time, checks whether it is still promising, and backtracks whenever the current path can no longer lead to a solution.
 
 ***
 
