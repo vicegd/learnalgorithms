@@ -171,31 +171,35 @@ $$
 (x_1, x_2, \dots, x_n)
 $$
 
+where each variable $x_i$ corresponds to one decision that must be made during the search.
+
 At an intermediate step, the algorithm has only constructed a partial solution:
 
 $$
 (x_1, x_2, \dots, x_k)
 $$
 
-where $k < n$.
+with $k < n$. This means that the first $k$ decisions have already been fixed, but the remaining variables are still open.
 
-At level $k$, the algorithm tries to assign a valid value to $x_{k+1}$. Each valid choice creates a child node in the state tree. If the partial solution remains consistent with the problem constraints, the search continues deeper. If not, the branch is discarded immediately.
+At level $k$, the algorithm tries to assign a valid value to $x_{k+1}$. Each valid choice creates a child node in the state tree. If the new partial solution is still consistent with the problem constraints, the search continues to level $k+1$. If the assignment violates a constraint, the branch is discarded immediately.
 
-This is the heart of backtracking: **do not wait until the entire vector is built to detect an error; reject bad partial solutions as soon as possible** [1][3].
+This is the heart of backtracking: **the algorithm does not wait until the entire vector is built to detect an error; it rejects invalid partial solutions as soon as they appear**. By doing so, it avoids exploring branches that cannot possibly lead to a valid complete solution.
 
 ***
 
 ## The rollback mechanism
 
-The word *backtracking* refers precisely to the act of going back after a failed attempt.
+The term *backtracking* refers precisely to the process of going back after a failed attempt. In other words, when a partial solution stops being promising, the algorithm returns to the most recent decision point and tries a different alternative.
 
 A branch of the search can end in two ways:
 - **Success:** a complete valid solution has been constructed.
 - **Failure:** the current partial solution cannot be extended into any valid complete solution.
 
-When failure occurs, the algorithm must **undo** the most recent choice, restore the previous state, and try the next available alternative. This “choose, explore, undo” pattern is the characteristic structure of backtracking algorithms [3][5].
+When failure occurs, the algorithm must **undo** the most recent choice, restore the previous state, and continue with the next available option. This is the characteristic **choose, explore, undo** pattern of backtracking algorithms.
 
-In recursive implementations, the rollback often happens naturally when the recursive call returns. In iterative mental models, you can imagine physically removing the last decision from the partial solution and trying another one.
+In recursive implementations, rollback usually happens naturally when a recursive call returns and the algorithm resumes execution at the previous level of the search tree. In iterative terms, this is equivalent to removing the last decision from the current partial solution and continuing with the next candidate.
+
+This rollback step is essential because it allows the same partial prefix to be reused while exploring several alternatives. Without it, the algorithm would not be able to systematically traverse the full search space.
 
 ***
 
