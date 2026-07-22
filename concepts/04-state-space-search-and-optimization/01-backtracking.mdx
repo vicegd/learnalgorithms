@@ -9,16 +9,26 @@ import TabItem from '@theme/TabItem';
 
 # The Backtracking Paradigm
 
-Backtracking is an algorithmic paradigm used to solve problems in which the number of possible candidate solutions is very large, but many of those candidates can be discarded early because they violate some constraint. The central idea is simple: **construct a solution step by step, and as soon as a partial solution cannot possibly lead to a valid complete solution, abandon it and return to the previous step** [1][2].
+Backtracking is an algorithmic paradigm used to solve problems in which the number of possible candidate solutions is very large, but many of those candidates can be discarded early because they violate some constraint. The central idea is simple: **construct a solution step by step, and as soon as a partial solution cannot possibly lead to a valid complete solution, abandon it and return to the previous step**.
 
-This paradigm is especially important in **combinatorial problems**, where the search space grows very quickly and brute force becomes impractical. Typical examples include:
+This paradigm is especially important in **combinatorial problems**. In computer science, a combinatorial problem is one whose solutions are formed by selecting, arranging, assigning, or combining elements from a finite set, usually under constraints. What makes these problems difficult is not the cost of one single operation, but the fact that the number of possible configurations grows very quickly as the input size increases. In many cases, the search space becomes so large that checking every possibility is impractical. Typical examples include:
 - N-Queens.
 - Sudoku.
 - Subset Sum.
 - Graph Coloring.
-- Hamiltonian Cycle [3][4][5].
+- Hamiltonian Cycle.
 
-At first glance, backtracking may seem similar to brute force, because both techniques explore many possibilities. However, the key difference is that brute force usually generates complete candidates and checks them at the end, while backtracking checks validity **during** construction and prunes invalid branches as early as possible [1][6].
+At first glance, backtracking may seem similar to brute force, because both techniques explore many possibilities. However, the key difference is in **when** they check validity and **how** they react to failure.
+
+A **brute-force** algorithm usually generates complete candidates first and checks them only after construction is finished. In other words, it explores the search space almost blindly: it may spend a lot of time building full solutions that were already doomed to fail from the beginning.
+
+A **backtracking** algorithm, by contrast, checks validity **during** construction. It builds the candidate incrementally, one decision at a time, and as soon as a partial assignment violates a constraint or cannot be extended into a valid solution, the algorithm prunes that branch immediately. This early rejection is what makes backtracking more efficient than naive exhaustive search in many practical cases.
+
+So the difference can be summarized as:
+- **Brute force:** generate everything first, validate later.
+- **Backtracking:** validate progressively, prune early.
+
+That is why backtracking is especially suitable for combinatorial problems: it still explores a large search space, but it avoids wasting time on candidates that are already impossible.
 
 ***
 
