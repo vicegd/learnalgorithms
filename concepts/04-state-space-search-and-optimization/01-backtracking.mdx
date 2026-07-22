@@ -205,7 +205,7 @@ This rollback step is essential because it allows the same partial prefix to be 
 
 ## Backtracking as DFS with pruning
 
-It is common to say that backtracking is “DFS with pruning,” and this is a very useful intuition [1][6].
+It is common to say that backtracking is “DFS with pruning,” and this is a very useful intuition.
 
 - **DFS** determines the order in which states are explored.
 - **Pruning** determines which branches can be ignored without exploring them fully.
@@ -215,7 +215,7 @@ Therefore, backtracking is not just a traversal strategy. It is a **problem-solv
 - DFS exploration,
 - constraint checking,
 - rollback,
-- and pruning [1][2].
+- and pruning.
 
 This distinction is important because not every DFS is backtracking, but most classical backtracking algorithms are naturally implemented with DFS.
 
@@ -227,12 +227,12 @@ Backtracking is particularly appropriate when:
 - The problem asks for **one valid solution**.
 - The problem asks for **all valid solutions**.
 - The problem has clear constraints that can be checked early.
-- The search space is too large for naive brute force, but many branches can be pruned [3][4].
+- The search space is too large for naive brute force, but many branches can be pruned.
 
 Typical families of problems include:
 - **Constraint satisfaction problems**, such as N-Queens or graph coloring.
 - **Enumeration problems**, where all solutions must be listed.
-- **Optimization problems**, where all feasible solutions may need to be considered unless additional bounds are used [3][8].
+- **Optimization problems**, where all feasible solutions may need to be considered unless additional bounds are used.
 
 ***
 
@@ -255,7 +255,7 @@ In compact form, the pattern is:
 - **Explore**.
 - **Undo**.
 
-This template is extremely general and appears in most classical examples [3][5].
+This template is extremely general and appears in most classical examples.
 
 ***
 
@@ -337,18 +337,18 @@ When solving optimization problems, this is also the place where you would compa
 
 ## Pruning: the key to efficiency
 
-Pruning is what makes backtracking significantly better than naive exhaustive search in practice [1][8].
+Pruning is what makes backtracking significantly better than naive exhaustive search in practice.
 
 A branch should be pruned whenever we can prove that continuing down that branch is useless. This may happen because:
 - the partial solution already violates a constraint,
 - the remaining decisions can no longer complete a valid solution,
-- or, in optimization problems, the partial solution is already worse than the best known answer [1][8].
+- or, in optimization problems, the partial solution is already worse than the best known answer.
 
 ### Examples of pruning
 
 - **N-Queens:** if two queens attack each other, the current partial placement is invalid, so the branch is pruned.
 - **Subset Sum:** if the partial sum already exceeds the target and all remaining numbers are positive, that branch can be discarded.
-- **Graph Coloring:** if two adjacent vertices share the same color, the current coloring is invalid and should not be extended [3][5].
+- **Graph Coloring:** if two adjacent vertices share the same color, the current coloring is invalid and should not be extended.
 
 The earlier a problem allows us to prune invalid states, the more effective backtracking becomes.
 
@@ -366,7 +366,7 @@ A backtracking method would instead:
 - continue only if it is,
 - and undo the choice as soon as it leads to a dead end.
 
-That is why backtracking is often described as **systematic trial and error**, but with intelligence: it avoids wasting time on branches that are already known to fail [1][3].
+That is why backtracking is often described as **systematic trial and error**, but with intelligence: it avoids wasting time on branches that are already known to fail.
 
 ***
 
@@ -382,7 +382,7 @@ $$
 \text{Total Time} = (\text{Number of generated nodes}) \times (\text{Cost per node})
 $$
 
-In many textbook problems, the work per node is small, often constant or close to constant, so the dominant factor is the number of generated states [1][3].
+In many textbook problems, the work per node is small, often constant or close to constant, so the dominant factor is the number of generated states.
 
 ### Exponential growth
 
@@ -418,7 +418,7 @@ $$
 T(n) = O(n!)
 $$
 
-This is why backtracking is powerful but still potentially expensive: pruning helps a lot in practice, but in the worst case the algorithm may still need to explore an exponential or factorial number of states [1][3][5].
+This is why backtracking is powerful but still potentially expensive: pruning helps a lot in practice, but in the worst case the algorithm may still need to explore an exponential or factorial number of states.
 
 ***
 
@@ -432,7 +432,7 @@ $$
 M_{\text{stack}} = O(h)
 $$
 
-In many classical problems, $h$ is proportional to the number of decisions, so the extra memory is often linear in the depth of the solution [7][6].
+In many classical problems, $h$ is proportional to the number of decisions, so the extra memory is often linear in the depth of the solution.
 
 ***
 
@@ -444,7 +444,7 @@ As a general rule:
 - **Backtracking** explores a search tree and is useful when the goal is to construct valid solutions under constraints.
 - **Dynamic Programming** is usually preferable when the problem contains **overlapping subproblems** and **optimal substructure**, because it avoids recomputing the same states many times.
 
-Therefore, if a problem can be solved efficiently with Dynamic Programming, that solution is often preferable in practice. Backtracking is still essential, however, when the problem requires explicit enumeration, when constraints are naturally incremental, or when no efficient DP formulation is available [1][2].
+Therefore, if a problem can be solved efficiently with Dynamic Programming, that solution is often preferable in practice. Backtracking is still essential, however, when the problem requires explicit enumeration, when constraints are naturally incremental, or when no efficient DP formulation is available.
 
 ***
 
@@ -455,7 +455,7 @@ Although the two methods are related, they should not be confused.
 - **Brute force** tries every possibility in a direct and usually unstructured way.
 - **Backtracking** also explores possibilities, but does so incrementally and rejects bad partial candidates early.
 
-So backtracking can be seen as a more intelligent form of exhaustive search. It may still have the same worst-case asymptotic complexity, but in many practical instances it performs much better because large subtrees are never explored [1][3].
+So backtracking can be seen as a more intelligent form of exhaustive search. It may still have the same worst-case asymptotic complexity, but in many practical instances it performs much better because large subtrees are never explored.
 
 ***
 
@@ -466,7 +466,7 @@ Some classical problems where backtracking is taught and applied are:
 - **N-Queens:** place $n$ queens on an $n \times n$ board so that no two attack each other.
 - **Subset Sum:** determine whether a subset of numbers sums to a target.
 - **Graph Coloring:** color the vertices of a graph using a limited number of colors without conflicts.
-- **Hamiltonian Cycle:** find a cycle that visits each vertex exactly once [3][5].
+- **Hamiltonian Cycle:** find a cycle that visits each vertex exactly once.
 
 These examples are useful because they show different aspects of the paradigm:
 - construction of partial solutions,
@@ -485,7 +485,7 @@ Use these questions to verify that the core ideas are clear.
 
 **Question:** Why is backtracking usually preferable to naive brute force in combinatorial problems?
 
-**Answer:** Because backtracking checks constraints while the solution is being built and prunes branches that cannot lead to a valid answer, instead of generating every complete candidate first [1][3].
+**Answer:** Because backtracking checks constraints while the solution is being built and prunes branches that cannot lead to a valid answer, instead of generating every complete candidate first.
 
 </details>
 
@@ -494,7 +494,7 @@ Use these questions to verify that the core ideas are clear.
 
 **Question:** In a state-space representation, what do nodes and edges represent?
 
-**Answer:** Nodes represent states or partial configurations of the problem, and edges represent valid transitions or choices between states [2][7].
+**Answer:** Nodes represent states or partial configurations of the problem, and edges represent valid transitions or choices between states.
 
 </details>
 
@@ -503,7 +503,7 @@ Use these questions to verify that the core ideas are clear.
 
 **Question:** Are DFS and backtracking the same thing?
 
-**Answer:** No. DFS is a traversal strategy, while backtracking is a problem-solving paradigm that usually uses DFS together with constraint checking, rollback, and pruning [1][6].
+**Answer:** No. DFS is a traversal strategy, while backtracking is a problem-solving paradigm that usually uses DFS together with constraint checking, rollback, and pruning.
 
 </details>
 
@@ -512,7 +512,7 @@ Use these questions to verify that the core ideas are clear.
 
 **Question:** At what moment does a backtracking algorithm return to a previous decision?
 
-**Answer:** When the current partial solution is complete and has already been processed, or when it is impossible to extend it into a valid full solution [3][5].
+**Answer:** When the current partial solution is complete and has already been processed, or when it is impossible to extend it into a valid full solution.
 
 </details>
 
@@ -521,7 +521,7 @@ Use these questions to verify that the core ideas are clear.
 
 **Question:** If a problem admits both a backtracking solution and a Dynamic Programming solution, which one is usually preferred in practice?
 
-**Answer:** Dynamic Programming is often preferred when applicable, because it avoids recomputation of overlapping subproblems and is usually more efficient [1][2].
+**Answer:** Dynamic Programming is often preferred when applicable, because it avoids recomputation of overlapping subproblems and is usually more efficient.
 
 </details>
 
@@ -534,7 +534,7 @@ Use these questions to verify that the core ideas are clear.
 - It usually follows a **DFS** exploration order.
 - It uses **pruning** to discard impossible branches early.
 - It is especially useful in **constraint satisfaction** and **combinatorial search** problems.
-- Its worst-case time is often **exponential** or **factorial**, but its memory usage is usually modest because it only stores the current path [1][3][6].
+- Its worst-case time is often **exponential** or **factorial**, but its memory usage is usually modest because it only stores the current path.
 
 ***
 
