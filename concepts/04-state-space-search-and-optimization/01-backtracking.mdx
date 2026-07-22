@@ -128,15 +128,15 @@ This is also why backtracking is memory efficient:
 
 At each level of the tree, the algorithm extends a **partial solution**. If the current partial assignment is written as:
 
-\[
+$$
 (x_1, x_2, \dots, x_k)
-\]
+$$
 
 then the next decision tries to produce:
 
-\[
+$$
 (x_1, x_2, \dots, x_k, x_{k+1})
-\]
+$$
 
 If this new candidate violates a constraint, the branch is immediately pruned. If it is still valid, the algorithm continues deeper into the tree. This process repeats until one of two things happens:
 - a complete valid solution is found, or
