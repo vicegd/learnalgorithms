@@ -252,7 +252,7 @@ Backtracking is most effective when the problem includes constraints that can be
 For example:
 - in N-Queens, two queens attacking each other makes the branch invalid right away;
 - in Sudoku, placing a number that already appears in the same row, column, or subgrid is enough to reject that candidate;
-- in subset sum, if the partial sum already exceeds the target, the branch can be discarded.
+- in Subset Sum, if the partial sum already exceeds the target, the branch can be discarded.
 
 The earlier the constraints can be checked, the more effective backtracking becomes.
 
@@ -266,7 +266,9 @@ This is typical in combinatorial problems, where the number of possible configur
 
 Backtracking is a classical technique for **constraint satisfaction problems** (CSPs). In a CSP, the task is to assign values to variables while respecting a set of restrictions. This is exactly the kind of setting where backtracking fits naturally.
 
-Typical examples include:
+Constraint satisfaction problems are a natural fit for backtracking because the goal is to assign values to variables while satisfying a set of explicit constraints, and each partial assignment can usually be checked immediately for consistency. In other backtracking problems, the search may be driven by a different objective, such as finding a path, generating all combinations, or optimizing a score, so the feasibility test and pruning rules are often less uniform and may depend more on the specific structure of the problem.
+
+Typical examples of CSPs include:
 - N-Queens,
 - graph coloring,
 - Sudoku,
@@ -334,11 +336,7 @@ In compact form, the pattern is usually summarized as:
 - **Explore** the consequences recursively.
 - **Undo** the choice and try the next alternative.
 
-This template is extremely general and appears in most classical examples, such as N-Queens, Sudoku, subset generation, graph coloring, and Hamiltonian path search. What changes from one problem to another is not the structure of the algorithm, but the meaning of the state, the set of available choices, and the constraints used to validate a partial solution.
-
-### What changes from one problem to another
-
-Although the backtracking skeleton is always similar, each problem defines its own:
+This scheme is extremely general and appears in most classical examples, such as N-Queens, Sudoku, subset generation, graph coloring, and Hamiltonian path search. However, although the backtracking skeleton is always similar, each problem defines its own:
 - state representation,
 - set of possible choices,
 - feasibility test,
@@ -421,8 +419,6 @@ This version is appropriate when we need to explore every valid answer. If the p
 
   </TabItem>
 </Tabs>
-
-### Why two templates?
 
 The first template is more efficient when only one solution is needed. The second template is necessary when the problem requires all solutions, a complete enumeration, or an optimization process over the full search space.
 
