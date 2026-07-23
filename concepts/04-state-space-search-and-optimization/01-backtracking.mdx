@@ -11,12 +11,7 @@ import TabItem from '@theme/TabItem';
 
 Backtracking is an algorithmic paradigm used to solve problems in which the number of possible candidate solutions is very large, but many of those candidates can be discarded early because they violate some constraint. The central idea is simple: **construct a solution step by step, and as soon as a partial solution cannot possibly lead to a valid complete solution, abandon it and return to the previous step**.
 
-This paradigm is especially important in **combinatorial problems**, where the number of possible configurations grows very quickly and brute force becomes impractical. In computer science, a combinatorial problem is one whose solutions are formed by selecting, arranging, assigning, or combining elements from a finite set, usually under constraints. What makes these problems difficult is not the cost of a single operation, but the explosive growth of the search space as the input size increases. Typical examples include:
-- N-Queens.
-- Sudoku.
-- Subset Sum.
-- Graph Coloring.
-- Hamiltonian Cycle.
+This paradigm is especially important in **combinatorial problems**, where the number of possible configurations grows very quickly and brute force becomes impractical. In computer science, a combinatorial problem is one whose solutions are formed by selecting, arranging, assigning, or combining elements from a finite set, usually under constraints. What makes these problems difficult is not the cost of a single operation, but the explosive growth of the search space as the input size increases. 
 
 At first glance, backtracking may seem similar to brute force, because both techniques explore many possibilities. However, brute force usually generates complete candidates first and checks them only at the end, while backtracking checks validity during construction and prunes invalid branches as soon as they appear.
 
@@ -575,6 +570,13 @@ In short:
 ## Typical examples in Algorithms courses
 
 Some classical problems where backtracking is taught and applied are:
+
+Typical examples include:
+- N-Queens.
+- Sudoku.
+- Subset Sum.
+- Graph Coloring.
+- Hamiltonian Cycle.
 
 - **N-Queens:** place $n$ queens on an $n \\times n$ board so that no two queens attack each other.
 - **Subset Sum:** determine whether a subset of numbers sums to a target value.
