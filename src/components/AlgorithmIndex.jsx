@@ -21,7 +21,7 @@ export default function AlgorithmIndex() {
   const groups = groupByCategory(algorithms);
 
   return (
-    <div>
+    <div className="no-numbering">
       {groups.map(({ category, entries }) => (
         <div key={category}>
           <h3>{category}</h3>
