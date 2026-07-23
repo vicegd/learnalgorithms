@@ -1,0 +1,41 @@
+.tocWrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.tocToggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.4rem 0;
+  width: 100%;
+  color: var(--ifm-color-emphasis-700);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.tocToggle:hover {
+  color: var(--ifm-color-primary);
+}
+
+.tocToggleLabel {
+  /* matches Docusaurus's default "On this page" heading style */
+}
+
+.tocToggleIcon {
+  display: inline-block;
+  font-size: 1.1rem;
+  line-height: 1;
+  transition: transform 0.2s ease;
+  transform: rotate(90deg); /* pointing down = expanded */
+}
+
+.tocToggleIconCollapsed {
+  transform: rotate(0deg); /* pointing right = collapsed */
+}
