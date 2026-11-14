@@ -33,7 +33,7 @@ const CHAPTERS = [
     description:
       'General strategies for designing algorithms, each one illustrated with classic problems and measured implementations.',
     topics: ['Brute force', 'Divide and conquer', 'Recurrences', 'Greedy', 'Dynamic programming'],
-    cta: '10 lessons',
+    cta: '10 lessons + exercises',
     to: '/concepts/category/3-algorithm-design-paradigms',
   },
   {
