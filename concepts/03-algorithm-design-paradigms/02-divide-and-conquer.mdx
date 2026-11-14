@@ -8,12 +8,12 @@ tags: [Paradigms, Divide and Conquer, Recursion]
 
 **Divide and conquer** is one of the oldest and most powerful strategies for designing algorithms. Instead of attacking a problem as a whole, it breaks it into smaller problems of the same kind, solves them (usually by applying the same strategy again), and combines their solutions. We have already met two examples: binary search, which discards half of the array at each step, and Quicksort, which partitions the array and sorts each part.
 
-This lesson presents the general scheme, what we need to apply it, and its two main variants. The following lessons show how to analyse the complexity of these algorithms and apply the paradigm to many classic problems.
+This lesson presents the general scheme, what we need to apply it, and its two main variants. The following lessons show how to analyze the complexity of these algorithms and apply the paradigm to many classic problems.
 
 :::note What you will learn in this chapter
 - The three steps of divide and conquer and the three ingredients needed to apply it.
 - The difference between **division** and **subtraction** schemes, and what **reduction** means.
-- How to analyse the complexity of a divide and conquer algorithm with recurrences and the general formulas for both schemes.
+- How to analyze the complexity of a divide and conquer algorithm with recurrences and the general formulas for both schemes.
 - Many classic applications: factorial, sum of a vector, searching, Fibonacci, greatest common divisor, Mergesort, Quicksort, the Towers of Hanoi, the multiplication of large integers, the tennis tournament, the Tromino puzzle, and the majority element, mode and median problems.
 :::
 
@@ -114,7 +114,7 @@ Each recursive call occupies a frame on the call stack. A subtraction scheme wit
 
 ## A First Example: Three Ways of Summing a Vector
 
-The sum of the elements of a vector, which we analysed in the first chapter, can be solved iteratively or with divide and conquer, both by subtraction and by division:
+The sum of the elements of a vector, which we analyzed in the first chapter, can be solved iteratively or with divide and conquer, both by subtraction and by division:
 
 ```java
 // Iterative: O(n) time, O(1) extra memory
@@ -172,5 +172,5 @@ All the examples of this chapter are implemented, with tests, in the [course rep
 - **🎁 Santa's boxes.** With 1,000,000 boxes and the same scales, how many weighings are needed? And if the scales can compare **three** groups at once (two on the scales and one aside), how many?
 - **💻 Run the three sums.** Run the three versions of the sum of a vector from the [course repository](https://github.com/vicegd/algorithms/blob/master/src/topics/divideconquer/vectorsum/VectorSum.java) for increasing sizes. For which size does the subtraction version fail with a `StackOverflowError` on your computer? Does it change if you increase the stack size with `-Xss`?
 - **✍️ Maximum by division.** Write a divide and conquer method that returns the maximum element of a vector by dividing it into two halves. Identify the divide, conquer and combine steps.
-- **🔍 Recognise the scheme.** For binary search, the factorial, Quicksort and Mergesort, indicate whether they use division or subtraction, how many subproblems they generate, and in which step (divide or combine) most of the work is done.
+- **🔍 Recognize the scheme.** For binary search, the factorial, Quicksort and Mergesort, indicate whether they use division or subtraction, how many subproblems they generate, and in which step (divide or combine) most of the work is done.
 :::

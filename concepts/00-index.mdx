@@ -4,10 +4,80 @@ title: Course Overview
 slug: /
 ---
 
-import ConceptIndex from '@site/src/components/ConceptIndex';
+# Course Overview
 
-# Concept Index
+These lessons cover the theory of **algorithmics**: how to measure the cost of an algorithm, how to analyze it before running it, and the main strategies for designing efficient algorithms. They follow the Algorithmics course of the Software Engineering degree, but every lesson is self-contained: you can read them in order as a course, or jump to any topic as a reference.
 
-Theoretical foundations and design paradigms behind algorithms and data structures.
+The code of the examples, with tests and time measurements, is in the course repository [vicegd/algorithms](https://github.com/vicegd/algorithms) (Java).
 
-<ConceptIndex />
+## How the lessons work
+
+- Every claim about running times has been **measured**, and every example has been **executed**. Where a lesson gives a number of operations or a time, it is a real measurement, not an estimate.
+- Most lessons end with **self-check questions** (open them to see the answer), a list of **key ideas**, and **practice** or **try it yourself** exercises. Exercises from the seminars and lab sessions appear without solutions.
+- Mathematical notation is kept to what is needed: sums, logarithms and the asymptotic notation introduced in chapter 1.
+
+## Contents
+
+### 1. Foundations of Algorithms
+
+What an algorithm is, and the tools to measure and analyze its cost.
+
+1. [Algorithmic Thinking](./01-foundations-of-algorithms/01-algorithmic-thinking.mdx): what an algorithm is, where the word comes from, and why we study algorithm design.
+2. [Case Study: Pairwise Product](./01-foundations-of-algorithms/02-case-study-pairwise.mdx): one problem solved in several ways, from quadratic to linear.
+3. [Data Structures](./01-foundations-of-algorithms/03-data-structures.mdx): arrays, the Java collections, graphs and trees.
+4. [Measuring Efficiency](./01-foundations-of-algorithms/04-measuring-efficiency.mdx): how to take reliable time measurements, and their limits.
+5. [Complexity Analysis](./01-foundations-of-algorithms/05-complexity-analysis.mdx): counting operations; best, worst and average case.
+6. [Asymptotic Notation](./01-foundations-of-algorithms/06-asymptotic-notation.mdx): big O, Omega and Theta.
+7. [Growth Rates and Predictions](./01-foundations-of-algorithms/07-growth-rates.mdx): complexity classes and predicting times.
+8. [Complexity of Loops](./01-foundations-of-algorithms/08-complexity-of-loops.mdx): analyzing iterative code.
+9. [Searching Case Studies](./01-foundations-of-algorithms/09-searching-case-studies.mdx): sequential search, the sentinel, and binary search.
+
+### 2. Fundamental Problem Domains
+
+Sorting, one of the most studied problems in computing.
+
+1. [The Sorting Problem](./02-fundamental-problem-domains/01-the-sorting-problem.mdx)
+2. [Bubble Sort](./02-fundamental-problem-domains/02-bubble-sort.mdx)
+3. [Insertion Sort](./02-fundamental-problem-domains/03-insertion-sort.mdx)
+4. [Selection Sort](./02-fundamental-problem-domains/04-selection-sort.mdx)
+5. [Quicksort](./02-fundamental-problem-domains/05-quicksort.mdx)
+6. [Beyond Quadratic Sorting](./02-fundamental-problem-domains/06-efficient-sorting.mdx): Shellsort, Heapsort, Mergesort, Radix sort and the $n \log n$ limit.
+7. [Comparing Sorting Algorithms](./02-fundamental-problem-domains/07-comparing-sorting-algorithms.mdx): choosing an algorithm in practice.
+
+### 3. Algorithm Design Paradigms
+
+General strategies for designing algorithms.
+
+1. [Brute Force and Exhaustive Search](./03-algorithm-design-paradigms/01-brute-force.mdx)
+2. [Divide and Conquer](./03-algorithm-design-paradigms/02-divide-and-conquer.mdx)
+3. [Analyzing Divide and Conquer](./03-algorithm-design-paradigms/03-divide-and-conquer-analysis.mdx): recurrences by subtraction and by division.
+4. [Divide and Conquer: Numbers and Searches](./03-algorithm-design-paradigms/04-divide-and-conquer-examples-1.mdx)
+5. [Divide and Conquer: Classic Problems](./03-algorithm-design-paradigms/05-divide-and-conquer-examples-2.mdx)
+6. [Divide and Conquer: Majority, Mode and Median](./03-algorithm-design-paradigms/06-divide-and-conquer-statistics.mdx)
+7. [Greedy Algorithms](./03-algorithm-design-paradigms/07-greedy-algorithms.mdx)
+8. [Greedy Algorithms: Classic Problems](./03-algorithm-design-paradigms/08-greedy-examples.mdx)
+9. [Dynamic Programming](./03-algorithm-design-paradigms/09-dynamic-programming.mdx)
+10. [Dynamic Programming: Classic Problems](./03-algorithm-design-paradigms/10-dynamic-programming-examples.mdx)
+
+### 4. State Space Search and Optimization
+
+Exact search over huge spaces of candidate solutions.
+
+1. [Backtracking](./04-state-space-search-and-optimization/01-backtracking.mdx)
+2. [Backtracking: Classic Problems](./04-state-space-search-and-optimization/02-backtracking-examples.mdx)
+3. [Branch and Bound](./04-state-space-search-and-optimization/03-branch-and-bound.mdx)
+4. [Branch and Bound: Classic Problems](./04-state-space-search-and-optimization/04-branch-and-bound-examples.mdx)
+
+### 5. Advanced Execution Models
+
+Using several processors at once.
+
+1. [Concurrency and Parallelism](./05-advanced-execution-models/01-parallel-algorithms.mdx)
+2. [The Fork/Join Framework](./05-advanced-execution-models/02-fork-join-framework.mdx)
+3. [Performance of Parallel Algorithms](./05-advanced-execution-models/03-parallel-performance.mdx): speedup, efficiency and Amdahl's law.
+
+The [Glossary](./glossary.mdx) collects the main terms of the course, each with a short definition and a link to the lesson where it is explained.
+
+## Suggested order
+
+Chapters 1 and 2 are the base for everything else: read them first and in order. In chapter 3, divide and conquer, greedy algorithms and dynamic programming can be read in that order (each one compares itself with the previous ones). Chapter 4 builds on brute force and dynamic programming. Chapter 5 (parallelism) only needs divide and conquer, so it can be read right after the first lessons of chapter 3.

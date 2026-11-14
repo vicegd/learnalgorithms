@@ -8,7 +8,7 @@ tags: [Parallelism, Concurrency, Threads, Multi-core]
 
 Until now, every algorithm in this course has been **sequential**: one instruction after another, on a single processor. But the computers we use, from phones to servers, have several processor **cores**, and a sequential program uses only one of them. **Parallel algorithms** divide the work so that several cores can do it at the same time.
 
-This chapter connects directly with divide and conquer: if a problem can be divided into **independent** subproblems, those subproblems can be solved **simultaneously**. This first lesson introduces the basic concepts; the next ones present Java's Fork/Join framework and how to analyse the performance of parallel algorithms.
+This chapter connects directly with divide and conquer: if a problem can be divided into **independent** subproblems, those subproblems can be solved **simultaneously**. This first lesson introduces the basic concepts; the next ones present Java's Fork/Join framework and how to analyze the performance of parallel algorithms.
 
 :::note What you will learn in this chapter
 - Why processors have several cores, and why that matters for software.
@@ -58,7 +58,7 @@ Concurrent tasks do **not** necessarily run at the same physical instant. With a
 Parallelism can greatly speed up many operations, such as sorting, searching or transforming data. It is especially well suited to any task that can be broken down into **smaller, independent components**, which is exactly what **divide and conquer** does.
 
 :::tip Concurrency is not parallelism
-Rob Pike, one of the creators of the Go language, summarised the difference in a famous talk: *concurrency is about **dealing** with lots of things at once; parallelism is about **doing** lots of things at once*. Concurrency is a way of structuring a program; parallelism is a way of executing it. You can watch the talk [Concurrency is not parallelism](https://www.youtube.com/watch?v=cN_DpYBzKso).
+Rob Pike, one of the creators of the Go language, summarized the difference in a famous talk: *concurrency is about **dealing** with lots of things at once; parallelism is about **doing** lots of things at once*. Concurrency is a way of structuring a program; parallelism is a way of executing it. You can watch the talk [Concurrency is not parallelism](https://www.youtube.com/watch?v=cN_DpYBzKso).
 :::
 
 ---

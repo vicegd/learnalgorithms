@@ -17,7 +17,7 @@ In the previous lesson we obtained exact expressions such as $T(n) = 3n + 4$ and
 - The formal definition of $O$ (big-O) and how to prove that a function belongs to $O(f(n))$.
 - The related notations $\Omega$ (big-Omega) and $\Theta$ (big-Theta), and what each one really says.
 - The algebraic properties that let us simplify expressions without going back to the definition.
-- The logarithm rules you need for analysing algorithms, and why the base of a logarithm does not matter.
+- The logarithm rules you need for analyzing algorithms, and why the base of a logarithm does not matter.
 - How to determine the order of complex expressions quickly and reliably.
 :::
 
@@ -36,7 +36,7 @@ In words: from some point $n_0$ onwards, $T(n)$ never exceeds a constant multipl
 Two details of the definition are important:
 
 - **The constant $c$** absorbs the constant factors: $3n$, $100n$ and $n/2$ are all $O(n)$. This is exactly the freedom we need, since constants depend on the machine and on the counting conventions.
-- **The threshold $n_0$** means that only the behaviour for **large** values of $n$ matters. What happens for small inputs is irrelevant to the definition.
+- **The threshold $n_0$** means that only the behavior for **large** values of $n$ matters. What happens for small inputs is irrelevant to the definition.
 
 ### Proving a bound: an example
 
@@ -67,7 +67,7 @@ For example, $\lim_{n \to \infty} \frac{5n^4 + 4n^3}{n^4} = \lim_{n \to \infty} 
 
 ### Big-O is a bound, not an exact description
 
-Since $O$ is an upper bound, a function belongs to many classes: $3n + 4$ is $O(n)$, but also $O(n^2)$ and $O(2^n)$, because all those functions grow at least as fast as $n$. These statements are true but not very informative. When we analyse an algorithm, we always give the **tightest** bound we can prove: saying that the sum of a vector is $O(n^2)$ is correct, but misleading.
+Since $O$ is an upper bound, a function belongs to many classes: $3n + 4$ is $O(n)$, but also $O(n^2)$ and $O(2^n)$, because all those functions grow at least as fast as $n$. These statements are true but not very informative. When we analyze an algorithm, we always give the **tightest** bound we can prove: saying that the sum of a vector is $O(n^2)$ is correct, but misleading.
 
 :::caution Big-O does not mean "worst case"
 A common misconception is that $O$ describes the worst case. It does not: $O$, $\Omega$ and $\Theta$ describe **functions**, and *any* of the functions we studied in the previous lesson can be described with them. The worst-case time of linear search is $O(n)$, its best-case time is $O(1)$, its average-case time is $O(n)$. When someone says that "an algorithm is $O(n^2)$" without further detail, they usually mean that its **worst-case** time is $O(n^2)$, but the two ideas are independent.
@@ -146,7 +146,7 @@ Compare $\log(n^8)$ and $(\log n)^8$:
 
 ## Logarithm Rules to Remember
 
-These identities, valid for positive values and bases different from 1, are used continuously when analysing algorithms:
+These identities, valid for positive values and bases different from 1, are used continuously when analyzing algorithms:
 
 1. $\log_a(n^k) = k \cdot \log_a n$
 2. $\log_a(n \cdot m) = \log_a n + \log_a m$
@@ -259,7 +259,7 @@ Some of these examples contain a trap:
 
 ## Summary
 
-- Asymptotic notation describes the **growth rate** of a function, ignoring constant factors and the behaviour for small $n$.
+- Asymptotic notation describes the **growth rate** of a function, ignoring constant factors and the behavior for small $n$.
 - $T(n) \in O(f(n))$ means $T(n) \le c \cdot f(n)$ from some $n_0$ onwards: an **upper bound**. $\Omega$ is a **lower bound** and $\Theta$ an **exact order**.
 - Asymptotic bounds and the best, worst and average cases are **independent** ideas.
 - Lower bounds on problems let us prove that an algorithm is **optimal**.
@@ -274,6 +274,6 @@ Some of these examples contain a trap:
 - **✍️ Prove it.** Using the definition, find constants $c$ and $n_0$ that prove that $3n^2 + 59n$ is $O(n^2)$. Then prove that it is also $\Omega(n^2)$, and conclude that it is $\Theta(n^2)$.
 - **❌ Disprove it.** Show that $n^2$ is **not** $O(n)$. (Hint: assume that constants $c$ and $n_0$ exist and find an $n \ge n_0$ that breaks the inequality.)
 - **🔁 Logarithms.** Simplify $2^{\log_2 n}$, $4^{\log_2 n}$ and $n^{\log_n 2}$. Which of them grow polynomially?
-- **📊 Visualise.** Plot $100n$, $n^2$ and $n \log_2 n$ for $n$ between 1 and 200 (with a spreadsheet or any plotting tool). Where does each curve overtake the others?
-- **🎯 Tight bounds.** For each of the methods you analysed in the previous lesson (maximum of a vector, checking if a vector is sorted), give the tightest bound for the best and the worst case.
+- **📊 Visualize.** Plot $100n$, $n^2$ and $n \log_2 n$ for $n$ between 1 and 200 (with a spreadsheet or any plotting tool). Where does each curve overtake the others?
+- **🎯 Tight bounds.** For each of the methods you analyzed in the previous lesson (maximum of a vector, checking if a vector is sorted), give the tightest bound for the best and the worst case.
 :::

@@ -296,7 +296,7 @@ protected void compute() {
 The same scheme applies to processing the lines of a large log, the images of a folder or the records of a dataset.
 
 :::caution Input/output and parallelism
-When the bottleneck is reading from a disk or a network, adding threads may not help much: they will simply wait for the same device. Parallelism pays off most when each piece of work requires significant **computation** (parsing, compressing, analysing...) once the data has been read.
+When the bottleneck is reading from a disk or a network, adding threads may not help much: they will simply wait for the same device. Parallelism pays off most when each piece of work requires significant **computation** (parsing, compressing, analyzing...) once the data has been read.
 :::
 
 ---
@@ -321,7 +321,7 @@ We measured the effect of the threshold by squaring 20 million integers on a com
 | | 100,000 | 400 | 4.1 ms |
 | | 5,000,000 | 8 | 4.1 ms |
 
-With tiny thresholds, the program creates **millions of tasks** whose management costs far more than squaring a number: the parallel version is up to **40 times slower** than the sequential one. With reasonable thresholds, it is about **3 times faster** (more than the number of cores, partly because the sequential and parallel loops are optimised differently by the compiler; with a heavier operation per element, the speedup approaches the number of cores, as the next lesson shows).
+With tiny thresholds, the program creates **millions of tasks** whose management costs far more than squaring a number: the parallel version is up to **40 times slower** than the sequential one. With reasonable thresholds, it is about **3 times faster** (more than the number of cores, partly because the sequential and parallel loops are optimized differently by the compiler; with a heavier operation per element, the speedup approaches the number of cores, as the next lesson shows).
 
 A useful rule of thumb is that each task at the base case should perform **at least a few thousand** simple operations, or fewer if each operation is expensive.
 

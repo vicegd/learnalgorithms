@@ -9,7 +9,7 @@ import TabItem from '@theme/TabItem';
 
 # Case Study: The Maximum Pairwise Product
 
-To truly understand why algorithmics matters, it helps to experience failure first. In this case study we take a deceptively simple problem and solve it again and again. Each version fixes a problem of the previous one, and each fix teaches a different lesson: about the limits of data types, the cost of naive strategies, the impact of data representation, and the danger of "optimisations" that are not actually correct.
+To truly understand why algorithmics matters, it helps to experience failure first. In this case study we take a deceptively simple problem and solve it again and again. Each version fixes a problem of the previous one, and each fix teaches a different lesson: about the limits of data types, the cost of naive strategies, the impact of data representation, and the danger of "optimizations" that are not actually correct.
 
 This is exactly the attitude described in the previous lesson: a good algorithm designer **refuses to be content** with the first solution that works.
 
@@ -19,7 +19,7 @@ This is exactly the attitude described in the previous lesson: a good algorithm 
 - How the number of operations of a brute-force solution grows, and why faster hardware does not fix it.
 - How sorting and, finally, a single linear scan reduce the cost from quadratic to linear time.
 - How data representation affects memory consumption.
-- How to gain confidence in a fast algorithm using **stress testing**, and how a plausible-looking optimisation can be wrong.
+- How to gain confidence in a fast algorithm using **stress testing**, and how a plausible-looking optimization can be wrong.
 :::
 
 ---
@@ -398,12 +398,12 @@ for (int test = 0; test < 100_000; test++) {
 When we ran it (with a fixed random seed), it found a counterexample in the very first test: `[3, 8, 4, 0, 5, 5, 8]`, where the correct answer is $8 \cdot 8 = 64$ but the buggy version returns $8 \cdot 5 = 40$. The same stress test, applied to the sorting and linear versions, found no differences in 100,000 random tests.
 
 :::tip Why small inputs?
-Random **small** inputs with **small** values are best: repeated values (like the two 8s above) appear frequently, and when a test fails, the counterexample is short enough to analyse by hand. Then complement random tests with deliberate **edge cases**: the minimum size ($n = 2$), all elements equal, zeros, the maximum allowed values (to detect overflow) and the largest input sizes (to detect performance problems).
+Random **small** inputs with **small** values are best: repeated values (like the two 8s above) appear frequently, and when a test fails, the counterexample is short enough to analyze by hand. Then complement random tests with deliberate **edge cases**: the minimum size ($n = 2$), all elements equal, zeros, the maximum allowed values (to detect overflow) and the largest input sizes (to detect performance problems).
 :::
 
 Remember that testing, even stress testing, can show the presence of bugs but not their absence. For the linear scan we also have an *argument*: after processing each element, `max1` and `max2` hold the two largest values (counting repetitions) among the elements processed so far. This statement, which remains true after every iteration, is a **loop invariant**, a tool that you will meet again when reasoning about the correctness of algorithms.
 
-**Lesson 4:** an optimisation is only an improvement if it is still correct. Keep the slow version: it is your best oracle.
+**Lesson 4:** an optimization is only an improvement if it is still correct. Keep the slow version: it is your best oracle.
 
 ---
 
@@ -435,7 +435,7 @@ Our specification said *non-negative* integers. Let us change it: the input may 
 | 5. Sort descending | Much faster, but modifies the input. | Change the strategy; watch out for side effects. |
 | 6. Sort ascending | Same growth, less work. | Distinguish growth rate from constant factors. |
 | 7. Linear scan | Optimal in time and memory. | Find exactly what you need, nothing more. |
-| Stress testing | Plausible "optimisations" can be wrong. | Compare fast versions against a trusted slow one. |
+| Stress testing | Plausible "optimizations" can be wrong. | Compare fast versions against a trusted slow one. |
 
 The rest of this chapter gives us the tools to make these intuitions precise: how to measure and count the cost of an algorithm, and how to describe its growth with asymptotic notation.
 
@@ -448,5 +448,5 @@ The rest of this chapter gives us the tools to make these intuitions precise: ho
 - **⏱️ Reproduce the growth.** Generate datasets of 10,000, 20,000, 40,000 and 80,000 numbers and measure the brute-force version. Does the time multiply by about 4 each time $n$ doubles? You will learn how to take reliable measurements in the first lab sessions.
 - **🐞 Break it and catch it.** Implement `buggyMaxPairwise` and the stress test above. Then introduce other bugs in the linear version (for example, replace `>` with `>=`, or remove the `else`) and check whether the stress test detects them. Which ones survive? Why?
 - **➖ Allow negative numbers.** Implement the linear version for integers of any sign, as described in the last checkpoint, and validate it with a stress test against brute force using values between $-9$ and $9$.
-- **🔢 Generalise.** Design an algorithm for the maximum product of **three** elements at different positions. How many candidates must you consider when negative numbers are allowed?
+- **🔢 Generalize.** Design an algorithm for the maximum product of **three** elements at different positions. How many candidates must you consider when negative numbers are allowed?
 :::

@@ -34,12 +34,12 @@ The most obvious way to compare two algorithms is to implement both as programs,
 
 1. **It requires too much effort.** We must fully implement and debug every alternative before knowing whether it is worth it.
 2. **The result depends on the quality of the implementation.** One program may simply be better written than the other, and then we are comparing programmers, not algorithms.
-3. **The chosen test cases may favour one algorithm.** An algorithm may be excellent for the inputs we happened to try and very poor for others (for example, already sorted data).
+3. **The chosen test cases may favor one algorithm.** An algorithm may be excellent for the inputs we happened to try and very poor for others (for example, already sorted data).
 4. **We may still not have the best algorithm.** Measuring tells us which of our candidates is faster on our machine today, not whether a much better algorithm exists or how far we are from the best possible solution.
 
 Measurements also depend on the **machine**: the processor, memory, operating system, compiler and even other programs running at the same time. A time in seconds measured on one computer says little about another.
 
-This is why we need the analytical approach, which studies the algorithm itself, independently of any implementation or machine. But this does not make experiments useless: they are the way to **validate** the theory, to discover the **constants** that theory ignores and to detect effects (memory hierarchy, compiler optimisations) that are hard to predict on paper. Engineers use both.
+This is why we need the analytical approach, which studies the algorithm itself, independently of any implementation or machine. But this does not make experiments useless: they are the way to **validate** the theory, to discover the **constants** that theory ignores and to detect effects (memory hierarchy, compiler optimizations) that are hard to predict on paper. Engineers use both.
 
 ---
 
@@ -138,9 +138,9 @@ long t2 = System.currentTimeMillis();
 
 Choosing powers of 10 for the number of repetitions makes the conversion immediate: with 1 repetition the result is in milliseconds ($10^{-3}$ s), with 1,000 repetitions it is the time of one execution in microseconds ($10^{-6}$ s), with 1,000,000 repetitions it is in nanoseconds ($10^{-9}$ s), and so on. The number of repetitions must be large enough to exceed 50 ms, but not so large that the experiment never ends.
 
-### The JIT compiler: optimised and non-optimised times
+### The JIT compiler: optimized and non-optimized times
 
-The Java virtual machine starts by **interpreting** the bytecode of a program, but it monitors which methods are executed most often and **compiles them to native code** while the program is running, applying aggressive optimisations. This is the **Just-In-Time (JIT) compiler**. It makes Java programs fast, but it makes measurements tricky: the same code may become much faster after running for a while, and the optimiser may even remove work whose result is never used.
+The Java virtual machine starts by **interpreting** the bytecode of a program, but it monitors which methods are executed most often and **compiles them to native code** while the program is running, applying aggressive optimizations. This is the **Just-In-Time (JIT) compiler**. It makes Java programs fast, but it makes measurements tricky: the same code may become much faster after running for a while, and the optimizer may even remove work whose result is never used.
 
 The `-Xint` option runs the virtual machine in **interpreted mode only**, without the JIT:
 
@@ -150,7 +150,7 @@ java -Xint MyMeasurementClass
 
 The following measurements of the sum of a vector (10 repetitions each, times in ms) show the difference:
 
-| $n$ | Without optimisation (`-Xint`) | With optimisation (JIT) |
+| $n$ | Without optimization (`-Xint`) | With optimization (JIT) |
 | ---: | ---: | ---: |
 | 80,000 | 10 | 3 |
 | 160,000 | 22 | 1 |
@@ -158,10 +158,10 @@ The following measurements of the sum of a vector (10 repetitions each, times in
 | 640,000 | 85 | 1 |
 | 1,280,000 | 171 | 2 |
 
-Without optimisation, the times **double** each time $n$ doubles, exactly what we expect from an algorithm whose time is proportional to $n$. With optimisation, the times are much smaller and so irregular that they say nothing about the growth: the JIT compiled and optimised the loop at some point during the experiment, and all the measurements are below the reliability threshold anyway.
+Without optimization, the times **double** each time $n$ doubles, exactly what we expect from an algorithm whose time is proportional to $n$. With optimization, the times are much smaller and so irregular that they say nothing about the growth: the JIT compiled and optimized the loop at some point during the experiment, and all the measurements are below the reliability threshold anyway.
 
 :::tip A practical compromise
-Times **without optimisation** are larger but match the theoretical complexity more faithfully, so they are better for learning to relate measurements and theory. Times **with optimisation** reflect the real performance of Java programs, but sometimes produce surprises. In the first lab sessions you will prioritise measurements without optimisation; later, when the goal is the best real performance, you will usually measure with optimisation.
+Times **without optimization** are larger but match the theoretical complexity more faithfully, so they are better for learning to relate measurements and theory. Times **with optimization** reflect the real performance of Java programs, but sometimes produce surprises. In the first lab sessions you will prioritize measurements without optimization; later, when the goal is the best real performance, you will usually measure with optimization.
 
 Professional benchmarks in Java use dedicated tools such as JMH (Java Microbenchmark Harness), which handle warm-up, repetitions and statistical analysis automatically.
 :::
@@ -171,7 +171,7 @@ Professional benchmarks in Java use dedicated tools such as JMH (Java Microbench
 - Measure **only the operation of interest**: create and fill the input data *outside* the measured interval.
 - Use the **same input data** for all the algorithms you compare (for example, a fixed random seed or a file).
 - Make sure the measured time exceeds **50 ms**, using repetitions if necessary.
-- **Use the result** of the measured operation (for example, accumulate it in a variable that you print at the end), so that the optimiser cannot discard the computation as useless.
+- **Use the result** of the measured operation (for example, accumulate it in a variable that you print at the end), so that the optimizer cannot discard the computation as useless.
 - Repeat each measurement several times and look at the **typical value** (for example, the median), discarding obvious outliers.
 - Close other heavy applications and **report the features of the machine** (processor and memory) together with the times.
 - Interrupt an experiment that takes too long (Ctrl+C in a terminal, or the stop button in the IDE), and mark it as *out of time* in your tables.
@@ -191,7 +191,7 @@ Measuring is only useful if we know what to look for. The most informative exper
 | $n^3$ | 8 | $k^3$ |
 | $2^n$ | the time is **squared** | |
 
-Let us test it with a quadratic algorithm: counting how many pairs of positions $(i, j)$ hold equal values, with two nested loops over a vector of $n$ elements. Without optimisation, we measured:
+Let us test it with a quadratic algorithm: counting how many pairs of positions $(i, j)$ hold equal values, with two nested loops over a vector of $n$ elements. Without optimization, we measured:
 
 | $n$ | Time (ms) | Ratio with the previous one |
 | ---: | ---: | ---: |
@@ -231,7 +231,7 @@ To compare two algorithms experimentally, we compute the **ratio** of their time
   - a constant **above 1** means the algorithm in the denominator is better;
   - a constant of exactly 1 would mean they are equally fast, something extremely rare in practice.
 
-The same technique compares **environments** instead of algorithms: running the same algorithm in Python and in Java (with and without optimisation), the ratio of their times oscillates around a constant that relates the two environments. Do not be surprised if the ratio involving the optimised Java version is unstable: the JIT changes the behaviour of the program as it runs.
+The same technique compares **environments** instead of algorithms: running the same algorithm in Python and in Java (with and without optimization), the ratio of their times oscillates around a constant that relates the two environments. Do not be surprised if the ratio involving the optimized Java version is unstable: the JIT changes the behavior of the program as it runs.
 
 <details>
   <summary>🧠 <strong>Checkpoint: Same complexity, different speed</strong></summary>
@@ -275,5 +275,5 @@ This value includes everything in the heap (not only our data structures) and de
 - **🔁 Use repetitions.** Find the number of repetitions (a power of 10) needed to measure the sum of a vector of 10,000 elements above 50 ms on your computer, and compute the time of one execution in microseconds.
 - **📈 Run a doubling test.** Measure, with `-Xint`, the times of an algorithm with two nested loops and of one with three nested loops for increasing sizes. Compute the ratios between consecutive times and check them against the table of this lesson.
 - **⚖️ Compare with ratios.** Measure the brute-force and the sorting versions of the maximum pairwise product for several sizes and compute the ratio of their times. Does it tend to 0, to infinity or to a constant? Is that what you expected?
-- **🧪 Optimised or not?** Repeat one of the previous experiments without `-Xint`. In which cases do the measurements still follow the theoretical growth, and in which do they become erratic?
+- **🧪 Optimized or not?** Repeat one of the previous experiments without `-Xint`. In which cases do the measurements still follow the theoretical growth, and in which do they become erratic?
 :::

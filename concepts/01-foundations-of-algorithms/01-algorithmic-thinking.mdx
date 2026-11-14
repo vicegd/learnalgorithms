@@ -26,7 +26,7 @@ As software engineers, our primary challenge shifts from making a program "just 
 
 ## A Word with a History
 
-We often think of algorithms as something new, but the word is more than a thousand years old. It comes from the name of **Muhammad ibn Musa al-Khwarizmi**, a Persian scholar born around 780 AD in the region of Khwarazm (in present-day Uzbekistan). He worked at the *House of Wisdom* in Baghdad, the great intellectual centre of the 9th century, and made contributions to mathematics, astronomy and geography.
+We often think of algorithms as something new, but the word is more than a thousand years old. It comes from the name of **Muhammad ibn Musa al-Khwarizmi**, a Persian scholar born around 780 AD in the region of Khwarazm (in present-day Uzbekistan). He worked at the *House of Wisdom* in Baghdad, the great intellectual center of the 9th century, and made contributions to mathematics, astronomy and geography.
 
 One of his books explained how to calculate with the Hindu decimal numeral system, including the use of zero and positional notation. When it was translated into Latin centuries later, its opening words, *"Dixit Algoritmi"* ("so said al-Khwarizmi"), turned his name into a label for the method itself. In medieval Latin, *algorismus* simply meant **calculating with decimal numerals**, as opposed to using an abacus or Roman numerals. Another of his books, on solving equations, gave us the word **algebra** (from *al-jabr*, "restoration").
 
@@ -73,7 +73,7 @@ This simple observation already contains a key lesson of this course: **an algor
 
 ## Formalizing the "Algorithm"
 
-A common analogy compares an algorithm to a cooking recipe. While this image is useful as an entry point, it is not rigorous enough for computer science. A recipe tolerates intuition, approximation and subjective interpretation ("add salt to taste", "bake until golden"). An algorithm, by contrast, must define a computational process with enough precision to be executed mechanically and analysed mathematically.
+A common analogy compares an algorithm to a cooking recipe. While this image is useful as an entry point, it is not rigorous enough for computer science. A recipe tolerates intuition, approximation and subjective interpretation ("add salt to taste", "bake until golden"). An algorithm, by contrast, must define a computational process with enough precision to be executed mechanically and analyzed mathematically.
 
 ### From intuition to formal specification
 
@@ -91,7 +91,7 @@ To reason rigorously about programs, computer science moves from a descriptive v
 | **General / informal** | An ordered and finite set of steps used to solve a problem. | Sequential resolution of a task. |
 | **Computer science / formal** | A finite, unambiguous, effective and executable sequence of instructions that transforms valid inputs into outputs according to a precise specification. | Predictability, correctness, safety and analysability. |
 
-In engineering, the difficulty is rarely in describing *an idea* for solving a problem. The real challenge is defining that idea with enough rigour that its behaviour can be trusted, implemented, tested and later analysed in terms of correctness and efficiency.
+In engineering, the difficulty is rarely in describing *an idea* for solving a problem. The real challenge is defining that idea with enough rigour that its behavior can be trusted, implemented, tested and later analyzed in terms of correctness and efficiency.
 
 ### Problems, instances and specifications
 
@@ -134,12 +134,12 @@ Instructions such as *"repeat several times"*, *"sort efficiently"* or *"stop wh
 #### 3. Input
 An algorithm accepts zero or more inputs taken from a defined domain. This domain is not a secondary detail: it is part of the specification itself.
 
-If a factorial procedure is intended only for non-negative integers, this restriction must be stated explicitly. Without a clearly defined input domain, it is impossible to decide whether a behaviour is correct, incorrect or simply outside the intended scope of the problem.
+If a factorial procedure is intended only for non-negative integers, this restriction must be stated explicitly. Without a clearly defined input domain, it is impossible to decide whether a behavior is correct, incorrect or simply outside the intended scope of the problem.
 
 #### 4. Output
 An algorithm must produce one or more outputs that are related in a well-defined way to the input. The existence of output is not enough; the output must satisfy the specification.
 
-Printing arbitrary values, returning undocumented "magic" values or terminating without a result does not constitute a valid solution unless such behaviour is part of the formal contract. Mathematically, we want to reason about the algorithm as a mapping from admissible inputs to valid outputs.
+Printing arbitrary values, returning undocumented "magic" values or terminating without a result does not constitute a valid solution unless such behavior is part of the formal contract. Mathematically, we want to reason about the algorithm as a mapping from admissible inputs to valid outputs.
 
 #### 5. Effectiveness
 Each step must be elementary enough to be carried out exactly, in finite time, by a mechanical executor. Traditionally, every instruction should be basic enough that a person could perform it with paper and pencil, given enough time.
@@ -151,7 +151,7 @@ The point of this property is not human practicality, but computational realism.
 These five properties are not merely historical definitions. Together, they form the minimal contract that makes algorithmic reasoning possible:
 
 - Without **finiteness**, we cannot guarantee that execution ever completes.
-- Without **definiteness**, two programmers could implement the "same" algorithm and obtain different behaviours.
+- Without **definiteness**, two programmers could implement the "same" algorithm and obtain different behaviors.
 - Without a clear **input** domain, correctness becomes impossible to define.
 - Without a specified **output**, success cannot be measured.
 - Without **effectiveness**, the procedure may be a mathematical fantasy rather than a realisable computation.
@@ -176,7 +176,7 @@ A code fragment may fail to terminate on some inputs, omit edge cases, rely on u
 
   **Question:** Why is the statement *"compute the factorial of an integer"* not yet a complete specification?
 
-  **Answer:** Because it does not define the admissible input domain, the behaviour for invalid values such as negative integers, the range of values that the result type can represent, or the expected output in exceptional cases. It describes a goal, but not yet a fully formalised computational process.
+  **Answer:** Because it does not define the admissible input domain, the behavior for invalid values such as negative integers, the range of values that the result type can represent, or the expected output in exceptional cases. It describes a goal, but not yet a fully formalised computational process.
 
 </details>
 
@@ -192,7 +192,7 @@ $$
 
 or, equivalently, the recursive definition $n! = n \cdot (n-1)!$ with base case $0! = 1$. The definition already encodes two facts: the domain is the set of non-negative integers, and there is a base case that stops the recursion.
 
-When we translate this mathematical object into code, the goal is not to obtain *some* implementation that returns correct values for a few test cases. The goal is an algorithm whose behaviour is well-defined for every input in the chosen domain and that respects the constraints of the machine. Let us analyse four versions.
+When we translate this mathematical object into code, the goal is not to obtain *some* implementation that returns correct values for a few test cases. The goal is an algorithm whose behavior is well-defined for every input in the chosen domain and that respects the constraints of the machine. Let us analyze four versions.
 
 <Tabs>
 <TabItem value="naive" label="❌ Version 1: naive" default>
@@ -235,7 +235,7 @@ public static long factorial(int n) {
 
 ### An improvement, with a hidden cost
 
-This version **terminates for every integer**: negative inputs are detected immediately. It satisfies finiteness and definiteness, and the behaviour for invalid inputs is now part of the contract: *"returns -1 if n is negative"*.
+This version **terminates for every integer**: negative inputs are detected immediately. It satisfies finiteness and definiteness, and the behavior for invalid inputs is now part of the contract: *"returns -1 if n is negative"*.
 
 This technique, returning a value that can never be a valid result, is common (for example, `indexOf` returns `-1` when an element is not found). However, it has drawbacks worth discussing:
 
@@ -262,7 +262,7 @@ public static long factorial(int n) {
 - **Guaranteed progress:** for every `n >= 0`, the argument decreases by one in each call until it reaches the base case, so execution terminates.
 - **Controlled failure:** instead of crashing with a `StackOverflowError` after thousands of nested calls, the algorithm *fails fast* with a meaningful error that the caller can handle.
 
-This is **structural robustness**: the algorithm does not rely on "good behaviour" from its clients; it enforces its contract proactively.
+This is **structural robustness**: the algorithm does not rely on "good behavior" from its clients; it enforces its contract proactively.
 
 </TabItem>
 <TabItem value="iterative" label="🏁 Version 4: iterative and range-safe">
@@ -296,7 +296,7 @@ This version is also **iterative**. The recursive versions need one stack frame 
 <details>
   <summary>🧠 <strong>Checkpoint: Tail calls and finiteness</strong></summary>
 
-  **Question:** Suppose we run the naive version in a language with *tail call optimisation* (TCO), where certain recursive calls reuse the current stack frame instead of allocating a new one. Would TCO make the naive implementation correct for negative inputs?
+  **Question:** Suppose we run the naive version in a language with *tail call optimization* (TCO), where certain recursive calls reuse the current stack frame instead of allocating a new one. Would TCO make the naive implementation correct for negative inputs?
 
   **Answer:** No. TCO might prevent the `StackOverflowError`, but it does not fix the logical problem: the control flow still never reaches a base case. The program would loop forever, consuming CPU time without producing an output. Finiteness is still violated, regardless of how the runtime manages the stack. (Incidentally, `n * factorial(n - 1)` is not even a tail call, because the multiplication happens *after* the recursive call returns.)
 
@@ -317,13 +317,13 @@ This version is also **iterative**. The recursive versions need one stack frame 
 
 The primary purpose of most programs is to **store and retrieve information**, and to transform it. To do so efficiently we need two things that cannot be separated:
 
-- **Data structures**, which organise information in memory, and
+- **Data structures**, which organize information in memory, and
 - **Algorithms**, which operate on those structures.
 
-Niklaus Wirth, the creator of Pascal, summarised this idea in the title of his classic 1976 book: ***Algorithms + Data Structures = Programs***. Choosing a good algorithm with an inappropriate data structure (or vice versa) usually leads to poor results. We will revisit this in the chapter dedicated to data structures.
+Niklaus Wirth, the creator of Pascal, summarized this idea in the title of his classic 1976 book: ***Algorithms + Data Structures = Programs***. Choosing a good algorithm with an inappropriate data structure (or vice versa) usually leads to poor results. We will revisit this in the chapter dedicated to data structures.
 
 :::tip The goal of this course
-This course is about helping you **understand how to structure information to support efficient processing in order to solve problems**. Every chapter adds new tools to that same goal: analysing the cost of a solution, and designing strategies that keep that cost under control.
+This course is about helping you **understand how to structure information to support efficient processing in order to solve problems**. Every chapter adds new tools to that same goal: analyzing the cost of a solution, and designing strategies that keep that cost under control.
 :::
 
 ---
@@ -342,7 +342,7 @@ Computing the sum of a list, its maximum element or the number of elements that 
 **Not-so-simple problems** are different:
 - It is **not clear how to solve them** at first sight.
 - The simple ideas are **too slow** for realistic input sizes.
-- They often require **optimisation**: among many valid solutions, we want the best one.
+- They often require **optimization**: among many valid solutions, we want the best one.
 
 Finding the shortest route between two cities, scheduling exams so that no student has two at the same time, or packing the most valuable set of items into a limited space all belong to this second group. These are the problems that this course focuses on.
 
@@ -377,11 +377,11 @@ Note that efficiency is **relative to the constraints**. A sorting program that 
 
 Which resources can an algorithm consume?
 
-- **Execution time**, the most commonly analysed resource.
+- **Execution time**, the most commonly analyzed resource.
 - **Memory** (space), both for the data and for auxiliary structures such as the call stack.
 - **Input/output and storage accesses**, which can dominate the cost when data does not fit in main memory.
 - **Network communication**, essential in distributed systems.
-- **Energy**, increasingly important in mobile devices and data centres.
+- **Energy**, increasingly important in mobile devices and data centers.
 - **Number of processors or cores**, in parallel algorithms.
 
 In this course we will focus mainly on **time** and **memory**. As you will see in the case study of the next lesson, these two resources often compete: saving time may cost memory, and vice versa, so we will frequently look for a reasonable compromise.
@@ -412,7 +412,7 @@ Many of the algorithm design paradigms in this course are, in essence, different
 
 ## Algorithm Design Is Difficult
 
-There is **no general procedure for designing a good algorithm**. There is no formula that, given any problem, produces the best algorithm for it. What exists is a collection of **paradigms** (like those in the table above), techniques for analysing cost, and a large body of known algorithms that can be adapted.
+There is **no general procedure for designing a good algorithm**. There is no formula that, given any problem, produces the best algorithm for it. What exists is a collection of **paradigms** (like those in the table above), techniques for analyzing cost, and a large body of known algorithms that can be adapted.
 
 Aho, Hopcroft and Ullman, in their classic *The Design and Analysis of Computer Algorithms* (1974), put it this way: perhaps the most important principle for the good algorithm designer is to **refuse to be content**. The first solution that works is rarely the best one. Good designers keep asking: *can I do better? Where is the time going? Is all this memory really necessary?* The case study in the next lesson follows exactly this attitude, improving a solution step by step.
 
@@ -444,25 +444,25 @@ Algorithmic questions are a standard part of technical interviews for software d
 | Solve a Sudoku. | Backtracking. |
 | Escape from a maze in the minimum number of steps. | Backtracking; branch and bound; graph search. |
 | Solve a sliding puzzle (such as the 15-puzzle). | Branch and bound. |
-| Maximise the value carried in a backpack with a weight limit (knapsack problem). | Greedy algorithms; dynamic programming; backtracking; branch and bound. |
+| Maximize the value carried in a backpack with a weight limit (knapsack problem). | Greedy algorithms; dynamic programming; backtracking; branch and bound. |
 
 Interviewers also ask conceptual questions, such as: *What is an algorithm? What is the time complexity of an algorithm? What is the space complexity of Insertion sort? What is the difference between the best and the worst case? How does Quicksort work? What is asymptotic analysis? What are the main approaches to designing algorithms?* By the end of this course, you should be able to answer all of them with confidence.
 
 :::info What interviewers really evaluate
-In an algorithmic interview, the final code is only part of the evaluation. Interviewers want to see whether you **clarify the problem** (input domain, edge cases), start from a correct solution, **analyse its cost** and then **improve it**. In other words, they evaluate algorithmic thinking, exactly the skill this course is designed to develop.
+In an algorithmic interview, the final code is only part of the evaluation. Interviewers want to see whether you **clarify the problem** (input domain, edge cases), start from a correct solution, **analyze its cost** and then **improve it**. In other words, they evaluate algorithmic thinking, exactly the skill this course is designed to develop.
 :::
 
 ---
 
 ## Why We Study This Discipline
 
-Studying algorithmics is not about memorising a catalogue of programming tricks. It is about internalising a way of thinking that remains valuable as languages, frameworks and platforms change.
+Studying algorithmics is not about memorizing a catalog of programming tricks. It is about internalising a way of thinking that remains valuable as languages, frameworks and platforms change.
 
 1. **It is important for all branches of computer science.** Databases, operating systems, networks, compilers, graphics, artificial intelligence and security all rely on efficient algorithms and data structures.
 2. **It plays a key role in technological innovation.** Search engines, route planners, compression formats, cryptography and machine learning are, at their core, algorithmic achievements.
 3. **It is independent of languages and tools.** Today's Java, Python or Rust will evolve or be replaced, but the reasons why one strategy scales better than another remain valid across languages, compilers and hardware generations.
 4. **It helps you think about how to solve problems.** Algorithmic thinking trains you to look past variable names and syntax and focus on the structure of the problem: what needs to be computed and how its cost grows.
-5. **It lets you evaluate designs before building them.** By analysing how a strategy behaves as the input grows, you can detect bottlenecks early and compare alternatives on paper, instead of discovering the problem after months of development.
+5. **It lets you evaluate designs before building them.** By analyzing how a strategy behaves as the input grows, you can detect bottlenecks early and compare alternatives on paper, instead of discovering the problem after months of development.
 6. **It is challenging, and good for the brain.** Designing an elegant algorithm is an intellectual exercise that combines creativity and rigour.
 
 ---

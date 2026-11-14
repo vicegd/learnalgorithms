@@ -7,16 +7,16 @@ tags: [Analysis, Loops, Patterns, Summations]
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# Complexity of Loops: A Catalogue of Patterns
+# Complexity of Loops: A Catalog of Patterns
 
-Most iterative algorithms are, at their core, combinations of loops. Once you can determine quickly and reliably how many times a loop runs, you can analyse almost any iterative program. This lesson collects the most common patterns, explains how to derive each result and points out the traps that appear most often in exams and in real code.
+Most iterative algorithms are, at their core, combinations of loops. Once you can determine quickly and reliably how many times a loop runs, you can analyze almost any iterative program. This lesson collects the most common patterns, explains how to derive each result and points out the traps that appear most often in exams and in real code.
 
 Throughout the lesson, `O(1)` in the body of a loop means "some work whose cost does not depend on $n$", and `instruction_O(f(n))` means an instruction whose cost is $O(f(n))$.
 
 :::note What you will learn in this lesson
 - The general rules for sequences, loops, nested loops and conditionals.
 - How the **step** of a loop (adding, multiplying, dividing) determines whether it is linear or logarithmic.
-- How to analyse nested loops whose limits depend on each other, using summations.
+- How to analyze nested loops whose limits depend on each other, using summations.
 - How to combine patterns, and some less obvious cases: $\sqrt{n}$ loops and harmonic sums.
 - The typical mistakes to avoid.
 :::
@@ -27,7 +27,7 @@ Throughout the lesson, `O(1)` in the body of a loop means "some work whose cost 
 
 - **Sequence.** For instructions $s_1, s_2, \dots, s_k$ executed one after another, the cost is $O(s_1) + O(s_2) + \cdots + O(s_k)$, which is the order of the **largest** one.
 - **Loop.** The cost is the **sum of the costs of all its iterations**. When every iteration costs the same, this is simply *number of iterations × cost of the body*.
-- **Nested loops.** Analyse from the **inside out**: compute the cost of the inner loop (possibly depending on the variable of the outer one), then sum over the iterations of the outer loop.
+- **Nested loops.** Analyze from the **inside out**: compute the cost of the inner loop (possibly depending on the variable of the outer one), then sum over the iterations of the outer loop.
 - **Conditional.** The cost of evaluating the condition plus the cost of the branch that is executed. For an upper bound, take the most expensive branch; for a precise analysis, count **how many times** each branch is executed.
 - **Method call.** The cost of the method for the size of its arguments.
 
@@ -222,7 +222,7 @@ where $H_n$ is the **harmonic number**, which grows like $\ln n$. This pattern (
 
 ### While loops
 
-`while` loops are analysed exactly like `for` loops: identify the variable that controls the loop, its initial value, how it changes in each iteration, and the condition that stops it.
+`while` loops are analyzed exactly like `for` loops: identify the variable that controls the loop, its initial value, how it changes in each iteration, and the condition that stops it.
 
 ```java
 int i = n;
@@ -245,7 +245,7 @@ The variable is halved at each iteration, so this is Pattern 2: $O(\log n)$. Som
 - **Adding instead of multiplying (or vice versa).** Sequential loops **add** (and the largest one dominates); nested loops **multiply**.
 
 <details>
-  <summary>🧠 <strong>Checkpoint: Analyse these fragments</strong></summary>
+  <summary>🧠 <strong>Checkpoint: Analyze these fragments</strong></summary>
 
   **Question:** Determine the complexity of each fragment.
 
@@ -283,7 +283,7 @@ The patterns of this lesson are easy to verify experimentally with the technique
 
 - The number of iterations of a loop depends on its **initial value**, **final condition** and **step**.
 - **Additive** steps over a range proportional to $n$ give $O(n)$; **multiplicative** steps give $O(\log n)$, even if the range is $n^2$ or $n^3$.
-- **Independent** nested loops multiply; **dependent** ones are analysed with **summations**.
+- **Independent** nested loops multiply; **dependent** ones are analyzed with **summations**.
 - **Sequential** code adds, and the largest term dominates.
 - Watch out for $O(\sqrt{n})$ loops, harmonic sums ($O(n \log n)$) and geometric sums (which can turn an apparent $O(n \log n)$ into $O(n)$).
 
@@ -296,5 +296,5 @@ The patterns of this lesson are easy to verify experimentally with the technique
 - **📏 Count exactly.** How many times does the body of `for (i = 1; i <= n; i++) for (j = 1; j <= i * i; j++) { O(1) }` run? Give the exact formula and its order.
 - **🧩 Find the trap.** `String s = ""; for (i = 0; i < n; i++) s += "x";` Strings in Java are immutable: each concatenation creates a new string, copying the previous one. What is the complexity of the loop? How does `StringBuilder` change it?
 - **🛠️ Design.** Write a loop whose complexity is $O(\sqrt{n} \log n)$, and another one whose complexity is $O(n \sqrt{n})$.
-- **💻 Verify.** Implement two of the patterns of this lesson, measure them with the doubling test (without optimisation) and check that the ratios match the theoretical complexity.
+- **💻 Verify.** Implement two of the patterns of this lesson, measure them with the doubling test (without optimization) and check that the ratios match the theoretical complexity.
 :::

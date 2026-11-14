@@ -102,7 +102,7 @@ The first rows of the table (Pascal's triangle):
 
 ## The 0/1 Knapsack Problem
 
-We met the knapsack problem in the greedy chapter. Now the objects **cannot be fragmented**: each object is either taken entirely or left. We have $n$ objects, each with a weight $w_i$ and a value $v_i$, and a backpack that can carry a total weight not exceeding $W$; we want to maximise the total value. We saw that no greedy heuristic is optimal for this version. Dynamic programming is.
+We met the knapsack problem in the greedy chapter. Now the objects **cannot be fragmented**: each object is either taken entirely or left. We have $n$ objects, each with a weight $w_i$ and a value $v_i$, and a backpack that can carry a total weight not exceeding $W$; we want to maximize the total value. We saw that no greedy heuristic is optimal for this version. Dynamic programming is.
 
 ### Data
 
@@ -203,7 +203,7 @@ We want to pay an amount with the **fewest possible coins**, for **any** coin sy
 
 ### Cheaper travel on the river
 
-A river has $n$ docks. At each one you can rent a boat to go to any other dock **downstream** (it is impossible to go upstream). A fee table indicates the cost of travelling from dock $i$ to dock $j$ ($i \lt j$). A trip from $i$ to $j$ may be more expensive than a succession of shorter trips: then it is better to go from $i$ to some dock $k$ and take a second boat from $k$ to $j$. Design an efficient algorithm that determines the **minimum cost for every pair** of docks $i \lt j$, and indicate its time as a function of $n$.
+A river has $n$ docks. At each one you can rent a boat to go to any other dock **downstream** (it is impossible to go upstream). A fee table indicates the cost of traveling from dock $i$ to dock $j$ ($i \lt j$). A trip from $i$ to $j$ may be more expensive than a succession of shorter trips: then it is better to go from $i$ to some dock $k$ and take a second boat from $k$ to $j$. Design an efficient algorithm that determines the **minimum cost for every pair** of docks $i \lt j$, and indicate its time as a function of $n$.
 
 Hint: think about how a trip from $i$ to $j$ can be split into smaller trips, which subproblems that defines, and in which order the table must be filled so that the values you need are already known.
 
@@ -268,6 +268,6 @@ Spelling correctors use it to suggest the closest dictionary words, and bioinfor
 - **🎒 Knapsack by hand.** Fill the knapsack table for the data of the checkpoint ($W = 6$), and recover the objects chosen by tracing back from $V(4, 6)$. Which of the two optimal combinations do you obtain?
 - **💾 One row.** Rewrite the knapsack algorithm using a single array of $W + 1$ positions. In which direction must the inner loop run so that each object is used at most once?
 - **💰 The change.** Solve the problem of the change with dynamic programming (try it yourself), and use it to find the amounts up to 100 for which the greedy algorithm fails with the coins 1, 4, 5, 12, 20, 50.
-- **🚣 The river.** Solve the problem of the cheapest travel on the river, and analyse its complexity.
+- **🚣 The river.** Solve the problem of the cheapest travel on the river, and analyze its complexity.
 - **🔤 LCS.** Implement the LCS algorithm, including the reconstruction of the subsequence, and test it with two versions of a short text.
 :::
