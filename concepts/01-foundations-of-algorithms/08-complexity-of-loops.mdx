@@ -1,0 +1,300 @@
+---
+title: Complexity of Loops
+sidebar_position: 8
+tags: [Analysis, Loops, Patterns, Summations]
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Complexity of Loops: A Catalogue of Patterns
+
+Most iterative algorithms are, at their core, combinations of loops. Once you can determine quickly and reliably how many times a loop runs, you can analyse almost any iterative program. This lesson collects the most common patterns, explains how to derive each result and points out the traps that appear most often in exams and in real code.
+
+Throughout the lesson, `O(1)` in the body of a loop means "some work whose cost does not depend on $n$", and `instruction_O(f(n))` means an instruction whose cost is $O(f(n))$.
+
+:::note What you will learn in this lesson
+- The general rules for sequences, loops, nested loops and conditionals.
+- How the **step** of a loop (adding, multiplying, dividing) determines whether it is linear or logarithmic.
+- How to analyse nested loops whose limits depend on each other, using summations.
+- How to combine patterns, and some less obvious cases: $\sqrt{n}$ loops and harmonic sums.
+- The typical mistakes to avoid.
+:::
+
+---
+
+## The General Rules
+
+- **Sequence.** For instructions $s_1, s_2, \dots, s_k$ executed one after another, the cost is $O(s_1) + O(s_2) + \cdots + O(s_k)$, which is the order of the **largest** one.
+- **Loop.** The cost is the **sum of the costs of all its iterations**. When every iteration costs the same, this is simply *number of iterations × cost of the body*.
+- **Nested loops.** Analyse from the **inside out**: compute the cost of the inner loop (possibly depending on the variable of the outer one), then sum over the iterations of the outer loop.
+- **Conditional.** The cost of evaluating the condition plus the cost of the branch that is executed. For an upper bound, take the most expensive branch; for a precise analysis, count **how many times** each branch is executed.
+- **Method call.** The cost of the method for the size of its arguments.
+
+The key quantity is always the **number of iterations**, and it depends on three things: the **initial value**, the **final condition** and the **step** of the loop variable.
+
+---
+
+## Pattern 1: Additive Steps → Linear
+
+When the loop variable is increased or decreased by a **constant** amount, the number of iterations is proportional to the distance it has to cover:
+
+```java
+for (i = 1; i <= n; i++) { O(1) }             // n iterations          → O(n)
+for (i = n; i > 0; i--) { O(1) }              // n iterations          → O(n)
+for (i = 1; i <= n; i += 2) { O(1) }          // about n/2 iterations  → O(n)
+for (i = 1; i <= 3*n; i += 2) { O(1) }        // about 3n/2 iterations → O(n)
+for (i = 1; i <= c1*n; i += c2) { O(1) }      // about c1·n/c2         → O(n)
+```
+
+In general, if the variable must travel a distance proportional to $n$ with a constant step, the loop runs about $\frac{\text{distance}}{\text{step}}$ times, which is $O(n)$. Changing the step from 1 to 2 halves the work, but **does not change the complexity**: the constant disappears in the $O$.
+
+:::caution The distance matters, not only the step
+`for (i = 1; i <= n*n; i += 2)` runs about $n^2/2$ times: it is $O(n^2)$, not $O(n)$, because the distance is $n^2$. And `for (i = n/2; i <= n; i++)` runs about $n/2$ times: still $O(n)$, because half of $n$ is proportional to $n$.
+:::
+
+---
+
+## Pattern 2: Multiplicative Steps → Logarithmic
+
+When the loop variable is **multiplied or divided** by a constant at each step, it reaches its limit very quickly:
+
+```java
+for (i = 1; i <= n; i *= 2) { O(1) }           // log2(n) + 1 iterations  → O(log n)
+for (i = n; i >= 1; i /= 2) { O(1) }           // log2(n) + 1 iterations  → O(log n)
+for (i = 1; i <= n; i *= c) { O(1) }           // logc(n) + 1 iterations  → O(log n)
+for (i = 1; i <= n*n; i *= 2) { O(1) }         // log2(n²) = 2·log2(n)    → O(log n)
+for (i = 1; i <= n*n*n/2; i *= c) { O(1) }     // logc(n³/2)              → O(log n)
+```
+
+**Why?** After $k$ iterations of the first loop, $i = 2^k$. The loop stops when $2^k \gt n$, that is, when $k \gt \log_2 n$. So it runs $\lfloor \log_2 n \rfloor + 1$ times. The same reasoning with base $c$ gives $\log_c n$ iterations for the third loop.
+
+The last two examples show the power of the logarithm rules from the asymptotic notation lesson: going up to $n^2$ or $n^3/2$ instead of $n$ only multiplies the number of iterations by a constant, since $\log(n^k) = k \log n$ and $\log(n^3/2) = 3 \log n - \log 2$. All of them are $O(\log n)$.
+
+:::danger A classic infinite loop
+`for (i = 0; i < n; i *= 2)` **never ends**: $0 \cdot 2 = 0$. Multiplicative loops must start at a positive value. Similarly, `i /= 2` with integers eventually reaches 0, so a condition like `i >= 0` would never become false.
+:::
+
+---
+
+## Pattern 3: Nested Loops
+
+### Independent limits: multiply
+
+When the limits of the inner loop do not depend on the outer variable, the costs simply **multiply**:
+
+```java
+for (i = 1; i <= n; i++)
+    for (j = 1; j <= n; j++) { O(1) }          // n · n = n²            → O(n²)
+
+for (i = 1; i <= n; i++)
+    for (j = 1; j <= n; j *= 2) { O(1) }       // n · log n             → O(n log n)
+```
+
+### Dependent limits: sum
+
+When the inner loop depends on the outer variable, we sum. A typical case is the **triangular** loop:
+
+```java
+for (i = 1; i <= n; i++)
+    for (j = i + 1; j <= n; j++) { O(1) }
+```
+
+For each $i$, the inner loop runs $n - i$ times:
+
+$$
+\sum_{i=1}^{n} (n - i) = (n-1) + (n-2) + \cdots + 1 + 0 = \frac{n(n-1)}{2} \in O(n^2)
+$$
+
+The inner loop is shorter on average (about $n/2$ iterations instead of $n$), but that only affects the constant: the result is still quadratic.
+
+### Three and four levels
+
+```java
+for (i = 1; i <= n; i++)
+    for (j = n; j >= 1; j--)
+        for (k = 1; k <= j; k++) { O(1) }
+```
+
+The innermost loop runs $j$ times. Summing from the inside out:
+
+$$
+\sum_{i=1}^{n} \sum_{j=1}^{n} j = \sum_{i=1}^{n} \frac{n(n+1)}{2} = n \cdot \frac{n(n+1)}{2} \in O(n^3)
+$$
+
+Note that the direction of the middle loop (decreasing) does not matter: what matters is the set of values $j$ takes.
+
+```java
+for (i = 1; i <= n; i++)
+    for (j = i; j <= n; j++)
+        for (k = j; k <= n; k++)
+            for (p = k; p <= n; p++) { O(1) }
+```
+
+Here each loop starts from the value of the previous one, so the body runs once for each combination $1 \le i \le j \le k \le p \le n$. The exact count is $\binom{n+3}{4} = \frac{n(n+1)(n+2)(n+3)}{24}$, which is $O(n^4)$. In general, $m$ nested loops whose ranges are proportional to $n$ give $O(n^m)$, even if the dependencies reduce the constant (here, by a factor of 24).
+
+:::tip A quick rule and its limits
+For nested loops whose ranges are all **proportional to $n$** (even if they depend on each other in a "triangular" way), the complexity is $n$ raised to the number of nested loops. But be careful: this rule fails when a loop is logarithmic or when its range is not proportional to $n$, as the next patterns show. When in doubt, write the summation.
+:::
+
+---
+
+## Pattern 4: Combining Patterns
+
+Most real loops combine the previous patterns. The approach is always the same: determine the number of iterations of each loop, and multiply them if they are independent.
+
+```java
+// (a)
+for (i = 2*n; i >= 0; i -= 3)                 // about 2n/3 iterations: O(n)
+    for (j = 1; j <= n*n*n; j *= 2) { O(1) }  // log2(n³) = 3·log2(n): O(log n)
+// Total: O(n log n)
+
+// (b)
+for (i = n; i >= 1; i /= 2)                    // log2(n) iterations: O(log n)
+    for (j = 1; j <= n/3; j++) { O(1) }        // n/3 iterations: O(n)
+// Total: O(n log n)
+
+// (c)
+for (i = 1; i <= n; i *= 3)                    // log3(n) iterations: O(log n)
+    for (j = 1; j <= n*n*n; j *= 2) { O(1) }   // 3·log2(n) iterations: O(log n)
+// Total: O(log² n)
+
+// (d)
+for (i = n/2; i <= n; i++)                     // n/2 iterations: O(n)
+    for (j = 1; j <= n/3; j += 2) { O(1) }     // n/6 iterations: O(n)
+// Total: O(n²)
+```
+
+Example (c) is worth remembering: two nested logarithmic loops give $O(\log^2 n)$, that is, $(\log n)^2$, which is not the same as $O(\log n)$ but is still far below $O(n)$. Example (d) shows that loops covering only a fraction of the range ($n/2$ to $n$, or up to $n/3$) are still linear.
+
+### Loops with expensive bodies
+
+When the body is not constant, multiply by its cost:
+
+```java
+for (i = 1; i <= n; i++)
+    instruction_O(n);                          // n · O(n) = O(n²)
+
+for (i = 1; i <= n; i *= 2)
+    instruction_O(n);                          // log n · O(n) = O(n log n)
+```
+
+### Conditionals inside loops
+
+When a loop contains a conditional with branches of different cost, a precise analysis counts **how many times** each branch executes:
+
+```java
+for (i = 1; i <= n; i++)
+    if (i % 10 == 0)
+        instruction_O(n);       // runs n/10 times
+    else
+        instruction_O(1);       // runs 9n/10 times
+```
+
+The expensive branch runs $n/10$ times, contributing $\frac{n}{10} \cdot O(n) = O(n^2)$; the cheap one contributes $O(n)$. The total is $O(n^2)$. If, instead, the expensive branch ran only a **constant** number of times (for example, only when `i == 1`), it would contribute just $O(n)$ and the total would be $O(n)$. Taking the most expensive branch for every iteration always gives a valid upper bound, but it may not be the tightest one.
+
+---
+
+## Pattern 5: Less Obvious Cases
+
+### Square-root loops
+
+```java
+for (i = 1; i * i <= n; i++) { O(1) }
+```
+
+The loop stops when $i^2 \gt n$, that is, when $i \gt \sqrt{n}$, so it runs $\lfloor \sqrt{n} \rfloor$ times: $O(\sqrt{n})$. This is the pattern of the classic primality test, which only needs to try divisors up to $\sqrt{n}$.
+
+### Harmonic sums
+
+```java
+for (i = 1; i <= n; i++)
+    for (j = 1; j <= n; j += i) { O(1) }
+```
+
+The inner loop advances in steps of $i$, so it runs about $n/i$ times. The total is:
+
+$$
+\sum_{i=1}^{n} \frac{n}{i} = n \sum_{i=1}^{n} \frac{1}{i} = n \cdot H_n \approx n \ln n \in O(n \log n)
+$$
+
+where $H_n$ is the **harmonic number**, which grows like $\ln n$. This pattern (an inner loop that becomes shorter and shorter, in proportion $1/i$) appears, for example, in the sieve of Eratosthenes.
+
+### While loops
+
+`while` loops are analysed exactly like `for` loops: identify the variable that controls the loop, its initial value, how it changes in each iteration, and the condition that stops it.
+
+```java
+int i = n;
+while (i > 1) {
+    O(1);
+    i = i / 2;
+}
+```
+
+The variable is halved at each iteration, so this is Pattern 2: $O(\log n)$. Sometimes the variable that controls the loop is not obvious (it may be the size of a data structure, or the distance between two indices, as in binary search); finding it is the first step of the analysis.
+
+---
+
+## Common Mistakes
+
+- **Counting loops instead of iterations.** Two nested loops are not always $O(n^2)$: if one of them is logarithmic, the result is $O(n \log n)$; if the inner one runs a constant number of times, it is $O(n)$.
+- **Forgetting the range.** A loop up to $n^2$ with an additive step is quadratic, not linear.
+- **Confusing $\log(n^k)$ with $\log^k n$.** A multiplicative loop up to $n^3$ is $O(\log n)$; two nested logarithmic loops are $O(\log^2 n)$.
+- **Ignoring the cost of the body.** Library calls (`contains`, `indexOf`, `sort`, string concatenation in a loop...) may hide linear or worse costs inside an apparently simple loop.
+- **Adding instead of multiplying (or vice versa).** Sequential loops **add** (and the largest one dominates); nested loops **multiply**.
+
+<details>
+  <summary>🧠 <strong>Checkpoint: Analyse these fragments</strong></summary>
+
+  **Question:** Determine the complexity of each fragment.
+
+```java
+// (1)
+for (i = 1; i <= n; i++)
+    for (j = 1; j <= 100; j++) { O(1) }
+
+// (2)
+for (i = 1; i <= n; i++) { O(1) }
+for (j = 1; j <= n; j++)
+    for (k = 1; k <= n; k *= 2) { O(1) }
+
+// (3)
+for (i = 1; i <= n; i *= 2)
+    for (j = 1; j <= i; j++) { O(1) }
+```
+
+  **Answer:**
+  1. $O(n)$. The inner loop runs 100 times, a constant, whatever the value of $n$.
+  2. $O(n \log n)$. The two parts are sequential: $O(n) + O(n \log n) = O(n \log n)$.
+  3. $O(n)$, a surprising one. The inner loop runs $i$ times, and $i$ takes the values $1, 2, 4, \dots, 2^k$ with $2^k \le n$. The total is $1 + 2 + 4 + \cdots + 2^k = 2^{k+1} - 1 \lt 2n$. Multiplying "$\log n$ iterations × up to $n$ per iteration" would give $O(n \log n)$, a valid but not tight bound. This is why dependent loops must be **summed**.
+
+</details>
+
+---
+
+## From Theory to Measurements
+
+The patterns of this lesson are easy to verify experimentally with the techniques of the lesson on measuring efficiency: implement a loop, measure its time for increasing sizes, and check the ratio between consecutive times. A quadratic loop should multiply its time by about 4 when $n$ doubles, a cubic one by about 8, and a loop of $O(n \log n)$ by a little more than 2. In the lab sessions you will do exactly this, both with given loops and with loops you design yourself to have a given complexity.
+
+---
+
+## Summary
+
+- The number of iterations of a loop depends on its **initial value**, **final condition** and **step**.
+- **Additive** steps over a range proportional to $n$ give $O(n)$; **multiplicative** steps give $O(\log n)$, even if the range is $n^2$ or $n^3$.
+- **Independent** nested loops multiply; **dependent** ones are analysed with **summations**.
+- **Sequential** code adds, and the largest term dominates.
+- Watch out for $O(\sqrt{n})$ loops, harmonic sums ($O(n \log n)$) and geometric sums (which can turn an apparent $O(n \log n)$ into $O(n)$).
+
+---
+
+## Practice
+
+:::tip Analytical challenge
+- **🔍 Classify.** Give the complexity of `for (i = n; i > 1; i = i / 3) for (j = 0; j < i * i; j++) { O(1) }`. Is it $O(n^2 \log n)$? (Hint: sum the iterations of the inner loop, as in the last checkpoint.)
+- **📏 Count exactly.** How many times does the body of `for (i = 1; i <= n; i++) for (j = 1; j <= i * i; j++) { O(1) }` run? Give the exact formula and its order.
+- **🧩 Find the trap.** `String s = ""; for (i = 0; i < n; i++) s += "x";` Strings in Java are immutable: each concatenation creates a new string, copying the previous one. What is the complexity of the loop? How does `StringBuilder` change it?
+- **🛠️ Design.** Write a loop whose complexity is $O(\sqrt{n} \log n)$, and another one whose complexity is $O(n \sqrt{n})$.
+- **💻 Verify.** Implement two of the patterns of this lesson, measure them with the doubling test (without optimisation) and check that the ratios match the theoretical complexity.
+:::
