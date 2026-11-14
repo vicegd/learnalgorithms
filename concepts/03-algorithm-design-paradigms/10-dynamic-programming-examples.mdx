@@ -1,0 +1,273 @@
+---
+title: "Dynamic Programming: Classic Problems"
+sidebar_position: 10
+tags: [Dynamic Programming, Combinations, Knapsack, LCS, Edit Distance]
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Dynamic Programming in Action
+
+This lesson applies the design steps of dynamic programming to several classic problems: counting combinations, the 0/1 knapsack problem, and two problems on strings, the longest common subsequence and the edit distance. It also proposes two problems from the course to solve yourself: the change and the cheapest travel on a river. The implementations of the course examples are in the [course repository](https://github.com/vicegd/algorithms/tree/master/src/topics/dynamic).
+
+:::note What you will learn in this lesson
+- How to turn a recursive formula with overlapping subproblems into a table: **Pascal's triangle**.
+- How to solve the **0/1 knapsack** problem optimally, fill its table by hand and recover which objects to take.
+- What a **pseudo-polynomial** algorithm is.
+- Two classic dynamic programming algorithms on strings: **LCS** and **edit distance**.
+:::
+
+---
+
+## Combinations
+
+In mathematics, a **combination** is a way of selecting $k$ things out of a larger group of $n$, where (unlike permutations) the **order does not matter**. For example, given three fruits (an apple, an orange and a pear), there are three combinations of two: {apple, orange}, {apple, pear} and {orange, pear}. The number of combinations is the binomial coefficient:
+
+$$
+C(n, k) = \binom{n}{k} = \frac{n!}{k!\,(n-k)!}
+$$
+
+Computing it with factorials is risky: $n!$ overflows a `long` for $n \gt 20$, even when the result is small. A better way uses the recurrence behind **Pascal's triangle**:
+
+$$
+C(n, k) = \begin{cases} 1 & \text{if } k = 0 \text{ or } k = n \\ C(n-1, k-1) + C(n-1, k) & \text{if } 0 \lt k \lt n \end{cases}
+$$
+
+(either a given element is in the selection, and we choose the other $k - 1$ among the remaining $n - 1$; or it is not, and we choose all $k$ among the remaining $n - 1$).
+
+<details>
+  <summary>🧠 <strong>Checkpoint: Combinations of 9 elements taken 5 at a time</strong></summary>
+
+  **Question:** How many combinations of 9 elements taken 5 at a time are there?
+
+  **Answer:** $C(9, 5) = \frac{9!}{5!\,4!} = \frac{9 \cdot 8 \cdot 7 \cdot 6}{4 \cdot 3 \cdot 2 \cdot 1} = 126$.
+
+</details>
+
+### Divide and conquer: exponential
+
+The recurrence translates directly into a recursive method:
+
+```java
+public long combinationsRecursive(int n, int k) {
+    if (k == 0 || k == n) return 1;
+    return combinationsRecursive(n - 1, k - 1) + combinationsRecursive(n - 1, k);
+}
+```
+
+It has the same problem as Fibonacci: the same subproblems are solved many times. Since every call ends in a base case that returns 1, and the result is the sum of those 1s, computing $C(n, k)$ requires $2\,C(n, k) - 1$ calls. We measured it:
+
+| $C(n, k)$ | Value | Recursive calls | Recursive time | Dynamic programming time |
+| :--- | ---: | ---: | ---: | ---: |
+| $C(20, 10)$ | 184,756 | 369,511 | 2 ms | 0.3 ms |
+| $C(26, 13)$ | 10,400,600 | 20,801,199 | 47 ms | 0.04 ms |
+| $C(30, 15)$ | 155,117,520 | 310,235,039 | 581 ms | 0.1 ms |
+| $C(32, 16)$ | 601,080,390 | 1,202,160,779 | 2,317 ms | 0.07 ms |
+
+### Dynamic programming: Pascal's triangle
+
+The different subproblems are the values $C(i, j)$ with $0 \le i \le n$ and $0 \le j \le \min(i, k)$. Store them in a table, filled row by row, from top to bottom: each cell is the sum of the cell above and the cell above-left.
+
+```java
+public long combinationsDP(int n, int k) {
+    long[][] table = new long[n + 1][k + 1];
+    for (int i = 0; i <= n; i++) {
+        for (int j = 0; j <= Math.min(i, k); j++) {
+            if (j == 0 || j == i)
+                table[i][j] = 1;                                     // borders of the triangle
+            else
+                table[i][j] = table[i - 1][j - 1] + table[i - 1][j];  // Pascal's rule
+        }
+    }
+    return table[n][k];
+}
+```
+
+The first rows of the table (Pascal's triangle):
+
+| $i$ \ $j$ | 0 | 1 | 2 | 3 | 4 | 5 |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| 0 | 1 | | | | | |
+| 1 | 1 | 1 | | | | |
+| 2 | 1 | 2 | 1 | | | |
+| 3 | 1 | 3 | 3 | 1 | | |
+| 4 | 1 | 4 | 6 | 4 | 1 | |
+| 5 | 1 | 5 | 10 | 10 | 5 | 1 |
+| 6 | 1 | 6 | 15 | 20 | 15 | 6 |
+
+**Complexity.** There are $O(n \cdot k)$ cells, each computed with one addition: $O(n \cdot k)$ time and memory (or $O(k)$ memory keeping only the previous row). Compare with the exponential growth of the recursive version.
+
+---
+
+## The 0/1 Knapsack Problem
+
+We met the knapsack problem in the greedy chapter. Now the objects **cannot be fragmented**: each object is either taken entirely or left. We have $n$ objects, each with a weight $w_i$ and a value $v_i$, and a backpack that can carry a total weight not exceeding $W$; we want to maximise the total value. We saw that no greedy heuristic is optimal for this version. Dynamic programming is.
+
+### Data
+
+Three objects and a weight limit $W = 10$:
+
+| Object | 1 | 2 | 3 |
+| :--- | :---: | :---: | :---: |
+| Weight $w_i$ | 6 | 5 | 5 |
+| Value $v_i$ | 8 | 5 | 5 |
+
+The greedy algorithm by value per weight would take object 1 (ratio $8/6 \approx 1.33$, versus 1 for the others), and then nothing else fits: value 8. Can we do better?
+
+### The subproblems and the recurrence
+
+**Subproblems:** let $V(i, j)$ be the maximum value we can carry using **only the first $i$ objects**, with a weight limit $j$. The solution of the problem is $V(n, W)$, here $V(3, 10)$.
+
+**Recurrence:** for object $i$ there are only two options: leave it, or take it (if it fits). If we leave it, the best is $V(i-1, j)$. If we take it, we gain $v_i$, and the remaining capacity $j - w_i$ must be used in the best possible way with the first $i - 1$ objects (the principle of optimality): $V(i-1, j - w_i) + v_i$. Hence:
+
+$$
+V(i, j) = \begin{cases} -\infty & \text{if } j \lt 0 \\ 0 & \text{if } i = 0 \text{ and } j \ge 0 \\ \max\big(V(i-1, j),\; V(i-1, j - w_i) + v_i\big) & \text{otherwise} \end{cases}
+$$
+
+The value $-\infty$ for a negative capacity simply means that an object that does not fit can never be taken.
+
+### Filling the table
+
+The table has a row for each number of objects $i$ (from 0 to $n$) and a column for each weight limit $j$ (from 0 to $W$). It is filled row by row, since each row only depends on the previous one:
+
+| $i$ \ $j$ | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| 0 (no objects) | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| 1 (object 1: $w=6, v=8$) | 0 | 0 | 0 | 0 | 0 | 0 | 8 | 8 | 8 | 8 | 8 |
+| 2 (object 2: $w=5, v=5$) | 0 | 0 | 0 | 0 | 0 | 5 | 8 | 8 | 8 | 8 | 8 |
+| 3 (object 3: $w=5, v=5$) | 0 | 0 | 0 | 0 | 0 | 5 | 8 | 8 | 8 | 8 | **10** |
+
+Some cells, step by step:
+
+- $V(1, 6) = \max(V(0, 6), V(0, 0) + 8) = \max(0, 8) = 8$: with capacity 6, object 1 fits.
+- $V(2, 5) = \max(V(1, 5), V(1, 0) + 5) = \max(0, 5) = 5$: with capacity 5, only object 2 fits.
+- $V(2, 10) = \max(V(1, 10), V(1, 5) + 5) = \max(8, 5) = 8$: objects 1 and 2 together weigh 11, so the best is object 1 alone.
+- $V(3, 10) = \max(V(2, 10), V(2, 5) + 5) = \max(8, 10) = $ **10**: taking object 3 and using the remaining capacity 5 in the best way (object 2) beats object 1.
+
+The optimal value is **10**, better than the 8 of the greedy algorithm.
+
+### Recovering the objects
+
+The table gives the optimal **value**. To know **which objects** to take, trace back from $V(n, W)$: if $V(i, j) \ne V(i-1, j)$, object $i$ was taken, so continue from $V(i-1, j - w_i)$; otherwise, it was not, so continue from $V(i-1, j)$.
+
+- $V(3, 10) = 10 \ne V(2, 10) = 8$: object 3 is taken; continue from $V(2, 5)$.
+- $V(2, 5) = 5 \ne V(1, 5) = 0$: object 2 is taken; continue from $V(1, 0)$.
+- $V(1, 0) = 0 = V(0, 0)$: object 1 is not taken.
+
+Solution: objects **2 and 3**, with total weight 10 and value 10.
+
+```java
+int knapsack01(int maxWeight, int[] weights, int[] values) {
+    int n = weights.length;
+    int[][] v = new int[n + 1][maxWeight + 1];          // row 0: no objects, all zeros
+    for (int i = 1; i <= n; i++)
+        for (int j = 0; j <= maxWeight; j++) {
+            v[i][j] = v[i - 1][j];                      // leave object i
+            if (weights[i - 1] <= j)                    // take it, if it fits
+                v[i][j] = Math.max(v[i][j], v[i - 1][j - weights[i - 1]] + values[i - 1]);
+        }
+    return v[n][maxWeight];
+}
+```
+
+<details>
+  <summary>🧠 <strong>Checkpoint: Fill a table yourself</strong></summary>
+
+  **Question:** Four objects with weights 3, 2, 1, 4 and values 6, 4, 5, 10. What is the maximum value with $W = 6$?
+
+  **Answer:** **15**. Several combinations reach it: objects 1, 2 and 3 (weights $3 + 2 + 1 = 6$, values $6 + 4 + 5 = 15$), or objects 3 and 4 (weights $1 + 4 = 5$, values $5 + 10 = 15$). Fill the $5 \times 7$ table to check it.
+
+</details>
+
+### Complexity: pseudo-polynomial
+
+The table has $(n + 1) \times (W + 1)$ cells, each computed in constant time: **$O(n \cdot W)$** in time and memory (memory can be reduced to $O(W)$ by keeping a single row, at the cost of not being able to reconstruct the objects).
+
+This looks polynomial, but it depends on the **value** of $W$, not on its size. $W$ is written with about $\log_2 W$ bits, so $O(n \cdot W)$ is exponential in the size of the input, just like the naive greatest common divisor of the divide and conquer chapter. Such algorithms are called **pseudo-polynomial**: excellent when $W$ is moderate (a few thousand), impractical when $W$ is huge (for example, weights in grams of a cargo ship). No algorithm that is polynomial in the size of the input is known for the 0/1 knapsack problem.
+
+---
+
+## Try It Yourself: The Change and the River
+
+The course proposes two more problems to solve with dynamic programming. Try them before looking for any solution.
+
+### The problem of the change
+
+We want to pay an amount with the **fewest possible coins**, for **any** coin system (we saw in the greedy chapter that the greedy heuristic fails for some systems). Hints:
+
+- The method could be `int change(int amount, int[] coins)`, with the coins sorted from the smallest to the largest, and the first one with a value of 1 (so that every amount can be paid).
+- The structure is very similar to the knapsack: a table with a row for each coin type and a column for each amount from 0 to the total. But now we look for the **lowest** value instead of the greatest, and each coin can be used **many times**.
+- With coins of 1, 4, 5, 12, 20, 50, 100 and 200, paying 15 requires **3** coins (5 + 5 + 5). Check that your algorithm finds it, and that the greedy one does not (it would take 12 + 1 + 1 + 1).
+- What is the complexity of your algorithm?
+
+### Cheaper travel on the river
+
+A river has $n$ docks. At each one you can rent a boat to go to any other dock **downstream** (it is impossible to go upstream). A fee table indicates the cost of travelling from dock $i$ to dock $j$ ($i \lt j$). A trip from $i$ to $j$ may be more expensive than a succession of shorter trips: then it is better to go from $i$ to some dock $k$ and take a second boat from $k$ to $j$. Design an efficient algorithm that determines the **minimum cost for every pair** of docks $i \lt j$, and indicate its time as a function of $n$.
+
+Hint: think about how a trip from $i$ to $j$ can be split into smaller trips, which subproblems that defines, and in which order the table must be filled so that the values you need are already known.
+
+---
+
+## Beyond the Course: Dynamic Programming on Strings
+
+Two classic problems show how dynamic programming handles **sequences**.
+
+### Longest common subsequence (LCS)
+
+A **subsequence** of a string is obtained by deleting some characters without changing the order of the rest. The **longest common subsequence** of two strings is the longest string that is a subsequence of both. For example, for `ALGORITHM` and `ALTRUISM`, an LCS is `ALRIM`, of length 5.
+
+**Subproblems:** $L(i, j)$ = length of the LCS of the first $i$ characters of $a$ and the first $j$ characters of $b$.
+
+$$
+L(i, j) = \begin{cases} 0 & \text{if } i = 0 \text{ or } j = 0 \\ L(i-1, j-1) + 1 & \text{if } a_i = b_j \\ \max\big(L(i-1, j),\; L(i, j-1)\big) & \text{otherwise} \end{cases}
+$$
+
+If the last characters match, they are part of the LCS; otherwise, one of them is not, and we keep the best of discarding either one. The table has $(|a| + 1) \times (|b| + 1)$ cells: $O(|a| \cdot |b|)$. The `diff` tool that compares versions of a file is based on this idea, applied to lines instead of characters.
+
+### Edit distance
+
+The **edit distance** (or Levenshtein distance) between two strings is the minimum number of single-character **insertions**, **deletions** and **substitutions** needed to transform one into the other. For example, `KITTEN` → `SITTING` needs 3 operations: substitute K by S, substitute E by I, insert G.
+
+$$
+D(i, j) = \min \begin{cases} D(i-1, j) + 1 & \text{(delete } a_i\text{)} \\ D(i, j-1) + 1 & \text{(insert } b_j\text{)} \\ D(i-1, j-1) + (a_i \ne b_j\ ?\ 1 : 0) & \text{(substitute, or keep if equal)} \end{cases}
+$$
+
+with $D(i, 0) = i$ and $D(0, j) = j$. The complete table for `KITTEN` (rows) and `SITTING` (columns):
+
+| | ∅ | S | I | T | T | I | N | G |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| ∅ | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 |
+| K | 1 | 1 | 2 | 3 | 4 | 5 | 6 | 7 |
+| I | 2 | 2 | 1 | 2 | 3 | 4 | 5 | 6 |
+| T | 3 | 3 | 2 | 1 | 2 | 3 | 4 | 5 |
+| T | 4 | 4 | 3 | 2 | 1 | 2 | 3 | 4 |
+| E | 5 | 5 | 4 | 3 | 2 | 2 | 3 | 4 |
+| N | 6 | 6 | 5 | 4 | 3 | 3 | 2 | **3** |
+
+Spelling correctors use it to suggest the closest dictionary words, and bioinformatics uses weighted variants to align DNA sequences.
+
+---
+
+## Summary
+
+| Problem | Subproblems | Recurrence (idea) | Complexity |
+| :--- | :--- | :--- | :--- |
+| Fibonacci | $F(i)$, $0 \le i \le n$ | $F(i) = F(i-1) + F(i-2)$ | $O(n)$ |
+| Combinations | $C(i, j)$ | $C(i, j) = C(i-1, j-1) + C(i-1, j)$ | $O(n \cdot k)$ |
+| 0/1 knapsack | $V(i, j)$: first $i$ objects, capacity $j$ | leave or take object $i$ | $O(n \cdot W)$, pseudo-polynomial |
+| LCS | $L(i, j)$: prefixes of both strings | match, or discard one character | $O(\lvert a \rvert \cdot \lvert b \rvert)$ |
+| Edit distance | $D(i, j)$: prefixes of both strings | delete, insert or substitute | $O(\lvert a \rvert \cdot \lvert b \rvert)$ |
+
+---
+
+## Practice
+
+:::tip Exercises
+- **🔺 Pascal.** Run `combinationsDP` and `combinationsRecursive` from the [course repository](https://github.com/vicegd/algorithms/tree/master/src/topics/dynamic/combinations) for increasing $n$ with $k = n/2$, and check the number of calls $2\,C(n, k) - 1$.
+- **🎒 Knapsack by hand.** Fill the knapsack table for the data of the checkpoint ($W = 6$), and recover the objects chosen by tracing back from $V(4, 6)$. Which of the two optimal combinations do you obtain?
+- **💾 One row.** Rewrite the knapsack algorithm using a single array of $W + 1$ positions. In which direction must the inner loop run so that each object is used at most once?
+- **💰 The change.** Solve the problem of the change with dynamic programming (try it yourself), and use it to find the amounts up to 100 for which the greedy algorithm fails with the coins 1, 4, 5, 12, 20, 50.
+- **🚣 The river.** Solve the problem of the cheapest travel on the river, and analyse its complexity.
+- **🔤 LCS.** Implement the LCS algorithm, including the reconstruction of the subsequence, and test it with two versions of a short text.
+:::
