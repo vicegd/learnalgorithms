@@ -9,128 +9,196 @@ import TabItem from '@theme/TabItem';
 
 # Introduction to Algorithmic Thinking
 
-In computational sciences, programming syntax is merely a vehicle for execution. The true engineering core lies in **Algorithmics**—the systematic study, design, and analysis of robust and efficient computational strategies. 
+In computer science, programming syntax is merely a vehicle for execution. The true engineering core lies in **Algorithmics**: the systematic study, design and analysis of correct and efficient computational strategies.
 
-As software engineers, our primary challenge shifts from making a program "just work" to mathematically ensuring that a strategy executes correctly and optimizes the consumption of hardware resources under arbitrary scalability.
+As software engineers, our primary challenge shifts from making a program "just work" to ensuring, with arguments we can defend, that a strategy executes correctly for every valid input and makes a reasonable use of hardware resources as the size of the problem grows.
 
----
-
-## Formalizing the "Algorithm"
-
-A common popular analogy compares an algorithm to a cooking recipe. While this image is useful as an entry point, it is not rigorous enough for computer science. A recipe tolerates intuition, approximation, and subjective interpretation; an algorithm, by contrast, must define a computational process with enough precision to be executed mechanically and analyzed mathematically.
-
-In software engineering, we are not satisfied with a procedure that *usually works* or that depends on human common sense to fill in missing details. We need a model of computation that specifies what problem is being solved, under which input conditions, through which exact operational steps, and with what guarantees of termination and correctness.
-
----
-
-### From intuition to formal specification
-
-At an informal level, many sources define an algorithm as a finite sequence of ordered steps that solves a problem. This intuition is acceptable for beginners, but it leaves several essential engineering questions unanswered: what counts as a valid input, what makes a step unambiguous, what guarantees termination, and how the procedure behaves when executed on a real machine with bounded memory and time.
-
-To reason rigorously about programs, computer science moves from a descriptive view of algorithms to a **formal specification view**. Under this perspective, an algorithm is not merely a sequence of instructions, but a computational object defined over an input domain, associated with an expected output relation, and constrained by precise execution rules.
-
-| Perspective | Definition | Operational Goal |
-| :--- | :--- | :--- |
-| **General / informal** | An ordered and finite set of steps used to solve a problem. | Sequential resolution of a task. |
-| **Computer Science / formal** | A finite, unambiguous, effective, and executable sequence of instructions that transforms valid inputs into outputs according to a precise specification. | Predictability, correctness, safety, and analyzability. |
-
-This distinction matters because, in engineering, the difficulty is rarely in describing *an idea* for solving a problem. The real challenge is defining that idea with enough rigor that its behavior can be trusted, implemented, tested, and later analyzed in terms of correctness and efficiency.
-
----
-
-### The classical properties of Knuth
-
-A classical characterization, widely attributed to [Donald Knuth in his foundational work *The Art of Computer Programming*](https://en.wikipedia.org/wiki/The_Art_of_Computer_Programming), states that a proper algorithm must satisfy five fundamental properties:
-
-#### 1. Finiteness
-The execution must terminate after a finite number of steps for every valid input in its domain. An algorithm that can enter an endless loop for some admissible input is not complete from a formal standpoint, even if it appears to work for many test cases.
-
-This property requires a mathematical guarantee that the execution always progresses toward termination. In later topics, this idea will connect directly with loop invariants, recursive well-foundedness, and formal proofs of termination.
-
-#### 2. Definiteness
-Every step must be specified clearly and without ambiguity. At any point during execution, the next action must be fully determined by the current state and the instruction sequence.
-
-Instructions such as *"repeat several times"*, *"sort efficiently"*, or *"stop when the result looks reasonable"* are not algorithmic statements; they are vague intentions. A formal algorithm replaces such expressions with exact control conditions, explicit comparisons, and precisely defined state transitions.
-
-#### 3. Input
-An algorithm accepts zero or more inputs taken from a defined domain. This domain is not a secondary detail: it is part of the specification itself.
-
-For example, if a factorial procedure is intended only for non-negative integers, then this restriction must be stated explicitly. Without a clearly defined input domain, it is impossible to decide whether a behavior is correct, incorrect, or simply outside the intended scope of the problem.
-
-#### 4. Output
-An algorithm must produce one or more outputs that are related in a well-defined way to the input. The existence of output is not enough; the output must satisfy the problem specification.
-
-This is why printing arbitrary values, returning sentinel values without documentation, or terminating without a result does not constitute a valid solution unless such behavior is part of the formal contract. In mathematical terms, we want to reason about the algorithm as a mapping from admissible inputs to valid outputs.
-
-#### 5. Effectiveness
-Each step must be elementary enough to be carried out exactly, in finite time, by a mechanical executor. Traditionally, this means that every instruction should be basic enough that a human could perform it with paper and pencil, provided sufficient time.
-
-The point of this property is not human practicality, but computational realism. A valid algorithm cannot contain magical steps such as *"guess the optimum solution instantly"* or *"inspect all future states at once"*. Every operation must be reducible to basic executable actions.
-
----
-
-### Why these properties matter in engineering
-
-These five properties are not merely historical definitions. Together, they form the minimal contract that allows algorithmic reasoning.
-
-- Without **finiteness**, we cannot guarantee that execution ever completes.  
-- Without **definiteness**, two programmers could implement the "same" algorithm and obtain different behaviors.  
-- Without a clear **input** domain, correctness becomes impossible to define.  
-- Without a specified **output**, success cannot be measured.  
-- Without **effectiveness**, the procedure may be a mathematical fantasy rather than a realizable computation.
-
-In other words, these properties are what transform an informal idea into a legitimate object of study in algorithmics. Only once this baseline is established does it make sense to ask deeper architectural questions.
-
-:::info Determinism and reproducibility
-In introductory contexts, algorithms are often presented as deterministic procedures: given the same input and the same initial state, execution follows the same path and produces the same result.
-
-This determinism is one of the reasons algorithms can be tested, verified, and compared scientifically. Even when modern systems incorporate randomness, probabilistic choice, or machine learning components, the algorithm still requires a formally defined state model, execution rule, and interpretation of outputs.
+:::note What you will learn in this chapter
+- Where the word *algorithm* comes from, and how the idea evolved from medieval arithmetic to modern computing.
+- How to move from an intuitive definition ("a recipe") to a formal one, based on Knuth's five properties and on the notion of a **problem specification**.
+- Why a piece of code that works on a few examples is not necessarily an algorithm, illustrated with several versions of the factorial.
+- What makes some problems "simple" and others hard, and what we mean by the **cost** and **efficiency** of a solution.
+- How decomposition and abstraction help us tackle complex problems, and why algorithm design has no universal recipe.
+- Where algorithms show up in real life and in technical job interviews, and how this course prepares you for both.
 :::
 
 ---
 
-### Algorithm vs. program fragment
+## 1. A Word with a History
 
-A crucial distinction for this course is that **not every piece of code is automatically an algorithm**.
+We often think of algorithms as something new, but the word is more than a thousand years old. It comes from the name of **Muhammad ibn Musa al-Khwarizmi**, a Persian scholar born around 780 AD in the region of Khwarazm (in present-day Uzbekistan). He worked at the *House of Wisdom* in Baghdad, the great intellectual centre of the 9th century, and made contributions to mathematics, astronomy and geography.
 
-A code fragment may fail to terminate on some inputs, may omit edge cases, may rely on undocumented assumptions, or may produce outputs that are not meaningfully tied to the original problem. In such cases, we do not yet have a robust algorithm; we only have a partial implementation attempt.
+One of his books explained how to calculate with the Hindu decimal numeral system, including the use of zero and positional notation. When it was translated into Latin centuries later, its opening words, *"Dixit Algoritmi"* ("so said al-Khwarizmi"), turned his name into a label for the method itself. In medieval Latin, *algorismus* simply meant **calculating with decimal numerals**, as opposed to using an abacus or Roman numerals. Another of his books, on solving equations, gave us the word **algebra** (from *al-jabr*, "restoration").
 
-This distinction becomes especially important in software engineering because many failures do not come from syntax errors, but from incomplete formalization. A program can compile, run, and even pass several examples while still violating one of the foundational properties above. In that sense, algorithm design begins *before* coding: it begins when we define the computational problem precisely enough to make correctness and analysis possible.
+The meaning of the word kept evolving:
+
+1. **Medieval period:** *algorism* means the art of written arithmetic with Hindu-Arabic numerals: precise, step-by-step procedures to add, subtract, multiply and divide that anyone could follow mechanically.
+2. **Late 19th century:** *algorithm* comes to mean, more generally, any finite set of precise rules for solving a problem.
+3. **1930s:** mathematicians such as Alan Turing and Alonzo Church formalised what it means for a procedure to be "mechanical". Turing's abstract machine showed that a device following simple instructions could, in principle, carry out any computation that can be described algorithmically. This laid the theoretical foundations of the computer age.
+4. **Today:** algorithms decide the route of our trips, the results of our searches, the products we are recommended and the news we read.
+
+:::info One of the oldest algorithms still in use
+Long before the word existed, Euclid described (around 300 BC) a procedure to compute the **greatest common divisor** of two integers. It is still taught, and still used, today:
+
+```java
+public static int gcd(int a, int b) {   // precondition: a >= 0, b >= 0, not both 0
+    while (b != 0) {
+        int r = a % b;   // remainder of the division
+        a = b;
+        b = r;
+    }
+    return a;
+}
+```
+
+It already has all the ingredients we will study: a precise input domain, unambiguous steps, a guaranteed end (the remainder strictly decreases and cannot go below zero) and a result whose correctness can be proven mathematically.
+:::
+
+---
+
+## 2. Our First Algorithm: "Hello, World!"
+
+Almost every programming course starts by printing `Hello, world!`. If you write it in C, Java, Python, Lisp or Ruby, the syntax changes considerably, but **the idea is exactly the same**: produce a fixed message as output.
+
+This simple observation already contains a key lesson of this course: **an algorithm is independent of the language used to express it**. The language is the vehicle; the algorithm is the idea. When we study an algorithm, we care about its logic, its correctness and its cost, and these properties remain valid whether we implement it in Java, C++ or a language that does not exist yet.
 
 <details>
-  <summary>🧠 <strong>Pedagogical Checkpoint: Formal reasoning</strong></summary>
+  <summary>🧠 <strong>Checkpoint: Is "Hello, world!" an algorithm?</strong></summary>
 
-  **Question:** Why is the statement *"compute the factorial of an integer"* not yet a complete algorithmic specification?
-
-  **Answer:** Because it does not define the admissible input domain, the behavior for invalid values such as negative integers, the exact operational method, or the expected output contract in exceptional cases. It describes a goal, but not yet a fully formalized computational process.
+  **Answer:** Technically yes, although a trivial one. It receives zero inputs (which is allowed), executes a finite number of unambiguous and effective steps, and produces a well-defined output. It satisfies all of Knuth's properties described below. It is simply not *interesting* from an algorithmic point of view, because there is no problem to solve and no decision to make.
 
 </details>
 
 ---
 
-## Structural Robustness: The Factorial Execution Lifecycle
+## 3. Formalizing the "Algorithm"
 
-An implementation that functions correctly under ideal conditions but crashes when confronted with boundary inputs is not a robust algorithm. It is a partial program that works only inside a narrow comfort zone. In engineering terms, robustness requires that the algorithm preserves its formal properties (finiteness, definiteness, correctness) across the entire declared input domain and under realistic execution constraints.
+A common analogy compares an algorithm to a cooking recipe. While this image is useful as an entry point, it is not rigorous enough for computer science. A recipe tolerates intuition, approximation and subjective interpretation ("add salt to taste", "bake until golden"). An algorithm, by contrast, must define a computational process with enough precision to be executed mechanically and analysed mathematically.
 
-To make this notion concrete, consider again the classical mathematical definition of the factorial of a non-negative integer $n$:
+### From intuition to formal specification
+
+Let us compare some definitions:
+
+- **Dictionary definition.** The dictionary of the Royal Spanish Academy (RAE) defines an algorithm as an *ordered and finite set of operations that allows us to find the solution of a problem*.
+- **Most widely accepted definition in computing.** A *finite sequence of steps or instructions to reach the solution of a given problem in a finite time, for any set of input values*.
+
+The second definition adds two crucial requirements: **finite time** (not only a finite description) and **for any set of input values** (not only for the examples we tried). Still, it leaves several engineering questions open: what counts as a valid input, what makes a step unambiguous, and how the procedure behaves on a real machine with limited memory.
+
+To reason rigorously about programs, computer science moves from a descriptive view of algorithms to a **formal specification view**. Under this perspective, an algorithm is a computational object defined over an input domain, associated with an expected relation between inputs and outputs, and constrained by precise execution rules.
+
+| Perspective | Definition | Operational goal |
+| :--- | :--- | :--- |
+| **General / informal** | An ordered and finite set of steps used to solve a problem. | Sequential resolution of a task. |
+| **Computer science / formal** | A finite, unambiguous, effective and executable sequence of instructions that transforms valid inputs into outputs according to a precise specification. | Predictability, correctness, safety and analysability. |
+
+In engineering, the difficulty is rarely in describing *an idea* for solving a problem. The real challenge is defining that idea with enough rigour that its behaviour can be trusted, implemented, tested and later analysed in terms of correctness and efficiency.
+
+### Problems, instances and specifications
+
+Before talking about algorithms, we must be precise about the **problem** they solve.
+
+- A **computational problem** describes, in general terms, the relation between the inputs and the desired outputs. For example: *"given a sequence of integers, return the same integers in non-decreasing order"*.
+- An **instance** of the problem is one concrete input, such as `[7, 3, 6]`. A problem has (usually infinitely) many instances.
+- A **specification** states the problem precisely, typically through:
+  - a **precondition**: the conditions that a valid input must satisfy (the input domain), and
+  - a **postcondition**: the conditions that the output must satisfy with respect to the input.
+
+For the factorial, a possible specification is:
 
 $$
-n! = \prod_{i=1}^{n} i = 1 \cdot 2 \cdot 3 \cdot \dots \cdot n
+\textbf{Pre: } n \in \mathbb{Z},\; 0 \le n \le 20 \qquad\qquad \textbf{Post: } \mathit{result} = n! = \prod_{i=1}^{n} i
 $$
 
-This definition already encodes several important facts:
-- The domain of the function is typically taken to be the set of non-negative integers.  
-- The base case is $0! = 1$.  
+(we will see later why the upper limit of 20 appears). With a specification in hand, we can finally define correctness:
 
-When we translate this mathematical object into code, the goal is not merely to obtain *some* implementation that returns correct values for a few test cases. The goal is to implement an algorithm whose behavior is well-defined for every input in the chosen domain, and whose interaction with the underlying machine respects the constraints of the execution environment.
+:::tip Correctness
+An algorithm is **correct** with respect to a specification if, for **every** instance that satisfies the precondition, it **terminates** and its output satisfies the postcondition.
+
+Note the word *every*. Testing a program with a hundred inputs can reveal errors, but it cannot prove their absence. Correctness is a property over the whole input domain, which is why we need reasoning and not only experiments.
+:::
+
+### The classical properties of Knuth
+
+A classical characterization, popularised by [Donald Knuth in his foundational work *The Art of Computer Programming*](https://en.wikipedia.org/wiki/The_Art_of_Computer_Programming), states that a proper algorithm must satisfy five fundamental properties.
+
+#### 1. Finiteness
+The execution must terminate after a finite number of steps for every valid input in its domain. An algorithm that can enter an endless loop for some admissible input is not complete from a formal standpoint, even if it appears to work for many test cases.
+
+This property requires an argument that the execution always progresses towards termination, as in Euclid's algorithm above. In later topics, this idea will connect with loop invariants, well-founded recursion and termination proofs.
+
+#### 2. Definiteness
+Every step must be specified clearly and without ambiguity. At any point during execution, the next action must be fully determined by the current state and the instruction sequence.
+
+Instructions such as *"repeat several times"*, *"sort efficiently"* or *"stop when the result looks reasonable"* are not algorithmic statements; they are vague intentions. A formal algorithm replaces them with exact control conditions, explicit comparisons and precisely defined state transitions.
+
+#### 3. Input
+An algorithm accepts zero or more inputs taken from a defined domain. This domain is not a secondary detail: it is part of the specification itself.
+
+If a factorial procedure is intended only for non-negative integers, this restriction must be stated explicitly. Without a clearly defined input domain, it is impossible to decide whether a behaviour is correct, incorrect or simply outside the intended scope of the problem.
+
+#### 4. Output
+An algorithm must produce one or more outputs that are related in a well-defined way to the input. The existence of output is not enough; the output must satisfy the specification.
+
+Printing arbitrary values, returning undocumented "magic" values or terminating without a result does not constitute a valid solution unless such behaviour is part of the formal contract. Mathematically, we want to reason about the algorithm as a mapping from admissible inputs to valid outputs.
+
+#### 5. Effectiveness
+Each step must be elementary enough to be carried out exactly, in finite time, by a mechanical executor. Traditionally, every instruction should be basic enough that a person could perform it with paper and pencil, given enough time.
+
+The point of this property is not human practicality, but computational realism. A valid algorithm cannot contain magical steps such as *"guess the optimal solution"* or *"inspect all future states at once"*. Every operation must be reducible to basic executable actions.
+
+### Why these properties matter in engineering
+
+These five properties are not merely historical definitions. Together, they form the minimal contract that makes algorithmic reasoning possible:
+
+- Without **finiteness**, we cannot guarantee that execution ever completes.
+- Without **definiteness**, two programmers could implement the "same" algorithm and obtain different behaviours.
+- Without a clear **input** domain, correctness becomes impossible to define.
+- Without a specified **output**, success cannot be measured.
+- Without **effectiveness**, the procedure may be a mathematical fantasy rather than a realisable computation.
+
+:::info Determinism and reproducibility
+In introductory contexts, algorithms are presented as **deterministic** procedures: given the same input and initial state, execution follows the same path and produces the same result. This is one of the reasons why algorithms can be tested, verified and compared scientifically.
+
+Some algorithms deliberately use randomness (for example, randomised Quicksort, which you will see in the sorting chapter). Even then, the algorithm requires a formally defined state model, execution rules and a precise interpretation of its outputs, often stated in terms of probabilities or expected values.
+:::
+
+### Algorithm, program and pseudocode
+
+A crucial distinction for this course is that **not every piece of code is automatically an algorithm**, and that an algorithm is not the same thing as a program:
+
+- An **algorithm** is an abstract method. It can be described in natural language, with a diagram or in **pseudocode** (a semi-formal notation that ignores the details of any particular language).
+- A **program** is the expression of one or more algorithms in a concrete programming language, together with everything a real system needs: input/output, error handling, data representation, libraries, etc.
+
+A code fragment may fail to terminate on some inputs, omit edge cases, rely on undocumented assumptions or produce outputs that are not meaningfully tied to the problem. In such cases we do not yet have a robust algorithm, only an implementation attempt. Many software failures do not come from syntax errors but from **incomplete formalisation**: a program can compile, run and even pass several tests while still violating one of the properties above. In that sense, algorithm design begins *before* coding, when we define the problem precisely enough to make correctness and analysis possible.
+
+<details>
+  <summary>🧠 <strong>Checkpoint: Formal reasoning</strong></summary>
+
+  **Question:** Why is the statement *"compute the factorial of an integer"* not yet a complete specification?
+
+  **Answer:** Because it does not define the admissible input domain, the behaviour for invalid values such as negative integers, the range of values that the result type can represent, or the expected output in exceptional cases. It describes a goal, but not yet a fully formalised computational process.
+
+</details>
 
 ---
 
+## 4. Case Study: Is This an Algorithm? The Factorial
+
+An implementation that works under ideal conditions but crashes when confronted with boundary inputs is not a robust algorithm; it is a partial program that only works inside a narrow comfort zone. To make this concrete, consider the classical definition of the factorial of a non-negative integer $n$:
+
+$$
+n! = \prod_{i=1}^{n} i = 1 \cdot 2 \cdot 3 \cdots n, \qquad 0! = 1
+$$
+
+or, equivalently, the recursive definition $n! = n \cdot (n-1)!$ with base case $0! = 1$. The definition already encodes two facts: the domain is the set of non-negative integers, and there is a base case that stops the recursion.
+
+When we translate this mathematical object into code, the goal is not to obtain *some* implementation that returns correct values for a few test cases. The goal is an algorithm whose behaviour is well-defined for every input in the chosen domain and that respects the constraints of the machine. Let us analyse four versions.
+
 <Tabs>
-  <TabItem value="naive" label="❌ Naive Implementation" default>
+  <TabItem value="naive" label="❌ Version 1: naive" default>
 
 ```java
-public static int factorial(int n) {
+public static long factorial(int n) {
     if (n == 0) return 1;
     return n * factorial(n - 1);
 }
@@ -138,31 +206,51 @@ public static int factorial(int n) {
 
 ### Where the naive version fails
 
-At first glance, this implementation appears correct: it encodes the recurrence $n! = n \cdot (n - 1)!$ with the standard base case $0! = 1$, and it terminates cleanly for all non-negative integers $n$ that are small enough to avoid hardware primitive limitations.
+At first glance this implementation looks correct: it encodes $n! = n \cdot (n-1)!$ with the base case $0! = 1$, and it terminates for every non-negative $n$.
 
-However, notice what happens when the method is called with a negative argument, for example `n = -1`:
-- The condition `n == 0` evaluates to `false`.  
-- The recursive call `factorial(n - 1)` is executed with `n - 1 = -2`.  
-- The same pattern repeats for `n = -2, -3, -4, ...`, never reaching a base case.
+Now call it with `n = -1`:
+- The condition `n == 0` is `false`.
+- The recursive call `factorial(-2)` is executed, then `factorial(-3)`, `factorial(-4)`, and so on, never reaching the base case.
 
-From a purely mathematical perspective, the code has silently extended the domain of the function to include all integers, but without specifying what the factorial of a negative number should be. From a computational perspective, it has created a recursion with no terminating state for that part of the input domain.
+Mathematically, the code has silently extended the domain of the function to all integers without saying what the factorial of a negative number should be. Computationally, it has created a recursion with no terminating state for part of its input domain.
 
-Internally, each recursive call allocates a new **activation record** (stack frame) on the call stack. Each frame stores local variables and parameters (such as `n`), the return address of the calling context, and bookkeeping information needed by the runtime environment.
-
-Since the recursion depth grows without bound when `n < 0`, the number of active stack frames also grows without bound. Eventually, this process exhausts the finite amount of stack memory assigned to the thread by the operating system or virtual machine, and the runtime raises a `StackOverflowError`, abruptly terminating the program.
+Internally, each recursive call allocates a new **activation record** (stack frame) on the call stack, storing parameters, local variables and the return address. Since the recursion depth grows without bound when `n` is negative, the stack eventually exhausts the memory assigned to the thread and the runtime raises a `StackOverflowError`, abruptly terminating the program.
 
 :::danger Violation of finiteness
-Although the code looks simple, it violates the **finiteness** property on part of its input domain. There exist valid values of the Java primitive type `int` for which the execution does not terminate in a finite number of steps, and instead triggers a low-level runtime failure. In other words, what appears to be an algorithm is, in fact, only a partial procedure.
+There are valid values of the Java type `int` for which the execution does not terminate in a finite number of steps. What appears to be an algorithm is only a partial procedure.
 :::
 
-This example illustrates an important engineering lesson: *correctness on a few "nice" inputs is not enough*. Without explicit domain handling and guard conditions, a seemingly harmless function can destabilize the entire process by exhausting stack memory.
-
   </TabItem>
-  <TabItem value="robust" label="✅ Robust Algorithm">
+  <TabItem value="sentinel" label="⚠️ Version 2: error value">
 
 ```java
-public static int factorial(int n) {
-    if (n < 0) throw new IllegalArgumentException("n must be non-negative");
+public static long factorial(int n) {
+    if (n < 0)
+        return -1;          // "impossible" value used to signal an error
+    else if (n == 0)
+        return 1;
+    return n * factorial(n - 1);
+}
+```
+
+### An improvement, with a hidden cost
+
+This version **terminates for every integer**: negative inputs are detected immediately. It satisfies finiteness and definiteness, and the behaviour for invalid inputs is now part of the contract: *"returns -1 if n is negative"*.
+
+This technique, returning a value that can never be a valid result, is common (for example, `indexOf` returns `-1` when an element is not found). However, it has drawbacks worth discussing:
+
+- The error travels through the same channel as valid results. If the caller forgets to check it, `-1` will silently propagate through later calculations (for example, `factorial(n) / 2` returns `0`).
+- It only works when there is a value that can never be a valid output. For many problems, no such value exists.
+
+It is a reasonable choice when the convention is clearly documented and widely known, as in the course repository.
+
+  </TabItem>
+  <TabItem value="robust" label="✅ Version 3: explicit contract">
+
+```java
+public static long factorial(int n) {
+    if (n < 0)
+        throw new IllegalArgumentException("n must be non-negative");
     if (n == 0) return 1;
     return n * factorial(n - 1);
 }
@@ -170,54 +258,232 @@ public static int factorial(int n) {
 
 ### Protecting the execution lifecycle
 
-This revised implementation introduces an explicit guard for negative inputs and a clear base case:
-- **Domain enforcement:** The algorithm checks `n < 0` and rejects invalid inputs immediately by throwing a documented exception. This makes the domain of the function explicit: only non-negative integers are accepted.
-- **Guaranteed progress:** For every `n >= 0`, the recursive calls systematically decrease the argument until the base case `n == 0` is reached, ensuring termination.
-- **Controlled failure mode:** Instead of allowing the runtime to crash with a `StackOverflowError` after arbitrarily many nested calls, the algorithm fails fast with a meaningful, high-level error that can be handled by the caller.
+- **Domain enforcement:** the check `n < 0` rejects invalid inputs immediately with a documented exception. The error cannot be ignored by accident.
+- **Guaranteed progress:** for every `n >= 0`, the argument decreases by one in each call until it reaches the base case, so execution terminates.
+- **Controlled failure:** instead of crashing with a `StackOverflowError` after thousands of nested calls, the algorithm *fails fast* with a meaningful error that the caller can handle.
 
-From the perspective of Knuth's properties, this version restores finiteness and definiteness across the entire input domain:
-- The control flow is unambiguous for every integer value of `n`.  
-- For all admissible inputs (`n >= 0`), the algorithm terminates after a finite number of steps.  
-- For inadmissible inputs (`n < 0`), the behavior is specified: an exception is thrown immediately.
+This is **structural robustness**: the algorithm does not rely on "good behaviour" from its clients; it enforces its contract proactively.
 
-This is what is meant by **structural robustness** at the algorithmic level: the execution lifecycle remains well-defined and under control, even in the presence of hostile or unexpected inputs. The algorithm does not rely on "good behavior" from users or clients; instead, it defends the integrity of the runtime stack and the rest of the system by enforcing its contract proactively.
+  </TabItem>
+  <TabItem value="iterative" label="🏁 Version 4: iterative and range-safe">
 
-:::tip Architectural Robustness
-In practice, robust software is not built by assuming that invalid inputs will never happen. It is built by designing algorithms whose execution lifecycle is explicitly guarded, whose domains are clearly stated, and whose failure modes are predictable and bounded. This approach reduces the probability that a local bug or an unhandled edge case escalates into a crash or a security vulnerability at system level.
-:::
+```java
+public static long factorial(int n) {
+    if (n < 0 || n > 20)
+        throw new IllegalArgumentException("n must be in [0, 20] to fit in a long");
+    long result = 1;
+    for (int i = 2; i <= n; i++) {
+        result *= i;
+    }
+    return result;
+}
+```
+
+### The limits of the machine are part of the specification
+
+Even Version 3 hides a subtle problem: **arithmetic overflow**. The factorial grows extremely fast:
+
+- $12! = 479{,}001{,}600$ fits in an `int` (maximum $2{,}147{,}483{,}647$), but $13! = 6{,}227{,}020{,}800$ does not.
+- $20! = 2{,}432{,}902{,}008{,}176{,}640{,}000$ fits in a `long` (maximum about $9.22 \times 10^{18}$), but $21!$ does not.
+
+In Java, integer overflow does **not** raise an error: the value silently wraps around and the method returns a wrong (sometimes even negative) number. That is why the specification of Section 3 restricted the domain to $0 \le n \le 20$. If we really need larger values, we must change the data representation (for example, using `java.math.BigInteger`), which in turn changes the cost of each multiplication.
+
+This version is also **iterative**. The recursive versions need one stack frame per call, so their extra memory grows proportionally to $n$. The loop needs only a couple of variables, whatever the value of $n$. Both compute the same function, but they consume resources differently, an idea we will formalise when studying complexity.
 
   </TabItem>
 </Tabs>
 
 <details>
-  <summary>🧠 <strong>Pedagogical Checkpoint: Tail calls and finiteness</strong></summary>
+  <summary>🧠 <strong>Checkpoint: Tail calls and finiteness</strong></summary>
 
-  **Question:** Suppose we implement `factorial` in a language with Tail Call Optimization (TCO), where recursive calls in tail position do not allocate new stack frames. Would TCO alone make the naive implementation correct for negative inputs?
+  **Question:** Suppose we run the naive version in a language with *tail call optimisation* (TCO), where certain recursive calls reuse the current stack frame instead of allocating a new one. Would TCO make the naive implementation correct for negative inputs?
 
-  **Answer:** No. TCO may avoid `StackOverflowError` by reusing a single stack frame, but it does not solve the logical problem: the control flow still loops forever for negative `n`, never reaching a base case or producing output. The algorithm would enter an infinite loop, consuming CPU cycles without termination. This still violates the finiteness property, regardless of how the runtime optimizes stack usage.
+  **Answer:** No. TCO might prevent the `StackOverflowError`, but it does not fix the logical problem: the control flow still never reaches a base case. The program would loop forever, consuming CPU time without producing an output. Finiteness is still violated, regardless of how the runtime manages the stack. (Incidentally, `n * factorial(n - 1)` is not even a tail call, because the multiplication happens *after* the recursive call returns.)
+
+</details>
+
+<details>
+  <summary>🧠 <strong>Checkpoint: Silent failures</strong></summary>
+
+  **Question:** Which is more dangerous in production: Version 1 called with `n = -5`, or Version 3 called with `n = 25`?
+
+  **Answer:** Probably Version 3 with `n = 25`. Version 1 crashes loudly, so the error is noticed immediately. Version 3 returns a wrong number *without any warning* because of overflow, and that wrong value may be stored, displayed or used in later decisions. Silent failures are usually much harder to detect and diagnose than crashes.
 
 </details>
 
 ---
 
-## Why We Study This Discipline
+## 5. Algorithms and Computer Science
 
-Studying algorithmics is not about memorizing a catalog of programming syntax tricks. It is about internalizing a way of thinking that remains valuable even as languages, frameworks, and platforms change.
+The primary purpose of most programs is to **store and retrieve information**, and to transform it. To do so efficiently we need two things that cannot be separated:
 
-1. **Language and Framework Invariance:** Programming ecosystems evolve constantly: today's Java, Python, C++, or Rust will eventually be replaced or reshaped by new technologies. By contrast, the core properties of structural execution remain universal laws, independent of language syntax or APIs. Once you understand why a particular strategy scales better, that insight remains valid across languages, compilers, and hardware generations.
-2. **Mathematical Abstraction:** Algorithmic thinking trains you to look past the surface details of code—variable names, library calls, syntactic sugar—and focus on the underlying structure of the problem. This abstraction layer separates *architecture* (what needs to be computed and how it scales) from *implementation details* (how a particular language expresses it).
-3. **Architectural Evaluation:** Algorithmics provides tools to evaluate whether a proposed design can scale *before* committing to a full implementation. By analyzing how computational paths develop, you can detect potential bottlenecks early, compare alternative designs on paper, and avoid investing months in architectures that will not meet performance or resilience goals once deployed.
+- **Data structures**, which organise information in memory, and
+- **Algorithms**, which operate on those structures.
+
+Niklaus Wirth, the creator of Pascal, summarised this idea in the title of his classic 1976 book: ***Algorithms + Data Structures = Programs***. Choosing a good algorithm with an inappropriate data structure (or vice versa) usually leads to poor results. We will revisit this in the chapter dedicated to data structures.
+
+:::tip The goal of this course
+This course is about helping you **understand how to structure information to support efficient processing in order to solve problems**. Every chapter adds new tools to that same goal: analysing the cost of a solution, and designing strategies that keep that cost under control.
+:::
 
 ---
 
-## Ecosystem Integration & Active Review
+## 6. Simple and Not-So-Simple Problems
 
-Algorithmic thinking becomes much more powerful when it is connected with practical experimentation and continuous reflection. This course integrates theoretical content, coding practice, and guided self-assessment so that you can move fluidly between abstract reasoning and concrete execution.
+Not all programming problems are equally challenging from an algorithmic point of view.
 
-:::tip Practical Application
-- **💻 Technical Lab:** Clone our [Official Course GitHub Repository](https://vicegd.github.io/algorithms/) and run the provided projects. Use these labs to compile and execute both recursive and iterative factorial implementations, manipulate the stack size (for example, via the `-Xss` flag in the JVM), and observe empirically how recursion depth and stack limits interact, relating these observations to the finiteness and stack frame space parameters developed in this chapter.
-- **🤖 Query your AI assistant:** Open your **NotebookLM** workspace, load the curated course materials, and use it as a sandbox for active retrieval. For example, you can ask:
-  > *"Based on Knuth's properties of an algorithm, perform a rigorous analysis explaining how the naive factorial method breaks the rules of computational design when given a negative integer."*
-  
-  Treat the assistant as a tool to check your own reasoning, not as a shortcut. Before reading the answer, write down your own argument, then compare and refine it. Focus strictly on identifying which qualitative properties are violated and how that maps to runtime memory faults.
+**Simple programming problems** share three features:
+- They can be solved with a **linear scan**: going through the data once.
+- It is difficult to do better, because every element must be read at least once.
+- The **obvious** approach works.
+
+Computing the sum of a list, its maximum element or the number of elements that satisfy a condition are typical examples. You can find implementations of the first two in the course repository ([`sum`](https://github.com/vicegd/algorithms/tree/master/src/topics/foundation/sum) and [`maximum`](https://github.com/vicegd/algorithms/tree/master/src/topics/foundation/maximum)).
+
+**Not-so-simple problems** are different:
+- It is **not clear how to solve them** at first sight.
+- The simple ideas are **too slow** for realistic input sizes.
+- They often require **optimisation**: among many valid solutions, we want the best one.
+
+Finding the shortest route between two cities, scheduling exams so that no student has two at the same time, or packing the most valuable set of items into a limited space all belong to this second group. These are the problems that this course focuses on.
+
+<details>
+  <summary>🧠 <strong>Checkpoint: Which kind of problem?</strong></summary>
+
+  **Question:** Which of the following problems is most representative of the problems this course focuses on? (a) find the median of a list of numbers, (b) find the first number of a list, (c) find the most interesting element of a list.
+
+  **Answer:** (a), the median. Option (b) is trivial: it requires a single access. Option (c) is tempting, but it is **not a computational problem at all**: "most interesting" has no precise definition, so no algorithm can be correct or incorrect for it. Finding the median, on the other hand, is a well-defined problem where the obvious approach (sorting the whole list) works but is not optimal, and where clever algorithms do better. This is exactly the kind of problem we will study.
+
+</details>
+
+---
+
+## 7. Two Goals When Designing a Solution
+
+When we design a computer program, we typically pursue two goals that are sometimes in tension:
+
+1. To design an algorithm that is **easy to understand, code and debug**.
+2. To design an algorithm that makes an **efficient use of the computer's resources**.
+
+The ideal, of course, is to achieve both. The first goal is the main concern of other courses in your degree (software engineering, programming methodology, testing). **This course focuses on the second goal**, without forgetting the first: an efficient algorithm that nobody can understand or maintain is rarely a good engineering solution.
+
+### Cost and efficiency
+
+Two terms will appear throughout the course:
+
+- The **cost** of a solution is the amount of resources it consumes.
+- A solution is **efficient** if it solves the problem within the required resource constraints.
+
+Note that efficiency is **relative to the constraints**. A sorting program that takes ten seconds may be perfectly efficient for a nightly batch process and completely unacceptable for an interactive web page.
+
+Which resources can an algorithm consume?
+
+- **Execution time**, the most commonly analysed resource.
+- **Memory** (space), both for the data and for auxiliary structures such as the call stack.
+- **Input/output and storage accesses**, which can dominate the cost when data does not fit in main memory.
+- **Network communication**, essential in distributed systems.
+- **Energy**, increasingly important in mobile devices and data centres.
+- **Number of processors or cores**, in parallel algorithms.
+
+In this course we will focus mainly on **time** and **memory**. As you will see in the case study of the next lesson, these two resources often compete: saving time may cost memory, and vice versa, so we will frequently look for a reasonable compromise.
+
+---
+
+## 8. How Can We Solve Complex Problems?
+
+The universal strategy for dealing with complexity, in algorithms and in engineering in general, is **decomposition**: dividing the problem into **subproblems** so that:
+
+- each subproblem is **well detailed** (it has its own precise specification),
+- each subproblem can be **solved independently**, and
+- the solutions of the subproblems can be **combined** into a solution of the original problem.
+
+At first, we do not need to know *how* each subproblem will be solved; we only need to know that it *can* be solved and what it guarantees. This is the concept of **abstraction**: we reason about a component through its contract, not through its internal details. For example, when we design an algorithm that needs a sorted list, we can simply assume a `sort` operation with a known cost, and worry about how to implement it later.
+
+Many of the algorithm design paradigms in this course are, in essence, different ways of decomposing a problem:
+
+| Paradigm | How the problem is decomposed |
+| :--- | :--- |
+| **Divide and conquer** | Into independent subproblems of the same kind, whose solutions are combined. |
+| **Dynamic programming** | Into overlapping subproblems, whose solutions are stored to avoid recomputing them. |
+| **Greedy algorithms** | Into a sequence of local decisions, each one taken and never undone. |
+| **Backtracking** | Into a sequence of decisions explored systematically, undoing the ones that lead to dead ends. |
+| **Branch and bound** | Like backtracking, but using estimates to explore the most promising options first and discard hopeless ones. |
+
+---
+
+## 9. Algorithm Design Is Difficult
+
+There is **no general procedure for designing a good algorithm**. There is no formula that, given any problem, produces the best algorithm for it. What exists is a collection of **paradigms** (like those in the table above), techniques for analysing cost, and a large body of known algorithms that can be adapted.
+
+Aho, Hopcroft and Ullman, in their classic *The Design and Analysis of Computer Algorithms* (1974), put it this way: perhaps the most important principle for the good algorithm designer is to **refuse to be content**. The first solution that works is rarely the best one. Good designers keep asking: *can I do better? Where is the time going? Is all this memory really necessary?* The case study in the next lesson follows exactly this attitude, improving a solution step by step.
+
+---
+
+## 10. Algorithms in Real Life
+
+Algorithms are no longer confined to textbooks and servers: they make decisions that affect people's lives every day. A quick look at news headlines from recent years shows the variety:
+
+- **Recommendation and entertainment.** In 2009, Netflix awarded a one-million-dollar prize to a team of researchers (*BellKor's Pragmatic Chaos*) for improving the accuracy of its movie recommendation algorithm. Streaming platforms also use algorithms to estimate how much a piece of content is worth.
+- **Science and health.** Algorithms compete to predict the structure of proteins (a field in which DeepMind's AlphaFold achieved a historic breakthrough) and to help design personalised cancer vaccines.
+- **Safety-critical systems.** Aircraft, drones and medical devices are controlled by algorithms. News reports have attributed crashes of military drones to poor software design, a reminder that an algorithmic error can destroy expensive equipment or put lives at risk.
+- **Society and fairness.** Translation systems have reproduced gender stereotypes, content moderation algorithms have flagged harmless publications, changes to social network feeds have influenced which news people see, and automatic pricing has raised the cost of products during emergencies.
+- **Perception.** Computer vision algorithms now match or surpass human performance on some image recognition tasks.
+
+These examples show that the properties studied in this chapter are not academic details. **Correctness** matters because a wrong answer can have real consequences. **Efficiency** matters because many of these systems process billions of items. And, increasingly, we also ask algorithms to be **fair, transparent and explainable**, so that people can understand and question the decisions that affect them.
+
+---
+
+## 11. Algorithms in Technical Interviews
+
+Algorithmic questions are a standard part of technical interviews for software development positions. Many classic interview questions correspond directly to topics in this course:
+
+| Typical interview question | Where you will study it |
+| :--- | :--- |
+| Sort a sequence of elements under some rule (for example, without nested loops). | Sorting algorithms; divide and conquer (Mergesort, Quicksort). |
+| Compute the $n$-th Fibonacci number, usually recursively. | Recursion; divide and conquer; dynamic programming. |
+| Solve the Towers of Hanoi with $n$ discs. | Recursion; divide and conquer. |
+| Solve a Sudoku. | Backtracking. |
+| Escape from a maze in the minimum number of steps. | Backtracking; branch and bound; graph search. |
+| Solve a sliding puzzle (such as the 15-puzzle). | Branch and bound. |
+| Maximise the value carried in a backpack with a weight limit (knapsack problem). | Greedy algorithms; dynamic programming; backtracking; branch and bound. |
+
+Interviewers also ask conceptual questions, such as: *What is an algorithm? What is the time complexity of an algorithm? What is the space complexity of Insertion sort? What is the difference between the best and the worst case? How does Quicksort work? What is asymptotic analysis? What are the main approaches to designing algorithms?* By the end of this course, you should be able to answer all of them with confidence.
+
+:::info What interviewers really evaluate
+In an algorithmic interview, the final code is only part of the evaluation. Interviewers want to see whether you **clarify the problem** (input domain, edge cases), start from a correct solution, **analyse its cost** and then **improve it**. In other words, they evaluate algorithmic thinking, exactly the skill this course is designed to develop.
+:::
+
+---
+
+## 12. Why We Study This Discipline
+
+Studying algorithmics is not about memorising a catalogue of programming tricks. It is about internalising a way of thinking that remains valuable as languages, frameworks and platforms change.
+
+1. **It is important for all branches of computer science.** Databases, operating systems, networks, compilers, graphics, artificial intelligence and security all rely on efficient algorithms and data structures.
+2. **It plays a key role in technological innovation.** Search engines, route planners, compression formats, cryptography and machine learning are, at their core, algorithmic achievements.
+3. **It is independent of languages and tools.** Today's Java, Python or Rust will evolve or be replaced, but the reasons why one strategy scales better than another remain valid across languages, compilers and hardware generations.
+4. **It helps you think about how to solve problems.** Algorithmic thinking trains you to look past variable names and syntax and focus on the structure of the problem: what needs to be computed and how its cost grows.
+5. **It lets you evaluate designs before building them.** By analysing how a strategy behaves as the input grows, you can detect bottlenecks early and compare alternatives on paper, instead of discovering the problem after months of development.
+6. **It is challenging, and good for the brain.** Designing an elegant algorithm is an intellectual exercise that combines creativity and rigour.
+
+---
+
+## Summary
+
+- The word *algorithm* derives from al-Khwarizmi; its meaning evolved from decimal arithmetic to any precise, mechanical problem-solving procedure.
+- An algorithm solves a **problem**, defined by a **specification** (precondition and postcondition) that applies to all its **instances**.
+- Knuth's five properties (**finiteness, definiteness, input, output and effectiveness**) form the minimal contract of an algorithm.
+- Code that works on a few examples is not necessarily an algorithm: the factorial shows how domain checks, error handling and machine limits (overflow, stack size) are part of the design.
+- This course focuses on **efficiency**: solving problems within resource constraints, mainly time and memory.
+- Complex problems are tackled through **decomposition** and **abstraction**, the basis of the design paradigms of the course.
+- There is no universal recipe for designing algorithms: good designers **refuse to be content** with their first solution.
+
+---
+
+## Practice
+
+:::tip Technical lab
+- **💻 Explore the code.** The course repository ([documentation](https://vicegd.github.io/algorithms/) and [source code](https://github.com/vicegd/algorithms)) contains the factorial examples of this lesson in [`src/topics/foundation/factorial`](https://github.com/vicegd/algorithms/tree/master/src/topics/foundation/factorial). Run the unsafe version with a negative argument and observe the `StackOverflowError`.
+- **🔬 Experiment with the stack.** Run the recursive factorial with large values of `n` and change the stack size of the JVM with the `-Xss` option (for example, `-Xss256k` and `-Xss8m`). How does the maximum recursion depth change? Does the iterative version care?
+- **🧮 Find the overflow.** Write a loop that prints $n!$ for $n = 0, 1, \dots, 25$ using `int`, then `long`. Identify the exact point where each type overflows and compare with the values given in Version 4. Then repeat the experiment using `Math.multiplyExact`, which throws an exception instead of overflowing silently.
+- **✍️ Write specifications.** Write a precondition and a postcondition for: (a) Euclid's algorithm; (b) finding the maximum of a list; (c) finding the position of an element in a list. In (c), what should happen if the element appears twice? And if it does not appear at all?
 :::
