@@ -1,197 +1,114 @@
 ---
-title: Parallel Algorithms & Frameworks
+title: Concurrency and Parallelism
 sidebar_position: 1
-tags: [Advanced Execution, Parallelism, Concurrency, Fork-Join, Java]
+tags: [Parallelism, Concurrency, Threads, Multi-core]
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+# Concurrency and Parallelism
 
-# Parallel Algorithms and Execution Models
+Until now, every algorithm in this course has been **sequential**: one instruction after another, on a single processor. But the computers we use, from phones to servers, have several processor **cores**, and a sequential program uses only one of them. **Parallel algorithms** divide the work so that several cores can do it at the same time.
 
-Up to this point in our computer science curriculum, we have evaluated computational strategies under a **sequential execution model**, assuming a single central processing unit (CPU) running one machine instruction at a time. However, modern hardware architectures scale processing power by adding physical compute cores rather than raw clock speed. 
+This chapter connects directly with divide and conquer: if a problem can be divided into **independent** subproblems, those subproblems can be solved **simultaneously**. This first lesson introduces the basic concepts; the next ones present Java's Fork/Join framework and how to analyse the performance of parallel algorithms.
 
-To build enterprise-level, highly scalable infrastructure, software engineers must design algorithms capable of safely breaking a workload apart to execute across multiple hardware registers simultaneously.
-
----
-
-## Concurrency vs. Parallelism
-
-A frequent point of confusion among software developers is the exact boundary between concurrent computing and parallel computing. While they appear similar, they represent completely different operational strategies:
-
-* **Concurrent Computing:** Focuses on managing the execution of two or more distinct tasks over a given timeframe on one or more CPUs. It represents the *logical structure* of the application. For instance, when an application handles a heavy file save operation in the background while keeping the user interface interactive, it is operating concurrently. Even on a single-core CPU, the operating system gives the illusion of simultaneous progress by rapidly switching between tasks (interleaving sentences).
-* **Parallel Computing:** Focuses on executing multiple instructions *at the exact same physical instant* across distinct processing blocks. It represents the *physical execution* of the application. True parallelism requires multi-core or multi-processor hardware environments, where instructions literally stream through separate silicon architectures synchronously.
+:::note What you will learn in this chapter
+- Why processors have several cores, and why that matters for software.
+- The difference between **concurrency** and **parallelism**, and the roles of processes, threads and tasks.
+- The **Fork/Join** framework of Java, and how to turn a divide and conquer algorithm into a parallel one.
+- How to choose the **threshold** below which the work is done sequentially.
+- How to measure and predict the benefit of parallelism: **speedup**, **efficiency** and **Amdahl's law**.
+:::
 
 ---
 
-## The Operating System Core Abstractions
+## Why Do We Have Multi-core Processors?
 
-To bridge the gap between abstract parallel algorithms and physical silicon, modern operating systems expose three nested operational boundaries:
+For decades, the performance of processors grew exponentially, thanks to two factors: the number of transistors on a chip doubled about every two years (an observation known as **Moore's law**, after Gordon Moore), and the **clock frequency** kept increasing. Programs became faster without any change: you just had to wait for the next generation of processors.
 
-* **Process:** An isolated execution environment created by the operating system. A process owns its private memory space, runtime environment, and environment variables. Because of this structural isolation, communicating between different processes requires heavy overhead (Inter-Process Communication - IPC).
-* **Thread:** A basic unit of execution that lives strictly within exactly one process. Multiple threads belonging to the same process run independently but share the process's allocated resources, system files, and heap memory space space. Threads are highly lightweight compared to processes, but sharing memory introduces synchronization hazards.
-* **Task:** An abstract, logical piece of business logic or small unit of execution designed to be processed by a thread.
+Around the turn of the century, this approach hit a wall. As frequencies increased, so did the **power consumption** and the **heat** produced by the chips, to levels that could not be dissipated. Designers needed another way to keep increasing performance.
 
-The operating system scheduler is responsible for mapping software threads onto physical CPU cores. When writing parallel code, engineers must synchronize thread interactions carefully to prevent catastrophic system state issues, such as **Race Conditions** or **Deadlocks** (where threads block each other indefinitely while attempting to access shared system resources).
+The answer was to place **several processors (cores) on the same chip**, working in parallel, like a job broken down into smaller tasks and distributed among a group of people. Multi-core processors reached the market in the mid-2000s. Today, consumer processors have from a few cores to a few dozen, servers many more, and graphics processors (GPUs) thousands of simple cores.
 
----
-
-## The Java Fork/Join Architecture
-
-Managing low-level raw native threads (`java.lang.Thread`) manually introduces major architectural complexities and optimization bottlenecks. To seamlessly align the **Divide and Conquer** paradigm with multi-core CPUs, Java introduces the **Fork/Join Framework**.
-
-The framework uses a specialized thread pool configuration called the **`ForkJoinPool`**. This architecture implements a **Work-Stealing Algorithm**: if a worker thread exhausts its assigned queue of subtasks, it actively reaches across the hardware grid to "steal" pending tasks from the queues of other busy threads, ensuring **100%** utilization of all available hardware cores.
-
-The execution model builds upon two core operations:
-* **`fork()`:** Launches a subtask asynchronously to run on a parallel thread.
-* **`join()`:** Halts the current thread execution until the targeted subtask completes, reading its result if one exists.
+But multiple cores are not enough: **applications must be designed to use them**. A sequential program runs on a single core, no matter how many the computer has. That is why parallel algorithms have become an essential part of software engineering.
 
 ---
 
-## Implementation Primitives
+## Concurrent Computing
 
-When engineering parallel tasks using this framework, you extend custom structural classes based on whether your algorithmic process needs to yield an integrated value.
+**Concurrent computing** consists of performing **two or more tasks** whose executions overlap in time, on **one or more** processors. It is the opposite of sequential computing, in which a task starts only when the previous one has finished.
 
-<Tabs>
-  <TabItem value="action" label="⚡ No Return Value (RecursiveAction)" default>
+Concurrency is extremely common in everyday programs:
 
-Extend **`RecursiveAction`** when your parallel algorithm performs an in-place transformation on a dataset or modifies memory directly without needing to return an aggregated computation value.
+- while an application waits for the user to enter a value, it may be saving other data in a database;
+- many tasks are performed **in the background**: downloading updates, indexing files, synchronising with the cloud;
+- a web server attends many clients at the same time.
 
-```java
-import java.util.concurrent.RecursiveAction;
+Concurrent tasks do **not** necessarily run at the same physical instant. With a **single** processor, the operating system alternates between them very quickly, giving the **feeling** of simultaneity, while the instructions are actually executed one after another. In Java, the basic tool to create concurrent units of execution is the class `Thread`.
 
-public class ParallelVectorModifier extends RecursiveAction {
-    private final int[] vector;
-    private final int left, right;
-    private static final int THRESHOLD = 1000; // Structural grain size
+## Parallel Computing
 
-    public ParallelVectorModifier(int[] vector, int left, int right) {
-        this.vector = vector;
-        this.left = left;
-        this.right = right;
-    }
+**Parallel computing** performs several tasks **at the same time**, using **more than one processor**. It is therefore intrinsically concurrent (multithreaded), but with real simultaneity.
 
-    @Override
-    protected void compute() {
-        // Base Case: Task is small enough for simple sequential execution
-        if ((right - left) <= THRESHOLD) {
-            for (int i = left; i <= right; i++) {
-                vector[i] *= 2; // In-place transformation
-            }
-        } else {
-            // Divide Step
-            int mid = left + (right - left) / 2;
-            ParallelVectorModifier leftSubtask = new ParallelVectorModifier(vector, left, mid);
-            ParallelVectorModifier rightSubtask = new ParallelVectorModifier(vector, mid + 1, right);
+| | Concurrency | Parallelism |
+| :--- | :--- | :--- |
+| Idea | Dealing with several tasks at once | Doing several tasks at once |
+| Processors | One or more | More than one |
+| Main goal | Structure and responsiveness (do not block while waiting) | Speed (finish the work sooner) |
+| Example | A text editor that checks spelling while you type | Sorting a huge array using all the cores |
 
-            // Conquer Step: Run the left subtask asynchronously on a parallel core
-            leftSubtask.fork(); 
-            
-            // Execute the right subtask right here on the current thread
-            rightSubtask.compute(); 
+Parallelism can greatly speed up many operations, such as sorting, searching or transforming data. It is especially well suited to any task that can be broken down into **smaller, independent components**, which is exactly what **divide and conquer** does.
 
-            // Combine Step: Wait for the parallel fork to finish processing
-            leftSubtask.join(); 
-        }
-    }
-}
+:::tip Concurrency is not parallelism
+Rob Pike, one of the creators of the Go language, summarised the difference in a famous talk: *concurrency is about **dealing** with lots of things at once; parallelism is about **doing** lots of things at once*. Concurrency is a way of structuring a program; parallelism is a way of executing it. You can watch the talk [Concurrency is not parallelism](https://www.youtube.com/watch?v=cN_DpYBzKso).
+:::
+
+---
+
+## Processes, Threads and Tasks
+
+Concurrency is built on three nested mechanisms:
+
+- A **process** is an operating system abstraction that allows a computer to support different units of execution. Each process has its own memory space; for example, each running application is usually a separate process.
+- A **thread** belongs to exactly one process and is a sequence of instructions that is executed independently of the others. The threads of a process **share its resources**, in particular its memory, which makes communication between them easy (and dangerous).
+- A **task** is a small unit of work: a component of the solution that some thread has to execute.
+
+```
+System
+ ├── Process
+ │    ├── Thread ── Task, Task, ...
+ │    └── Thread ── Task, ...
+ ├── Process
+ │    ├── Thread ── Task, ...
+ │    └── ...
+ └── ...
 ```
 
-  </TabItem>
-  <TabItem value="task" label="📊 Returns a Value (RecursiveTask)">
+The **operating system** decides which threads run on which processors, and when: concurrently (alternating on the same core) or in parallel (on different cores).
 
-Extend **`RecursiveTask<V>`** when your parallel algorithm maps to a classic Divide and Conquer pipeline that must explicitly aggregate and synthesize subsols into an integrated result value.
+### The danger of sharing
 
-```java
-import java.util.concurrent.RecursiveTask;
+Because threads share memory, they must be **synchronised** so that they do not interfere with each other. Two classic problems:
 
-public class ParallelVectorAggregator extends RecursiveTask<Long> {
-    private final int[] vector;
-    private final int left, right;
-    private static final int THRESHOLD = 1000;
+- **Race conditions:** two threads modify the same data at the same time, and the result depends on the exact order of their instructions. For example, if two threads execute `counter++` simultaneously, one of the increments may be lost, because each one reads the old value before the other writes the new one.
+- **Deadlocks:** threads block each other forever, each one waiting for a resource held by another.
 
-    public ParallelVectorAggregator(int[] vector, int left, int right) {
-        this.vector = vector;
-        this.left = left;
-        this.right = right;
-    }
-
-    @Override
-    protected Long compute() {
-        // Base Case
-        if ((right - left) <= THRESHOLD) {
-            long localSum = 0;
-            for (int i = left; i <= right; i++) {
-                localSum += vector[i];
-            }
-            return localSum;
-        }
-
-        // Divide Step
-        int mid = left + (right - left) / 2;
-        ParallelVectorAggregator leftSubtask = new ParallelVectorAggregator(vector, left, mid);
-        ParallelVectorAggregator rightSubtask = new ParallelVectorAggregator(vector, mid + 1, right);
-
-        // Conquer Step
-        leftSubtask.fork(); // Asynchronous launch
-        long rightResult = rightSubtask.compute(); // Synchronous execution
-
-        // Combine Step: Retrieve the parallel result and merge the solutions
-        long leftResult = leftSubtask.join(); 
-        return leftResult + rightResult;
-    }
-}
-```
-
-  </TabItem>
-</Tabs>
+Writing correct programs with raw threads and locks is difficult. Fortunately, for divide and conquer algorithms there is a much simpler approach: if each task works on a **separate part of the data** and the results are combined only when the subtasks have finished, no synchronisation is needed beyond waiting for the subtasks. This is the model of the Fork/Join framework, presented in the next lesson.
 
 ---
 
-## Lecture Hall Interactive Checkpoints
+## Summary
 
-Test your understanding of multi-core runtime architectures using these actual interactive questions pulled directly from our Vevox lecture slides:
-
-<details>
-  <summary> Neuromorphic Class Test 1: Fork/Join Without Values</summary>
-
-**Question:** Which class do we need to extend in order to work with the Fork/Join framework when we DO NOT expect to return a value?
-
-* **Option A:** `ForkJoinPool`
-* **Option B:** `RecursiveTask<V>`
-* **Option C:** `RecursiveAction`
-* **Option D:** `ForkJoinTask<V>`
-
-**Detailed Solution:**
-The correct answer is **Option C: `RecursiveAction`**. 
-* The Fork/Join architecture uses two distinct subclasses of `ForkJoinTask`. 
-* When your task represents a pure computational operation that alters state or data in-place without needing to return a value, you extend `RecursiveAction`. Its `compute()` method returns `void`.
-
-</details>
-
-<details>
-  <summary> Neuromorphic Class Test 2: Fork/Join Value Aggregation</summary>
-
-**Question:** Which class do we need to extend in order to work with the Fork/Join framework when we expect to return a value?
-
-* **Option A:** `ForkJoinPool`
-* **Option B:** `RecursiveTask<V>`
-* **Option C:** `RecursiveAction`
-* **Option D:** `ForkJoinTask<V>`
-
-**Detailed Solution:**
-The correct answer is **Option B: `RecursiveTask<V>`**.
-* When your parallel algorithm corresponds to an aggregation, reduction, or synthesis pipeline (like calculating a vector sum, matching keys, or building a structured tree), the task must pass a return object back up the stack. 
-* Extending `RecursiveTask<V>` forces you to define a type parameter `V`, changing the return signature of your `compute()` block to that specific object type.
-
-</details>
+- Processor frequencies stopped growing because of power and heat; performance now grows by adding **cores**, and software must be designed to use them.
+- **Concurrency** means dealing with several tasks whose executions overlap; **parallelism** means executing several tasks at the same time on several processors.
+- **Processes** have their own memory; **threads** belong to a process and share its memory; **tasks** are units of work executed by threads.
+- Shared memory requires synchronisation to avoid race conditions and deadlocks. Divide and conquer algorithms that work on independent parts of the data avoid most of these problems.
 
 ---
 
-## Ecosystem Integration & Active Review
+## Practice
 
-:::tip Advanced Technical Challenge
-* **💻 Technical Lab Session:** Head to the `ExecutionModels/Parallel` package in your IDE workspace. Run the performance benchmark file `ParallelBenchmark.java`. Adjust the structural `THRESHOLD` value from $10$ up to $1,000,000$ to map out the exact performance point where the overhead of threading changes from an asset to a liability.
-* **🤖 Query Your AI Tutor:** Open your **NotebookLM** interactive classroom workspace and run this specific verification prompt:  
-  > *"Compare concurrency and parallelism using the definitions from our course foundations. Explain why executing a `RecursiveTask<V>` on a hardware layout with only one single core will provide zero physical speedup, and detail the workflow of Java's Work-Stealing algorithm inside the `ForkJoinPool`."*
+:::tip Exercises
+- **🖥️ Know your machine.** Find out how many cores your computer has, and check it from Java with `Runtime.getRuntime().availableProcessors()`.
+- **🏁 A race condition.** Write a program in which two threads increment the same `int` counter 1,000,000 times each, without synchronisation. Run it several times. Is the final value always 2,000,000? Then use `AtomicInteger` instead and repeat.
+- **🎬 See it animated.** The *Java Concurrent Animated* application (available in the course materials and on [SourceForge](https://sourceforge.net/projects/javaconcurrenta/)) shows, with animations, how the main concurrency mechanisms of Java work.
+- **🤔 Classify.** For each situation, say whether it involves concurrency, parallelism or both: a browser downloading several images while you scroll; a video encoder using 8 cores; a single-core microcontroller reading sensors and updating a display.
 :::
