@@ -5,94 +5,96 @@ import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
 import styles from './index.module.css';
 
-const PSEUDOCODE = `function coinChange(coins, S):
-  dp = [∞] * (S + 1)
-  dp[0] = 0
-
-  for i in 1 .. S:
-    for c in coins:
-      if c ≤ i:
-        dp[i] = min(dp[i],
-                    dp[i - c] + 1)
-
-  return dp[S] ≠ ∞ ? dp[S] : -1`;
-
-function Hero() {
-  return (
-    <section className={styles.hero}>
-      <div className={styles.heroContent}>
-        <p className={styles.heroEyebrow}>Learn Algorithms</p>
-        <h1 className={styles.heroTitle}>
-          From intuition<br />
-          <span className={styles.heroAccent}>to proof.</span>
-        </h1>
-        <p className={styles.heroSubtitle}>
-          Structured algorithm sheets, theoretical foundations, and interactive
-          visualizations — everything you need to truly understand classic algorithms.
-        </p>
-        <div className={styles.heroButtons}>
-          <Link className={clsx('button button--lg', styles.btnPrimary)} to="/algorithms/">
-            Browse Algorithms →
-          </Link>
-          <Link className={clsx('button button--lg', styles.btnGhost)} to="/blog">
-            Read the Blog
-          </Link>
-        </div>
-      </div>
-      <div className={styles.heroVisual} aria-hidden="true">
-        <div className={styles.codeCard}>
-          <div className={styles.codeCardDots}>
-            <span /><span /><span />
-          </div>
-          <pre className={styles.codeCardPre}>{PSEUDOCODE}</pre>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-const SECTIONS = [
+const CHAPTERS = [
   {
     accentClass: styles.accentPurple,
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="28" height="28">
-        <circle cx="12" cy="12" r="3" />
-        <path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12" />
-      </svg>
-    ),
-    eyebrow: 'Theoretical Background',
-    title: 'Concepts',
+    eyebrow: 'Chapter 1',
+    title: 'Foundations of Algorithms',
     description:
-      'The theoretical groundwork that makes algorithms truly make sense. Each topic is a self-contained chapter — read it in order as a structured course, or jump to any entry as a quick reference.',
-    topics: ['Complexity Analysis', 'Recursion', 'Divide & Conquer', 'Dynamic Programming', 'Greedy', '...'],
-    cta: 'Browse Concepts',
-    to: '/concepts/',
+      'What an algorithm is, and how to measure and analyze its cost: empirical measurement, counting operations, asymptotic notation, growth rates and loops.',
+    topics: ['Algorithmic thinking', 'Data structures', 'Measuring efficiency', 'Complexity analysis', 'Big O', 'Searching'],
+    cta: '9 lessons',
+    to: '/concepts/category/1-foundations-of-algorithms',
+  },
+  {
+    accentClass: styles.accentBlue,
+    eyebrow: 'Chapter 2',
+    title: 'Fundamental Problem Domains',
+    description:
+      'Sorting, one of the most studied problems in computing: the simple algorithms, Quicksort, the efficient alternatives and how to choose one in practice.',
+    topics: ['Bubble', 'Insertion', 'Selection', 'Quicksort', 'Mergesort', 'Heapsort', 'Radix sort'],
+    cta: '7 lessons',
+    to: '/concepts/category/2-fundamental-problem-domains',
   },
   {
     accentClass: styles.accentGreen,
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="28" height="28">
-        <rect x="3" y="3" width="7" height="7" rx="1" />
-        <rect x="14" y="3" width="7" height="7" rx="1" />
-        <rect x="3" y="14" width="7" height="7" rx="1" />
-        <rect x="14" y="14" width="7" height="7" rx="1" />
-      </svg>
-    ),
-    eyebrow: 'Algorithm Collection',
-    title: 'Algorithm Sheets',
-    requiresAlgorithms: true,
+    eyebrow: 'Chapter 3',
+    title: 'Algorithm Design Paradigms',
     description:
-      'Rigorous, interactive breakdowns of each algorithm: from the naive approach and why it fails, through the full derivation, to annotated multi-language code and step-by-step table visualizations.',
-    topics: ['Problem Statement', 'Complexity Analysis', 'Pseudocode', 'Interactive Trace', '...'],
-    cta: 'Browse Algorithms',
-    to: '/algorithms/',
+      'General strategies for designing algorithms, each one illustrated with classic problems and measured implementations.',
+    topics: ['Brute force', 'Divide and conquer', 'Recurrences', 'Greedy', 'Dynamic programming'],
+    cta: '10 lessons',
+    to: '/concepts/category/3-algorithm-design-paradigms',
+  },
+  {
+    accentClass: styles.accentOrange,
+    eyebrow: 'Chapter 4',
+    title: 'State Space Search and Optimization',
+    description:
+      'Exact search over huge spaces of candidate solutions: exploring implicit trees of states, pruning hopeless branches and using bounds and heuristics.',
+    topics: ['Backtracking', 'Pruning', 'N-queens', 'Branch and bound', 'A*'],
+    cta: '4 lessons',
+    to: '/concepts/category/4-state-space-search-and-optimization',
+  },
+  {
+    accentClass: styles.accentTeal,
+    eyebrow: 'Chapter 5',
+    title: 'Advanced Execution Models',
+    description:
+      'Using several processors at once: concurrency and parallelism, the Java Fork/Join framework, and how to measure and predict parallel performance.',
+    topics: ['Threads', 'Fork/Join', 'Thresholds', 'Speedup', "Amdahl's law"],
+    cta: '3 lessons',
+    to: '/concepts/category/5-advanced-execution-models',
   },
 ];
+
+const ALGORITHMS_SECTION = {
+  accentClass: styles.accentGreen,
+  eyebrow: 'Algorithm Collection',
+  title: 'Algorithm Sheets',
+  description:
+    'Rigorous, interactive breakdowns of each algorithm: from the naive approach and why it fails, through the full derivation, to annotated multi-language code and step-by-step table visualizations.',
+  topics: ['Problem Statement', 'Complexity Analysis', 'Pseudocode', 'Interactive Trace', '...'],
+  cta: 'Browse Algorithms',
+  to: '/algorithms/',
+};
+
+function Intro() {
+  return (
+    <header className={styles.intro}>
+      <p className={styles.heroEyebrow}>Learn Algorithms</p>
+      <h1 className={styles.introTitle}>Algorithmics, from intuition to proof</h1>
+      <p className={styles.introText}>
+        A complete course on the design and analysis of algorithms: how to measure their cost,
+        how to analyze it before running a single line, and the main strategies to design efficient
+        solutions. Every example has been executed and every time has been measured.
+      </p>
+      <div className={styles.heroButtons}>
+        <Link className={clsx('button button--lg', styles.btnPrimary)} to="/concepts/">
+          Start the course →
+        </Link>
+        <Link className={clsx('button button--lg', styles.btnGhost)} to="/concepts/glossary">
+          Glossary
+        </Link>
+      </div>
+    </header>
+  );
+}
 
 function SectionCard({ accentClass, icon, eyebrow, title, description, topics, cta, to }) {
   return (
     <article className={clsx(styles.card, accentClass)}>
-      <div className={styles.cardIcon}>{icon}</div>
+      {icon && <div className={styles.cardIcon}>{icon}</div>}
       <p className={styles.cardEyebrow}>{eyebrow}</p>
       <h2 className={styles.cardTitle}>{title}</h2>
       <p className={styles.cardDescription}>{description}</p>
@@ -119,12 +121,13 @@ function SectionCard({ accentClass, icon, eyebrow, title, description, topics, c
 export default function Home() {
   const { siteConfig } = useDocusaurusContext();
   const showAlgorithms = siteConfig.customFields?.showAlgorithms !== false;
-  const sections = SECTIONS.filter((s) => showAlgorithms || !s.requiresAlgorithms);
+  const sections = showAlgorithms ? [...CHAPTERS, ALGORITHMS_SECTION] : CHAPTERS;
   return (
     <Layout title="Home" description={siteConfig.tagline}>
       <main className={styles.main}>
+        <Intro />
         <div className={styles.grid}>
-          {sections.map(({ requiresAlgorithms: _r, ...s }) => (
+          {sections.map((s) => (
             <SectionCard key={s.title} {...s} />
           ))}
         </div>
