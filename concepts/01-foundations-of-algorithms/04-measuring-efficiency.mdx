@@ -1,0 +1,279 @@
+---
+title: Measuring Efficiency
+sidebar_position: 4
+tags: [Analysis, Empirical Analysis, Execution Time, Benchmarking]
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Measuring Efficiency: Experiments and Analysis
+
+In the case study we compared four strategies for the maximum pairwise product and saw differences ranging from seconds to fractions of a millisecond. But how exactly should we compare algorithms? Is it enough to run them and look at the clock? What should we measure, and how can we trust the numbers?
+
+There are two complementary ways of studying the efficiency of an algorithm:
+
+- **Empirical analysis:** implement the algorithm, run it with inputs of different sizes and measure the resources it consumes.
+- **Analytical (theoretical) analysis:** study the algorithm on paper and obtain a mathematical function that describes how its cost grows with the size of the input.
+
+This lesson explains what to measure, why purely empirical comparisons are not enough, and how to take **reliable** measurements when we do need them, as you will in the lab sessions. The next lessons develop the analytical approach.
+
+:::note What you will learn in this lesson
+- Which resources determine the efficiency of a program, and which factors influence its execution time.
+- Why comparing algorithms only by running them has serious limitations.
+- How to measure execution times reliably in Java: timer resolution, the 50 ms threshold, repetitions, and the effect of the JIT compiler.
+- How to check, with measurements, whether an algorithm grows as theory predicts (the **doubling test**).
+- How to compare two algorithms, or two environments, using the **ratio** of their times.
+:::
+
+---
+
+## How Can We Compare Two Algorithms?
+
+The most obvious way to compare two algorithms is to implement both as programs, run them on a suitable range of inputs and measure how many resources each one uses. As the only method, however, this approach has serious drawbacks:
+
+1. **It requires too much effort.** We must fully implement and debug every alternative before knowing whether it is worth it.
+2. **The result depends on the quality of the implementation.** One program may simply be better written than the other, and then we are comparing programmers, not algorithms.
+3. **The chosen test cases may favour one algorithm.** An algorithm may be excellent for the inputs we happened to try and very poor for others (for example, already sorted data).
+4. **We may still not have the best algorithm.** Measuring tells us which of our candidates is faster on our machine today, not whether a much better algorithm exists or how far we are from the best possible solution.
+
+Measurements also depend on the **machine**: the processor, memory, operating system, compiler and even other programs running at the same time. A time in seconds measured on one computer says little about another.
+
+This is why we need the analytical approach, which studies the algorithm itself, independently of any implementation or machine. But this does not make experiments useless: they are the way to **validate** the theory, to discover the **constants** that theory ignores and to detect effects (memory hierarchy, compiler optimisations) that are hard to predict on paper. Engineers use both.
+
+---
+
+## What Do We Measure?
+
+When we talk about the efficiency of a program, several resources may be relevant:
+
+- **Compilation time.** It is not usually important, since a program is compiled once and executed many times.
+- **Memory occupation.** It is sometimes a very critical parameter. A running program uses memory for its **code**, its static **data**, the **stack** (local variables and one frame per active method call, which grows with recursion) and the **heap** (dynamically created objects, such as arrays and collections).
+- **Execution time.** We always want to solve problems in the shortest possible time. This is the resource we will study most often.
+
+Time and memory often run counter to each other: we can frequently save time by storing more information (for example, keeping previously computed results, as you will see in dynamic programming) or save memory by recomputing things. We must find a **compromise** suited to the problem.
+
+### What does the execution time depend on?
+
+The time a program takes depends on many factors:
+
+- the **speed of the computer** (processor, memory, disk);
+- the **quality of the compiler** and of the runtime environment (for example, the Java virtual machine);
+- the **number of input/output operations**, which are much slower than computations in memory;
+- the **size of the problem**, that is, of the input data;
+- the **algorithm** used.
+
+Only the last two are properties of our solution. The first ones affect the time by a more or less **constant factor**: a computer twice as fast will run the same program about twice as fast. The size of the problem and the algorithm, on the other hand, determine **how the time grows**, and that is what really matters when the problems become large.
+
+---
+
+## The Analytical View in a Nutshell
+
+In the analytical approach, we call $T(n)$ the execution time of a program with an input of size $n$.
+
+We cannot express $T(n)$ in standard units such as seconds, because the real time depends on all the factors listed above. Instead, we consider an **idealised computer** in which each elementary operation takes one unit of time, and we count operations. We can then make statements such as *"the running time is proportional to $n$"* or *"proportional to $n^2$"*, without specifying a constant, because the constant depends on the real machine.
+
+The exact meaning of $n$ depends on the nature of the problem:
+
+| Input | Typical measure of the size $n$ |
+| :--- | :--- |
+| Vector or list | The number of elements. |
+| Matrix | The number of elements that compose it (or its order, for square matrices). |
+| Graph | The number of nodes (and often also the number of edges). |
+| Database table | The number of records. |
+| Integer (for example, in primality tests) | The number of digits or bits needed to represent it. |
+
+We will develop this approach in detail in the next lessons. For now, keep the key idea: theory predicts the **shape** of the growth; experiments tell us the **actual times** on a particular machine. Let us see how to measure them properly.
+
+---
+
+## Measuring Execution Times in Java
+
+### The clock
+
+The simplest way to measure time in Java is to read the clock before and after the code:
+
+```java
+long t1 = System.currentTimeMillis();
+long result = sum(vector);                  // the operation we want to measure
+long t2 = System.currentTimeMillis();
+System.out.println("Time: " + (t2 - t1) + " ms");
+```
+
+`System.currentTimeMillis()` returns the number of milliseconds elapsed since midnight of January 1, 1970 (UTC), as a `long` value. The difference between two calls is the elapsed time in milliseconds.
+
+Java also offers `System.nanoTime()`, which has a finer resolution and is designed specifically for measuring intervals (it is not affected by changes in the system clock). Both are useful, but neither solves the main problems, which are explained next.
+
+### Small times are not reliable
+
+If we measure the sum of a vector of 10,000 integers once, we obtain something like this:
+
+```text
+millis=0   nanos=150140
+millis=0   nanos=149813
+millis=1   nanos=139972
+millis=0   nanos=142837
+```
+
+The operation takes about 0.15 ms, which is below the resolution of `currentTimeMillis`: most measurements give **0**, and occasionally **1**, depending on whether a millisecond "tick" happened to occur during the measurement. Even with `nanoTime`, very short measurements fluctuate because of everything else happening in the system: the operating system interrupts our program to run other tasks, and in Java the **garbage collector** may pause it to reclaim memory. These interruptions are a small, random amount of time, but when the measured time is also small, they distort it completely.
+
+:::danger The 50 ms rule
+In this course we **do not trust times below about 50 milliseconds**. In general, the longer the measured time, the more reliable it is: a measurement of 3,578 ms is more reliable than one of 123 ms, because the random disturbances represent a smaller fraction of it.
+:::
+
+### Repetitions
+
+What if the operation we want to measure is very fast? We repeat it many times inside the measured interval, so that the total time exceeds the threshold, and then divide:
+
+```java
+int nTimes = 1000;
+long t1 = System.currentTimeMillis();
+for (int k = 0; k < nTimes; k++) {
+    sum(vector);
+}
+long t2 = System.currentTimeMillis();
+// (t2 - t1) is the time of 1000 executions, in milliseconds,
+// which is numerically the time of ONE execution in microseconds
+```
+
+Choosing powers of 10 for the number of repetitions makes the conversion immediate: with 1 repetition the result is in milliseconds ($10^{-3}$ s), with 1,000 repetitions it is the time of one execution in microseconds ($10^{-6}$ s), with 1,000,000 repetitions it is in nanoseconds ($10^{-9}$ s), and so on. The number of repetitions must be large enough to exceed 50 ms, but not so large that the experiment never ends.
+
+### The JIT compiler: optimised and non-optimised times
+
+The Java virtual machine starts by **interpreting** the bytecode of a program, but it monitors which methods are executed most often and **compiles them to native code** while the program is running, applying aggressive optimisations. This is the **Just-In-Time (JIT) compiler**. It makes Java programs fast, but it makes measurements tricky: the same code may become much faster after running for a while, and the optimiser may even remove work whose result is never used.
+
+The `-Xint` option runs the virtual machine in **interpreted mode only**, without the JIT:
+
+```text
+java -Xint MyMeasurementClass
+```
+
+The following measurements of the sum of a vector (10 repetitions each, times in ms) show the difference:
+
+| $n$ | Without optimisation (`-Xint`) | With optimisation (JIT) |
+| ---: | ---: | ---: |
+| 80,000 | 10 | 3 |
+| 160,000 | 22 | 1 |
+| 320,000 | 42 | 1 |
+| 640,000 | 85 | 1 |
+| 1,280,000 | 171 | 2 |
+
+Without optimisation, the times **double** each time $n$ doubles, exactly what we expect from an algorithm whose time is proportional to $n$. With optimisation, the times are much smaller and so irregular that they say nothing about the growth: the JIT compiled and optimised the loop at some point during the experiment, and all the measurements are below the reliability threshold anyway.
+
+:::tip A practical compromise
+Times **without optimisation** are larger but match the theoretical complexity more faithfully, so they are better for learning to relate measurements and theory. Times **with optimisation** reflect the real performance of Java programs, but sometimes produce surprises. In the first lab sessions you will prioritise measurements without optimisation; later, when the goal is the best real performance, you will usually measure with optimisation.
+
+Professional benchmarks in Java use dedicated tools such as JMH (Java Microbenchmark Harness), which handle warm-up, repetitions and statistical analysis automatically.
+:::
+
+### Good practices for measuring
+
+- Measure **only the operation of interest**: create and fill the input data *outside* the measured interval.
+- Use the **same input data** for all the algorithms you compare (for example, a fixed random seed or a file).
+- Make sure the measured time exceeds **50 ms**, using repetitions if necessary.
+- **Use the result** of the measured operation (for example, accumulate it in a variable that you print at the end), so that the optimiser cannot discard the computation as useless.
+- Repeat each measurement several times and look at the **typical value** (for example, the median), discarding obvious outliers.
+- Close other heavy applications and **report the features of the machine** (processor and memory) together with the times.
+- Interrupt an experiment that takes too long (Ctrl+C in a terminal, or the stop button in the IDE), and mark it as *out of time* in your tables.
+
+---
+
+## Does the Time Grow as Expected? The Doubling Test
+
+Measuring is only useful if we know what to look for. The most informative experiment is to **double the size of the problem** repeatedly and observe the ratio between consecutive times, $t(2n) / t(n)$. Theory predicts this ratio for each kind of growth:
+
+| If the time is proportional to... | Doubling $n$ multiplies the time by... | Multiplying $n$ by $k$ multiplies the time by... |
+| :--- | :--- | :--- |
+| $\log n$ | a little more than 1 (it adds a constant) | a little more than 1 |
+| $n$ | 2 | $k$ |
+| $n \log n$ | a little more than 2 | a little more than $k$ |
+| $n^2$ | 4 | $k^2$ |
+| $n^3$ | 8 | $k^3$ |
+| $2^n$ | the time is **squared** | |
+
+Let us test it with a quadratic algorithm: counting how many pairs of positions $(i, j)$ hold equal values, with two nested loops over a vector of $n$ elements. Without optimisation, we measured:
+
+| $n$ | Time (ms) | Ratio with the previous one |
+| ---: | ---: | ---: |
+| 1,000 | 15 | |
+| 2,000 | 59 | 3.9 |
+| 4,000 | 240 | 4.1 |
+| 8,000 | 1,004 | 4.2 |
+| 16,000 | 4,093 | 4.1 |
+
+The ratio is consistently about **4**, confirming quadratic growth. Note that the first measurement (15 ms) is below 50 ms and should be treated with caution, and that from 16,000 we can **predict** the next values: about 16 seconds for 32,000 elements and about a minute for 64,000.
+
+The doubling test also works the other way round: if we do not know the complexity of a program, measuring the ratio gives us a good hint. A ratio of about 2 suggests linear growth, about 4 quadratic, about 8 cubic.
+
+<details>
+  <summary>🧠 <strong>Checkpoint: Interpreting a doubling experiment</strong></summary>
+
+  **Question:** A program takes 120, 250, 510 and 1,030 ms for sizes 1,000, 2,000, 4,000 and 8,000. What growth does it suggest, and how long would you expect for 64,000?
+
+  **Answer:** The ratios are about 2.1, 2.0 and 2.0, which suggests linear growth (or $n \log n$, which is hard to distinguish from linear with so few points). With linear growth, each doubling doubles the time: 16,000 → about 2,060 ms, 32,000 → about 4,120 ms, 64,000 → about **8,240 ms**. If the growth were $n \log n$, the real value would be somewhat higher, so it is worth measuring and checking.
+
+</details>
+
+---
+
+## Comparing Two Algorithms with Time Ratios
+
+To compare two algorithms experimentally, we compute the **ratio** of their times, $t_1(n) / t_2(n)$, for the same problem sizes, and observe its trend as $n$ grows:
+
+- If the algorithms have **different complexities**:
+  - if the ratio **tends to 0**, the algorithm in the numerator has the lower complexity: it is the better one;
+  - if the ratio **tends to infinity**, the algorithm in the numerator has the higher complexity: it is the worse one.
+
+  The larger the problem, the more advantageous the algorithm with lower complexity becomes.
+
+- If the algorithms have the **same complexity**, the ratio tends to a **constant**, called the **implementation constant**:
+  - a constant **below 1** means the algorithm in the numerator is better;
+  - a constant **above 1** means the algorithm in the denominator is better;
+  - a constant of exactly 1 would mean they are equally fast, something extremely rare in practice.
+
+The same technique compares **environments** instead of algorithms: running the same algorithm in Python and in Java (with and without optimisation), the ratio of their times oscillates around a constant that relates the two environments. Do not be surprised if the ratio involving the optimised Java version is unstable: the JIT changes the behaviour of the program as it runs.
+
+<details>
+  <summary>🧠 <strong>Checkpoint: Same complexity, different speed</strong></summary>
+
+  **Question:** Two sorting programs, A and B, have the same complexity. For $n$ = 10,000, 20,000 and 40,000, the ratio $t_A / t_B$ is 2.6, 2.4 and 2.5. Which one would you choose, and does this ratio say anything about how both programs grow?
+
+  **Answer:** B: the ratio is stable around 2.5, so A is consistently about 2.5 times slower. A stable ratio is precisely the sign that both programs have the **same** growth; it only reveals the difference in their implementation constants. If they had different complexities, the ratio would keep growing or shrinking.
+
+</details>
+
+---
+
+## Measuring Memory
+
+Memory can also be measured, although with even more care than time in a language with automatic memory management. A rough estimate of the heap in use can be obtained from the `Runtime` class:
+
+```java
+Runtime runtime = Runtime.getRuntime();
+runtime.gc();   // only a request: the virtual machine may ignore it
+long usedBytes = runtime.totalMemory() - runtime.freeMemory();
+```
+
+This value includes everything in the heap (not only our data structures) and depends on when the garbage collector last ran, so it should only be used for coarse comparisons. For memory, the analytical approach (counting how many elements of each type an algorithm stores) is usually more informative than measurements.
+
+---
+
+## Summary
+
+- Efficiency is about resources: mainly **execution time** and **memory**, which often have to be balanced.
+- Comparing algorithms only by running them is costly, depends on the implementation, the test cases and the machine, and does not tell us how good an algorithm can be. The **analytical** approach studies the growth of $T(n)$ independently of all that.
+- Experiments remain essential to **validate** theory and to know real times. To measure reliably in Java: avoid times below **50 ms**, use **repetitions**, be aware of the **JIT** (`-Xint` disables it), measure only the operation of interest and use the same data for all algorithms.
+- The **doubling test** checks the growth: ratios of about 2, 4 and 8 indicate linear, quadratic and cubic time.
+- The **ratio of times** of two algorithms tends to 0 or infinity when their complexities differ, and to the **implementation constant** when they are equal.
+
+---
+
+## Practice
+
+:::tip Technical lab
+- **⏱️ See the resolution problem.** Measure the sum of a vector of 10,000 elements once with `currentTimeMillis` and once with `nanoTime`, ten times each. How stable are the results?
+- **🔁 Use repetitions.** Find the number of repetitions (a power of 10) needed to measure the sum of a vector of 10,000 elements above 50 ms on your computer, and compute the time of one execution in microseconds.
+- **📈 Run a doubling test.** Measure, with `-Xint`, the times of an algorithm with two nested loops and of one with three nested loops for increasing sizes. Compute the ratios between consecutive times and check them against the table of this lesson.
+- **⚖️ Compare with ratios.** Measure the brute-force and the sorting versions of the maximum pairwise product for several sizes and compute the ratio of their times. Does it tend to 0, to infinity or to a constant? Is that what you expected?
+- **🧪 Optimised or not?** Repeat one of the previous experiments without `-Xint`. In which cases do the measurements still follow the theoretical growth, and in which do they become erratic?
+:::

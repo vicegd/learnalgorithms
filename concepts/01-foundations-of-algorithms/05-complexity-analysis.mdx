@@ -1,52 +1,51 @@
 ---
 title: Complexity Analysis
 sidebar_position: 5
-tags: [Analysis, Time Complexity, Space Complexity, Data Structures]
+tags: [Analysis, Time Complexity, Space Complexity, Best Case, Worst Case, Average Case]
 ---
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# The Science of Complexity Analysis
+# Complexity Analysis: Counting the Cost of an Algorithm
 
-In the previous case study, we saw how an optimal strategy drastically outperformed a brute-force approach. But how do we formalize this comparison? 
+In the previous lesson we saw that measurements depend on the machine, the compiler and the implementation, and that comparing algorithms only by running them has serious limitations. We now develop the alternative: studying the algorithm **on paper**, by counting how many elementary operations it performs as a function of the size of its input.
 
-As computer scientists, we cannot simply say an algorithm "feels faster." We need a rigorous mathematical framework to prove its efficiency across any hardware architecture.
+The result is a function, $T(n)$, that describes the cost of the algorithm independently of any particular computer. It allows us to compare algorithms before implementing them, to predict their behaviour for large inputs and to understand *why* one is better than another.
 
----
-
-## The Flaw of Empirical Measurement
-
-A beginner's first instinct when comparing two algorithms is to use empirical measurement—starting a stopwatch before the code runs and stopping it afterward (e.g., using `System.currentTimeMillis()` in Java). 
-
-This approach is fundamentally flawed for engineering analysis.
-
-:::danger The Stopwatch Fallacy
-Measuring execution time in absolute seconds ($s$) or milliseconds ($ms$) is completely unreliable because the results are heavily skewed by external variables:
-1. **Hardware disparities:** An $O(n^2)$ algorithm might run faster on a quantum supercomputer than an $O(n)$ algorithm on a decade-old laptop for small datasets.
-2. **OS & Background processes:** Operating systems constantly interrupt CPU execution to manage background tasks, ruining precise measurements.
-3. **Compiler optimizations:** The JVM or compiler might optimize the byte-code differently depending on the machine.
+:::note What you will learn in this lesson
+- The cost model used to analyse algorithms: elementary operations that take one unit of time.
+- How to obtain $T(n)$ by counting how many times each instruction executes, for loops, conditionals and method calls.
+- The summation formulas that appear most often when analysing loops.
+- Why the cost of an algorithm can depend on the *content* of the input, and how we handle it with the **best**, **worst** and **average** cases.
+- How to analyse the **memory** an algorithm needs, $S(n)$, including the call stack.
 :::
 
-Instead of asking *"How many seconds does this take?"*, we must ask: **"How does the number of operations grow as the input size grows?"**
+---
+
+## The Cost Model
+
+To analyse an algorithm mathematically, we use an **idealised computer** with the following rules:
+
+- **Elementary operations** take exactly **one unit of time (u.t.)**: assigning a value, an arithmetic operation, a comparison, a logical operation, accessing an element of an array, returning from a method...
+- Instructions are executed **one after another** (no parallelism).
+- Memory is unlimited and accessing any position takes the same time.
+
+This model is a deliberate simplification. In a real processor a division is slower than an addition, and accessing data that is in the cache is much faster than accessing main memory. But all these differences are **bounded by constants**: a division may cost, say, 20 times more than an addition, but never $n$ times more. Since our goal is to understand how the cost **grows** with $n$, constant factors do not change the conclusions, as the next lesson will make precise.
+
+:::caution Not every line of code is elementary
+A line such as `Arrays.sort(v)`, `list.contains(x)` or `text.indexOf(word)` looks like a single instruction, but it executes a whole algorithm whose cost depends on the size of the data. When analysing a program, always ask how much a library call really costs. In the exercises of this course, we will make it explicit, for example by writing `instruction_O(n)` for an operation whose cost grows linearly.
+:::
+
+### The size of the input
+
+As we saw in the previous lesson, the cost is expressed as a function of the **size of the input**, $n$: the number of elements of a vector, of a matrix or of the records of a table, the number of nodes of a graph, etc. Sometimes more than one parameter is needed: the cost of an algorithm on a graph usually depends on both the number of nodes and the number of edges, and the cost of processing an $r \times c$ matrix depends on both dimensions.
 
 ---
 
-## The Analytical Approach
+## Counting Operations: The Sum of a Vector
 
-To mathematically analyze an algorithm, we define a theoretical model where every primitive machine instruction (e.g., assignment, arithmetic operation, or logical comparison) takes exactly **1 unit of time ($u.t.$)**.
-
-### Defining the Input Size ($n$)
-The complexity of a function is always expressed in terms of the size of its input, denoted as **$n$**. Depending on the data structure, $n$ represents different metrics:
-* **Arrays / Lists:** The number of elements in the collection.
-* **Matrices:** The total number of cells ($rows \times columns$).
-* **Graphs:** The number of vertices ($V$) and edges ($E$).
-
----
-
-## Deducing Time Complexity: $T(n)$
-
-Let's calculate the exact mathematical equation for the execution time, **$T(n)$**, of a simple algorithm that sums all the integers in an array.
+Let us calculate the exact execution time $T(n)$ of an algorithm that sums all the integers of an array.
 
 ```java showLineNumbers
 public static int sum(int[] list) {
@@ -58,78 +57,215 @@ public static int sum(int[] list) {
 }
 ```
 
-Let's break down the execution cost line by line, assuming `list.length` is $n$:
+<details>
+  <summary>🧠 <strong>Checkpoint: Before reading on</strong></summary>
 
-| Line | Instruction Context | Executions | Cost Explanation |
+  **Question:** Counting each elementary instruction as one unit, which of these expressions is the execution time of this method? (a) $2n$ (b) $3n+4$ (c) $3n+3$ (d) $2n+3$
+
+  **Answer:** (b) $3n+4$. Check it with the table below. The most common mistake is to forget that the loop condition is evaluated one **extra** time, the one that returns `false` and ends the loop.
+
+</details>
+
+Let us count how many times each instruction is executed, with $n$ = `list.length`:
+
+| Line | Instruction | Executions | Explanation |
 | :--- | :--- | :--- | :--- |
-| **2** | `int value = 0;` | **$1$** | Runs exactly once at initialization. |
-| **3** | `int i = 0;` | **$1$** | The loop counter initialization runs once. |
-| **3** | `i < list.length;` | **$n + 1$** | The condition is checked before every iteration ($n$ times), plus one final check that evaluates to `false` to break the loop. |
-| **3** | `i++` | **$n$** | The increment executes at the end of each valid loop iteration. |
-| **4** | `value += list[i];` | **$n$** | The core body of the loop executes exactly $n$ times. |
-| **6** | `return value;` | **$1$** | Returns the result once at the end. |
+| 2 | `int value = 0;` | $1$ | Runs once, at the beginning. |
+| 3 | `int i = 0;` | $1$ | The initialisation of the loop runs once. |
+| 3 | `i < list.length` | $n + 1$ | Checked before each of the $n$ iterations, plus one final time that evaluates to `false`. |
+| 3 | `i++` | $n$ | Executed at the end of each iteration. |
+| 4 | `value += list[i];` | $n$ | The body of the loop runs $n$ times. |
+| 6 | `return value;` | $1$ | Runs once, at the end. |
 
-By algebraically summing the frequencies of all primitive operations, we obtain the exact polynomial equation for the execution time:
+Adding up the executions:
 
-$$T(n) = 1 + 1 + (n + 1) + n + n + 1$$
-$$T(n) = 3n + 4$$
+$$
+T(n) = 1 + 1 + (n + 1) + n + n + 1 = 3n + 4
+$$
 
-This tells us that for an array of $1,000$ elements, the CPU will execute exactly $3,004$ elemental operations.
+For an array of 1,000 elements, this model predicts 3,004 elementary operations.
 
----
-
-## The Space Complexity: $S(n)$
-
-While Time Complexity ($T(n)$) measures CPU cycles, **Space Complexity ($S(n)$)** measures the peak auxiliary memory (RAM) the algorithm allocates during execution. 
-
-An engineer must constantly balance these two resources. Sometimes, you can drastically reduce execution time by caching data, which intentionally sacrifices memory (a concept known as the *Time-Memory Trade-off*).
-
-:::info In-Place vs. Out-of-Place Algorithms
-* **In-Place ($S(n) = O(1)$):** The algorithm transforms the input using only a few scalar variables (like the `value` and `i` variables in our sum example). It does not require memory proportional to the input size.
-* **Out-of-Place ($S(n) = O(n)$):** The algorithm requires cloning the input or creating secondary arrays (e.g., *MergeSort*), scaling memory consumption linearly with the input data.
+:::info How precise is "exact"?
+Is `value += list[i]` one operation, or three (read `list[i]`, add, assign)? Is `i++` one or two? Different authors count differently, and they would obtain $T(n) = 5n + 4$ or $6n + 4$ instead of $3n + 4$. All these answers have something essential in common: they are **proportional to $n$** for large values of $n$. The constants depend on arbitrary counting decisions (and, in reality, on the machine), while the **growth** does not. This is the key motivation for the asymptotic notation of the next lesson.
 :::
 
 ---
 
-## Execution Scenarios
+## Counting Loops with Summations
 
-The execution time of an algorithm does not depend solely on the size of the input ($n$), but often on the **initial configuration or distribution** of the data. To properly evaluate an algorithm, we analyze three scenarios:
+When loops are nested, or when the number of iterations of the inner loop depends on the outer one, counting line by line becomes cumbersome. Instead, we express the number of executions of the innermost instruction as a **summation** and simplify it.
+
+### Useful formulas
+
+| Summation | Closed form | Typical origin |
+| :--- | :--- | :--- |
+| $\displaystyle\sum_{i=1}^{n} 1$ | $n$ | A simple loop. |
+| $\displaystyle\sum_{i=1}^{n} i$ | $\dfrac{n(n+1)}{2}$ | An inner loop that runs $i$ times (triangular loops). |
+| $\displaystyle\sum_{i=1}^{n} i^2$ | $\dfrac{n(n+1)(2n+1)}{6}$ | Three nested loops with dependent limits. |
+| $\displaystyle\sum_{i=0}^{k} 2^i$ | $2^{k+1} - 1$ | Quantities that double at each step. |
+| $\displaystyle\sum_{i=0}^{k} r^i$ | $\dfrac{r^{k+1} - 1}{r - 1}$ (for $r \ne 1$) | Geometric growth with ratio $r$. |
+
+### Example 1: a triangular loop
+
+```java
+for (int i = 0; i < n; i++)
+    for (int j = i + 1; j < n; j++)
+        count++;                       // how many times?
+```
+
+For each value of $i$, the inner loop runs $n - 1 - i$ times. Therefore:
+
+$$
+\sum_{i=0}^{n-1} (n - 1 - i) = (n-1) + (n-2) + \cdots + 1 + 0 = \frac{n(n-1)}{2}
+$$
+
+This is exactly the "half of the pairs" version of the brute-force pairwise product: about $n^2/2$ executions, which still grows quadratically.
+
+### Example 2: a loop that doubles its counter
+
+```java
+for (int i = 1; i <= n; i *= 2)
+    count++;                           // how many times?
+```
+
+The counter takes the values $1, 2, 4, 8, \dots, 2^k$, and the loop stops when $2^k > n$. The number of iterations is the number of powers of 2 that do not exceed $n$:
+
+$$
+\lfloor \log_2 n \rfloor + 1
+$$
+
+For $n = 1{,}000{,}000$ that is only 20 iterations. Loops whose counter is **multiplied or divided** by a constant run a **logarithmic** number of times, a pattern that we will meet in binary search and in divide and conquer algorithms.
+
+### Example 3: a matrix
+
+```java
+long total = 0;
+for (int r = 0; r < rows; r++)
+    for (int c = 0; c < cols; c++)
+        total += matrix[r][c];
+```
+
+The body executes $rows \cdot cols$ times. If we take $n$ as the **number of elements** of the matrix, the algorithm is linear in $n$. If the matrix is square and we take $n$ as its **order** (number of rows), the same algorithm executes $n^2$ times. Both statements are correct: what changes is the meaning of $n$, which is why it must always be stated explicitly.
+
+---
+
+## Conditionals and Method Calls
+
+- **Sequence.** The cost of a sequence of instructions is the **sum** of their costs.
+- **Conditional** (`if (c) A else B`). The cost is the cost of evaluating the condition plus the cost of the branch that is executed. Since we may not know which branch will run, we consider the most expensive one when we want an upper bound, and this naturally leads to distinguishing cases (see below).
+- **Loop.** The cost is the sum, over all iterations, of the cost of the condition and the body, plus one final evaluation of the condition.
+- **Method call.** The cost is the cost of the code of the method, applied to the size of its arguments, plus a constant for the call itself. When the method is recursive, this leads to equations in which $T(n)$ is defined in terms of $T$ applied to smaller sizes (**recurrences**), which you will learn to solve in the divide and conquer chapter.
+
+---
+
+## Best, Worst and Average Case
+
+For the sum of a vector, $T(n)$ depends only on $n$: the loop always performs the same work, whatever the values in the vector. But for many algorithms, two inputs of the **same size** can require very different amounts of work. Consider searching for a value:
+
+```java
+public static boolean contains(int[] list, int value) {
+    for (int i = 0; i < list.length; i++)
+        if (list[i] == value)
+            return true;               // found: stop immediately
+    return false;
+}
+```
+
+If the value is in the first position, the method returns after one iteration. If it is not in the vector, it must inspect all $n$ elements. To characterise algorithms like this one, we distinguish three cases:
 
 <Tabs>
-  <TabItem value="worst" label="🔴 Worst Case (The Standard)" default>
-    **Definition:** The maximum possible time the algorithm will take for any input of size $n$. <br/>
-    **Engineering Value:** This is the absolute guarantee of performance. When designing mission-critical systems (like pacemakers or aviation software), engineers exclusively rely on the Worst Case to ensure the system never exceeds its maximum response time deadline.
+  <TabItem value="worst" label="🔴 Worst case" default>
+
+**Definition:** $T_{worst}(n)$ is the **maximum** time of the algorithm over all inputs of size $n$. For `contains`, it corresponds to the value not being present (or being in the last position): all $n$ elements are inspected.
+
+**Value:** it is a **guarantee**: the algorithm will never take longer, whatever the input. This is the case that is analysed most often, and the essential one in critical systems that must respond within a deadline (aircraft, medical devices, industrial control).
+
   </TabItem>
-  <TabItem value="best" label="🟢 Best Case">
-    **Definition:** The minimum possible time the algorithm could take for an ideal input of size $n$. <br/>
-    **Engineering Value:** Usually deceptive. While an algorithm might finish instantly if the data is already perfectly sorted, we cannot rely on ideal conditions in production environments.
+  <TabItem value="best" label="🟢 Best case">
+
+**Definition:** $T_{best}(n)$ is the **minimum** time over all inputs of size $n$. For `contains`, it is the value being in the first position: one iteration, whatever the value of $n$.
+
+**Value:** limited, and sometimes deceptive. Some "best cases" are very unlikely to happen in practice. However, it can be informative: some sorting algorithms, for example, are very fast on data that is already sorted or almost sorted, and that situation does happen in real applications.
+
   </TabItem>
-  <TabItem value="average" label="🟡 Average Case">
-    **Definition:** The mathematical expectation of the running time, calculated by taking the weighted average of all possible inputs and their probabilities. <br/>
-    **Engineering Value:** Highly useful for consumer applications (like web servers) where occasional slowdowns are acceptable as long as the overall throughput remains high.
+  <TabItem value="average" label="🟡 Average case">
+
+**Definition:** $T_{average}(n)$ is the **expected** time over the inputs of size $n$. If the possible situations (cases) are numbered $1, 2, \dots, N$, and case $i$ happens with probability $P_i$ and takes time $T_i(n)$, then:
+
+$$
+T_{average}(n) = \sum_{i=1}^{N} P_i \cdot T_i(n)
+$$
+
+**Value:** apparently, it is the most reasonable measure, because it describes what we should expect "normally". But it has two difficulties: it requires knowing (or assuming) the **probability distribution** of the inputs, which may not reflect reality, and the calculation is usually harder than for the other cases.
+
   </TabItem>
 </Tabs>
 
+### A small average-case calculation
+
+Suppose that the value we look for **is** in the vector, and that it is equally likely to be in any position, so each position has probability $1/n$. If it is in position $i$ (counting from 1), `contains` inspects $i$ elements. The expected number of inspected elements is:
+
+$$
+\sum_{i=1}^{n} \frac{1}{n} \cdot i = \frac{1}{n} \cdot \frac{n(n+1)}{2} = \frac{n+1}{2}
+$$
+
+On average, we inspect about **half** of the vector: still proportional to $n$. In the lesson on searching we will repeat this analysis counting every instruction, and also considering the possibility that the value is not present.
+
+<details>
+  <summary>🧠 <strong>Checkpoint: Which case?</strong></summary>
+
+  **Question:** For the maximum pairwise product algorithms of the case study (brute force, sorting, linear scan), do the best, worst and average cases differ?
+
+  **Answer:** For brute force and for the linear scan, essentially no: both always traverse the same loops completely, whatever the values (only the number of times the `if` body executes changes, which does not affect the growth). For the version based on sorting, it depends on the sorting algorithm: some sorting algorithms (such as the TimSort used by Java for objects) are much faster when the data is already sorted. Analysing the cases always requires looking at **which inputs make the algorithm work more or less**.
+
+</details>
+
+:::info Amortised cost
+There is a fourth way of looking at cost, which we mentioned when studying `ArrayList`: the **amortised** cost, which is the average cost **per operation over a sequence of operations**, in the worst case. It does not involve probabilities. An `ArrayList` occasionally performs an expensive copy when it grows, but over any long sequence of insertions the average cost per insertion is constant.
+:::
+
 ---
 
-## The Data Structures Catalog
+## Space Complexity: $S(n)$
 
-As we established earlier: *Program = Data Structures + Algorithms*. To write efficient code, you must select the correct container. Below is a foundational mapping of Java's Collection Framework (`java.util`) to their structural purpose. You will interact heavily with these in your laboratory sessions.
+Time is not the only resource. The **space complexity** $S(n)$ measures the **additional memory** that an algorithm needs, as a function of the size of the input, beyond the memory occupied by the input itself. It is analysed with the same counting approach: how many variables, and of what size, does the algorithm create?
 
-| Interface | Core Java Implementation | Structural Purpose & Behavior |
-| :--- | :--- | :--- |
-| **`List`** | `ArrayList`, `LinkedList` | Ordered sequences that allow duplicated elements. |
-| **`Set`** | `HashSet`, `TreeSet` | Mathematical sets that guarantee unique elements (no duplicates). |
-| **`Queue`** | `PriorityQueue` | Processing lines. Usually FIFO (First-In, First-Out) or based on priority weighting. |
-| **`Map`** | `HashMap`, `TreeMap` | Dictionary structures holding Key-Value pairs for instant $O(1)$ or $O(\log n)$ retrieval. |
-| **`Stack`** | `ArrayDeque` | LIFO (Last-In, First-Out) structures, mirroring the physical CPU execution stack. |
+- The sum of a vector needs two variables (`value` and `i`), whatever the value of $n$: its additional space is **constant**.
+- An algorithm that copies the input into a new array, or that creates an auxiliary array of the same size (as Mergesort does), needs space **proportional to $n$**.
+
+:::info In-place and out-of-place algorithms
+- An algorithm is **in place** when it transforms the input using only a constant (or very small) amount of additional memory, such as a few variables.
+- An algorithm is **out of place** when it needs additional memory that grows with the input, such as auxiliary arrays or copies.
+:::
+
+### Do not forget the stack
+
+Recursive algorithms consume memory even if they do not create any data structure: each active call occupies a **frame** on the call stack. The recursive factorial of the first lesson performs $n$ nested calls before reaching the base case, so it needs stack space proportional to $n$; the iterative version needs constant space. This is why a deep recursion can end with a `StackOverflowError` even when the algorithm is correct.
+
+### The time-memory trade-off
+
+Time and space are often exchanged: we can sometimes save a lot of time by storing results that would otherwise have to be recomputed (the main idea of dynamic programming), or save memory at the cost of recomputing. An engineer must consider both resources and choose the balance that fits the constraints of the problem.
 
 ---
 
-## Ecosystem Integration & Active Review
+## Summary
 
-:::tip Analytical Challenge
-* **💻 Technical Lab:** Review the `java.util` package in your IDE. Try instantiating an `ArrayList` and a `LinkedList`, and observe the methods available to them. 
-* **🤖 Query Your AI Assistant:** Open **NotebookLM** and execute the following query to test your analytical deduction skills:  
-  > *"Based on the course's complexity analysis rules, provide me with a Java method containing a single `while` loop, and guide me through deducing its exact $T(n)$ polynomial equation step by step."*
+- We analyse algorithms in an **idealised model** in which each elementary operation costs one unit of time. Library calls are not necessarily elementary.
+- $T(n)$ is obtained by **counting** how many times each instruction executes. For the sum of a vector, $T(n) = 3n + 4$.
+- Nested and dependent loops are counted with **summations**; loops whose counter is multiplied or divided by a constant run a **logarithmic** number of times.
+- The exact constants depend on counting conventions, but the **growth** does not.
+- When the cost depends on the content of the input, we distinguish the **best**, **worst** and **average** cases. The worst case is a guarantee; the average case requires assumptions about probabilities.
+- $S(n)$ measures the **additional memory**, including the call stack used by recursion.
+
+---
+
+## Practice
+
+:::tip Analytical challenge
+- **🧮 Count it.** Obtain $T(n)$, counting each instruction as one unit, for a method that returns the **maximum** of a non-empty vector of $n$ integers. Does the result depend on the content of the vector? (Hint: the assignment inside the `if` may or may not execute.)
+- **📐 Use summations.** How many times does the innermost instruction run in this fragment? `for (i = 0; i < n; i++) for (j = 0; j < i; j++) for (k = 0; k < j; k++) x++;` Give the exact formula and its leading term.
+- **🔢 Logarithmic loops.** How many iterations does `for (i = n; i >= 1; i /= 3)` perform? Check your formula for $n = 1$, $n = 9$ and $n = 10$.
+- **⚖️ Cases.** For a method that checks whether a vector is sorted in ascending order (returning `false` as soon as it finds two consecutive elements out of order), describe the best and worst cases and their cost.
+- **💾 Space.** Compare the additional space needed by the three versions of the maximum pairwise product (brute force, sorting a copy, linear scan).
+- **💻 Verify experimentally.** Add a counter to the sum of a vector that increments once per elementary operation, run it for several values of $n$ and check that the result is $3n + 4$.
 :::
