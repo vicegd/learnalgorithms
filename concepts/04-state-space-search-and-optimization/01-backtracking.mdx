@@ -222,7 +222,7 @@ This makes backtracking especially useful in problems where:
 
 Backtracking is a good idea in several common situations.
 
-### 1. When the problem asks for one valid solution
+### When the problem asks for one valid solution
 
 Sometimes the goal is not to find all solutions, but simply to find **any** solution that satisfies the constraints. In these cases, backtracking can stop as soon as it finds the first valid answer. This can make it much more efficient than brute force, because the algorithm does not need to explore the entire search space once a correct solution has already been found.
 
@@ -233,7 +233,7 @@ Examples include:
 
 In this kind of problem, backtracking is useful because it searches systematically, but it can terminate early once success has been reached.
 
-### 2. When the problem asks for all valid solutions
+### When the problem asks for all valid solutions
 
 In other cases, the objective is to enumerate **every** possible solution that satisfies the constraints. Here, backtracking is especially natural because it can explore the entire search space while discarding invalid branches as early as possible.
 
@@ -245,7 +245,7 @@ Examples include:
 
 This is one of the classic strengths of backtracking: it can systematically generate all feasible answers without wasting effort on branches that are already impossible.
 
-### 3. When constraints can be checked early
+### When constraints can be checked early
 
 Backtracking is most effective when the problem includes constraints that can be evaluated on a partial solution, not only on a complete one. If the algorithm can detect a violation early, it can prune the branch immediately and avoid exploring it further.
 
@@ -256,13 +256,13 @@ For example:
 
 The earlier the constraints can be checked, the more effective backtracking becomes.
 
-### 4. When the search space is large but structured
+### When the search space is large but structured
 
 Backtracking is a strong option when the number of possible candidates is enormous, but the problem has enough structure to guide the search. In these cases, brute force would be too expensive, but backtracking can still be practical because it avoids exploring large portions of the tree.
 
 This is typical in combinatorial problems, where the number of possible configurations grows rapidly with the input size. Backtracking does not remove the combinatorial nature of the problem, but it can dramatically reduce the amount of work by pruning useless branches.
 
-### 5. When the problem is a constraint satisfaction problem
+### When the problem is a constraint satisfaction problem
 
 Backtracking is a classical technique for **constraint satisfaction problems** (CSPs). In a CSP, the task is to assign values to variables while respecting a set of restrictions. This is exactly the kind of setting where backtracking fits naturally.
 
@@ -276,7 +276,7 @@ Typical examples of CSPs include:
 
 In these problems, each variable assignment is a decision, and each new decision must preserve consistency with the constraints already imposed. If consistency is lost, the algorithm goes back and tries another option.
 
-### 6. When the problem is an enumeration problem
+### When the problem is an enumeration problem
 
 Backtracking is also very suitable when the objective is to **enumerate** solutions rather than just find one. Since the algorithm already explores the search tree systematically, it can be adapted to collect every valid result.
 
@@ -288,7 +288,7 @@ This is useful in:
 
 In this setting, backtracking acts as a controlled exhaustive search: it still explores all valid answers, but it avoids expanding branches that are impossible from the beginning.
 
-### 7. When the problem is an optimization problem with pruning opportunities
+### When the problem is an optimization problem with pruning opportunities
 
 Backtracking can also be used in optimization problems, although in those cases it is often combined with additional pruning rules or bounding techniques. The idea is to search for the best feasible solution, but stop exploring branches that cannot improve the current best one.
 
