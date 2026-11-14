@@ -13,7 +13,7 @@ const CHAPTERS = [
     description:
       'What an algorithm is, and how to measure and analyze its cost: empirical measurement, counting operations, asymptotic notation, growth rates and loops.',
     topics: ['Algorithmic thinking', 'Data structures', 'Measuring efficiency', 'Complexity analysis', 'Big O', 'Searching'],
-    cta: '9 lessons',
+    cta: '9 lessons + exercises',
     to: '/concepts/category/1-foundations-of-algorithms',
   },
   {
