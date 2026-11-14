@@ -80,6 +80,7 @@ const SECTIONS = [
     ),
     eyebrow: 'Algorithm Collection',
     title: 'Algorithm Sheets',
+    requiresAlgorithms: true,
     description:
       'Rigorous, interactive breakdowns of each algorithm: from the naive approach and why it fails, through the full derivation, to annotated multi-language code and step-by-step table visualizations.',
     topics: ['Problem Statement', 'Complexity Analysis', 'Pseudocode', 'Interactive Trace', '...'],
@@ -117,11 +118,13 @@ function SectionCard({ accentClass, icon, eyebrow, title, description, topics, c
 
 export default function Home() {
   const { siteConfig } = useDocusaurusContext();
+  const showAlgorithms = siteConfig.customFields?.showAlgorithms !== false;
+  const sections = SECTIONS.filter((s) => showAlgorithms || !s.requiresAlgorithms);
   return (
     <Layout title="Home" description={siteConfig.tagline}>
       <main className={styles.main}>
         <div className={styles.grid}>
-          {SECTIONS.map((s) => (
+          {sections.map(({ requiresAlgorithms: _r, ...s }) => (
             <SectionCard key={s.title} {...s} />
           ))}
         </div>

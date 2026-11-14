@@ -1,6 +1,7 @@
 import React from 'react';
 import Layout from '@theme/Layout';
 import { usePluginData } from '@docusaurus/useGlobalData';
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 
 function StatCard({ value, label }) {
   return (
@@ -23,6 +24,8 @@ function StatCard({ value, label }) {
 
 export default function Stats() {
   const { stats } = usePluginData('docusaurus-plugin-site-data');
+  const { siteConfig } = useDocusaurusContext();
+  const showAlgorithms = siteConfig.customFields?.showAlgorithms !== false;
 
   return (
     <Layout title="Site Stats" description="Live statistics about the learning content on this site">
@@ -30,8 +33,12 @@ export default function Stats() {
         <h1>Site Stats</h1>
         <p>Auto-generated from the current content — updates with every build.</p>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginTop: '2rem' }}>
-          <StatCard value={stats.algorithms} label="Algorithms documented" />
-          <StatCard value={stats.withVisualizer} label="With interactive visualizer" />
+          {showAlgorithms && (
+            <>
+              <StatCard value={stats.algorithms} label="Algorithms documented" />
+              <StatCard value={stats.withVisualizer} label="With interactive visualizer" />
+            </>
+          )}
           <StatCard value={stats.concepts} label="Concept pages" />
           <StatCard value={stats.comingSoon} label="Coming soon" />
           <StatCard value={stats.linkedConceptTerms} label="Linked concept terms" />

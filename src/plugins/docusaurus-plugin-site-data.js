@@ -92,8 +92,9 @@ function buildCrossRef(algorithmEntries) {
 // ---------------------------------------------------------------------------
 // Plugin
 // ---------------------------------------------------------------------------
-export default function pluginSiteData(context) {
+export default function pluginSiteData(context, options = {}) {
   const { siteDir } = context;
+  const includeAlgorithms = options.includeAlgorithms !== false;
 
   return {
     name: 'docusaurus-plugin-site-data',
@@ -134,7 +135,7 @@ export default function pluginSiteData(context) {
         }
       }
 
-      if (fs.existsSync(algDir)) scanAlgorithms(algDir);
+      if (includeAlgorithms && fs.existsSync(algDir)) scanAlgorithms(algDir);
 
       // ── Concepts ───────────────────────────────────────────────────────────
       const conDir = path.join(siteDir, 'concepts');
