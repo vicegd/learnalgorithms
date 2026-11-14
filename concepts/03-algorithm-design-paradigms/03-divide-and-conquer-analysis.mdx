@@ -1,0 +1,200 @@
+---
+title: Analysing Divide and Conquer
+sidebar_position: 3
+tags: [Divide and Conquer, Recurrences, Master Theorem, Complexity]
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Analysing Divide and Conquer Algorithms
+
+The loops of iterative algorithms can be analysed by counting iterations, as we did in the first chapter. Recursive algorithms need a different tool: the execution time is expressed in terms of **itself** applied to smaller sizes, giving a **recurrence equation**. Fortunately, most divide and conquer algorithms follow one of two very regular patterns, and for both of them the solution is known in general. This lesson presents those two patterns, explains where their formulas come from, and shows how to apply them.
+
+:::note What you will learn in this lesson
+- How to model a divide and conquer algorithm with the parameters $a$, $b$ and $k$.
+- The complexity formulas for **division** and **subtraction** schemes, and the intuition behind them (the recursion tree).
+- How to identify $a$, $b$ and $k$ in real code, and the most common mistakes.
+- The limits of these formulas.
+:::
+
+---
+
+## The Parameters $a$, $b$ and $k$
+
+Both schemes are described by three parameters:
+
+- $a$: the **number of subproblems** (recursive calls) executed in each invocation;
+- $b$: how the size decreases: each subproblem has size $n / b$ (**division**) or $n - b$ (**subtraction**), where $b$ is a constant;
+- $k$: the cost of the work done in each invocation **excluding the recursive calls** (dividing and combining) is $O(n^k)$, a polynomial.
+
+The base case takes constant time (or, more generally, $c \cdot n^k$ for its small size).
+
+---
+
+## Division Scheme
+
+The execution time satisfies:
+
+$$
+T(n) = \begin{cases} a \cdot T(n/b) + c \cdot n^k & \text{if } n \text{ is greater than the base case} \\ c \cdot n^k & \text{in the base case} \end{cases}
+$$
+
+and its solution is:
+
+$$
+T(n) \in \begin{cases} O(n^k) & \text{if } a \lt b^k \\ O(n^k \log n) & \text{if } a = b^k \\ O(n^{\log_b a}) & \text{if } a \gt b^k \end{cases}
+$$
+
+This result is a particular case of the so-called **master theorem**.
+
+### Where does it come from? The recursion tree
+
+Draw the tree of recursive calls. The root is the original problem, of size $n$. It has $a$ children of size $n/b$, each of which has $a$ children of size $n/b^2$, and so on, until the base case. The tree has about $\log_b n$ levels.
+
+| Level | Number of subproblems | Size of each one | Non-recursive work at the level |
+| :---: | :---: | :---: | :--- |
+| 0 | $1$ | $n$ | $c \cdot n^k$ |
+| 1 | $a$ | $n/b$ | $a \cdot c \cdot (n/b)^k = c \cdot n^k \cdot \frac{a}{b^k}$ |
+| 2 | $a^2$ | $n/b^2$ | $c \cdot n^k \cdot \left(\frac{a}{b^k}\right)^2$ |
+| $i$ | $a^i$ | $n/b^i$ | $c \cdot n^k \cdot \left(\frac{a}{b^k}\right)^i$ |
+| $\log_b n$ (leaves) | $a^{\log_b n} = n^{\log_b a}$ | constant | proportional to $n^{\log_b a}$ |
+
+The total time is the sum of all levels: $c \cdot n^k$ multiplied by a **geometric series** of ratio $r = \frac{a}{b^k}$. Everything depends on that ratio:
+
+- **$a \lt b^k$ ($r \lt 1$):** the work **decreases** from each level to the next. The sum is dominated by the first term: the work at the root, $O(n^k)$. The subproblems shrink faster than they multiply.
+- **$a = b^k$ ($r = 1$):** every level does the **same** work, $c \cdot n^k$, and there are $\log_b n$ levels: $O(n^k \log n)$.
+- **$a \gt b^k$ ($r \gt 1$):** the work **increases** from each level to the next. The sum is dominated by the last level, the leaves, whose number is $a^{\log_b n}$. By the logarithm rule $x^{\log_b y} = y^{\log_b x}$ from the asymptotic notation lesson, $a^{\log_b n} = n^{\log_b a}$: $O(n^{\log_b a})$.
+
+So the three cases correspond to three situations: the cost is concentrated at the **top** of the tree, **evenly spread** over all levels, or concentrated at the **bottom**.
+
+---
+
+## Subtraction Scheme
+
+The execution time satisfies:
+
+$$
+T(n) = \begin{cases} a \cdot T(n - b) + c \cdot n^k & \text{if } n \text{ is greater than the base case} \\ c \cdot n^k & \text{in the base case} \end{cases}
+$$
+
+and its solution is:
+
+$$
+T(n) \in \begin{cases} O(n^k) & \text{if } a \lt 1 \text{ (never happens)} \\ O(n^{k+1}) & \text{if } a = 1 \\ O(a^{n / b}) & \text{if } a \gt 1 \end{cases}
+$$
+
+The intuition is again in the recursion tree, which now has about $n / b$ levels:
+
+- **$a = 1$:** a single chain of $n/b$ calls, with sizes $n, n - b, n - 2b, \dots$. The work at each one is at most $c \cdot n^k$, and there are $n/b$ of them: $O(n^{k+1})$. A loop of $n$ iterations whose body costs $O(n^k)$, written recursively.
+- **$a \gt 1$:** the number of calls **multiplies by $a$ at each level**, through $n/b$ levels: $a^{n/b}$ calls. The algorithm is **exponential**, and the non-recursive work does not even matter.
+
+:::danger Avoid subtraction with several subproblems
+An algorithm with $a \gt 1$ in a subtraction scheme is exponential, and therefore unusable except for very small inputs. If you find yourself writing two or more recursive calls on $n - 1$ (or $n - 2$...), stop and think: most likely the same subproblems are being solved many times, and a different technique (an iterative version, or dynamic programming) is needed.
+:::
+
+---
+
+## Identifying $a$, $b$ and $k$
+
+To apply the formulas, look at the code of the recursive method and answer three questions:
+
+1. **How many recursive calls are executed** in one invocation (in the general case)? That is $a$. Count the calls that are actually executed, not the ones that are written: in binary search there are two calls in the code, but only one of them runs in each invocation, so $a = 1$. And a call inside a loop that runs $m$ times counts $m$ times.
+2. **What is the size of each recursive call?** If it is $n/b$, the scheme is division; if it is $n - b$, subtraction.
+3. **What is the cost of everything else** (loops, copies, partitions, merges)? If it is $O(n^k)$, that gives $k$. A constant amount of work means $k = 0$.
+
+### Examples
+
+<Tabs>
+<TabItem value="div" label="Division" default>
+
+| Algorithm | $a$ | $b$ | $k$ | Case | Complexity |
+| :--- | :---: | :---: | :---: | :--- | :--- |
+| Binary search | 1 | 2 | 0 | $a = b^k$ ($1 = 1$) | $O(\log n)$ |
+| Sum of a vector by division | 2 | 2 | 0 | $a \gt b^k$ ($2 \gt 1$) | $O(n^{\log_2 2}) = O(n)$ |
+| Mergesort | 2 | 2 | 1 | $a = b^k$ ($2 = 2$) | $O(n \log n)$ |
+| Quicksort (balanced partitions) | 2 | 2 | 1 | $a = b^k$ | $O(n \log n)$ |
+| Tennis tournament | 2 | 2 | 2 | $a \lt b^k$ ($2 \lt 4$) | $O(n^2)$ |
+| Multiplication of large integers (4 products) | 4 | 2 | 1 | $a \gt b^k$ ($4 \gt 2$) | $O(n^{\log_2 4}) = O(n^2)$ |
+| Karatsuba multiplication (3 products) | 3 | 2 | 1 | $a \gt b^k$ ($3 \gt 2$) | $O(n^{\log_2 3}) \approx O(n^{1.585})$ |
+
+</TabItem>
+<TabItem value="sub" label="Subtraction">
+
+| Algorithm | $a$ | $b$ | $k$ | Case | Complexity |
+| :--- | :---: | :---: | :---: | :--- | :--- |
+| Factorial | 1 | 1 | 0 | $a = 1$ | $O(n)$ |
+| Sum of a vector by subtraction | 1 | 1 | 0 | $a = 1$ | $O(n)$ |
+| Sequential search, recursive | 1 | 1 | 0 | $a = 1$ | $O(n)$ |
+| Quicksort (most unbalanced partitions) | 1 | 1 | 1 | $a = 1$ | $O(n^2)$ |
+| Towers of Hanoi | 2 | 1 | 0 | $a \gt 1$ | $O(2^n)$ |
+| Fibonacci with $F(n-1) + F(n-1)$ (upper bound) | 2 | 1 | 0 | $a \gt 1$ | $O(2^n)$ |
+
+</TabItem>
+</Tabs>
+
+Notice how Quicksort appears in both tables: with perfectly balanced partitions, it follows a division scheme ($a = 2$, $b = 2$, $k = 1$); with the most unbalanced ones, a subtraction scheme in which one of the two parts is empty, so only one non-trivial call remains ($a = 1$, $b = 1$, $k = 1$). Both formulas confirm what we found in the sorting chapter: $O(n \log n)$ in the best case and $O(n^2)$ in the worst.
+
+<details>
+  <summary>🧠 <strong>Checkpoint: Analyse these schemes</strong></summary>
+
+  **Question:** Give the complexity of (1) an algorithm that splits a problem of size $n$ into 8 subproblems of size $n/2$ and combines them in $O(n^2)$, and (2) the same with 7 subproblems.
+
+  **Answer:** (1) $a = 8$, $b = 2$, $k = 2$: $a = 8 \gt b^k = 4$, so $O(n^{\log_2 8}) = O(n^3)$. This is the divide and conquer multiplication of $n \times n$ matrices with 8 products of half-size blocks: no better than the classic algorithm. (2) With $a = 7$: $O(n^{\log_2 7}) \approx O(n^{2.81})$. This is **Strassen's algorithm**, which saves one block multiplication at the cost of more additions, and beats the classic cubic algorithm for large matrices. The same trick, saving one recursive call, makes Karatsuba's multiplication faster.
+
+</details>
+
+---
+
+## How Each Parameter Affects the Cost
+
+The formulas give useful design guidance:
+
+- **Reducing $a$** (fewer subproblems) is often the key to a faster algorithm when $a \gt b^k$: Karatsuba (4 to 3 products) and Strassen (8 to 7) are famous examples.
+- **Reducing $k$** (cheaper division and combination) helps when $a \le b^k$. For example, Mergesort with an $O(n^2)$ merge would be $O(n^2)$ instead of $O(n \log n)$.
+- **Division beats subtraction**: dividing the size by 2 instead of subtracting 1 turns $O(n)$ levels into $O(\log n)$, and can turn an exponential algorithm into a polynomial one.
+
+---
+
+## Limits of the Formulas
+
+These formulas cover the most common cases, but not all of them:
+
+- **Subproblems of different sizes.** If an algorithm divides into parts of sizes $n/3$ and $2n/3$, or into parts whose size depends on the data (Quicksort with random pivots, Quickselect), the formulas do not apply directly. The recursion tree, or probabilistic analysis, is needed. For example, Quicksort's average case is $O(n \log n)$, and Quickselect's average case is $O(n)$, although neither follows exactly any of the two schemes.
+- **Non-polynomial non-recursive work.** If dividing and combining costs, for example, $O(n \log n)$, $k$ is not an integer power. The recurrence $T(n) = 2T(n/2) + n \log n$ has solution $O(n \log^2 n)$, which the simple formulas do not give. The general master theorem covers many of these cases.
+- **Exact constants.** The formulas give the order of growth, not the exact time.
+
+When an algorithm does not fit the schemes, the safest method is to draw the recursion tree, compute the work at each level and add it up, as we did above.
+
+---
+
+## Predicting Execution Times
+
+Once the complexity is known, the techniques of the first chapter apply directly. For example, if Mergesort ($O(n \log n)$) takes 2 seconds for $n = 2^{20}$, for $n = 2^{22}$ it will take about
+
+$$
+t_2 = \frac{2^{22} \cdot 22}{2^{20} \cdot 20} \cdot 2 \approx 8.8 \text{ seconds}
+$$
+
+And if the Towers of Hanoi ($O(2^n)$) take 1 second for 20 discs, then 30 discs will take about $2^{10} = 1{,}024$ seconds (17 minutes), and 64 discs, about $2^{44}$ seconds: more than 500,000 years.
+
+---
+
+## Summary
+
+- Divide and conquer algorithms are analysed with **recurrences**, characterised by $a$ (number of subproblems), $b$ (how the size decreases) and $k$ (cost of dividing and combining, $O(n^k)$).
+- **Division** ($n/b$): $O(n^k)$ if $a \lt b^k$; $O(n^k \log n)$ if $a = b^k$; $O(n^{\log_b a})$ if $a \gt b^k$.
+- **Subtraction** ($n - b$): $O(n^{k+1})$ if $a = 1$; $O(a^{n/b})$, exponential, if $a \gt 1$.
+- The **recursion tree** explains the formulas: the cost is concentrated at the top, evenly spread, or concentrated at the leaves.
+- Count the recursive calls that are **executed**, not the ones written. Subproblems of unequal or data-dependent size need a specific analysis.
+
+---
+
+## Practice
+
+:::tip Exercises
+- **🌳 Draw the tree.** Draw the recursion tree of $T(n) = 3T(n/2) + n$ for $n = 16$, write the work at each level, and check that the total grows like $n^{\log_2 3}$.
+- **🔍 Identify the parameters.** Write a recursive method that searches for the maximum of a vector by dividing it into **three** parts. What are $a$, $b$ and $k$? What is its complexity?
+- **⚖️ Compare designs.** Problem A is solved by dividing into 2 halves and combining in $O(n^2)$; problem B by dividing into 4 quarters and combining in $O(n)$. Which algorithm has the better complexity?
+- **💻 Measure.** In lab session 3 you will measure recursive models of each type. Before measuring, predict how the time should grow when $n$ doubles (division) or when $n$ increases by a constant (subtraction with $a \gt 1$), and then compare with your measurements.
+:::
