@@ -195,7 +195,7 @@ or, equivalently, the recursive definition $n! = n \cdot (n-1)!$ with base case 
 When we translate this mathematical object into code, the goal is not to obtain *some* implementation that returns correct values for a few test cases. The goal is an algorithm whose behaviour is well-defined for every input in the chosen domain and that respects the constraints of the machine. Let us analyse four versions.
 
 <Tabs>
-  <TabItem value="naive" label="❌ Version 1: naive" default>
+<TabItem value="naive" label="❌ Version 1: naive" default>
 
 ```java
 public static long factorial(int n) {
@@ -220,8 +220,8 @@ Internally, each recursive call allocates a new **activation record** (stack fra
 There are valid values of the Java type `int` for which the execution does not terminate in a finite number of steps. What appears to be an algorithm is only a partial procedure.
 :::
 
-  </TabItem>
-  <TabItem value="sentinel" label="⚠️ Version 2: error value">
+</TabItem>
+<TabItem value="sentinel" label="⚠️ Version 2: error value">
 
 ```java
 public static long factorial(int n) {
@@ -244,8 +244,8 @@ This technique, returning a value that can never be a valid result, is common (f
 
 It is a reasonable choice when the convention is clearly documented and widely known, as in the course repository.
 
-  </TabItem>
-  <TabItem value="robust" label="✅ Version 3: explicit contract">
+</TabItem>
+<TabItem value="robust" label="✅ Version 3: explicit contract">
 
 ```java
 public static long factorial(int n) {
@@ -264,8 +264,8 @@ public static long factorial(int n) {
 
 This is **structural robustness**: the algorithm does not rely on "good behaviour" from its clients; it enforces its contract proactively.
 
-  </TabItem>
-  <TabItem value="iterative" label="🏁 Version 4: iterative and range-safe">
+</TabItem>
+<TabItem value="iterative" label="🏁 Version 4: iterative and range-safe">
 
 ```java
 public static long factorial(int n) {
@@ -290,7 +290,7 @@ In Java, integer overflow does **not** raise an error: the value silently wraps 
 
 This version is also **iterative**. The recursive versions need one stack frame per call, so their extra memory grows proportionally to $n$. The loop needs only a couple of variables, whatever the value of $n$. Both compute the same function, but they consume resources differently, an idea we will formalise when studying complexity.
 
-  </TabItem>
+</TabItem>
 </Tabs>
 
 <details>
