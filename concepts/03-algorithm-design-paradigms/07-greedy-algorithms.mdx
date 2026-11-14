@@ -1,7 +1,7 @@
 ---
 title: Greedy Algorithms
 sidebar_position: 7
-tags: [Paradigms, Greedy, Optimization, Heuristics]
+tags: [Paradigms, Greedy, Heuristics, Optimization]
 ---
 
 import Tabs from '@theme/Tabs';
@@ -9,195 +9,222 @@ import TabItem from '@theme/TabItem';
 
 # Greedy Algorithms
 
-Unlike general programming strategies that explore multiple alternative paths, **Greedy Algorithms** are designed strictly for optimization problems where the goal is to maximize or minimize a specific objective function. 
+Many problems ask not just for *a* solution, but for the **best** one: the fewest coins, the shortest route, the highest value, the smallest waiting time. These are **optimization problems**. Greedy algorithms attack them in the simplest possible way: they build the solution step by step and, at each step, they take the choice that **looks best right now**, without ever reconsidering it.
 
-The core operational philosophy of a greedy strategy is short-sighted and immediate: **at each sequential step, the algorithm locks in the decision that appears to be locally optimal at that exact moment, hoping that these choices will ultimately culminate in a globally optimal solution.**
+This strategy is fast and easy to implement, and for some problems it produces the optimal solution. For many others it does not. The art of greedy algorithms lies in knowing which situation we are in.
 
----
-
-## Formal Mathematical Structure of a Greedy Strategy
-
-To design a mathematically rigorous greedy algorithm, we abstract the problem environment into a systematic framework composed of five core functional components:
-
-* **The Candidate Set ($C$):** The complete collection of initial elements, resources, or decisions out of which a final solution must be constructed.
-* **The Selection Function (Heuristic Rule):** The core criterion or weight metric used to evaluate the remaining candidates. It identifies the most promising element to ingest at the current step.
-* **The Feasibility Function:** A validation check that evaluates whether a selected candidate can be safely added to the partial solution without violating any structural constraints of the problem.
-* **The Objective Function:** The underlying optimization metric (the cost, profit, distance, or weight) that the system is attempting to maximize or minimize.
-* **The Solution Function:** A boolean control check that determines when a valid, complete solution has been successfully constructed from the selected elements.
-
-### The Mathematical Optimization Goal
-Given a candidate selection path, a greedy algorithm attempts to build a subset of elements $S \subseteq C$ that satisfies the constraints of the feasibility function while optimally driving the value of the objective function:
-
-$$\text{Maximize or Minimize } z = f(S)$$
-
----
-
-## The Irreversibility Principle & The State Space Tree
-
-The most defining architectural feature of a greedy algorithm is its absolute **irreversibility**. 
-
-When looking at a problem through a **State Space Tree** (a virtual or fictitious tree representing every possible sequence of decisions), alternative paradigms like Backtracking explore a branch, detect a dead-end, and perform expensive memory monitoring operations to undo choices and backtrack up the tree.
-
-```text
-               [ Root: Initial State ]
-                         │
-                 Greedy Selection
-                         ▼
-                [ Local Optimum 1 ]
-                         │
-                 Greedy Selection
-                         ▼
-                [ Local Optimum 2 ] ──► (No Backtracking Allowed!)
-                         │
-                         ▼
-                [ Final Leaf Solution ]
-```
-
-A greedy algorithm completely eliminates this monitoring overhead. It develops exactly **one single path** from the root to a leaf node. 
-* Once a candidate is chosen and integrated into the partial solution, that decision is permanent.
-* It is never reconsidered, re-evaluated, or undone. 
-
-:::danger The Heuristic Dependency
-Because greedy decisions are irreversible, the global correctness of the algorithm depends entirely on the quality of its underlying heuristic rule. If the heuristic is flawed or lacks specific mathematical properties, the algorithm will fall into a **Local Optimum trap**, yielding a sub-optimal or completely incorrect global result.
+:::note What you will learn in these lessons
+- The characteristics of greedy algorithms: local decisions, heuristics and irreversibility.
+- The elements of a greedy algorithm and its general scheme.
+- When a greedy algorithm is optimal, how to prove it, and how to disprove it with a **counterexample**.
+- The problem of the change, with its conditions for optimality and a subtle implementation trap.
+- Many classic examples: files on a disk, the knapsack problem, the diligent plumber, the knight's tour, assigning tasks to agents and graph colouring.
 :::
 
 ---
 
-## Interactive Learning Checkpoint
+## The Idea
 
-Let's evaluate your understanding of optimization limits using the live interactive scenarios from our Vevox lecture hall slides:
+Greedy algorithms:
 
-<details>
-  <summary>📊 <strong>Vevox Interactive Case 1: Minimal Spanning Trees (Prim's Algorithm)</strong></summary>
+- are used in **optimization problems**;
+- like other techniques, build the solution **step by step**;
+- at each step, look for the **locally optimal** choice, hoping that the sequence of local optima leads to the global optimum;
+- choose using **heuristic rules** (rules of thumb), based on some knowledge about the problem.
 
-**Question:** Which algorithmic technique is guaranteed to obtain the absolute **globally optimal** solution for Prim's Minimum Spanning Tree problem?
+### Decisions are never reconsidered
 
-* **Option A:** Greedy Algorithms
-* **Option B:** Backtracking
-* **Option C:** Branch and Bound
-* **Option D:** All of them
+A greedy algorithm makes its decisions based on the information available **locally**, at the moment of deciding. And a decision, once made, is **never reconsidered**: there is no need to keep track of past decisions or to undo them. This is what makes greedy algorithms so fast, and also what makes them fail when an early choice turns out to be a bad one.
 
-**Lecture Hall Analysis:** Prim's algorithm is a textbook example of a greedy triumph. 
+### The tree of states
 
-**Detailed Solution:**
-The correct answer is **Option D: All of them** (with Greedy being the most efficient). 
-* While exact methods like Backtracking or Branch and Bound *can* find the optimal solution by exhaustively searching the state space, **Prim's greedy strategy is mathematically proven to always achieve the global optimum directly**. 
-* This guarantee holds true because the problem of finding a Minimum Spanning Tree satisfies specific algebraic structures known as *Matroids*, where local optimal choices (choosing the cheapest edge connecting an unvisited vertex) are mathematically safe and never require backtracking.
+The process can be seen as a path through the **tree of states** of the problem: a (virtual) tree whose root is the initial state, whose children are the states reachable with one decision, and so on. Exhaustive techniques, such as backtracking (which you will study later), explore many branches of that tree. A greedy algorithm develops **a single path**: at each node, the heuristic indicates which child to follow, and the others are discarded forever.
 
-</details>
+For this to work, every state that is developed must be **achievable**: from it, it must still be possible to reach a solution of the problem.
 
-<details>
-  <summary>📊 <strong>Vevox Interactive Case 2: The Agent Task Assignment Problem</strong></summary>
-
-**Question:** Consider the Generalized Assignment Problem, where you must allocate $n$ tasks to $m$ distinct agents under strict resource constraints. Which technique is guaranteed to secure the **globally optimal** solution?
-
-* **Option A:** Greedy Algorithms
-* **Option B:** Divide and Conquer
-* **Option C:** Backtracking and Branch and Bound
-
-**Detailed Solution:**
-The correct answer is **Option C: Backtracking and Branch and Bound**.
-* Task assignment under resource constraints is an NP-hard combinatorially explosive problem. 
-* A simple greedy heuristic (such as always assigning the remaining task to the cheapest available agent) will complete extremely quickly, but it **does not guarantee a globally optimal solution**. It will inevitably get trapped in a sub-optimal arrangement because early irreversible decisions leave later tasks stranded with highly inefficient options. To guarantee perfection, exact exploration techniques like Backtracking or Branch and Bound are required.
-
-</details>
-
-<details>
-  <summary>📊 <strong>Vevox Interactive Case 3: Execution Velocity vs. Solution Quality</strong></summary>
-
-**Question:** Which technique is the **fastest** to execute when solving the complex problem of assigning tasks to agents?
-
-* **Option A:** Greedy Algorithms
-* **Option B:** Divide and Conquer
-* **Option C:** Backtracking
-* **Option D:** Branch and Bound
-
-**Detailed Solution:**
-The correct answer is **Option A: Greedy Algorithms**.
-* Even though a greedy approach might yield a sub-optimal solution for the task assignment problem, its computational velocity is unmatched. 
-* Because it navigates exactly one path down the state space tree without ever backtracking or branching into sub-trees, a greedy algorithm operates within a safe polynomial runtime boundary (typically $O(n^2)$ or $O(n \log n)$). Exact methods like Backtracking exhibit exponential execution growth curves ($O(2^n)$ or $O(n!)$), rendering them unusable for massive live industrial datasets.
-
-</details>
+```
+                    initial state
+                   /      |      \
+              state A   state B   state C        ← the heuristic picks B
+                         /    \
+                    state D   state E            ← and then E
+                               |
+                            solution
+```
 
 ---
 
-## Algorithmic Case Study: The Fractional vs. Discrete Knapsack
+## Key Features
 
-To contrast the absolute necessity of heuristic validation, let's explore the classic **Knapsack Problem** across two structural variants: the *Fractional Knapsack* (where greedy succeeds) and the *0/1 Discrete Knapsack* (where greedy fails).
+The main features of greedy algorithms are:
 
-### Problem Blueprint
-You are an engineer configuring a cargo allocation pipeline. You have a container with a strict maximum weight capacity $W$, and a set of items, where each item $i$ has a weight $w_i$ and a profit value $p_i$. Your goal is to maximize the total profit value.
+- They are **quick and easy to implement**: usually a loop that selects, checks and adds, often after sorting the candidates.
+- They **depend entirely on the quality of the heuristic**. A low-quality heuristic may not provide optimal solutions; in the worst case, it might not provide a solution at all, even though the problem has one.
 
-### The Greedy Heuristic: Profit-to-Weight Ratio
-A highly reliable greedy heuristic is to calculate the **density value** or profit-per-unit-weight ratio ($\rho_i$) for every single candidate:
+So they are appropriate when:
 
-$$\rho_i = \frac{p_i}{w_i}$$
+- the heuristic is good enough to **guarantee the optimal solution** (and we can prove it), or
+- there is **no time to apply other techniques**, and a good (not necessarily optimal) solution found quickly is valuable. In this case, the greedy algorithm acts as a **heuristic method**, or as a fast way to obtain an initial solution for other techniques.
 
-The algorithm sorts the candidates descending based on $\rho_i$ and ingests them sequentially.
+Many problems cannot be solved optimally with this approach. For them, we will need the techniques of the following chapters: dynamic programming, backtracking and branch and bound.
 
-<Tabs>
-  <TabItem value="fractional" label="✅ Fractional Knapsack (Greedy Success)" default>
+---
 
-In the fractional variant, you can break items into fractions (e.g., liquid cargo, raw minerals, grains). If the remaining capacity of the knapsack cannot hold the entire next item, you simply slice it and take exactly what fits to top off the weight limit.
+## Elements of a Greedy Algorithm
+
+Most greedy algorithms can be described with the same elements:
+
+- a set of **candidates** (coins, objects, tasks, edges...);
+- the **partial solution** built so far (the candidates already chosen);
+- a **selection function** (the heuristic) that chooses the most promising candidate at each step;
+- a **feasibility function** that checks whether adding a candidate to the partial solution keeps it valid (for example, without exceeding a capacity);
+- a **solution function** that checks whether the partial solution is already a complete solution;
+- an **objective function** that gives the value of a solution, which we want to minimise or maximise.
+
+### General outline
 
 ```java
-public class FractionalKnapsack {
-    public static double getMaxSizeGreedy(double capacity, Item[] items) {
-        // 1. Sort items descending based on their density ratio (p_i / w_i)
-        Arrays.sort(items, (a, b) -> Double.compare(b.getRatio(), a.getRatio()));
-
-        double totalProfit = 0.0;
-        
-        for (Item item : items) {
-            if (capacity - item.weight >= 0) {
-                // Ingest the entire item
-                capacity -= item.weight;
-                totalProfit += item.profit;
-            } else {
-                // Ingest the exact remaining fraction
-                double fraction = capacity / item.weight;
-                totalProfit += (item.profit * fraction);
-                break; // Knapsack is perfectly full
-            }
-        }
-        return totalProfit;
+void greedy(State currentState) {
+    while (!isSolution()) {
+        if (currentState.meetsHeuristic())
+            currentState = selectedState;          // accept the selected choice
+        else
+            currentState = currentState.nextState();   // discard it and try the next one
     }
 }
 ```
 
-#### Analytical Verdict
-Because item breaking is allowed, sorting by profit-to-weight ratio guarantees a globally optimal solution. The time complexity is dominated entirely by the sorting step, running in an efficient **$O(n \log n)$** linearithmic profile.
+In more detail, with the elements above:
 
-  </TabItem>
-  <TabItem value="discrete" label="❌ 0/1 Discrete Knapsack (Greedy Failure)">
+```java
+Solution greedy(Set<Candidate> candidates) {
+    Solution solution = empty;
+    while (!candidates.isEmpty() && !isSolution(solution)) {
+        Candidate x = select(candidates);          // the heuristic: the most promising one
+        candidates.remove(x);                      // never considered again
+        if (isFeasible(solution, x))
+            solution.add(x);                       // decisions are never undone
+    }
+    return isSolution(solution) ? solution : NO_SOLUTION;
+}
+```
 
-In the 0/1 discrete variant, items are indivisible items (e.g., laptops, engines, art pieces). You must either take an item entirely ($1$) or leave it completely ($0$). Slicing is physically impossible.
-
-#### The Local Optimum Trap Example
-Imagine a knapsack with a maximum capacity of **$W = 100\text{ kg}$**, and three competing candidates:
-* **Item A:** $\text{Weight} = 20\text{ kg}$, $\text{Profit} = 100 \implies \rho_A = 5.0$
-* **Item B:** $\text{Weight} = 50\text{ kg}$, $\text{Profit} = 200 \implies \rho_B = 4.0$
-* **Item C:** $\text{Weight} = 50\text{ kg}$, $\text{Profit} = 200 \implies \rho_C = 4.0$
-
-Let's trace how the greedy selection path operates compared to the absolute mathematical global truth:
-
-* **The Greedy Path:** It targets the highest ratio first, taking **Item A** ($20\text{ kg}$, Profit $100$). The remaining capacity drops to $80\text{ kg}$. Next, it takes **Item B** ($50\text{ kg}$, Profit $200$). The capacity drops to $30\text{ kg}$. It looks at Item C, but it weighs $50\text{ kg}$, so it fails the feasibility test and is rejected. The algorithm terminates.
-  $$\text{Greedy Total Profit} = 100 + 200 = \mathbf{300}$$
-* **The Global Optimal Path:** If an exact algorithm rejects Item A entirely, it can ingest **Item B** and **Item C** concurrently ($50\text{ kg} + 50\text{ kg} = 100\text{ kg}$).
-  $$\text{Global Total Profit} = 200 + 200 = \mathbf{400}$$
-
-#### Analytical Verdict
-For the 0/1 Discrete variant, the greedy strategy **fails** to secure the global optimum. It gets trapped by its early irreversible choice. To solve this specific problem configuration optimally, engineers must pivot to **Dynamic Programming** or **Branch and Bound**.
-
-  </TabItem>
-</Tabs>
+When the selection function consists of taking the candidates in a fixed order (by size, by value, by ratio...), the algorithm usually starts by **sorting** the candidates, and its complexity is dominated by that sorting: $O(n \log n)$.
 
 ---
 
-## Ecosystem Integration & Active Review
+## The Problem of the Change
 
-:::tip Concept Consolidation
-* **💻 Technical Lab Session:** Access your local repository and open the `Paradigms/Greedy` package. Run the automated execution harness to benchmark how the fractional greedy solver processes a massive collection of $500,000$ pseudo-randomized items in milliseconds, and examine the code structure for custom element sorting.
-* **🤖 Query Your AI Assistant:** Open your **NotebookLM** interactive learning workspace and execute the following targeted verification prompt:  
-  > *"Based on the course taxonomy of algorithm design paradigms, contrast the concept of a State Space Tree as used in Greedy algorithms versus exact exploration techniques. Explain why the irreversibility of choices makes Greedy exceptionally fast but structurally vulnerable to local optima traps."*
+**Problem.** Design an algorithm to pay a certain amount of money using the **fewest possible coins**.
+
+For example, to pay **€2.89** with euro coins (€2, €1, 50, 20, 10, 5, 2 and 1 cents), a cashier would naturally give: one €2 coin, one 50-cent coin, one 20-cent coin, one 10-cent coin, one 5-cent coin and two 2-cent coins. Seven coins, which is optimal.
+
+**Heuristic:** take the coin of the **highest value** that does not exceed the amount that remains to be paid.
+
+```java
+int[] calculateCoins(int amount, int[] coins) {      // amount in cents, coins in decreasing order
+    int[] solution = new int[coins.length];
+    int remaining = amount;
+    for (int i = 0; i < coins.length && remaining > 0; i++) {
+        solution[i] = remaining / coins[i];          // as many coins of this value as possible
+        remaining = remaining % coins[i];            // what is left to pay
+    }
+    return solution;                                 // if remaining > 0, there was no solution
+}
+```
+
+Taking as many coins as possible of each value at once (with a division and a remainder) is equivalent to taking them one by one, but faster. The complexity is $O(m)$, where $m$ is the number of different coins.
+
+### A counterexample
+
+Depending on the monetary system and on the **availability** of coins, this heuristic does not always provide the optimal solution. To prove that a greedy algorithm is not optimal, a single **counterexample** is enough:
+
+- We need to pay **€0.60**.
+- Available coins: **€0.50, €0.20, €0.02**.
+- Greedy solution: €0.50 + 5 × €0.02 = **6 coins**.
+- Optimal solution: 3 × €0.20 = **3 coins**.
+
+The first choice (the 50-cent coin) looked best, but it led to a bad solution, and a greedy algorithm never goes back. This problem can be solved optimally with other techniques: backtracking, which explores all the possibilities, or dynamic programming, which is the usual choice for it.
+
+<details>
+  <summary>🧠 <strong>Checkpoint: Can greedy even fail to find a solution?</strong></summary>
+
+  **Question:** With coins of €0.50 and €0.20 only, how does the greedy algorithm pay €0.60?
+
+  **Answer:** It takes a 50-cent coin, and then cannot pay the remaining 10 cents with the available coins: it reports **no solution**. But a solution exists: 3 × €0.20. This illustrates the warning above: a poor heuristic may fail to find a solution even when the problem has one.
+
+</details>
+
+### When is the greedy change optimal?
+
+With the previous heuristic, the solution is always optimal if two conditions hold:
+
+- the monetary system is composed of coins with values $1, p, p^2, p^3, \dots, p^n$, where $p \gt 1$ and $n \gt 0$ (for example, 1, 2, 4, 8, 16... or 1, 10, 100...);
+- we have an **unlimited** number of coins of each value.
+
+There is a mathematical proof of this. These conditions are **sufficient, but not necessary**: many real systems, like the euro (1, 2, 5, 10, 20, 50, 100, 200 cents) or the US dollar, are not of this form, but they are designed so that the greedy algorithm is still optimal (they are called **canonical** coin systems). The system 50, 20, 2 of the counterexample is not canonical.
+
+:::danger Never use `double` for money
+The pseudocode of this problem is often written with the amount as a real number (`double amount = 2.89`). But real numbers are stored in binary and most decimal amounts **cannot be represented exactly**. We tried it with the euro coins written as `double` values (2, 1, 0.5, 0.2...):
+
+- to pay **€0.30**, the algorithm returned 0.20 + 0.05 + 0.02 + 0.02, a total of **€0.29**: after subtracting, the remainder was 0.0099999... instead of 0.01, so the 1-cent coin "did not fit";
+- for €2.89 it returned the right coins, but with a remainder of $1.04 \times 10^{-16}$ instead of 0.
+
+Always represent money with **integers** (cents), as in the code above, or with `BigDecimal`.
+:::
+
+---
+
+## How to Know if a Greedy Algorithm Is Optimal
+
+Since greedy algorithms are so easy to write, the real question is always: **is the result optimal?**
+
+### Disproving: find a counterexample
+
+A single input for which the greedy result is worse than the best possible one proves that the heuristic is **not** optimal. Small inputs, solved by hand or by brute force, are the best source of counterexamples. A stress test (as in the first chapter) comparing the greedy algorithm with an exhaustive search on many small random inputs finds them automatically.
+
+### Proving: two properties
+
+For a greedy algorithm to be optimal, the problem usually needs two properties:
+
+- **The greedy choice property:** there is always an optimal solution that contains the choice made by the heuristic. Making that choice never closes the door to the optimum.
+- **Optimal substructure:** after making the choice, what remains is a smaller problem of the same kind, and an optimal solution of it, combined with the choice, gives an optimal solution of the whole problem.
+
+The most common way to prove the greedy choice property is an **exchange argument**: take any optimal solution that does not follow the greedy rule, and show that exchanging some of its elements so that it follows the rule does not make it worse. You will see an example of this argument with the diligent plumber in the next lesson.
+
+---
+
+## A Curiosity: Egyptian Fractions
+
+The ancient Egyptians wrote fractions as sums of **distinct unit fractions** (fractions with numerator 1). For example, to divide 5 loaves of bread among 8 people, $\frac{5}{8} = \frac{1}{2} + \frac{1}{8}$: give each person half a loaf and an eighth of a loaf.
+
+Every fraction can be written this way, and Fibonacci (the same Leonardo of Pisa of the rabbits) described a **greedy algorithm** to do it: subtract the **largest unit fraction** that fits, and repeat with what remains. For $\frac{4}{625}$, the largest unit fraction that fits is $\frac{1}{157}$ (since $\lceil 625/4 \rceil = 157$). The numerator of the remainder always decreases, so the algorithm always terminates, with at most as many terms as the original numerator.
+
+But the result can be far from the best one. Applying the greedy algorithm to $\frac{4}{625}$ we obtained:
+
+$$
+\frac{4}{625} = \frac{1}{157} + \frac{1}{32{,}709} + \frac{1}{1{,}604{,}785{,}313} + \frac{1}{5{,}150{,}671{,}800{,}036{,}230{,}625}
+$$
+
+while there are decompositions with only three terms and much smaller denominators. Whether **every** fraction $\frac{4}{n}$ can be written with just three unit fractions is the **Erdős–Straus conjecture** (1948), which is still unproven. The short film *The Mystery of Egyptian Fractions* tells this story.
+
+---
+
+## Summary
+
+- Greedy algorithms solve **optimization problems** by building the solution step by step, taking the **locally best** choice according to a **heuristic**, and never reconsidering a decision.
+- They are fast and simple, but their results depend entirely on the heuristic: they may be optimal, merely good, or even fail to find a solution.
+- Their elements are the candidates, the selection function, the feasibility function, the solution function and the objective function.
+- A single **counterexample** proves that a greedy algorithm is not optimal. Proving optimality requires the greedy choice property and optimal substructure, usually through an exchange argument.
+- The greedy change is optimal for coin systems $1, p, p^2, \dots$ with unlimited coins (and for canonical systems like the euro), but not in general. Never represent money with floating-point numbers.
+
+---
+
+## Practice
+
+:::tip Exercises
+- **💰 Change.** Run the [course implementation](https://github.com/vicegd/algorithms/tree/master/src/topics/greedy/change) with euro coins for several amounts. Then find, for the coin system 1, 3, 4, an amount for which the greedy algorithm is not optimal.
+- **🐞 The floating-point trap.** Implement the change algorithm with `double` values, and write a loop that checks every amount from €0.01 to €5.00. For how many amounts is the result wrong?
+- **🔍 Stress test.** Write a brute-force (or dynamic programming) solution for the change problem, and compare it with the greedy one on all amounts up to 100 for random coin systems. How often is the greedy algorithm optimal?
+- **🏺 Egyptian fractions.** Implement Fibonacci's greedy algorithm with `BigInteger` and decompose $\frac{5}{121}$. How many digits has the largest denominator?
 :::
