@@ -2,6 +2,6 @@
   "label": "3. Algorithm Design Paradigms",
   "link": {
     "type": "generated-index",
-    "description": "Explore various algorithm design approaches and their applications in solving complex computational problems."
+    "description": "The main algorithm design paradigms: brute force, divide and conquer (scheme, recurrence analysis and many classic problems), greedy algorithms and dynamic programming."
   }
 }
