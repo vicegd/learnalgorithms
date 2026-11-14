@@ -52,6 +52,10 @@ const SKIP_TYPES = new Set([
 // ---------------------------------------------------------------------------
 export default function remarkAutolinkConcepts() {
   return (tree) => {
+    // No terms configured: an empty alternation would match the empty string
+    // forever, so skip the transform entirely.
+    if (SORTED_TERMS.length === 0) return;
+
     // Per-page set of already-linked URLs (prevents duplicate links)
     const linkedUrls = new Set();
 
@@ -115,6 +119,11 @@ function splitTextNode(text, linkedUrls) {
 
   while ((match = regex.exec(text)) !== null) {
     const matchedText = match[0];
+    // Guard against zero-length matches, which would never advance the regex.
+    if (matchedText.length === 0) {
+      regex.lastIndex++;
+      continue;
+    }
     const normKey = SORTED_TERMS.find(
       (t) => t.toLowerCase() === matchedText.toLowerCase()
     );
