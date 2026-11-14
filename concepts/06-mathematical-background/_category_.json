@@ -1,0 +1,7 @@
+{
+  "label": "6. Mathematical Background",
+  "link": {
+    "type": "generated-index",
+    "description": "The mathematics used throughout the course, with explanations of where each fact comes from: sums, logarithms and factorials; mathematical induction, proofs of correctness and loop invariants; and the methods to solve recurrences."
+  }
+}

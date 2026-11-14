@@ -56,6 +56,16 @@ const CHAPTERS = [
     cta: '3 lessons',
     to: '/concepts/category/5-advanced-execution-models',
   },
+  {
+    accentClass: styles.accentPurple,
+    eyebrow: 'Chapter 6',
+    title: 'Mathematical Background',
+    description:
+      'The mathematics behind the analysis of algorithms, explained rather than just stated: sums, logarithms, factorials, induction, loop invariants and recurrences.',
+    topics: ['Sums', 'Logarithms', 'Stirling', 'Induction', 'Invariants', 'Recurrences'],
+    cta: '2 lessons',
+    to: '/concepts/category/6-mathematical-background',
+  },
 ];
 
 const ALGORITHMS_SECTION = {

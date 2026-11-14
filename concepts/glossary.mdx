@@ -55,15 +55,23 @@ The main terms of the course, in alphabetical order. Each entry gives a short de
 
 **Fork/Join.** The Java framework for parallel divide and conquer: a task splits (forks) into subtasks, which run in parallel, and waits for (joins) their results. See [The Fork/Join Framework](./05-advanced-execution-models/02-fork-join-framework.mdx).
 
+**Geometric series.** A sum $1 + r + r^2 + \dots + r^k$; it is dominated by its last term if $r \gt 1$ and by its first if $r \lt 1$, the key to analyzing divide and conquer. See [Sums, Logarithms and Factorials](./06-mathematical-background/01-sums-and-logarithms.mdx).
+
 **Greedy algorithm.** An algorithm that builds a solution step by step, always taking the choice that looks best at the moment and never reconsidering it. See [Greedy Algorithms](./03-algorithm-design-paradigms/07-greedy-algorithms.mdx).
+
+**Harmonic number.** $H_n = 1 + 1/2 + \dots + 1/n \approx \ln n + 0.577$. It appears in the average case of randomized algorithms such as Quicksort. See [Sums, Logarithms and Factorials](./06-mathematical-background/01-sums-and-logarithms.mdx).
 
 **Heuristic.** A rule of thumb that usually leads to good decisions but does not guarantee them. In search, an estimate of how promising a state is. See [Greedy Algorithms](./03-algorithm-design-paradigms/07-greedy-algorithms.mdx) and [Branch and Bound](./04-state-space-search-and-optimization/03-branch-and-bound.mdx).
 
 **Implicit graph.** A graph of states that is never stored: its nodes are generated only when the search reaches them. See [Backtracking](./04-state-space-search-and-optimization/01-backtracking.mdx).
 
+**Induction.** A proof technique: prove a property for a base case, and prove that if it holds for smaller values it holds for the next one. It is how recursive algorithms are proved correct. See [Induction, Correctness and Recurrences](./06-mathematical-background/02-induction-and-recurrences.mdx).
+
 **In-place algorithm.** An algorithm that needs only a constant (or very small) amount of memory besides its input. See [The Sorting Problem](./02-fundamental-problem-domains/01-the-sorting-problem.mdx).
 
 **Live node.** In branch and bound, a node that has been generated but not yet expanded. See [Branch and Bound](./04-state-space-search-and-optimization/03-branch-and-bound.mdx).
+
+**Loop invariant.** A property that holds before a loop and after every iteration, used to prove the loop correct. See [Induction, Correctness and Recurrences](./06-mathematical-background/02-induction-and-recurrences.mdx).
 
 **Memoization.** The top-down form of dynamic programming: a recursive algorithm that stores each result the first time it is computed and reuses it afterwards. See [Dynamic Programming](./03-algorithm-design-paradigms/09-dynamic-programming.mdx).
 
@@ -90,6 +98,8 @@ The main terms of the course, in alphabetical order. Each entry gives a short de
 **Speedup.** The time of the sequential version divided by the time of the parallel version. See [Performance of Parallel Algorithms](./05-advanced-execution-models/03-parallel-performance.mdx).
 
 **Stable sorting algorithm.** A sorting algorithm that keeps the relative order of elements with equal keys. See [The Sorting Problem](./02-fundamental-problem-domains/01-the-sorting-problem.mdx).
+
+**Stirling's formula.** The approximation $n! \approx \sqrt{2\pi n}(n/e)^n$, which shows that $n!$ grows faster than any exponential and that $\log (n!) \in \Theta(n \log n)$. See [Sums, Logarithms and Factorials](./06-mathematical-background/01-sums-and-logarithms.mdx).
 
 **Stress testing.** Comparing a fast algorithm with a simple, trusted one (often brute force) on many random small inputs to find bugs. See [Brute Force and Exhaustive Search](./03-algorithm-design-paradigms/01-brute-force.mdx).
 
