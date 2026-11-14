@@ -9,695 +9,397 @@ import TabItem from '@theme/TabItem';
 
 # Backtracking
 
-Backtracking is an algorithmic paradigm used to solve problems in which the number of possible candidate solutions is very large, but many of those candidates can be discarded early because they violate some constraint. The central idea is simple: **construct a solution step by step, and as soon as a partial solution cannot possibly lead to a valid complete solution, abandon it and return to the previous step**.
+Some problems resist every technique seen so far. There is no greedy criterion that guarantees the optimum, the problem does not split into independent halves, and there is no small table of subproblems to fill. Very often the only way to be sure of the answer is to **examine the candidate solutions one by one**. Backtracking is the paradigm that organizes that examination so that it is systematic (no candidate is forgotten) and as cheap as possible (whole families of candidates are discarded at once).
 
-This paradigm is especially important in **combinatorial problems**, where the number of possible configurations grows very quickly and brute force becomes impractical. In computer science, a combinatorial problem is one whose solutions are formed by selecting, arranging, assigning, or combining elements from a finite set, usually under constraints. What makes these problems difficult is not the cost of a single operation, but the explosive growth of the search space as the input size increases. 
+The central idea fits in one sentence: **build the solution step by step, and as soon as a partial solution cannot be completed into a valid one, undo the last step and try something else**. The name comes from that "undo": when the algorithm reaches a dead end, it goes *back* along the *track* it has followed and takes a different turn.
 
-At first glance, backtracking may seem similar to brute force, because both techniques explore many possibilities. However, brute force usually generates complete candidates first and checks them only at the end, while backtracking checks validity during construction and prunes invalid branches as soon as they appear.
-
-A **brute-force** algorithm explores the search space almost blindly: it may spend a lot of time building full solutions that were already doomed to fail from the beginning.
-
-A **backtracking** algorithm builds the candidate incrementally, one decision at a time, and as soon as a partial assignment violates a constraint or cannot be extended into a valid solution, the algorithm prunes that branch immediately. This early rejection is what makes backtracking more efficient than naive exhaustive search in many practical cases.
-
-So the difference can be summarized as:
-- **Brute force:** generate everything first, validate later.
-- **Backtracking:** validate progressively, prune early.
-
-That is why backtracking is especially suitable for combinatorial problems: it still explores a large search space, but it avoids wasting time on candidates that are already impossible.
+Backtracking is the second-to-last design technique of the course. The last one, [branch and bound](./03-branch-and-bound.mdx), explores the same kind of search space with a different strategy.
 
 ***
 
 ## Why brute force is not enough
 
-In many algorithmic problems, the number of possible configurations grows so fast that generating them all is not realistic. This phenomenon is called **combinatorial explosion**: a small increase in input size can produce an enormous increase in the number of candidate solutions.
+Brute force (also called **exhaustive search**) generates every possible candidate and checks each one at the end. Sometimes it is the only option, but its cost explodes very quickly. This phenomenon is called **combinatorial explosion**.
 
-Consider the classic **Magic Square** problem. We want to fill an $n \times n$ square with the numbers from 1 to $n^2$, without repetition, so that every row, every column, and both diagonals have the same sum.
+### The magic square
 
-If we solve it by naive brute force, the number of possible arrangements becomes huge very quickly:
+A **magic square** of side $n$ is an $n \times n$ table filled with the numbers $1, 2, \dots, n^2$, each used once, so that every row, every column and both diagonals add up to the same value (the *magic constant*). For $n = 3$ the constant is 15, and this is a valid square:
 
-- For $n = 3$, there are $9! = 362{,}880$ possible arrangements.
-- For $n = 5$, there are $25! \approx 1.55 \times 10^{25}$ possible arrangements.
+| | | |
+|:---:|:---:|:---:|
+| 2 | 7 | 6 |
+| 9 | 5 | 1 |
+| 4 | 3 | 8 |
 
-This means that even a moderately sized instance can generate a search space that is far beyond what can be explored exhaustively in practice. And this is only counting the number of arrangements; in a real problem, each arrangement also has to be checked against the constraints, which adds even more work.
+How many ways are there to fill the table? Number 1 can go in any of the 9 cells, number 2 in any of the remaining 8, and so on until number 9, which goes in the only free cell:
 
-The key idea is that **not every partial arrangement is worth exploring**. In a magic square, for example, once a row sum, column sum, or diagonal sum already makes a valid final solution impossible, there is no reason to continue extending that candidate. Backtracking takes advantage of exactly this fact: it detects impossible partial assignments as soon as they appear and stops exploring that branch immediately.
+- For $n = 3$: $9! = 362{,}880$ arrangements.
+- For $n = 4$: $16! \approx 2.1 \times 10^{13}$ arrangements.
+- For $n = 5$: $25! \approx 1.55 \times 10^{25}$ arrangements.
 
-In other words, brute force wastes time exploring configurations that were doomed from the start, while backtracking avoids that waste by pruning the search tree early.
+Even at a billion arrangements per second, checking every $5 \times 5$ arrangement would take hundreds of millions of years.
 
-### Visual intuition
+The key observation is that **most arrangements are doomed long before they are complete**. If the first row already sums to 16, nothing placed in the other six cells can fix it. A brute-force algorithm does not notice this and keeps generating the $6! = 720$ completions of that row. Backtracking checks each row, column and diagonal as soon as it is full and abandons the branch immediately.
 
-```text
-Magic Square search space
+We measured both strategies on the $3 \times 3$ square:
 
-Brute force:
-                      [ Start ]
-                          |
-          ┌───────────────┼───────────────┐
-          ▼               ▼               ▼
-      [ Choice A ]   [ Choice B ]   [ Choice C ]
-          |               |               |
-          ▼               ▼               ▼
-     [ A1, A2 ]      [ B1, B2 ]      [ C1, C2 ]
-          |               |               |
-          ▼               ▼               ▼
-     [ Full candidate ] [ Full candidate ] [ Full candidate ]
-          |               |               |
-          X               ✓               X
+| Strategy | Nodes visited (partial and complete tables) | Magic squares found |
+|---|---:|---:|
+| Brute force: fill all 9 cells, then check | 986,410 | 8 |
+| Backtracking: check every line as soon as it is full | 2,378 | 8 |
 
-Backtracking:
-                      [ Start ]
-                          |
-          ┌───────────────┼───────────────┐
-          ▼               ▼               ▼
-      [ Choice A ]   [ Choice B ]   [ Choice C ]
-          |               |               |
-          X               ▼               X
-                          |
-                      [ B1, B2 ]
-                          |
-                          ✓
-```
+Both find the same 8 magic squares (they are rotations and reflections of the one above), but backtracking does about **400 times less work**. The gap grows with $n$.
 
-In the first case, every branch is expanded until a complete candidate is built, and only then is it checked. In the second case, invalid branches are discarded immediately, so the algorithm spends its effort only on promising candidates.
+### Brute force in the real world
 
-Brute force follows the rule **generate everything first, test later**.  
-Backtracking follows the rule **test early, prune immediately**.
-
-That difference is what makes backtracking much more efficient in combinatorial problems where constraints can be checked incrementally.
+The same arithmetic explains why long passwords are safe. A password of 8 lowercase letters has $26^8 \approx 2.1 \times 10^{11}$ possibilities, which a modern attacker can try exhaustively. With 12 characters drawn from letters, digits and symbols there are more than $10^{23}$, which is out of reach. Attackers therefore combine brute force with knowledge (dictionaries of common words and patterns) to discard unlikely candidates, which is the same idea that turns brute force into backtracking.
 
 ***
 
-## State-space search
+## Problems as graphs of states
 
-To understand backtracking more precisely, it is useful to view the problem as a search through a space of states. This perspective makes it easier to formalize how the algorithm explores partial solutions, how it generates new candidates, and why invalid branches can be discarded early.
+Many problems can be modeled as an abstract graph:
 
-Backtracking is usually understood as a **state-space search** technique. In this framework, each problem configuration is modeled as a state, and solving the problem means moving through a space of states until a goal state is found. A state can represent a complete solution, a partial solution, or an intermediate configuration that may still be extended.
+- **Nodes** represent the **states** of the problem (a partially filled table, a partial assignment, a position in a game).
+- **Edges** represent **valid changes** from one state to another (placing a number, making a move).
 
-A state-space model can be interpreted as a graph:
-- **Nodes** represent states or partial configurations of the problem.
-- **Edges** represent valid transitions from one state to another.
+Solving the problem means finding a node, or a path, with some property in that graph: a full magic square, a winning sequence of moves, a route between two cities.
 
-The algorithm begins at an initial state and explores possible transitions until it reaches one or more solution states. If a state violates the problem constraints, or if it is clear that no valid solution can be reached from it, that branch is abandoned and the search returns to the previous decision point.
+:::caution A common confusion
+It is the **nodes** that represent states and the **edges** that represent changes, not the other way round.
+:::
 
-### Explicit graph vs implicit graph
+### Explicit and implicit graphs
 
-For many real problems, it is impossible or inefficient to build the entire graph in memory before searching it. The graph may simply be too large, or it may not even be practical to enumerate all its states in advance.
+If the graph were small, we could build it in memory and apply a standard graph search. In combinatorial problems this is impossible: the $5 \times 5$ magic square graph has more than $10^{25}$ nodes. Backtracking therefore works on an **implicit graph**:
 
-That is why backtracking typically works on an **implicit graph**:
-- The graph is **not stored explicitly** in memory.
-- When the algorithm is at a state, it generates only the child nodes of that state.
-- Once a branch has been explored, it can be discarded and the algorithm continues elsewhere.
+- The graph is **never built**. We only have a *description* of its nodes and edges (the rules of the problem).
+- Nodes are generated **only when the search reaches them**, and they are **discarded** once they have been examined.
+- If a solution is found early, the rest of the graph is never generated, which **saves time**.
+- Only the nodes on the current path are kept, which **saves space**.
 
-This is different from an **explicit graph**, where all nodes and edges are constructed and stored before the search begins. In an explicit graph, the whole structure must exist in memory, which can be expensive or impossible for large combinatorial problems. In contrast, an implicit graph generates states only when they are needed, so the algorithm avoids storing branches that will never be explored.
+### The tree of states
 
-This gives two major advantages:
-1. **Lower memory usage**, because only the current path and its local information must be stored.
-2. **Potential time savings**, because many branches are never explored at all if they are pruned early.
+The implicit graph explored by backtracking is usually drawn as a tree, the **tree of states** (or *search tree*):
 
-This perspective is one of the reasons backtracking is so effective in combinatorial problems: instead of building the full search space, it explores it gradually and only keeps the parts that may still lead to a valid solution.
+- The **root** is the initial state (nothing decided yet).
+- Each **level** corresponds to one decision.
+- Each **child** of a node is one way of making the next decision.
+- **Leaves** are either complete solutions or dead ends.
+
+A familiar example is tic-tac-toe ("three in a row"). The root is the empty board, its 9 children are the 9 possible first moves of X, each of those has 8 children for the replies of O, and so on. Game-playing programs for chess or Go explore trees like this one; techniques such as **minimax**, **alpha-beta pruning** and **Monte Carlo tree search** are all refinements of the same idea.
+
+```text
+                        [ empty board ]                level 0
+               ┌──────────────┼──────────────┐
+          [X in a1]       [X in a2]   ...  [X in c3]     level 1 (9 nodes)
+        ┌─────┼─────┐
+   [O in a2] ... [O in c3]                               level 2 (8 children each)
+        ...
+```
 
 ***
 
-## Tree of states
+## The backtracking method
 
-Backtracking can be understood as a search through a space of possible states. Although this space may be represented abstractly as a graph, in introductory algorithmic settings it is usually more helpful to visualize it as a **tree of states**. This tree is not a literal data structure stored in memory, but a conceptual model of how the algorithm explores the problem.
+### Solutions as vectors
 
-Each node in the tree represents a state of the problem:
-- The **root** corresponds to the initial state.
-- Each **internal node** represents a partial solution.
-- Each **child** represents one valid choice or decision that extends the current partial solution.
-- A **leaf** may represent either a complete solution or a dead end.
-
-Each level of the tree corresponds to one decision step. The deeper a node is, the more decisions have already been fixed. This is why backtracking is usually a constructive process: the algorithm does not jump directly to complete solutions, but builds them incrementally, one decision at a time.
-
-```text
-                     [ Root: Initial State ]
-                                │
-          ┌─────────────────────┼─────────────────────┐
-          ▼                     ▼                     ▼
-     [ Choice X₁ ]         [ Choice Y₁ ]         [ Choice Z₁ ]
-          │                     │                     │
-          ▼                     ▼                     ▼
-     [ Choice X₂ ]         [ Choice Y₂ ]         (Invalid State)
-          │                     │                     │
-          ▼                     ▼             [ Prune & Backtrack ]
-   (Solution Leaf)        (Invalid State)             ▲
-          ▲                     │                      │
-   [ Return Solution ]     [ Prune Branch ] ──────────┘
-```
-
-The algorithm explores this tree **depth first**. It selects one branch, follows it as far as possible, and only when that branch can no longer lead to a valid solution does it return to the most recent decision point and try another alternative. This strategy is known as **Depth-First Search (DFS)**.
-
-DFS fits backtracking very well because the algorithm only needs to remember the current path from the root to the current node. The recursive call stack is usually enough to keep track of that path, which makes backtracking memory efficient:
-- it does not need to store the entire search tree,
-- it only keeps the active branch,
-- and it discards branches as soon as they are proven invalid.
-
-## Partial solutions and decision levels
-
-A backtracking algorithm usually builds a candidate solution incrementally. If the final solution has $n$ decision variables, we can represent it as:
+In backtracking, a solution is usually expressed as a **vector**
 
 $$
 (x_1, x_2, \dots, x_n)
 $$
 
-where each variable $x_i$ corresponds to one decision that must be made during the search.
+where each component $x_i$ is the $i$-th decision, chosen from a finite set of candidates. Each level of the tree fixes one component. At any moment, the algorithm is at some level $k$ with a **partial solution** $(x_1, \dots, x_k)$:
 
-At an intermediate step, the algorithm has only constructed a partial solution:
+- If a value for $x_{k+1}$ is compatible with the decisions already made, the algorithm adds it and **moves down** to level $k+1$.
+- If the partial solution becomes a **complete solution**, the path has succeeded. The algorithm stops if one solution is enough (**first solution**) or keeps searching if it needs every solution, or the best one (**all solutions**).
+- If no value for $x_{k+1}$ is compatible, the path has failed. The algorithm **goes back** to level $k$, **removes** the last decision, and tries the next candidate there. When it returns to a node that still has unexplored children, the search continues through them.
 
-$$
-(x_1, x_2, \dots, x_k)
-$$
+This is a **depth-first search** of the tree of states, with two additions: the tree is generated on the fly, and branches are cut as soon as they are known to be useless. The pattern is often summarized as **choose, explore, unchoose**.
 
-with $k < n$. This means that the first $k$ decisions have already been fixed, but the remaining variables are still open.
+### A small trace
 
-At level $k$, the algorithm tries to assign a valid value to $x_{k+1}$. Each valid choice creates a child node in the state tree. If the new partial solution remains consistent with the problem constraints, the search continues to level $k+1$. If the assignment violates a constraint, the branch is discarded immediately.
+Let us generate all binary strings of length 3 with **no two consecutive 1s**. The solution is a vector $(x_1, x_2, x_3)$ with $x_i \in \{0, 1\}$. Before setting $x_i = 1$, we check that $x_{i-1} \ne 1$.
 
-This is the heart of backtracking: **the algorithm does not wait until the entire vector is built to detect an error; it rejects invalid partial solutions as soon as they appear**. By doing so, it avoids exploring branches that cannot possibly lead to a valid complete solution.
+```text
+                          ( )
+              ┌────────────┴────────────┐
+            (0)                         (1)
+        ┌────┴────┐                 ┌────┴────┐
+     (0,0)      (0,1)            (1,0)      (1,1) ✗ pruned
+    ┌──┴──┐     ┌──┴──┐         ┌──┴──┐
+ (000)  (001) (010) (011)✗   (100) (101)
+   ✓      ✓     ✓               ✓     ✓
+```
 
-## The rollback mechanism
-
-The term *backtracking* refers precisely to the process of going back after a failed attempt. When a partial solution stops being promising, the algorithm returns to the most recent decision point and tries a different alternative.
-
-A branch of the search can end in two ways:
-- **Success:** a complete valid solution has been constructed.
-- **Failure:** the current partial solution cannot be extended into any valid complete solution.
-
-When failure occurs, the algorithm must **undo** the most recent choice, restore the previous state, and continue with the next available option. This is the characteristic **choose, explore, undo** pattern of backtracking algorithms.
-
-In recursive implementations, rollback usually happens naturally when a recursive call returns and the algorithm resumes execution at the previous level of the search tree. In iterative terms, this is equivalent to removing the last decision from the current partial solution and continuing with the next candidate.
-
-This rollback step is essential because it allows the same partial prefix to be reused while exploring several alternatives. Without it, the algorithm would not be able to systematically traverse the full search space.
-
-In summary, the tree of states explains the structure of the search, partial solutions explain how the candidate is built, and rollback explains how the algorithm moves from one branch to another.
+The algorithm goes down the leftmost branch to $(0,0,0)$, records it, goes back one level, tries $(0,0,1)$, goes back two levels, tries $(0,1,0)$, rejects $(0,1,1)$ without generating it, and so on. It finds the 5 valid strings. The pruned node $(1,1)$ would have had two children; in longer strings, cutting a node near the root removes a whole subtree of size $2^{\text{remaining levels}}$.
 
 ***
 
-## Backtracking as DFS with pruning
+## General schemes
 
-It is common to describe backtracking as **DFS with pruning**, and this is a useful first intuition. In backtracking, DFS determines the order in which the search space is explored, while pruning determines which branches are discarded without being explored completely.
-
-However, backtracking is more than just a traversal strategy. It is a **problem-solving paradigm** that combines several ideas:
-- incremental construction of a candidate solution,
-- depth-first exploration of the state space,
-- early constraint checking,
-- rollback when a branch fails,
-- and pruning of impossible branches.
-
-This distinction matters because not every DFS algorithm is backtracking. A plain DFS traversal may simply visit nodes in depth-first order, while a backtracking algorithm also builds partial solutions, checks feasibility at each step, and undoes choices when necessary.
-
-For this reason, backtracking is best understood as a DFS-based search process specialized for combinatorial problems with constraints.
-
-***
-
-## When backtracking is a good idea
-
-Backtracking is particularly appropriate when the problem can be naturally described as a sequence of decisions and when those decisions can be checked against constraints before a complete solution is built. In other words, it is a good choice when the solution space is large, but many candidate branches can be eliminated early.
-
-This makes backtracking especially useful in problems where:
-- the solution is built incrementally,
-- partial solutions can be validated as soon as they are generated,
-- the number of possible combinations grows very quickly,
-- and pruning can eliminate a large part of the search space.
-
-Backtracking is a good idea in several common situations.
-
-### When the problem asks for one valid solution
-
-Sometimes the goal is not to find all solutions, but simply to find **any** solution that satisfies the constraints. In these cases, backtracking can stop as soon as it finds the first valid answer. This can make it much more efficient than brute force, because the algorithm does not need to explore the entire search space once a correct solution has already been found.
-
-Examples include:
-- finding one valid arrangement of queens in the N-Queens problem,
-- solving a Sudoku puzzle,
-- finding a path that satisfies certain restrictions in a graph.
-
-In this kind of problem, backtracking is useful because it searches systematically, but it can terminate early once success has been reached.
-
-### When the problem asks for all valid solutions
-
-In other cases, the objective is to enumerate **every** possible solution that satisfies the constraints. Here, backtracking is especially natural because it can explore the entire search space while discarding invalid branches as early as possible.
-
-Examples include:
-- listing all valid permutations or combinations that satisfy a condition,
-- generating all subsets with a given property,
-- enumerating all valid colorings of a graph,
-- producing all solutions to a puzzle.
-
-This is one of the classic strengths of backtracking: it can systematically generate all feasible answers without wasting effort on branches that are already impossible.
-
-### When constraints can be checked early
-
-Backtracking is most effective when the problem includes constraints that can be evaluated on a partial solution, not only on a complete one. If the algorithm can detect a violation early, it can prune the branch immediately and avoid exploring it further.
-
-For example:
-- in N-Queens, two queens attacking each other makes the branch invalid right away;
-- in Sudoku, placing a number that already appears in the same row, column, or subgrid is enough to reject that candidate;
-- in Subset Sum, if the partial sum already exceeds the target, the branch can be discarded.
-
-The earlier the constraints can be checked, the more effective backtracking becomes.
-
-### When the search space is large but structured
-
-Backtracking is a strong option when the number of possible candidates is enormous, but the problem has enough structure to guide the search. In these cases, brute force would be too expensive, but backtracking can still be practical because it avoids exploring large portions of the tree.
-
-This is typical in combinatorial problems, where the number of possible configurations grows rapidly with the input size. Backtracking does not remove the combinatorial nature of the problem, but it can dramatically reduce the amount of work by pruning useless branches.
-
-### When the problem is a constraint satisfaction problem
-
-Backtracking is a classical technique for **constraint satisfaction problems** (CSPs). In a CSP, the task is to assign values to variables while respecting a set of restrictions. This is exactly the kind of setting where backtracking fits naturally.
-
-Constraint satisfaction problems are a natural fit for backtracking because the goal is to assign values to variables while satisfying a set of explicit constraints, and each partial assignment can usually be checked immediately for consistency. In other backtracking problems, the search may be driven by a different objective, such as finding a path, generating all combinations, or optimizing a score, so the feasibility test and pruning rules are often less uniform and may depend more on the specific structure of the problem.
-
-Typical examples of CSPs include:
-- N-Queens,
-- graph coloring,
-- Sudoku,
-- scheduling and assignment problems.
-
-In these problems, each variable assignment is a decision, and each new decision must preserve consistency with the constraints already imposed. If consistency is lost, the algorithm goes back and tries another option.
-
-### When the problem is an enumeration problem
-
-Backtracking is also very suitable when the objective is to **enumerate** solutions rather than just find one. Since the algorithm already explores the search tree systematically, it can be adapted to collect every valid result.
-
-This is useful in:
-- permutation generation,
-- combination generation,
-- subset generation,
-- puzzle solving where all solutions are needed.
-
-In this setting, backtracking acts as a controlled exhaustive search: it still explores all valid answers, but it avoids expanding branches that are impossible from the beginning.
-
-### When the problem is an optimization problem with pruning opportunities
-
-Backtracking can also be used in optimization problems, although in those cases it is often combined with additional pruning rules or bounding techniques. The idea is to search for the best feasible solution, but stop exploring branches that cannot improve the current best one.
-
-This is common in:
-- route planning,
-- resource allocation,
-- scheduling,
-- combinatorial optimization problems.
-
-If the algorithm can estimate a bound on the best possible result from a partial solution, then branches that cannot outperform the current best solution can be discarded. This is one of the main ideas behind branch-and-bound, which is closely related to backtracking.
-
-### When backtracking is not a good idea
-
-Backtracking is not always the best choice. It is usually a poor fit when:
-- the problem has too many solutions and almost no pruning is possible,
-- partial solutions cannot be checked early,
-- the same subproblems are solved repeatedly, making dynamic programming better,
-- or the problem is large enough that even a pruned search tree remains impractical.
-
-In those situations, other paradigms such as dynamic programming, greedy algorithms, or heuristic search may be more appropriate.
-
-In summary, backtracking is a good idea when the problem is combinatorial, structured, and constraint-driven, especially if invalid branches can be detected early and eliminated before they grow too large.
-
-***
-
-## General scheme of a backtracking algorithm
-
-Most backtracking algorithms follow the same conceptual structure. Although the details vary from problem to problem, the underlying logic is always the same: build a candidate solution incrementally, test it as soon as possible, and abandon it immediately if it becomes invalid.
-
-A typical backtracking procedure starts from an empty or initial state and then repeatedly tries to extend it:
-
-1. Start from an empty or initial state.
-2. Check whether the current state is already a complete solution.
-3. If it is, process it as a valid answer and stop if the problem only asks for one solution.
-4. If it is not complete, generate the possible next choices.
-5. For each choice:
-   - apply the choice to the current partial state,
-   - test whether the new state is still valid,
-   - if it is valid, continue recursively from that state,
-   - once the recursive call finishes, undo the choice and restore the previous state.
-
-In compact form, the pattern is usually summarized as:
-
-- **Choose** a candidate.
-- **Explore** the consequences recursively.
-- **Undo** the choice and try the next alternative.
-
-This scheme is extremely general and appears in most classical examples, such as N-Queens, Sudoku, subset generation, graph coloring, and Hamiltonian path search. However, although the backtracking skeleton is always similar, each problem defines its own:
-- state representation,
-- set of possible choices,
-- feasibility test,
-- stopping condition,
-- and objective, if the problem is about optimization.
-
-***
-
-## Common recursive templates
-
-Backtracking algorithms are usually implemented with one of two recursive templates, depending on the objective of the search. The underlying search process is the same in both cases; what changes is whether the algorithm stops at the first valid answer or continues exploring the state space.
+The two schemes below are the skeleton of every backtracking algorithm in this course. Only the meaning of "state", "children" and "solution" changes from problem to problem.
 
 <Tabs>
-  <TabItem value="first-sol" label="🎯 First Solution & Exit" default>
+<TabItem value="first" label="First solution" default>
 
-Use this version when the objective is to find **any one valid solution**. As soon as a valid configuration is found, the algorithm can stop immediately.
+Use this scheme when **any** valid solution is enough (or when we only need to know whether one exists). A `found` flag stops the exploration as soon as the first solution appears.
 
 ```java
-public class BacktrackingFirstSolution {
-    private boolean found = false;
+boolean found = false;
 
-    public void solve(State initialState) {
-        found = backtracking(initialState);
-        if (!found) {
-            System.out.println("THERE IS NO SOLUTION");
-        }
-    }
+void solve(State initial) {
+    backtracking(initial);
+    if (!found)
+        System.out.println("THERE IS NO SOLUTION");
+}
 
-    private boolean backtracking(State state) {
-        if (isSolution(state)) {
-            System.out.println(state);
-            found = true;
-            return true;
-        }
-
-        for (State child : state.getChildren()) {
-            if (backtracking(child)) {
-                return true;
-            }
-        }
-
-        return false;
+void backtracking(State state) {
+    if (isSolution(state)) {
+        process(state);          // print it, copy it...
+        found = true;
+    } else {
+        for (State child : childrenOf(state))
+            if (!found && isValid(child))
+                backtracking(child);
     }
 }
 ```
 
-This pattern is especially useful when the problem only asks whether a solution exists, or when any valid configuration is acceptable. In that case, there is no need to explore the rest of the search tree once success has been reached.
+</TabItem>
+<TabItem value="all" label="All / best / worst solutions">
 
-  </TabItem>
-  <TabItem value="all-solutions" label="📊 All / Optimal Solutions">
-
-Use this version when the objective is to enumerate **all solutions**, count them, or keep track of the best one according to some objective function.
+Use this scheme when we need **every** solution, their number, or the **best** (or worst) one according to some objective. The search never stops early.
 
 ```java
-public class BacktrackingAllSolutions {
-    private int count = 0;
+int count = 0;
 
-    public void solve(State initialState) {
-        backtracking(initialState);
-        if (count == 0) {
-            System.out.println("THERE IS NO SOLUTION");
-        }
+void solve(State initial) {
+    backtracking(initial);
+    if (count == 0)
+        System.out.println("THERE IS NO SOLUTION");
+}
+
+void backtracking(State state) {
+    if (isSolution(state)) {
+        process(state);          // print it, or compare it with the best so far
+        count++;
     }
-
-    private void backtracking(State state) {
-        if (isSolution(state)) {
-            System.out.println(state);
-            count++;
-            return;
-        }
-
-        for (State child : state.getChildren()) {
-            backtracking(child);
-        }
+    else {                       // see the note below about this 'else'
+        for (State child : childrenOf(state))
+            if (isValid(child))
+                backtracking(child);
     }
 }
 ```
 
-This version is appropriate when we need to explore every valid answer. If the problem is about optimization, this same structure can be extended by maintaining a variable with the best solution found so far and updating it whenever a better candidate appears.
-
-  </TabItem>
+</TabItem>
 </Tabs>
 
-The first template is more efficient when only one solution is needed. The second template is necessary when the problem requires all solutions, a complete enumeration, or an optimization process over the full search space.
+The two versions differ in very little: the `found` flag. Two details deserve attention:
+
+- **The `else` after a solution.** It is correct only if no further solution can appear *below* a solution node. That is the case when solutions are always leaves (a permutation of $n$ elements cannot be extended). If a solution can be extended into another solution (for example, "all subsets whose sum is at least $c$"), the `else` must be removed so that the search continues below it.
+- **Saving the solution.** The "unchoose" step erases decisions as the recursion returns. If the solution is needed after the search finishes, it must be **copied** when it is found (or the undo step must be skipped once `found` is true). Otherwise the caller receives an empty vector.
+
+For optimization, the "all solutions" scheme keeps a variable with the **best solution found so far** and its value. Every time a complete solution is reached, it is compared with the best one and replaces it if it is better. This variable is also the basis of the most powerful kind of pruning, described below.
+
+***
+
+## Designing a backtracking algorithm
+
+To apply the schemes to a concrete problem, answer these questions in order:
+
+1. **What is a solution?** Define the vector $(x_1, \dots, x_n)$ and the meaning of each component. A good representation often makes the constraints hold by construction. In the N-queens problem, storing one row per column guarantees that no two queens share a column.
+2. **What are the candidates at each level?** These are the children of a node. Their number is the **branching factor** (or *degree*) of the tree.
+3. **When is a partial solution still valid?** This is the **feasibility test**. It should be cheap: auxiliary arrays that answer "is this row used?" in $O(1)$ are better than scanning the whole partial solution.
+4. **When is a node a solution?** Usually when the last level is reached, sometimes earlier.
+5. **What must be undone when going back?** Every change made when choosing a candidate (marks, sums, counters) must be reverted after the recursive call, so that the state is exactly as it was before.
+6. **Is there an objective?** If we look for the best solution, decide how to compare solutions and what bound can be used to prune.
 
 ***
 
 ## Pruning: the key to efficiency
 
-Pruning is one of the main reasons why backtracking is much more effective than naive exhaustive search in practice. The basic idea is simple: if we can prove that a branch of the search tree can no longer lead to a valid or optimal solution, then there is no reason to keep exploring it.
+Without pruning, backtracking is just brute force written recursively. Pruning means **not generating a child (or not exploring it) when we can prove that its subtree contains nothing useful**. There are several kinds:
 
-This early elimination of impossible branches can dramatically reduce the size of the search space. Instead of generating every candidate and checking it at the end, backtracking stops as soon as a partial state becomes infeasible or clearly unpromising.
+- **Feasibility pruning.** The partial solution already violates a constraint: two queens attack each other, a line of the magic square does not add up, two adjacent regions of a map have the same color.
+- **Look-ahead pruning.** The partial solution is still valid, but it can no longer be completed. In the subset sum problem with positive numbers, if the current sum plus *all* the remaining numbers is still below the target, no completion can reach it.
+- **Bound pruning** (optimization). The partial solution is valid, but its cost already equals or exceeds the cost of the best complete solution found so far, so it cannot lead to a better one. This is the bridge between backtracking and [branch and bound](./03-branch-and-bound.mdx).
+- **Symmetry breaking.** If several branches are mirror images of each other, explore only one. For example, in the N-queens problem we can place the first queen only in the top half of the first column and mirror the solutions found.
 
-A branch should be pruned whenever continuing down that branch is useless. This may happen for several reasons:
-- the partial solution already violates a constraint;
-- the remaining decisions can no longer complete a valid solution;
-- or, in optimization problems, the current partial solution is already worse than the best known answer.
+The choice of pruning tests involves a trade-off. Each test costs time at every node where it is evaluated. A test that rarely rejects anything can make the algorithm slower. As a rule of thumb, simple tests are almost always worth it; expensive tests pay off only when the tree is very large.
 
-This last case is especially important in optimization settings. There, pruning is not only about rejecting invalid states, but also about discarding **suboptimal** states that cannot possibly improve the current best solution. In that sense, pruning is closely related to branch-and-bound.
-
-### Constraint-based pruning
-
-The most common form of pruning is based on constraints. If a partial solution already breaks a rule, the branch is immediately discarded.
-
-Examples:
-- **N-Queens:** if two queens attack each other, the current partial placement is invalid, so the branch is pruned.
-- **Graph Coloring:** if two adjacent vertices share the same color, the current coloring is invalid and should not be extended.
-- **Sudoku:** if a number is repeated in a row, column, or subgrid, that partial board is rejected immediately.
-
-In all of these cases, the algorithm does not need to wait until a full solution is built. The violation is enough to stop exploration early.
-
-### Bound-based pruning
-
-In optimization problems, we often maintain the best solution found so far. If a partial candidate cannot possibly beat that best solution, we can prune it even if it is still feasible.
-
-Examples:
-- **Subset Sum / Knapsack:** if the current sum already exceeds the target, and all remaining values are non-negative, the branch can be discarded.
-- **Traveling Salesman Problem:** if the current partial tour already has a cost greater than the best known complete tour, there is no reason to continue that branch.
-
-This kind of pruning is particularly powerful because it cuts off branches that are not invalid, but simply not worth pursuing.
-
-### Why early pruning matters
-
-The earlier a problem allows us to prune invalid or unpromising states, the more effective backtracking becomes. Good pruning rules reduce the number of recursive calls, shorten the search, and often make problems that would otherwise be intractable much more manageable in practice.
-
-In summary, pruning is the mechanism that transforms backtracking from a blind enumeration technique into a much more intelligent search strategy.
-
-***
-
-## Worked intuition
-
-Imagine a problem where you must make one decision at a time, and where not every combination of decisions is allowed. At each step, you choose one value, but the partial result may already be enough to know whether that branch is still worth exploring.
-
-A brute-force method would generate all complete combinations first and only then check which ones are valid. This means it can waste a lot of time building full candidates that were already impossible from an earlier step.
-
-A backtracking method works differently. It would:
-- choose the first value,
-- immediately check whether the partial choice is still consistent,
-- continue only if the current branch is still promising,
-- and undo the choice as soon as it leads to a dead end.
-
-That is why backtracking is often described as **systematic trial and error**, but with intelligence. It explores possibilities in an organized way, while discarding bad branches as soon as they are recognized.
+The **order** in which children are tried also matters. Trying the most promising candidate first finds good solutions earlier, which makes bound pruning more effective. Choosing the most constrained variable first (the one with fewest candidates left) detects dead ends earlier. In the [knight's tour](./02-backtracking-examples.mdx#knights-tour), a simple ordering rule reduces 27 million recursive calls to 64.
 
 ***
 
 ## Complexity analysis
 
-The running time of a backtracking algorithm depends mainly on two factors:
-- the number of nodes generated in the state tree,
-- and the amount of work needed to process each node.
+### Time
 
-A useful abstract model is:
+The execution time of a backtracking algorithm is
 
 $$
-\text{Total Time} = (\text{Number of generated nodes}) \times (\text{Cost per node})
+T = (\text{number of nodes generated}) \times (\text{time per node})
 $$
 
-In many textbook problems, the work done at each node is small, often constant or close to constant. In that case, the dominant factor is the size of the search tree itself.
+The time per node is usually constant or close to it, so the analysis focuses on the **number of nodes**. In the worst case (no pruning at all) every combination of values is generated. If each component $x_i$ can take $m_i$ values, the tree has:
 
-The important point is that backtracking does not avoid worst-case explosion in general: it reduces the search space in practice by pruning, but if very few branches can be discarded, the algorithm may still end up exploring an enormous number of states.
+- $m_1$ nodes at level 1,
+- $m_1 \cdot m_2$ nodes at level 2,
+- ...
+- $m_1 \cdot m_2 \cdots m_n$ nodes at level $n$.
 
-### Exponential growth
+Two typical cases:
 
-If each state can generate up to $m$ children and the maximum depth is $n$, then the number of explored nodes may grow exponentially:
-
-$$
-T(n) = m + m^2 + m^3 + \dots + m^n
-$$
-
-This leads to:
+**Constant degree.** If every node has $m$ children, the number of nodes is
 
 $$
-T(n) = O(m^n)
+T(n) = m + m^2 + \dots + m^n = \frac{m^{n+1} - m}{m - 1} \in O(m^n)
 $$
 
-A common special case is when each level offers roughly two choices. Then the complexity becomes:
+For $m = 2$ (include or exclude an element, set a bit to 0 or 1): $T(n) = 2^{n+1} - 2 \in O(2^n)$.
+
+**Degree decreasing by one.** If each level can only use the elements not used above (permutations), the degree is $n$ at the root, $n-1$ below, and so on:
 
 $$
-T(n) = O(2^n)
+T(n) = n + n(n-1) + n(n-1)(n-2) + \dots + n! \in O(n!)
 $$
 
-This kind of growth is typical in problems where each decision has a small fixed number of alternatives, but the number of decisions is large.
+In fact the sum is less than $e \cdot n! \approx 2.72 \cdot n!$, so the leaves dominate.
 
-### Factorial growth
-
-In some problems, the number of available choices decreases by one at each level. This is typical in permutation-like problems, where each new decision selects one element from the remaining unused elements.
-
-In that case, the search may grow factorially:
+Backtracking algorithms therefore have, in general, **exponential or factorial** worst-case complexity. Among the usual functions, the ordering from best to worst is
 
 $$
-T(n) = n + n(n-1) + n(n-1)(n-2) + \dots + n!
+O(2^n) \subset O(10^n) \subset O(n!) \subset O(n^n)
 $$
 
-which leads to:
+since $n! = 1 \cdot 2 \cdots n \le n \cdot n \cdots n = n^n$ and, for large $n$, $n!$ eventually exceeds any $c^n$.
+
+Pruning does **not** change the worst case, but it can change the practical behavior dramatically. For the N-queens problem we counted the nodes generated when looking for all solutions, and compared them with the size of the full tree of degree $n$ (one row per column, $n^n$ leaves) and with $n!$ (one row per column, all different):
+
+| $n$ | Solutions | Nodes generated | $n!$ | Full tree of degree $n$ | Time (all solutions) |
+|---:|---:|---:|---:|---:|---:|
+| 8 | 92 | 2,057 | 40,320 | $1.9 \times 10^7$ | 0.5 ms |
+| 10 | 724 | 35,539 | $3.6 \times 10^6$ | $1.1 \times 10^{10}$ | 3.5 ms |
+| 12 | 14,200 | 856,189 | $4.8 \times 10^8$ | $9.7 \times 10^{12}$ | 71 ms |
+| 14 | 365,596 | 27,358,553 | $8.7 \times 10^{10}$ | $1.2 \times 10^{16}$ | 2.5 s |
+
+The algorithm generates thousands of times fewer nodes than $n!$, yet the count still grows by a factor of about 5 per extra queen. Pruning buys a few more sizes; it does not make the problem polynomial.
+
+### Memory
+
+Backtracking keeps only the **current path** of the tree, not the whole tree. The memory used by the recursion stack is
 
 $$
-T(n) = O(n!)
+M_{\text{stack}} = O(h) \cdot O(f(n)) = O(h \cdot f(n))
 $$
 
-This happens because the algorithm is effectively exploring permutations of the input elements.
+where $h$ is the **height of the tree of calls** and $f(n)$ the stack space of each call. With $O(1)$ space per call, $M_{\text{stack}} = O(h)$. The height is usually:
 
-### Why this matters
+- $O(n)$ when each call reduces the problem **by subtraction** (one decision per level, as in all the examples of this chapter),
+- $O(\log n)$ when each call reduces it **by division**.
 
-This is why backtracking is powerful but still potentially expensive. Pruning can dramatically reduce the number of states explored in practice, but in the worst case the algorithm may still need to visit an exponential or factorial number of nodes.
-
-So, backtracking should be understood as a technique that improves practical efficiency by cutting off useless branches early, not as a method that eliminates combinatorial complexity altogether.
+To this we must add the data structures of the problem (the solution vector, the marks), which are usually $O(n)$ or $O(n^2)$.
 
 ***
 
-## Space complexity
+## Backtracking and the other paradigms
 
-One of the main strengths of backtracking is that it usually uses much less memory than methods that store the entire search space.
+| Paradigm | How it explores | Guarantees the optimum? | Typical cost |
+|---|---|---|---|
+| Brute force | Generates every complete candidate, checks at the end | Yes | Exponential or factorial |
+| Greedy | One choice per step, never reconsidered | Only for some problems | Polynomial |
+| Divide and conquer | Splits into independent subproblems | Yes (when applicable) | Often polynomial |
+| Dynamic programming | Solves each distinct subproblem once and stores it | Yes (when the principle of optimality holds) | Polynomial or pseudo-polynomial |
+| Backtracking | Depth-first over the tree of states, with pruning | Yes | Exponential or factorial in the worst case |
+| Branch and bound | Best-first over the tree of states, with bounds | Yes | Exponential in the worst case |
 
-The main memory cost comes from the recursion stack and from the information associated with the current partial solution. If the maximum depth of the recursion tree is $h$ and each recursive frame uses constant memory, then the auxiliary space required by the stack is:
+If a problem can be solved both with dynamic programming and with backtracking, **dynamic programming is usually preferable**: it reuses subproblems instead of exploring them again. Backtracking is the right choice when:
 
-$$
-M_{\\text{stack}} = O(h)
-$$
+- we need to **enumerate** all solutions (DP gives a value, not the list);
+- the constraints are complicated and easy to check incrementally, but hard to express as a recurrence;
+- the problem is NP-hard and no efficient method is known, so an exact answer requires exploring the search space.
 
-This happens because backtracking explores one branch at a time. It does not need to keep all branches in memory simultaneously; it only stores the active path from the root to the current node, together with the local data needed to undo decisions when necessary.
-
-In many classical problems, $h$ is proportional to the number of decisions in the final solution, so the extra memory is often linear in the depth of the search. This makes backtracking much more memory-efficient than exhaustive methods that explicitly generate and store every candidate.
-
-However, this low space usage does not mean the algorithm is cheap overall: backtracking saves memory, but it may still require a very large amount of time in the worst case.
-
-***
-
-## Backtracking vs Dynamic Programming
-
-A common question in algorithm design is when to use backtracking and when to use dynamic programming. Although both techniques can be used to solve combinatorial problems, they are based on very different ideas.
-
-As a general rule:
-- **Backtracking** explores a search tree and is useful when the goal is to construct valid solutions under constraints.
-- **Dynamic Programming** is usually preferable when the problem contains **overlapping subproblems** and **optimal substructure**, because it avoids recomputing the same states many times.
-
-The key difference is that backtracking searches for feasible solutions by exploring possibilities and pruning invalid branches, while dynamic programming stores and reuses the results of subproblems. In other words, backtracking is about **search**, whereas dynamic programming is about **reuse**.
-
-This distinction has important practical consequences:
-- If the problem asks for **one valid solution** or for **all valid solutions**, backtracking is often the natural choice.
-- If the problem asks for an **optimal value** and can be decomposed into repeated subproblems, dynamic programming is often more efficient.
-- If the problem has many constraints that can be checked incrementally, backtracking may be easier to formulate.
-- If the same states are solved many times, dynamic programming is usually superior.
-
-Therefore, if a problem can be solved efficiently with dynamic programming, that solution is often preferable in practice. Backtracking is still essential, however, when the problem requires explicit enumeration, when constraints are naturally incremental, or when no efficient dynamic programming formulation is available.
-
-In short:
-- **Backtracking** is a systematic search technique.
-- **Dynamic Programming** is a memorization-based optimization technique.
+Backtracking is a poor choice when partial solutions cannot be checked until they are complete (nothing can be pruned), or when the instance is so large that even the pruned tree is out of reach. In that case, heuristics (greedy, local search, metaheuristics) give good but not guaranteed answers.
 
 ***
 
-## Backtracking vs brute force
+## Backtracking in practice
 
-Although the two methods are related, they should not be confused.
+Backtracking is everywhere, often hidden inside tools we use daily:
 
-- **Brute force** tries every possibility in a direct and usually unstructured way. It typically generates complete candidates and checks them only after the full solution has been constructed.
-- **Backtracking** also explores possibilities, but it does so incrementally and rejects bad partial candidates as soon as they become invalid.
-
-The key difference is that brute force performs a nearly blind enumeration of the search space, while backtracking adds structure and early pruning. This means that backtracking does not merely try “all possibilities”; it tries them in a controlled order and stops exploring branches that cannot lead to a valid answer.
-
-So backtracking can be seen as a more intelligent form of exhaustive search. It may still have the same worst-case asymptotic complexity as brute force, but in many practical instances it performs much better because large subtrees are never explored.
-
-In short:
-- **Brute force:** generate everything, test later.
-- **Backtracking:** generate progressively, test early, and prune immediately.
+- **Puzzles and constraint satisfaction**: Sudoku, crosswords, timetabling, scheduling. Constraint programming solvers are backtracking engines with very sophisticated pruning.
+- **SAT solvers**, which decide whether a Boolean formula can be satisfied, are based on the DPLL algorithm, a backtracking search with clever propagation. They are used to verify hardware and software.
+- **Logic programming**: the Prolog language executes programs by backtracking over the possible ways to prove a goal.
+- **Regular expressions**: the engines of Java, Python, JavaScript and many other languages match patterns by backtracking. Badly written patterns can trigger *catastrophic backtracking*. In Python, matching `(a+)+b` against a string of $n$ letters `a` followed by `c` takes about twice as long for each extra letter: 0.7 s for $n = 24$ and 2.8 s for $n = 26$. This has caused real outages of web services.
+- **Compilers** use graph coloring (a classic backtracking problem) to assign variables to processor registers.
+- **Games**: chess and Go engines explore game trees with depth-first search plus pruning.
 
 ***
 
-## Typical examples in Algorithms courses
-
-Some classical problems where backtracking is taught and applied are:
-
-Typical examples include:m
-- N-Queens.
-- Sudoku.
-- Subset Sum.
-- Graph Coloring.
-- Hamiltonian Cycle.
-
-- **N-Queens:** place $n$ queens on an $n \\times n$ board so that no two queens attack each other.
-- **Subset Sum:** determine whether a subset of numbers sums to a target value.
-- **Graph Coloring:** assign colors to the vertices of a graph using a limited number of colors without creating conflicts between adjacent vertices.
-- **Hamiltonian Cycle:** find a cycle that visits each vertex exactly once.
-
-These problems are especially useful in an Algorithms course because they illustrate several core ideas of the backtracking paradigm in a very clear way:
-
-- **Construction of partial solutions:** the algorithm builds the answer step by step instead of trying to generate it all at once.
-- **Feasibility checks:** each new decision can be tested immediately to see whether it is still consistent with the constraints.
-- **Pruning conditions:** invalid or unpromising branches can be discarded early.
-- **Different search objectives:** depending on the problem, backtracking may be used to find one solution, all solutions, or the best feasible solution.
-
-Taken together, these examples show why backtracking is a natural technique for combinatorial problems: the search space is large, but the constraints often allow many branches to be eliminated before they grow too far.
-
-***
-
-## Self-check questions
-
-Use these questions to verify that the core ideas are clear.
+## Self-check
 
 <details>
-  <summary>📌 <strong>Self-check 1: Why not brute force?</strong></summary>
+<summary><strong>1. Brute force or backtracking?</strong> Why does backtracking explore far fewer nodes than brute force on the magic square, if both find the same 8 solutions?</summary>
 
-**Question:** Why is backtracking usually preferable to naive brute force in combinatorial problems?
-
-**Answer:** Because backtracking checks constraints while the solution is being built and prunes branches that cannot lead to a valid answer, instead of generating every complete candidate first.
+Brute force builds all 362,880 complete tables (and every partial table along the way) before checking anything. Backtracking checks each row, column and diagonal as soon as it is full, so a wrong first row is rejected after placing 3 numbers instead of 9, and its $6! = 720$ completions are never generated.
 
 </details>
 
 <details>
-  <summary>📌 <strong>Self-check 2: Nodes and edges</strong></summary>
+<summary><strong>2. Nodes and edges.</strong> True or false: "In the graph of a problem, nodes represent valid changes and edges represent states."</summary>
 
-**Question:** In a state-space representation, what do nodes and edges represent?
-
-**Answer:** Nodes represent states or partial configurations of the problem, and edges represent valid transitions or choices between states.
+False. It is the other way round: **nodes** are states, **edges** are valid changes between states.
 
 </details>
 
 <details>
-  <summary>📌 <strong>Self-check 3: DFS and backtracking</strong></summary>
+<summary><strong>3. Which scheme?</strong> You need the cheapest way to assign 10 tasks to 10 agents. Do you use the "first solution" or the "all solutions" scheme?</summary>
 
-**Question:** Are DFS and backtracking the same thing?
-
-**Answer:** No. DFS is a traversal strategy, while backtracking is a problem-solving paradigm that usually uses DFS together with constraint checking, rollback, and pruning.
+The "all solutions" scheme, keeping the best solution found so far. The first complete assignment found is not necessarily the cheapest, so the search cannot stop there (although bound pruning will discard most of the tree).
 
 </details>
 
 <details>
-  <summary>📌 <strong>Self-check 4: When do we backtrack?</strong></summary>
+<summary><strong>4. Complexities.</strong> Which of these are typical complexities of backtracking algorithms: $O(n!)$, $O(n^2)$, $O(n)$, $O(2^n)$, $O(4^n)$, $O(n \log n)$? And which is the worst of $O(n!)$, $O(10^n)$ and $O(n^n)$?</summary>
 
-**Question:** When does a backtracking algorithm return to a previous decision point?
-
-**Answer:** It returns to a previous decision point when the current branch has either produced a complete solution or been proven unable to lead to a valid complete solution.
+The typical ones are $O(n!)$, $O(2^n)$ and $O(4^n)$ (exponential and factorial). The polynomial ones are not. The worst of the three is $O(n^n)$, since $10^n \lt n! \le n^n$ for large $n$.
 
 </details>
 
 <details>
-  <summary>📌 <strong>Self-check 5: Backtracking or Dynamic Programming?</strong></summary>
+<summary><strong>5. Memory.</strong> What does the memory used by the recursion stack depend on, and how high is the tree when the problem shrinks by subtraction or by division?</summary>
 
-**Question:** If a problem admits both a backtracking solution and a Dynamic Programming solution, which one is usually preferred in practice?
+It depends on the height $h$ of the tree of calls and on the stack space used by each call: $O(h \cdot f(n))$. The height is usually $O(n)$ when the problem shrinks by subtraction and $O(\log n)$ when it shrinks by division.
 
-**Answer:** Dynamic Programming is often preferred when applicable, because it avoids recomputation of overlapping subproblems and is usually more efficient.
+</details>
+
+<details>
+<summary><strong>6. Undo.</strong> A student's "first solution" algorithm prints a correct solution while searching, but the vector returned to the caller is full of -1. Why?</summary>
+
+The "unchoose" step runs after the recursive call returns, even after the solution has been found, and erases every decision. The solution must be copied when it is found, or the undo must be skipped once `found` is true.
+
+</details>
+
+<details>
+<summary><strong>7. DP or backtracking?</strong> You know how to solve a problem with dynamic programming and also with backtracking. Which one should you usually use?</summary>
+
+Dynamic programming, because it solves each distinct subproblem once (usually in polynomial or pseudo-polynomial time), while backtracking may explore an exponential number of nodes. Backtracking remains necessary when all solutions must be listed or no DP formulation exists.
 
 </details>
 
 ***
 
-## Key ideas to remember
+## Key ideas
 
-- Backtracking explores a **state-space tree**.
-- It builds solutions **incrementally**, one decision at a time.
-- It usually follows a **depth-first search (DFS)** exploration order.
-- It uses **pruning** to discard impossible or unpromising branches early.
-- It is especially useful in **constraint satisfaction** and **combinatorial search** problems.
-- Its worst-case time complexity is often **exponential** or **factorial**, but its space usage is usually modest because it only stores the current path.
+- Backtracking performs a **depth-first search** of an **implicit tree of states**, generating nodes only when they are reached.
+- A solution is a **vector** of decisions $(x_1, \dots, x_n)$; each level of the tree fixes one decision.
+- The pattern is **choose, explore, unchoose**: every change must be undone when going back.
+- There are two schemes: **first solution** (stop as soon as one is found) and **all solutions** (enumerate, count, or keep the best).
+- **Pruning** (feasibility, look-ahead, bounds, symmetry) and a good **ordering** of candidates make the difference between a usable algorithm and brute force.
+- The worst-case time is usually **exponential** ($O(2^n)$, $O(m^n)$) or **factorial** ($O(n!)$); the memory is only $O(h)$ for the stack.
+- When dynamic programming applies, it is usually better. Backtracking is the tool for enumeration and for hard combinatorial problems.
 
-***
-
-## Suggested review prompt
-
-:::tip Concept Consolidation
-Review the following idea in your notes or with your study group:
-
-> *Explain why backtracking is usually described as DFS over an implicit state-space tree. Then compare it with brute force and Dynamic Programming, and state when each technique is preferable.*
-:::
+The next lesson applies the schemes to classic problems: [permutations, subset sum, N-queens, the knight's tour, graph coloring and task assignment](./02-backtracking-examples.mdx).
