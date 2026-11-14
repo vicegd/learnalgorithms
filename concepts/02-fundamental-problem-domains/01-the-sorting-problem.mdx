@@ -1,0 +1,216 @@
+---
+title: The Sorting Problem
+sidebar_position: 1
+tags: [Sorting, Stability, In-place, Comparisons]
+---
+
+# The Sorting Problem
+
+Sorting is one of the most frequent operations in any information system, and one of the most thoroughly studied problems in computer science. When there is a certain volume of data, keeping it sorted makes searching (and many other operations) much faster: we saw in the previous chapter that binary search needs about 20 steps to search a million sorted elements, while sequential search may need a million.
+
+Sorting is also one of the problems with the **largest number of known algorithms**. This makes it an ideal laboratory for everything we learnt in the previous chapter: the same problem, solved by strategies whose costs range from quadratic to linearithmic (and even linear, under certain conditions), with very different behaviours depending on the input.
+
+:::note What you will learn in this chapter
+- How to state the sorting problem precisely, and why sorting integers is enough to understand sorting in general.
+- The criteria used to classify and compare sorting algorithms: complexity, comparisons, moves, stability, memory, adaptivity.
+- Three **simple** algorithms (bubble, insertion and selection), and how to analyse their best, worst and average cases exactly.
+- **Quicksort**, the most widely used general-purpose sorting algorithm, and the importance of choosing a good pivot.
+- Other efficient algorithms (Shellsort, Heapsort, Mergesort, Radix sort), the theoretical limit of comparison-based sorting, and how to choose an algorithm in practice.
+:::
+
+---
+
+## Statement of the Problem
+
+Given a sequence of $n$ elements $a_1, a_2, \dots, a_n$ and an **order relation** $\le$ defined on them, the sorting problem consists of rearranging the elements so that they appear in **increasing** order:
+
+- **Input:** a sequence $\langle a_1, a_2, \dots, a_n \rangle$.
+- **Output:** a **permutation** $\langle a'_1, a'_2, \dots, a'_n \rangle$ of the input such that $a'_1 \le a'_2 \le \cdots \le a'_n$.
+
+Both conditions of the postcondition are important. "Sorted" alone is not enough: an algorithm that returned `[0, 0, 0]` for any input would produce a sorted sequence. The output must also be a **permutation** of the input: the same elements, possibly in a different order, with nothing lost, duplicated or invented.
+
+The order relation can be anything that lets us compare two elements: numerical order, alphabetical order, dates, or a combination of criteria ("by surname, and then by first name"). Decreasing order is just increasing order with the reversed relation.
+
+### What can influence sorting?
+
+- **The type of the elements:** comparing two integers is very cheap; comparing two long strings, or two objects through a method, may be much more expensive. Moving large records in memory is also more expensive than moving integers.
+- **The size of the problem:** algorithms that are excellent for 20 elements can be hopeless for 20 million, and vice versa.
+- **The device where the data is stored:** sorting data in main memory is very different from sorting data that does not fit in memory and lives on a disk.
+- **The initial order of the data:** some algorithms are much faster when the data is already sorted or almost sorted; others do not care; and some are at their **worst** precisely with sorted data.
+
+### Why sorting integers is enough
+
+In practice, sorting problems are usually much more complex than sorting a vector of integers: we sort customers, transactions, files or streets. However, they can be **reduced** to the same problem: we sort according to a **key** (a customer identifier, a date, a price...), and the rest of the record travels with it. Sorting numbers or sorting streets, houses or cars by any quantifiable property is essentially the same task.
+
+For this reason, in this chapter we will sort **arrays of integers in Java**, which keeps the code simple and lets us focus on the algorithms. Everything carries over to other types by replacing the comparison `a < b` with the appropriate comparison (in Java, `compareTo` or a `Comparator`).
+
+:::tip Sorting records efficiently
+When the records are large, moving them is expensive. A common technique is to sort an array of **indices** (or references) to the records instead of the records themselves: each move then copies a small number, and the records stay where they are. In Java, sorting an array of objects already works this way: the array only contains references.
+:::
+
+---
+
+## Classification Criteria
+
+Sorting algorithms are compared according to several criteria.
+
+### 1. Total number of steps: complexity
+
+The complexity in the best, worst and average cases, which we will analyse with the tools of the previous chapter. Simple algorithms are $O(n^2)$ in their worst case; efficient ones reach $O(n \log n)$.
+
+### 2. Number of comparisons
+
+How many times two **keys** are compared. Comparisons are the "decisions" of the algorithm, and for complex keys (strings, objects) they can be the dominant cost. We will write $C(n)$ for the number of comparisons.
+
+### 3. Number of moves (interchanges)
+
+How many times elements are moved or exchanged. An **interchange** (swap) of two elements requires three assignments, so it is usually **much more expensive than a comparison**, especially when the elements are large records. We will write $M(n)$ for the number of moves or swaps.
+
+Counting comparisons and moves separately is more informative than counting all operations together: two algorithms with the same complexity may be very different in practice if one performs many more swaps than the other.
+
+### 4. Stability
+
+A sorting algorithm is **stable** if it preserves the relative order of elements with **equal keys**.
+
+Suppose we have a list of students already sorted alphabetically by name, and we now sort it by grade. With a stable algorithm, students with the same grade remain in alphabetical order. With an unstable one, they may come out in any order.
+
+| Before (sorted by name) | Sorted by grade, **stable** | Sorted by grade, **unstable** (possible result) |
+| :--- | :--- | :--- |
+| Ana, 7 | Bruno, 5 | Bruno, 5 |
+| Bruno, 5 | **Ana, 7** | **Carla, 7** |
+| Carla, 7 | **Carla, 7** | **Ana, 7** |
+| David, 9 | David, 9 | David, 9 |
+
+Stability is what makes it possible to sort by several criteria in successive passes: first by the secondary criterion, then (stably) by the primary one. It does not matter when sorting plain integers, because equal integers are indistinguishable, but it is essential when sorting records.
+
+### 5. Type of memory used: internal and external algorithms
+
+- **Internal algorithms** sort data that fits entirely in **main memory**, where any element can be accessed directly at a similar cost. All the algorithms in this chapter, except the last section, are internal.
+- **External algorithms** sort data that does **not fit** in main memory and must stay in secondary storage (disks), where access is much slower and sequential access is much cheaper than random access. They are designed to minimise the number of disk accesses.
+
+### 6. Additional criteria
+
+Two more properties will help us describe the algorithms:
+
+- **Extra memory (in place or not).** An algorithm is **in place** if it sorts the elements within the original array, using only a constant (or very small) amount of additional memory. Some algorithms, such as Mergesort, need an auxiliary array of size $n$.
+- **Adaptivity.** An algorithm is **adaptive** if it takes advantage of the existing order in the input, running faster on data that is already sorted or almost sorted. This matters a lot in practice, because real data is often partially sorted (for example, a sorted list to which a few new elements have been appended).
+
+---
+
+## Utility Methods
+
+To make the code of the algorithms shorter and more readable, we use a few utility methods. The course repository defines them in the class [`Util`](https://github.com/vicegd/algorithms/blob/master/src/topics/sorting/utils/Util.java):
+
+```java
+public final class Util {
+
+    /** Swaps the elements at positions i and j (three assignments). */
+    public static void swap(int[] elements, int i, int j) {
+        int temp = elements[i];
+        elements[i] = elements[j];
+        elements[j] = temp;
+    }
+
+    /** Position of the smallest element from position firstElement to the end. */
+    public static int findPosMin(int[] elements, int firstElement) {
+        int minPos = firstElement;
+        for (int i = firstElement + 1; i < elements.length; i++) {
+            if (elements[i] < elements[minPos]) {
+                minPos = i;
+            }
+        }
+        return minPos;
+    }
+
+    /** Position of the largest element from position firstElement to the end. */
+    public static int findPosMax(int[] elements, int firstElement) {
+        int maxPos = firstElement;
+        for (int i = firstElement + 1; i < elements.length; i++) {
+            if (elements[i] > elements[maxPos]) {
+                maxPos = i;
+            }
+        }
+        return maxPos;
+    }
+}
+```
+
+Note that `findPosMin` and `findPosMax` are not elementary operations: each one inspects all the elements from `firstElement` to the end, so its cost is linear in the number of elements inspected. When we analyse an algorithm that calls them, we must take that into account.
+
+:::caution Avoid "magic" initial values
+A tempting way of writing `findPosMin` is to start with `value = Integer.MAX_VALUE` and update it whenever a smaller element appears. It works for most inputs, but if all the remaining elements are equal to `Integer.MAX_VALUE`, no element is ever "smaller", and the method returns an invalid position. Initialising with the **first element of the range**, as above, is correct for every input.
+:::
+
+All the sorting algorithms of the repository implement a common interface, which makes it easy to test and compare them:
+
+```java
+public interface SortingAlgorithm {
+    void sort(int[] elements);
+}
+```
+
+### How to check that a sorting algorithm is correct
+
+Sorting is an ideal problem for the **stress testing** technique of the previous chapter, because Java already provides a trusted sorting method, `Arrays.sort`, to use as an oracle:
+
+```java
+Random random = new Random();
+for (int test = 0; test < 10_000; test++) {
+    int n = random.nextInt(30);                      // includes n = 0 and n = 1
+    int[] a = new int[n];
+    for (int i = 0; i < n; i++)
+        a[i] = random.nextInt(10);                   // small values: many duplicates
+    int[] expected = a.clone();
+    Arrays.sort(expected);
+    algorithm.sort(a);
+    if (!Arrays.equals(a, expected)) {
+        System.out.println("Failed for " + Arrays.toString(expected));
+        break;
+    }
+}
+```
+
+Comparing with `Arrays.sort` checks **both** conditions of the specification at once: that the result is sorted and that it is a permutation of the input. All the algorithms of this chapter pass this test in the course repository. Remember to include the edge cases: empty arrays, a single element, all elements equal, already sorted and reverse-sorted inputs.
+
+---
+
+## Simple and Sophisticated Algorithms
+
+Sorting algorithms are traditionally classified into two families:
+
+- **Simple (direct) algorithms**, with complexity $O(n^2)$ in their worst case. They are short, easy to understand and adequate for small arrays (a few dozen elements), and some of them are very good on almost sorted data. They follow three basic ideas:
+  - sorting by **direct exchange**: bubble sort;
+  - sorting by **insertion**: direct insertion;
+  - sorting by **selection**: direct selection.
+- **Sophisticated algorithms**, with complexity $O(n \log n)$ in their average (and sometimes worst) case. They are more complex, but they are the only option for large arrays. Each of them improves one of the three basic ideas:
+  - **Quicksort** improves exchange;
+  - **Shellsort** improves insertion;
+  - **Heapsort** improves selection;
+  - and **Mergesort** follows a different idea, merging sorted sequences.
+
+Throughout the chapter we will use the same example, so that the algorithms can be compared step by step:
+
+$$
+\text{Initial vector: } \; 4 \;\; 5 \;\; 6 \;\; 1 \;\; 3 \;\; 2 \;\; 7 \;\; 8
+$$
+
+---
+
+## Summary
+
+- Sorting rearranges $n$ elements into increasing order according to an order relation. The output must be **sorted** and a **permutation** of the input.
+- Real problems sort records by a **key**; sorting integers captures the essence of all of them.
+- Algorithms are compared by their **complexity**, number of **comparisons** and of **moves**, **stability**, **memory** (internal or external, in place or not) and **adaptivity**.
+- Utility methods (`swap`, `findPosMin`, `findPosMax`) simplify the code, but they are not free: `findPosMin` and `findPosMax` are linear.
+- Comparing with `Arrays.sort` on many small random inputs is a simple and powerful way to test any sorting algorithm.
+
+---
+
+## Practice
+
+:::tip Before starting
+- **💻 Get the code.** Clone the [course repository](https://github.com/vicegd/algorithms) and locate [`src/topics/sorting`](https://github.com/vicegd/algorithms/tree/master/src/topics/sorting). It contains every algorithm of this chapter, each with its tests.
+- **🧪 Build your test harness.** Write the stress test of this lesson as a reusable method that receives any `SortingAlgorithm`, and use it with every algorithm you study.
+- **🃏 Stability by hand.** Sort the cards 5♠, 3♥, 5♥, 2♣, 3♠ by number, keeping the original order of equal numbers. Then sort the original sequence by suit (♣, ♥, ♠) and, stably, by number. What is the final order?
+- **🤔 Think about the data.** Give an example of a real application in which the data to be sorted is usually almost sorted, and another one in which it is usually random.
+:::

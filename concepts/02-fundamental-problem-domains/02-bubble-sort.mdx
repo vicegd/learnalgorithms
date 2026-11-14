@@ -1,0 +1,255 @@
+---
+title: Bubble Sort
+sidebar_position: 2
+tags: [Sorting, Simple Algorithms, Exchange, Bubble Sort]
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Sorting by Direct Exchange: Bubble Sort
+
+Bubble sort is probably the best-known sorting algorithm, and also one of the least efficient. It is worth studying precisely because it is so simple: it lets us practise the exact analysis of comparisons and moves, introduces the important idea of **inversions**, and shows how small changes (a stop condition, a change of direction) affect the behaviour without changing the complexity.
+
+:::note What you will learn in this lesson
+- How bubble sort works, and how to trace it by hand.
+- How to count its comparisons and swaps exactly in the best, worst and average cases.
+- What an **inversion** is, and why any algorithm that only swaps adjacent elements is quadratic on average.
+- Two improvements, bubble sort with a **sentinel** and **bidirectional** bubble sort, and what they do (and do not) achieve.
+:::
+
+---
+
+## The Idea
+
+Bubble sort is based on the **successive comparison and exchange of adjacent elements**. In each pass, it traverses the array comparing each element with the previous one and, if they are out of order, exchanges them.
+
+In the version used in this course, each pass goes **from right to left**. In this way, in the first pass, the **smallest** element "bubbles" step by step to the leftmost position, like a bubble rising to the surface. In the second pass, the second smallest element reaches the second position, and so on. After pass $i$, the first $i$ positions contain the $i$ smallest elements, already in their final positions, so the next pass does not need to visit them.
+
+```java
+public void sort(int[] elements) {
+    for (int i = 1; i < elements.length; i++) {               // pass i
+        for (int j = elements.length - 1; j >= i; j--) {      // from right to left
+            if (elements[j - 1] > elements[j]) {
+                Util.swap(elements, j - 1, j);
+            }
+        }
+    }
+}
+```
+
+### Trace
+
+With the initial vector **4 5 6 1 3 2 7 8**, the state after each pass is:
+
+| Pass | Vector after the pass | Comment |
+| :---: | :--- | :--- |
+| 1 | **1** 4 5 6 2 3 7 8 | The 1 travels from position 4 to position 1. |
+| 2 | 1 **2** 4 5 6 3 7 8 | The 2 reaches position 2. |
+| 3 | 1 2 **3** 4 5 6 7 8 | The vector is already sorted... |
+| 4 | 1 2 3 4 5 6 7 8 | ...but the algorithm does not know it, |
+| 5 | 1 2 3 4 5 6 7 8 | so it keeps comparing |
+| 6 | 1 2 3 4 5 6 7 8 | all the remaining pairs |
+| 7 | 1 2 3 4 5 6 7 8 | until the end. |
+
+Look at the first pass in detail. Starting from the right: 7 and 8 are in order; 2 and 7 too; 3 and 2 are not, so they are exchanged; then 1 and 2 are in order, but the 1 keeps advancing because 6, 5 and 4 are all greater than it. Notice how one element can travel a long way to the **left** in a single pass, while an element that must move to the **right** (like the 6) advances only one position per pass. We will come back to this asymmetry.
+
+---
+
+## Analysis
+
+### Comparisons
+
+The comparison `elements[j - 1] > elements[j]` is executed in **every** iteration of the inner loop, whatever the data. In pass $i$, the inner loop runs from $j = n-1$ down to $j = i$, that is, $n - i$ times:
+
+$$
+C(n) = \sum_{i=1}^{n-1} (n - i) = (n-1) + (n-2) + \cdots + 1 = \frac{n(n-1)}{2}
+$$
+
+This is the same in the best, worst and average cases: bubble sort always performs $\frac{n(n-1)}{2}$ comparisons. For $n = 1{,}000$, that is **499,500** comparisons, even if the array was already sorted.
+
+### Swaps
+
+The number of swaps does depend on the data:
+
+- **Best case** (already sorted): no pair is ever out of order, so there are **0 swaps**.
+- **Worst case** (reverse order): **every** comparison finds a pair out of order, so there are $\frac{n(n-1)}{2}$ swaps.
+- **Average case** (random order): on average, $\frac{n(n-1)}{4}$ swaps, half of the worst case. The next section explains why.
+
+| Case | Comparisons $C(n)$ | Swaps $M(n)$ | Complexity |
+| :--- | :--- | :--- | :--- |
+| Best (sorted) | $\frac{n(n-1)}{2}$ | 0 | $O(n^2)$ |
+| Worst (reverse order) | $\frac{n(n-1)}{2}$ | $\frac{n(n-1)}{2}$ | $O(n^2)$ |
+| Average (random) | $\frac{n(n-1)}{2}$ | $\frac{n(n-1)}{4}$ | $O(n^2)$ |
+
+We checked these formulas by instrumenting the algorithm with $n = 1{,}000$: it performed exactly 499,500 comparisons in all three cases, and 0, 499,500 and 251,988 swaps for sorted, reverse and random data (the theoretical average is 249,750).
+
+Bubble sort is therefore **$O(n^2)$ in all cases**, with a **high number of comparisons** and a **high number of swaps**. It is **stable** (it only exchanges elements that are strictly out of order, so equal elements never cross each other) and **in place**, but **not adaptive**: a sorted array costs as many comparisons as a random one.
+
+---
+
+## Inversions: Why Adjacent Swaps Are Slow
+
+An **inversion** in a sequence is a pair of positions $(i, j)$ with $i \lt j$ whose elements are in the wrong order, $a_i \gt a_j$. The number of inversions measures **how unsorted** a sequence is:
+
+- a sorted sequence has **0** inversions;
+- a sequence in reverse order has the maximum number: every pair is inverted, $\frac{n(n-1)}{2}$ inversions;
+- in a random permutation, each pair is inverted with probability $\frac{1}{2}$, so the expected number of inversions is $\frac{1}{2} \cdot \frac{n(n-1)}{2} = \frac{n(n-1)}{4}$.
+
+For example, in **4 5 6 1 3 2 7 8** the pairs (4,1), (5,3) and (3,2) are inversions, while (1,7) is not.
+
+The key observation is that **exchanging two adjacent elements that are out of order removes exactly one inversion**, no more and no less (the relative order of all other pairs does not change). Therefore:
+
+- bubble sort performs exactly as many swaps as there are inversions, which explains the table above;
+- **any** algorithm that only exchanges adjacent elements needs at least as many swaps as there are inversions, that is, $\frac{n(n-1)}{4}$ on average: it is **necessarily quadratic on average**.
+
+To sort faster, an algorithm must move elements over **long distances** in a single step, removing many inversions at once. This is exactly what Shellsort, Quicksort and the other efficient algorithms do.
+
+<details>
+  <summary>🧠 <strong>Checkpoint: Counting inversions</strong></summary>
+
+  **Question:** How many inversions does **4 5 6 1 3 2 7 8** have? How many swaps will bubble sort perform on it?
+
+  **Answer:** Count element by element how many later elements are smaller: 4 is greater than 1, 3 and 2 (3 inversions); 5 is greater than 1, 3 and 2 (3); 6 is greater than 1, 3 and 2 (3); 1 has none; 3 is greater than 2 (1); 2, 7 and 8 have none. Total: **10 inversions**, so bubble sort performs exactly **10 swaps**: 4 in the first pass, 3 in the second and 3 in the third, as you can check in the trace.
+
+</details>
+
+---
+
+## Bubble Sort with a Sentinel
+
+Observing the trace, the last passes are repeated unnecessarily: the vector was sorted after pass 3, but the algorithm performed four more passes. We can add a **stop condition**: if a whole pass makes **no exchange**, the vector is already sorted and the algorithm can stop. A boolean variable (the "sentinel") records whether the current pass has exchanged anything.
+
+```java
+public void sort(int[] elements) {
+    int i = 1;
+    boolean hasChange = true;
+    while (hasChange && (i < elements.length)) {
+        hasChange = false;
+        for (int j = elements.length - 1; j >= i; j--) {
+            if (elements[j - 1] > elements[j]) {
+                Util.swap(elements, j - 1, j);
+                hasChange = true;                   // this pass did something
+            }
+        }
+        i++;
+    }
+}
+```
+
+With the same initial vector, the algorithm now stops after the fourth pass, the first one without exchanges:
+
+| Pass | Vector after the pass |
+| :---: | :--- |
+| 1 | 1 4 5 6 2 3 7 8 |
+| 2 | 1 2 4 5 6 3 7 8 |
+| 3 | 1 2 3 4 5 6 7 8 |
+| 4 | 1 2 3 4 5 6 7 8 (no exchanges: stop) |
+
+### Analysis
+
+- **Best case** (already sorted): the first pass makes $n - 1$ comparisons and no exchange, and the algorithm stops. $C(n) = n - 1$, $M(n) = 0$: **$O(n)$**.
+- **Worst case** (reverse order): every pass exchanges something, so all passes are performed, exactly as in the basic version: **$O(n^2)$**.
+- **Average case**: the number of passes saved is usually small, and the number of swaps (equal to the number of inversions) does not change at all: **$O(n^2)$**.
+
+The sentinel makes bubble sort **adaptive** to sorted input, but it does not change the complexity of the worst and average cases.
+
+### Rabbits and turtles
+
+The sentinel helps only if the vector becomes sorted early, and that depends on **where** the misplaced elements are. Consider these two inputs, which are both "almost sorted": a single element is out of place.
+
+| Input | Passes | Comparisons | Why |
+| :--- | :---: | :---: | :--- |
+| 2 3 4 5 6 7 8 **1** | 2 | 13 | The 1 must move left: it travels all the way in a single pass (a "rabbit"). |
+| **8** 1 2 3 4 5 6 7 | 7 | 28 | The 8 must move right: it advances only one position per pass (a "turtle"). |
+
+For the second input, the sentinel saves nothing: the algorithm performs all $n - 1$ passes and $\frac{n(n-1)}{2}$ comparisons, the same as the basic version. So, for this input, the complexity is $O(n^2)$, even though the vector is almost sorted.
+
+---
+
+## Bidirectional Bubble Sort
+
+The asymmetry between rabbits and turtles suggests an improvement: **alternate the direction** of the passes. A left-to-right pass carries the largest element to the end; then a right-to-left pass carries the smallest element to the beginning. Turtles become rabbits in every other pass. This variant is also known as **cocktail shaker sort**.
+
+```java
+public void sort(int[] elements) {
+    int left = 0;
+    int right = elements.length - 1;
+    boolean hasChange = true;
+    while (hasChange && (left < right)) {
+        hasChange = false;
+        for (int i = left; i < right; i++) {            // left to right: largest to the end
+            if (elements[i] > elements[i + 1]) {
+                Util.swap(elements, i, i + 1);
+                hasChange = true;
+            }
+        }
+        if (!hasChange) break;
+        for (int i = right - 1; i >= left; i--) {       // right to left: smallest to the start
+            if (elements[i] > elements[i + 1]) {
+                Util.swap(elements, i, i + 1);
+                hasChange = true;
+            }
+        }
+        left++;
+        right--;
+    }
+}
+```
+
+With **8 1 2 3 4 5 6 7**, the first left-to-right pass carries the 8 directly to the end, and the following passes only confirm that everything is sorted. Bidirectional bubble sort handles both rabbits and turtles well.
+
+However, it still only exchanges **adjacent** elements, so it performs exactly as many swaps as there are inversions: it is still **$O(n^2)$ in the worst and average cases**. It reduces the number of comparisons in some situations, but it does not change the nature of the algorithm.
+
+:::tip Another simple improvement
+Instead of a boolean, the algorithm can remember the **position of the last exchange** in each pass. Everything beyond that position is already sorted, so the next pass can stop there. It is a further refinement of the same idea, with the same complexity.
+:::
+
+---
+
+## Measurements
+
+The following times (in milliseconds, **without optimisation**, `-Xint`) were measured with the implementations of the course repository:
+
+| Algorithm | $n$ | Sorted | Random | Reverse |
+| :--- | ---: | ---: | ---: | ---: |
+| Bubble | 4,000 | 129 | 285 | 417 |
+| | 8,000 | 542 | 1,132 | 1,592 |
+| Bubble with sentinel | 4,000 | 0.1 | 301 | 415 |
+| | 8,000 | 0.1 | 1,151 | 1,684 |
+| Bidirectional bubble | 4,000 | 0.1 | 287 | 429 |
+| | 8,000 | 0.1 | 1,080 | 1,746 |
+
+Observe that:
+
+- doubling $n$ multiplies the times by about **4**, as expected for $O(n^2)$, in every column except the sorted one for the versions with a stop condition, which are linear and far below the 50 ms reliability threshold;
+- the basic version takes a significant time even on **sorted** data, because it still performs all the comparisons;
+- the **reverse** order is the slowest case, because every comparison leads to a swap;
+- the improved versions do not help with random or reverse data.
+
+:::info A surprise from the hardware
+When the same experiment is repeated **with** the JIT optimiser, bubble sort becomes **slower on random data than on reverse-sorted data** (for $n = 20{,}000$, about 570 ms versus 350 ms in our measurements), although random data requires half the swaps. The reason is the processor's **branch prediction**: with reverse data, the `if` is always true and the processor predicts it perfectly; with random data, the outcome is unpredictable, and every misprediction wastes cycles. Our cost model ignores such effects, which is one more reason to complement analysis with measurements.
+:::
+
+---
+
+## Summary
+
+- Bubble sort compares and exchanges **adjacent** elements. In this course's version, each pass moves the smallest remaining element to the left.
+- It always performs $\frac{n(n-1)}{2}$ comparisons, and between 0 and $\frac{n(n-1)}{2}$ swaps ($\frac{n(n-1)}{4}$ on average): **$O(n^2)$ in all cases**. It is stable and in place.
+- Each adjacent swap removes exactly one **inversion**, so any algorithm based only on adjacent swaps is quadratic on average.
+- The **sentinel** stops the algorithm when a pass makes no exchange: best case $O(n)$, worst and average $O(n^2)$.
+- **Bidirectional** bubble sort fixes the "turtles" problem, but it remains $O(n^2)$.
+- In practice, bubble sort is almost never the right choice: insertion sort is simpler to justify and faster.
+
+---
+
+## Practice
+
+:::tip Exercises
+- **✍️ Trace it.** Sort the vector **5 6 1 3 9 8 7 4 2** by hand with bubble sort, writing the vector after each pass. Then repeat it with bubble sort with a sentinel. How many passes does each version need?
+- **🔢 Count.** For the same vector, count the inversions and check that the number of swaps you performed matches.
+- **💻 Measure.** Use the [course implementations](https://github.com/vicegd/algorithms/tree/master/src/topics/sorting/bubble) to measure bubble sort with sorted, reverse and random data for increasing sizes, without optimisation. Do the times grow as expected? (This is part of lab session 2.)
+- **🐢 Find the turtles.** Design an input of size $n$ for which bubble sort with a sentinel performs all $n - 1$ passes, but bidirectional bubble sort only needs a constant number of passes.
+- **🧮 Instrument.** Add counters of comparisons and swaps to bubble sort and check the formulas of this lesson for $n = 10, 100$ and $1{,}000$.
+:::
