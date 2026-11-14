@@ -1,0 +1,182 @@
+---
+title: Insertion Sort
+sidebar_position: 3
+tags: [Sorting, Simple Algorithms, Insertion Sort, Adaptive]
+---
+
+# Sorting by Insertion
+
+Insertion sort is the method most people use, without thinking, to sort a hand of cards: take the cards one by one and insert each one into its place among the cards already sorted. It is a quadratic algorithm, like bubble sort, but it is much better in practice: it performs fewer comparisons and moves, and it is extremely fast on data that is already almost sorted. For this reason, it is used inside many professional sorting algorithms.
+
+:::note What you will learn in this lesson
+- How direct insertion works, and how to trace it.
+- The exact number of comparisons and moves in the best, worst and average cases, and their relation with inversions.
+- Why insertion sort is **adaptive**, and why that makes it valuable in practice.
+- **Binary insertion**, which reduces the comparisons, and why it is still quadratic.
+:::
+
+---
+
+## The Idea
+
+The vector is divided into two "virtual" parts: a **sorted sequence** on the left and an **unsorted sequence** on the right. Initially, the sorted part contains only the first element (a single element is always sorted).
+
+In each step, we take the **first element of the unsorted sequence** and **insert** it into its corresponding place in the sorted sequence. To make room, the elements of the sorted part that are greater than it are **shifted** one position to the right. After $n - 1$ steps, the sorted part covers the whole vector.
+
+```java
+public void sort(int[] elements) {
+    for (int i = 1; i < elements.length; i++) {
+        int key = elements[i];                    // first element of the unsorted part
+        int j = i - 1;
+        while (j >= 0 && key < elements[j]) {     // shift the greater elements to the right
+            elements[j + 1] = elements[j];
+            j--;
+        }
+        elements[j + 1] = key;                    // insert the element in the gap
+    }
+}
+```
+
+The element being inserted is stored in a variable (called `key` here, and `pivot` in some versions of the code) because its position will be overwritten by the shifts. Note that shifting an element requires **one** assignment, while a swap requires three: insertion sort moves data more cheaply than bubble sort.
+
+### Trace
+
+With the initial vector **4 5 6 1 3 2 7 8**:
+
+| Step | Element inserted | Sorted part \| unsorted part | Shifts |
+| :---: | :---: | :--- | :---: |
+| 1 | 5 | **4 5** \| 6 1 3 2 7 8 | 0 |
+| 2 | 6 | **4 5 6** \| 1 3 2 7 8 | 0 |
+| 3 | 1 | **1 4 5 6** \| 3 2 7 8 | 3 |
+| 4 | 3 | **1 3 4 5 6** \| 2 7 8 | 3 |
+| 5 | 2 | **1 2 3 4 5 6** \| 7 8 | 4 |
+| 6 | 7 | **1 2 3 4 5 6 7** \| 8 | 0 |
+| 7 | 8 | **1 2 3 4 5 6 7 8** | 0 |
+
+Elements that are already greater than everything in the sorted part (5, 6, 7 and 8) are inserted with a **single comparison** and no shift. The total number of shifts is $3 + 3 + 4 = 10$: exactly the number of **inversions** of the initial vector, as we will see now.
+
+---
+
+## Analysis
+
+When inserting the element at position $i$, the inner loop compares it with the elements of the sorted part, from right to left, until it finds one that is not greater (or reaches the beginning). Each element greater than `key` is shifted once. Therefore, the number of shifts in step $i$ is the number of elements **before** position $i$ that are **greater** than `key`: exactly the number of inversions in which `key` is the second element. Summing over all steps:
+
+> The total number of shifts performed by insertion sort is **exactly the number of inversions** of the input.
+
+And each step performs one comparison per shift, plus (usually) one more comparison that stops the loop.
+
+<details>
+  <summary>🔍 <strong>Detailed count for each case</strong></summary>
+
+- **Best case** (already sorted): each element is compared once with the previous element, which is smaller, and the loop stops immediately. $C(n) = n - 1$ comparisons and **0 shifts**. In addition, each step saves and restores `key`: $2(n-1)$ assignments, which are not shifts of other elements.
+- **Worst case** (reverse order): the element at position $i$ is smaller than all the $i$ elements before it, so it is compared with all of them and all of them are shifted: $\sum_{i=1}^{n-1} i = \frac{n(n-1)}{2}$ comparisons and $\frac{n(n-1)}{2}$ shifts.
+- **Average case** (random order): on average, each element is greater than half of the previous ones, so the number of shifts is the expected number of inversions, $\frac{n(n-1)}{4}$, and the number of comparisons is about $\frac{n^2}{4}$.
+
+</details>
+
+| Case | Comparisons $C(n)$ | Shifts $M(n)$ | Complexity |
+| :--- | :--- | :--- | :--- |
+| Best (sorted) | $n - 1$ | $0$ | $O(n)$ |
+| Worst (reverse order) | $\frac{n(n-1)}{2}$ | $\frac{n(n-1)}{2}$ | $O(n^2)$ |
+| Average (random) | $\approx \frac{n^2}{4}$ | $\frac{n(n-1)}{4}$ | $O(n^2)$ |
+
+We verified these values by instrumenting the algorithm with $n = 1{,}000$: 999 comparisons for sorted data, 499,500 comparisons and shifts for reverse data, and 252,985 comparisons and 251,988 shifts for random data.
+
+Compared with bubble sort, insertion sort performs **half the comparisons** on average ($\frac{n^2}{4}$ instead of $\frac{n^2}{2}$), and its moves are **shifts** (one assignment) instead of **swaps** (three assignments). It is **stable** (an element stops as soon as it finds one that is not greater, so it never jumps over an equal element) and **in place**.
+
+---
+
+## Insertion Sort Is Adaptive
+
+Since the work is proportional to the number of inversions, the cost of insertion sort is, more precisely,
+
+$$
+T(n) = O(n + I)
+$$
+
+where $I$ is the number of inversions of the input. For an **almost sorted** input, with only a few elements out of place, $I$ is small and the algorithm is practically **linear**. This is much stronger than the adaptivity of bubble sort with a sentinel, which, as we saw, can still be quadratic when a single element is misplaced (the "turtle" problem). For insertion sort, a single misplaced element costs at most $n$ additional shifts, wherever it is.
+
+This property makes insertion sort very valuable in practice:
+
+- it is the best choice for **small arrays**, thanks to its very low overhead;
+- it is ideal to **maintain a sorted collection** to which elements are added one by one;
+- many efficient algorithms use it as a component: Quicksort and Mergesort implementations often switch to insertion sort for small subarrays, and the TimSort algorithm used by Java to sort objects relies on it to process short runs.
+
+<details>
+  <summary>🧠 <strong>Checkpoint: Almost sorted data</strong></summary>
+
+  **Question:** A vector of $n = 1{,}000{,}000$ elements is sorted, except that 10 random elements have been changed to random values. Approximately how much work does insertion sort do? And bubble sort with a sentinel?
+
+  **Answer:** Each of the 10 misplaced elements creates, at most, about $n$ inversions, so $I \le 10n$ and insertion sort performs at most around $10^7$ shifts plus $10^6$ comparisons: a few hundredths of a second. Bubble sort with a sentinel depends on where the misplaced elements are: if one of them must move a long way to the right (a "turtle"), it may need a number of passes proportional to $n$, each with up to $n$ comparisons: hundreds of billions of operations, which means hours instead of milliseconds.
+
+</details>
+
+---
+
+## Binary Insertion
+
+In each step, the element is inserted into a **sorted** sequence. We can therefore find its position with **binary search** instead of comparing it with the elements one by one:
+
+```java
+public void sort(int[] elements) {
+    for (int i = 1; i < elements.length; i++) {
+        int key = elements[i];
+        int left = 0;
+        int right = i - 1;
+        while (left <= right) {                   // binary search of the insertion point
+            int center = left + (right - left) / 2;
+            if (key < elements[center])
+                right = center - 1;
+            else
+                left = center + 1;                // equal elements: insert after them (stable)
+        }
+        for (int j = i - 1; j >= left; j--)       // shift to make room
+            elements[j + 1] = elements[j];
+        elements[left] = key;
+    }
+}
+```
+
+The number of comparisons drops to about $\log_2 i$ per step, that is, about $n \log_2 n$ in total, whatever the input. But the number of **shifts** does not change: the element must still be moved to its place, and all the greater elements must still move one position. In the worst and average cases, the shifts are still $O(n^2)$, so binary insertion is still **quadratic**.
+
+It is advantageous when **comparisons are expensive** (long strings, complex objects) compared with moves. Notice also that it is **less adaptive**: on sorted data, it performs about $n \log_2 n$ comparisons instead of $n - 1$. The `else` branch, which moves `left` to the right when the keys are equal, keeps the algorithm **stable**.
+
+---
+
+## Measurements
+
+Times in milliseconds, **without optimisation** (`-Xint`), with the course implementations:
+
+| Algorithm | $n$ | Sorted | Random | Reverse |
+| :--- | ---: | ---: | ---: | ---: |
+| Direct insertion | 4,000 | 0.1 | 80 | 157 |
+| | 8,000 | 0.2 | 329 | 670 |
+| Binary insertion | 4,000 | 1.1 | 52 | 102 |
+| | 8,000 | 2.4 | 227 | 430 |
+| *Bubble (for comparison)* | *8,000* | *542* | *1,132* | *1,592* |
+
+- On **sorted** data, direct insertion is practically instantaneous (linear time), while binary insertion is slower, because it always performs its binary searches.
+- On **random** and **reverse** data, both are quadratic (the times multiply by about 4 when $n$ doubles), and the reverse case costs about twice the random one, matching the formulas ($\frac{n^2}{2}$ versus $\frac{n^2}{4}$ shifts).
+- Direct insertion is **3 to 4 times faster than bubble sort** on random data, and binary insertion is faster still, thanks to its fewer comparisons.
+
+---
+
+## Summary
+
+- Insertion sort keeps a sorted part on the left and inserts the next element into it, **shifting** the greater elements.
+- The number of shifts equals the number of **inversions**: $T(n) = O(n + I)$. Best case $O(n)$; worst and average cases $O(n^2)$.
+- It performs about half the comparisons of bubble sort, and cheaper moves. It is **stable**, **in place** and **adaptive**.
+- It is the best simple algorithm in practice, the best choice for small or almost sorted arrays, and a building block of efficient hybrid algorithms.
+- **Binary insertion** reduces the comparisons to $O(n \log n)$, but the moves remain $O(n^2)$.
+
+---
+
+## Practice
+
+:::tip Exercises
+- **✍️ Trace it.** Sort **5 6 1 3 9 8 7 4 2** by hand with direct insertion, showing the sorted and unsorted parts after each step and the number of shifts. Check that the total number of shifts equals the number of inversions.
+- **🔁 Sort in decreasing order.** Which single change in the code sorts the vector in decreasing order? Is the result still stable?
+- **💻 Measure.** Measure direct insertion with sorted, reverse and random data, without optimisation, and compare the ratios between consecutive times with those of bubble sort (lab session 2).
+- **🧪 Almost sorted.** Generate a sorted vector of 100,000 elements, change $k$ random positions, and measure insertion sort for $k = 0, 10, 100, 1{,}000$. How does the time depend on $k$?
+- **⚖️ Expensive comparisons.** Sort an array of long strings with direct insertion and with binary insertion, counting comparisons. When does binary insertion pay off?
+:::
