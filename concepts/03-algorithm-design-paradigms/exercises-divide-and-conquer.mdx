@@ -1,0 +1,166 @@
+---
+title: "Exercises: Brute Force and Divide and Conquer"
+sidebar_position: 6.5
+tags: [Exercises, Brute Force, Divide and Conquer, Recurrences]
+---
+
+# Exercises: Brute Force and Divide and Conquer
+
+These exercises review the lessons on brute force and divide and conquer, from the [first lesson of the chapter](./01-brute-force.mdx) to [majority, mode and median](./06-divide-and-conquer-statistics.mdx). Try each one before reading its solution: the solutions are grouped at the [end of the page](#solutions).
+
+***
+
+## Brute force
+
+**3.1. Pairs that cancel.** Given an array of $n$ distinct integers, count the pairs of positions $i \lt j$ such that $a[i] + a[j] = 0$. Write the brute-force algorithm and give its complexity. Then describe two faster algorithms, one using sorting and one using a hash set.
+
+## Analysis
+
+**3.2. Apply the formulas.** Give the complexity of each recurrence, identifying $a$, $b$ and $k$ and the scheme (division or subtraction):
+
+- (a) $T(n) = 3T(n/3) + O(n)$
+- (b) $T(n) = 8T(n/2) + O(n^2)$
+- (c) $T(n) = T(n/2) + O(n)$
+- (d) $T(n) = 2T(n/4) + O(\sqrt{n})$
+- (e) $T(n) = T(n-1) + O(n^2)$
+- (f) $T(n) = 3T(n-2) + O(1)$
+
+**3.3. Strassen.** The classic multiplication of two $n \times n$ matrices performs $n^3$ multiplications. Splitting each matrix into four blocks of size $n/2$, the product needs 8 block products and some additions, $O(n^2)$. Strassen found how to do it with **7** block products (and more additions, still $O(n^2)$). Give the complexity of both divide and conquer versions. For $n = 1024$, how many scalar multiplications does each one perform, if the recursion goes down to $1 \times 1$ blocks?
+
+## Designing divide and conquer algorithms
+
+**3.4. Counting inversions.** An inversion of an array is a pair of positions $i \lt j$ with $a[i] \gt a[j]$. The number of inversions measures how far an array is from being sorted (it is used, for example, to compare two rankings). Brute force counts them in $O(n^2)$. Design an $O(n \log n)$ algorithm. *Hint*: modify Mergesort.
+
+**3.5. A peak.** A **peak** of an array is a position whose element is not smaller than its neighbors (the elements at the ends have only one neighbor). Every non-empty array has at least one peak. Find one in $O(\log n)$.
+
+**3.6. A rotated array.** A sorted array of distinct integers has been **rotated**: for example `15 18 22 3 7 9` comes from `3 7 9 15 18 22`. Find the minimum in $O(\log n)$. Does your algorithm still work if the elements may be repeated?
+
+**3.7. Integer square root.** Compute $\lfloor \sqrt{n} \rfloor$ for a `long` $n \ge 0$ using only integer arithmetic, in $O(\log n)$ steps. How many iterations does your algorithm need for $n = 10^{18}$?
+
+**3.8. The counterfeit coin.** Among $n$ coins that look identical, exactly one is counterfeit and **lighter** than the others. You have a two-pan balance. Design an algorithm that finds the counterfeit coin with as few weighings as possible. How many weighings does it need for 27 coins? And for 1,000?
+
+**3.9. Median of two arrays.** Two sorted arrays `a` and `b` have $n$ elements each. Find the median of the $2n$ elements (take the smaller of the two central elements) in $O(\log n)$, without merging them.
+
+***
+
+## Solutions
+
+**3.1.** Brute force tries every pair:
+
+```java
+int count = 0;
+for (int i = 0; i < n; i++)
+    for (int j = i + 1; j < n; j++)
+        if (a[i] + a[j] == 0) count++;
+```
+
+It performs $\frac{n(n-1)}{2}$ checks: $O(n^2)$. Two faster options:
+- **Sorting**, $O(n \log n)$: sort the array and move two indices from both ends towards the center. If the sum is positive, move the right index left; if negative, move the left index right; if zero, count it and move both.
+- **Hash set**, $O(n)$ on average: for each element $x$, check whether $-x$ is already in the set, then add $x$.
+
+Brute force remains the best tool to **test** the two faster versions on small random arrays.
+
+**3.2.**
+- (a) Division, $a = 3$, $b = 3$, $k = 1$: $a = b^k$, so $O(n \log n)$.
+- (b) Division, $a = 8$, $b = 2$, $k = 2$: $a = 8 \gt b^k = 4$, so $O(n^{\log_2 8}) = O(n^3)$.
+- (c) Division, $a = 1$, $b = 2$, $k = 1$: $a = 1 \lt b^k = 2$, so $O(n)$. The work at the root dominates: $n + n/2 + n/4 + \dots \lt 2n$.
+- (d) Division, $a = 2$, $b = 4$, $k = 1/2$: $b^k = \sqrt{4} = 2 = a$, so $O(\sqrt{n} \log n)$. The formula also works with non-integer $k$.
+- (e) Subtraction, $a = 1$, $b = 1$, $k = 2$: $O(n^{k+1}) = O(n^3)$.
+- (f) Subtraction, $a = 3 \gt 1$, $b = 2$: $O(3^{n/2})$, exponential.
+
+**3.3.** With 8 products, $T(n) = 8T(n/2) + O(n^2)$: $a = 8 \gt b^k = 4$, so $O(n^{\log_2 8}) = O(n^3)$, no better than the classic algorithm. With 7 products, $T(n) = 7T(n/2) + O(n^2)$: $O(n^{\log_2 7}) \approx O(n^{2.807})$. For $n = 1024 = 2^{10}$, the classic method performs $1024^3 \approx 1.07 \times 10^9$ multiplications, and Strassen's $7^{10} \approx 2.82 \times 10^8$, about 3.8 times fewer. In practice, the recursion stops at blocks of a few dozen elements, because the extra additions make Strassen slower for small matrices. As with Karatsuba, the improvement comes **only** from reducing $a$.
+
+**3.4.** Count the inversions of each half recursively, and count the "crossing" inversions (one element in each half) during the merge. When an element of the **right** half is copied to the output before the remaining elements of the left half, it is smaller than all of them: it forms an inversion with each one.
+
+```java
+static long countInversions(int[] a, int[] aux, int left, int right) {
+    if (left >= right) return 0;
+    int center = left + (right - left) / 2;
+    long count = countInversions(a, aux, left, center)
+               + countInversions(a, aux, center + 1, right);
+    for (int i = left; i <= right; i++) aux[i] = a[i];
+    int i = left, j = center + 1, k = left;
+    while (i <= center && j <= right) {
+        if (aux[i] <= aux[j]) a[k++] = aux[i++];
+        else {
+            a[k++] = aux[j++];
+            count += center - i + 1;    // aux[j] is smaller than aux[i..center]
+        }
+    }
+    while (i <= center) a[k++] = aux[i++];
+    while (j <= right) a[k++] = aux[j++];
+    return count;
+}
+```
+
+The recurrence is that of Mergesort, $T(n) = 2T(n/2) + O(n)$: $O(n \log n)$. For `4 7 1 6 2` it returns 6. We checked it against brute force on 20,000 random arrays. (It sorts the array as a side effect; pass a copy if the original must be kept.)
+
+**3.5.** Look at the middle element and its right neighbor. If `a[mid] < a[mid + 1]`, the sequence rises to the right, so there is a peak to the right of `mid` (either the values keep rising until the end, which is a peak, or they fall somewhere, and that point is a peak). Otherwise, there is a peak at `mid` or to its left.
+
+```java
+static int peak(int[] a) {
+    int left = 0, right = a.length - 1;
+    while (left < right) {
+        int mid = left + (right - left) / 2;
+        if (a[mid] < a[mid + 1]) left = mid + 1;
+        else right = mid;
+    }
+    return left;
+}
+```
+
+Half of the range is discarded at each step: $O(\log n)$. Like binary search, but the array does not need to be sorted.
+
+**3.6.** Compare the middle element with the **last** one. If `a[mid] > a[right]`, the rotation point (the minimum) is to the right of `mid`; otherwise it is at `mid` or to its left.
+
+```java
+static int minRotated(int[] a) {
+    int left = 0, right = a.length - 1;
+    while (left < right) {
+        int mid = left + (right - left) / 2;
+        if (a[mid] > a[right]) left = mid + 1;
+        else right = mid;
+    }
+    return a[left];
+}
+```
+
+$O(\log n)$. With repeated elements it can fail: if `a[mid] == a[right]` (as in `2 2 2 0 2`), there is no way to know on which side the minimum is. Discarding only the last element (`right--`) keeps it correct, but in the worst case (almost all elements equal) the cost becomes $O(n)$.
+
+**3.7.** Binary search over the possible answers: the largest $m$ with $m^2 \le n$.
+
+```java
+static long isqrt(long n) {
+    long left = 0, right = Math.min(n, 3_037_000_499L);   // the square of the bound fits in a long
+    while (left <= right) {
+        long mid = left + (right - left) / 2;
+        if (mid * mid <= n) left = mid + 1;
+        else right = mid - 1;
+    }
+    return right;
+}
+```
+
+$O(\log n)$ iterations. For $n = 10^{18}$ the range has about $3 \times 10^9$ candidates, so about 32 iterations (31 in our run), and the result is $10^9$. The upper bound avoids overflow when computing `mid * mid`. (Using `Math.sqrt` on a `double` can be wrong by one for large `long` values, because a `double` has only 53 bits of precision.)
+
+**3.8.** Split the coins into **three** groups as equal as possible and weigh two of them against each other. If one pan is lighter, the counterfeit is in that group; if they balance, it is in the third group. Each weighing keeps one third of the coins: $T(n) = T(n/3) + 1$, so $\lceil \log_3 n \rceil$ weighings. For 27 coins, **3** weighings ($3^3 = 27$). For 1,000 coins, **7** ($3^6 = 729 \lt 1000 \le 3^7 = 2187$). Splitting into two halves would need $\lceil \log_2 n \rceil$ weighings (5 and 10): a balance has three outcomes, and dividing by 3 uses all of them.
+
+**3.9.** Choose how many elements $i$ of `a` belong to the lower half of the union (the $n$ smallest elements); then $j = n - i$ come from `b`. The choice is correct when `a[i-1] <= b[j]` and `b[j-1] <= a[i]`, and the median is then the larger of `a[i-1]` and `b[j-1]`. If `a[i-1] > b[j]`, too many elements were taken from `a`, so $i$ must decrease; otherwise it must increase. Binary search on $i$ between 0 and $n$:
+
+```java
+static int median(int[] a, int[] b) {
+    int n = a.length, lo = 0, hi = n;
+    while (true) {
+        int i = (lo + hi) / 2, j = n - i;
+        int aLeft  = (i == 0) ? Integer.MIN_VALUE : a[i - 1];
+        int aRight = (i == n) ? Integer.MAX_VALUE : a[i];
+        int bLeft  = (j == 0) ? Integer.MIN_VALUE : b[j - 1];
+        int bRight = (j == n) ? Integer.MAX_VALUE : b[j];
+        if (aLeft <= bRight && bLeft <= aRight) return Math.max(aLeft, bLeft);
+        if (aLeft > bRight) hi = i - 1;
+        else lo = i + 1;
+    }
+}
+```
+
+Each step halves the range of $i$: $O(\log n)$. We compared it with merging and sorting on 20,000 random pairs of arrays. Merging would cost $O(n)$.
