@@ -11,21 +11,21 @@ import TabItem from '@theme/TabItem';
 
 In the previous lesson we saw that measurements depend on the machine, the compiler and the implementation, and that comparing algorithms only by running them has serious limitations. We now develop the alternative: studying the algorithm **on paper**, by counting how many elementary operations it performs as a function of the size of its input.
 
-The result is a function, $T(n)$, that describes the cost of the algorithm independently of any particular computer. It allows us to compare algorithms before implementing them, to predict their behaviour for large inputs and to understand *why* one is better than another.
+The result is a function, $T(n)$, that describes the cost of the algorithm independently of any particular computer. It allows us to compare algorithms before implementing them, to predict their behavior for large inputs and to understand *why* one is better than another.
 
 :::note What you will learn in this lesson
-- The cost model used to analyse algorithms: elementary operations that take one unit of time.
+- The cost model used to analyze algorithms: elementary operations that take one unit of time.
 - How to obtain $T(n)$ by counting how many times each instruction executes, for loops, conditionals and method calls.
-- The summation formulas that appear most often when analysing loops.
+- The summation formulas that appear most often when analyzing loops.
 - Why the cost of an algorithm can depend on the *content* of the input, and how we handle it with the **best**, **worst** and **average** cases.
-- How to analyse the **memory** an algorithm needs, $S(n)$, including the call stack.
+- How to analyze the **memory** an algorithm needs, $S(n)$, including the call stack.
 :::
 
 ---
 
 ## The Cost Model
 
-To analyse an algorithm mathematically, we use an **idealised computer** with the following rules:
+To analyze an algorithm mathematically, we use an **idealised computer** with the following rules:
 
 - **Elementary operations** take exactly **one unit of time (u.t.)**: assigning a value, an arithmetic operation, a comparison, a logical operation, accessing an element of an array, returning from a method...
 - Instructions are executed **one after another** (no parallelism).
@@ -34,7 +34,7 @@ To analyse an algorithm mathematically, we use an **idealised computer** with th
 This model is a deliberate simplification. In a real processor a division is slower than an addition, and accessing data that is in the cache is much faster than accessing main memory. But all these differences are **bounded by constants**: a division may cost, say, 20 times more than an addition, but never $n$ times more. Since our goal is to understand how the cost **grows** with $n$, constant factors do not change the conclusions, as the next lesson will make precise.
 
 :::caution Not every line of code is elementary
-A line such as `Arrays.sort(v)`, `list.contains(x)` or `text.indexOf(word)` looks like a single instruction, but it executes a whole algorithm whose cost depends on the size of the data. When analysing a program, always ask how much a library call really costs. In the exercises of this course, we will make it explicit, for example by writing `instruction_O(n)` for an operation whose cost grows linearly.
+A line such as `Arrays.sort(v)`, `list.contains(x)` or `text.indexOf(word)` looks like a single instruction, but it executes a whole algorithm whose cost depends on the size of the data. When analyzing a program, always ask how much a library call really costs. In the exercises of this course, we will make it explicit, for example by writing `instruction_O(n)` for an operation whose cost grows linearly.
 :::
 
 ### The size of the input
@@ -71,7 +71,7 @@ Let us count how many times each instruction is executed, with $n$ = `list.lengt
 | Line | Instruction | Executions | Explanation |
 | :--- | :--- | :--- | :--- |
 | 2 | `int value = 0;` | $1$ | Runs once, at the beginning. |
-| 3 | `int i = 0;` | $1$ | The initialisation of the loop runs once. |
+| 3 | `int i = 0;` | $1$ | The initialization of the loop runs once. |
 | 3 | `i < list.length` | $n + 1$ | Checked before each of the $n$ iterations, plus one final time that evaluates to `false`. |
 | 3 | `i++` | $n$ | Executed at the end of each iteration. |
 | 4 | `value += list[i];` | $n$ | The body of the loop runs $n$ times. |
@@ -178,7 +178,7 @@ If the value is in the first position, the method returns after one iteration. I
 
 **Definition:** $T_{worst}(n)$ is the **maximum** time of the algorithm over all inputs of size $n$. For `contains`, it corresponds to the value not being present (or being in the last position): all $n$ elements are inspected.
 
-**Value:** it is a **guarantee**: the algorithm will never take longer, whatever the input. This is the case that is analysed most often, and the essential one in critical systems that must respond within a deadline (aircraft, medical devices, industrial control).
+**Value:** it is a **guarantee**: the algorithm will never take longer, whatever the input. This is the case that is analyzed most often, and the essential one in critical systems that must respond within a deadline (aircraft, medical devices, industrial control).
 
 </TabItem>
 <TabItem value="best" label="🟢 Best case">
@@ -216,7 +216,7 @@ On average, we inspect about **half** of the vector: still proportional to $n$. 
 
   **Question:** For the maximum pairwise product algorithms of the case study (brute force, sorting, linear scan), do the best, worst and average cases differ?
 
-  **Answer:** For brute force and for the linear scan, essentially no: both always traverse the same loops completely, whatever the values (only the number of times the `if` body executes changes, which does not affect the growth). For the version based on sorting, it depends on the sorting algorithm: some sorting algorithms (such as the TimSort used by Java for objects) are much faster when the data is already sorted. Analysing the cases always requires looking at **which inputs make the algorithm work more or less**.
+  **Answer:** For brute force and for the linear scan, essentially no: both always traverse the same loops completely, whatever the values (only the number of times the `if` body executes changes, which does not affect the growth). For the version based on sorting, it depends on the sorting algorithm: some sorting algorithms (such as the TimSort used by Java for objects) are much faster when the data is already sorted. Analyzing the cases always requires looking at **which inputs make the algorithm work more or less**.
 
 </details>
 
@@ -228,7 +228,7 @@ There is a fourth way of looking at cost, which we mentioned when studying `Arra
 
 ## Space Complexity: $S(n)$
 
-Time is not the only resource. The **space complexity** $S(n)$ measures the **additional memory** that an algorithm needs, as a function of the size of the input, beyond the memory occupied by the input itself. It is analysed with the same counting approach: how many variables, and of what size, does the algorithm create?
+Time is not the only resource. The **space complexity** $S(n)$ measures the **additional memory** that an algorithm needs, as a function of the size of the input, beyond the memory occupied by the input itself. It is analyzed with the same counting approach: how many variables, and of what size, does the algorithm create?
 
 - The sum of a vector needs two variables (`value` and `i`), whatever the value of $n$: its additional space is **constant**.
 - An algorithm that copies the input into a new array, or that creates an auxiliary array of the same size (as Mergesort does), needs space **proportional to $n$**.
@@ -250,7 +250,7 @@ Time and space are often exchanged: we can sometimes save a lot of time by stori
 
 ## Summary
 
-- We analyse algorithms in an **idealised model** in which each elementary operation costs one unit of time. Library calls are not necessarily elementary.
+- We analyze algorithms in an **idealised model** in which each elementary operation costs one unit of time. Library calls are not necessarily elementary.
 - $T(n)$ is obtained by **counting** how many times each instruction executes. For the sum of a vector, $T(n) = 3n + 4$.
 - Nested and dependent loops are counted with **summations**; loops whose counter is multiplied or divided by a constant run a **logarithmic** number of times.
 - The exact constants depend on counting conventions, but the **growth** does not.

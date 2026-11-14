@@ -1,5 +1,5 @@
 ---
-title: Analysing Divide and Conquer
+title: Analyzing Divide and Conquer
 sidebar_position: 3
 tags: [Divide and Conquer, Recurrences, Master Theorem, Complexity]
 ---
@@ -7,9 +7,9 @@ tags: [Divide and Conquer, Recurrences, Master Theorem, Complexity]
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# Analysing Divide and Conquer Algorithms
+# Analyzing Divide and Conquer Algorithms
 
-The loops of iterative algorithms can be analysed by counting iterations, as we did in the first chapter. Recursive algorithms need a different tool: the execution time is expressed in terms of **itself** applied to smaller sizes, giving a **recurrence equation**. Fortunately, most divide and conquer algorithms follow one of two very regular patterns, and for both of them the solution is known in general. This lesson presents those two patterns, explains where their formulas come from, and shows how to apply them.
+The loops of iterative algorithms can be analyzed by counting iterations, as we did in the first chapter. Recursive algorithms need a different tool: the execution time is expressed in terms of **itself** applied to smaller sizes, giving a **recurrence equation**. Fortunately, most divide and conquer algorithms follow one of two very regular patterns, and for both of them the solution is known in general. This lesson presents those two patterns, explains where their formulas come from, and shows how to apply them.
 
 :::note What you will learn in this lesson
 - How to model a divide and conquer algorithm with the parameters $a$, $b$ and $k$.
@@ -136,7 +136,7 @@ To apply the formulas, look at the code of the recursive method and answer three
 Notice how Quicksort appears in both tables: with perfectly balanced partitions, it follows a division scheme ($a = 2$, $b = 2$, $k = 1$); with the most unbalanced ones, a subtraction scheme in which one of the two parts is empty, so only one non-trivial call remains ($a = 1$, $b = 1$, $k = 1$). Both formulas confirm what we found in the sorting chapter: $O(n \log n)$ in the best case and $O(n^2)$ in the worst.
 
 <details>
-  <summary>🧠 <strong>Checkpoint: Analyse these schemes</strong></summary>
+  <summary>🧠 <strong>Checkpoint: Analyze these schemes</strong></summary>
 
   **Question:** Give the complexity of (1) an algorithm that splits a problem of size $n$ into 8 subproblems of size $n/2$ and combines them in $O(n^2)$, and (2) the same with 7 subproblems.
 
@@ -182,7 +182,7 @@ And if the Towers of Hanoi ($O(2^n)$) take 1 second for 20 discs, then 30 discs 
 
 ## Summary
 
-- Divide and conquer algorithms are analysed with **recurrences**, characterised by $a$ (number of subproblems), $b$ (how the size decreases) and $k$ (cost of dividing and combining, $O(n^k)$).
+- Divide and conquer algorithms are analyzed with **recurrences**, characterised by $a$ (number of subproblems), $b$ (how the size decreases) and $k$ (cost of dividing and combining, $O(n^k)$).
 - **Division** ($n/b$): $O(n^k)$ if $a \lt b^k$; $O(n^k \log n)$ if $a = b^k$; $O(n^{\log_b a})$ if $a \gt b^k$.
 - **Subtraction** ($n - b$): $O(n^{k+1})$ if $a = 1$; $O(a^{n/b})$, exponential, if $a \gt 1$.
 - The **recursion tree** explains the formulas: the cost is concentrated at the top, evenly spread, or concentrated at the leaves.

@@ -14,9 +14,9 @@ This lesson applies the greedy strategy to a series of classic problems. For som
 :::note What you will learn in this lesson
 - Two disk problems that look alike, but where the same idea is optimal in one case and not in the other.
 - The **knapsack problem**: three heuristics, the optimal one for fractional objects, and why it fails when objects cannot be broken.
-- The **diligent plumber**: minimising the waiting time with one or several workers, and an exchange argument that proves optimality.
+- The **diligent plumber**: minimizing the waiting time with one or several workers, and an exchange argument that proves optimality.
 - The **knight's tour**, where a smart heuristic makes all the difference.
-- The **assignment of tasks to agents** and **graph colouring**, two problems where greedy algorithms give good but not always optimal solutions.
+- The **assignment of tasks to agents** and **graph coloring**, two problems where greedy algorithms give good but not always optimal solutions.
 - Some famous greedy algorithms that are always optimal.
 :::
 
@@ -24,7 +24,7 @@ This lesson applies the greedy strategy to a series of classic problems. For som
 
 ## Files on a Disk
 
-### Maximise the number of files
+### Maximize the number of files
 
 We have a disk with a capacity of **880 MB** and want to store **as many files as possible** from a list with these sizes (in MB): 100, 350, 450, 370, 5000, 500, 700, 800, 50.
 
@@ -48,9 +48,9 @@ public int maximizeFileCount(int[] files, int diskCapacity) {
 
 This heuristic is **optimal**. Exchange argument: take any optimal selection of $k$ files. If it contains a file that is larger than some file left out, exchanging them keeps $k$ files and does not increase the space used. Repeating the exchange, we reach the $k$ smallest files, which therefore also fit. So the greedy algorithm, which takes as many of the smallest files as fit, stores at least $k$ files.
 
-### Minimise the free space
+### Minimize the free space
 
-Now the disk has **1200 MB**, and we want to **fill it as much as possible** (minimise the free space) with the same files.
+Now the disk has **1200 MB**, and we want to **fill it as much as possible** (minimize the free space) with the same files.
 
 **Heuristic:** store the **largest** files first, while they fit.
 
@@ -66,12 +66,12 @@ Both problems use the same strategy (sort, then take while it fits), and the cod
 
 ## The Knapsack Problem
 
-We have $n$ objects and a backpack. Each object $i$ has a **weight** $w_i$ and a **value** $v_i$, and the backpack can carry a total weight not exceeding $W$. The goal is to **maximise the total value** of the objects carried, respecting the weight limit.
+We have $n$ objects and a backpack. Each object $i$ has a **weight** $w_i$ and a **value** $v_i$, and the backpack can carry a total weight not exceeding $W$. The goal is to **maximize the total value** of the objects carried, respecting the weight limit.
 
 In the **fractional** version, objects **can be broken**: we can carry a fraction $x_i$ of object $i$, with $0 \le x_i \le 1$ (think of gold dust, or liquids). The problem is:
 
 $$
-\text{maximise } \sum_{i=1}^{n} x_i v_i \quad \text{subject to} \quad \sum_{i=1}^{n} x_i w_i \le W, \quad 0 \le x_i \le 1
+\text{maximize } \sum_{i=1}^{n} x_i v_i \quad \text{subject to} \quad \sum_{i=1}^{n} x_i w_i \le W, \quad 0 \le x_i \le 1
 $$
 
 With the greedy elements: the **candidates** are the $n$ objects; the **state** is the solution vector $X = (x_1, x_2, \dots, x_n)$; the **feasibility** condition is $\sum x_i w_i \le W$; and the **selection function** is the heuristic.
@@ -163,7 +163,7 @@ To adapt the algorithm to indivisible objects, the selection function must skip 
 
 ## The Diligent Plumber
 
-A plumber needs to make $n$ urgent repairs, and he knows in advance how long each one will take: $t_i$ minutes for the $i$-th task. He wants to **minimise the average waiting time** of his customers (to keep them as happy as possible). If $w_i$ is the time that the $i$-th customer waits until his repair is finished, he must minimise:
+A plumber needs to make $n$ urgent repairs, and he knows in advance how long each one will take: $t_i$ minutes for the $i$-th task. He wants to **minimize the average waiting time** of his customers (to keep them as happy as possible). If $w_i$ is the time that the $i$-th customer waits until his repair is finished, he must minimize:
 
 $$
 W(n) = \sum_{i=1}^{n} w_i
@@ -175,7 +175,7 @@ $$
 w_1 = t_1, \quad w_2 = t_1 + t_2, \quad \dots, \quad w_n = t_1 + t_2 + \cdots + t_n
 $$
 
-The problem is to find the **order** (permutation) of the tasks that minimises $W(n)$.
+The problem is to find the **order** (permutation) of the tasks that minimizes $W(n)$.
 
 **Heuristic:** do the **shortest** tasks first (the *shortest processing time* rule).
 
@@ -200,7 +200,7 @@ The first task is counted $n$ times, the last one only once. Now take any order 
 
 ### Several plumbers
 
-The company hires more plumbers: now there are $F$ plumbers for the $n$ tasks, and the goal is still to minimise the total waiting time. The greedy strategy becomes:
+The company hires more plumbers: now there are $F$ plumbers for the $n$ tasks, and the goal is still to minimize the total waiting time. The greedy strategy becomes:
 
 1. Sort the tasks by **increasing duration**, as before.
 2. Assign the tasks in that order, each one to the **least busy** plumber.
@@ -219,7 +219,7 @@ Total waiting time: $2 + 7 + 15 + 3 + 9 + 4 + 11 = $ **51** minutes. Since the t
 
 ## The Knight's Tour
 
-The problem consists of **traversing the entire chessboard** with a knight, visiting each square **exactly once**, using the knight's L-shaped moves (two squares in one direction and one in the perpendicular direction). From a square in the centre of the board, a knight can reach 8 squares; near the edges and corners, fewer.
+The problem consists of **traversing the entire chessboard** with a knight, visiting each square **exactly once**, using the knight's L-shaped moves (two squares in one direction and one in the perpendicular direction). From a square in the center of the board, a knight can reach 8 squares; near the edges and corners, fewer.
 
 A greedy algorithm builds the tour step by step, choosing the next square with a heuristic, and never goes back. Two heuristics:
 
@@ -266,7 +266,7 @@ We must assign $n$ tasks to $n$ agents, so that each agent performs exactly one 
 | … | | | | |
 | n | 17 | 14 | … | 28 |
 
-**Goal:** minimise the total cost of executing the $n$ tasks.
+**Goal:** minimize the total cost of executing the $n$ tasks.
 
 Two natural greedy heuristics:
 
@@ -277,40 +277,40 @@ Both are fast, $O(n^2)$, since each assignment scans a row or a column. Are they
 
 ---
 
-## Graph Colouring
+## Graph Coloring
 
-In graph theory, **graph colouring** is a special case of graph labelling:
+In graph theory, **graph coloring** is a special case of graph labelling:
 
-- **vertex colouring** paints the vertices of a graph so that **no two adjacent vertices share the same colour**;
-- **edge colouring** paints the edges so that no two adjacent edges (with a common endpoint) share the same colour.
+- **vertex coloring** paints the vertices of a graph so that **no two adjacent vertices share the same color**;
+- **edge coloring** paints the edges so that no two adjacent edges (with a common endpoint) share the same color.
 
-The goal is to use as few colours as possible. The minimum number of colours needed for the vertices is the **chromatic number** of the graph.
+The goal is to use as few colors as possible. The minimum number of colors needed for the vertices is the **chromatic number** of the graph.
 
 ### A greedy algorithm
 
 ```
-Colour the first node with the first colour
+Color the first node with the first color
 For each of the remaining n - 1 nodes:
-    colour it with the lowest-numbered colour that has not been used
-    on any previously coloured node adjacent to it
-    (if all the colours used so far appear on adjacent nodes, use a new colour)
+    color it with the lowest-numbered color that has not been used
+    on any previously colored node adjacent to it
+    (if all the colors used so far appear on adjacent nodes, use a new color)
 ```
 
-It is fast: $O(n^2)$ with an adjacency matrix. But the number of colours depends heavily on the **order** in which the nodes are visited. We tested it on a "crown" graph with 8 nodes ($u_0, \dots, u_3$ and $v_0, \dots, v_3$, where each $u_i$ is connected to every $v_j$ with $j \ne i$). This graph can be coloured with just **2** colours (all the $u$ nodes with one colour and all the $v$ nodes with another), and the greedy algorithm finds that colouring if it visits the nodes in the order $u_0, u_1, u_2, u_3, v_0, \dots$ But in the order $u_0, v_0, u_1, v_1, \dots$ it uses **4** colours. For larger crown graphs, the gap grows without limit.
+It is fast: $O(n^2)$ with an adjacency matrix. But the number of colors depends heavily on the **order** in which the nodes are visited. We tested it on a "crown" graph with 8 nodes ($u_0, \dots, u_3$ and $v_0, \dots, v_3$, where each $u_i$ is connected to every $v_j$ with $j \ne i$). This graph can be colored with just **2** colors (all the $u$ nodes with one color and all the $v$ nodes with another), and the greedy algorithm finds that coloring if it visits the nodes in the order $u_0, u_1, u_2, u_3, v_0, \dots$ But in the order $u_0, v_0, u_1, v_1, \dots$ it uses **4** colors. For larger crown graphs, the gap grows without limit.
 
 So the greedy algorithm does not always find the chromatic number. In fact, computing the chromatic number of a general graph is a computationally hard problem. Better orders (for example, visiting first the nodes with more neighbours) usually help, but guarantee nothing.
 
 ### Applications
 
-Graph colouring models many practical problems in which some things cannot share a resource:
+Graph coloring models many practical problems in which some things cannot share a resource:
 
-- **making schedules and timetables**: exams that share students cannot be scheduled at the same time (each colour is a time slot);
+- **making schedules and timetables**: exams that share students cannot be scheduled at the same time (each color is a time slot);
 - **assigning radio frequencies** to mobile phone antennas that interfere with each other;
-- **Sudoku**: each cell is a node, cells in the same row, column or box are adjacent, and the 9 digits are the colours;
-- **map colouring**: neighbouring countries must have different colours.
+- **Sudoku**: each cell is a node, cells in the same row, column or box are adjacent, and the 9 digits are the colors;
+- **map coloring**: neighbouring countries must have different colors.
 
-:::info The four colour theorem
-Any map drawn on a plane can be coloured with at most **four** colours so that neighbouring regions have different colours. This was conjectured in 1852 and proved only in 1976 by Kenneth Appel and Wolfgang Haken, with a proof that required checking a large number of cases **by computer**, the first major theorem proved this way.
+:::info The four color theorem
+Any map drawn on a plane can be colored with at most **four** colors so that neighbouring regions have different colors. This was conjectured in 1852 and proved only in 1976 by Kenneth Appel and Wolfgang Haken, with a proof that required checking a large number of cases **by computer**, the first major theorem proved this way.
 :::
 
 ---
@@ -332,14 +332,14 @@ For some important problems, a well-chosen greedy algorithm is provably optimal.
 | :--- | :--- | :--- |
 | Change (canonical coins, unlimited) | Highest coin that fits | Yes |
 | Change (any coins) | Highest coin that fits | No |
-| Maximise the number of files | Smallest files first | Yes |
-| Minimise free space on a disk | Largest files first | No |
+| Maximize the number of files | Smallest files first | Yes |
+| Minimize free space on a disk | Largest files first | No |
 | Fractional knapsack | Highest value per weight first | Yes |
 | 0/1 knapsack | Highest value per weight first | No |
 | One or several plumbers | Shortest tasks first | Yes |
 | Knight's tour | Fewest onward jumps (Warnsdorff) | Usually finds a tour; not guaranteed |
 | Tasks to agents | Cheapest per row or per column | Think about it (see the exercises) |
-| Graph colouring | Lowest available colour | No |
+| Graph coloring | Lowest available color | No |
 
 ---
 
@@ -351,5 +351,5 @@ For some important problems, a well-chosen greedy algorithm is provably optimal.
 - **🔧 Plumbers.** Prove that, with one plumber, the total waiting time for the order $t_1, \dots, t_n$ is $\sum_{i=1}^{n} (n - i + 1)\, t_i$. Compute it for the tasks 9, 1, 4, 6 in the best and the worst order.
 - **♞ Knight's tour.** Run both versions of the [knight's tour](https://github.com/vicegd/algorithms/tree/master/src/topics/greedy/knighttour) on boards of size 5 to 12. For which sizes does Warnsdorff's rule find a tour from the corner?
 - **👥 Agents.** Build a $3 \times 3$ cost matrix for which the "by rows" heuristic does not give the cheapest assignment.
-- **🎨 Colouring.** Colour the graph of the countries of South America with the greedy algorithm, visiting the countries in alphabetical order. How many colours do you need? Can you do it with fewer by changing the order?
+- **🎨 Coloring.** Color the graph of the countries of South America with the greedy algorithm, visiting the countries in alphabetical order. How many colors do you need? Can you do it with fewer by changing the order?
 :::

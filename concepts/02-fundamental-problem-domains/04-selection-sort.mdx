@@ -6,7 +6,7 @@ tags: [Sorting, Simple Algorithms, Selection Sort]
 
 # Sorting by Selection
 
-Selection sort follows the most direct strategy imaginable: find the smallest element and put it first; then find the smallest of the rest and put it second; and so on. It is the simple algorithm with the most **predictable** behaviour, the one that performs the **fewest exchanges**, and, unlike the previous two, it is **not stable**.
+Selection sort follows the most direct strategy imaginable: find the smallest element and put it first; then find the smallest of the rest and put it second; and so on. It is the simple algorithm with the most **predictable** behavior, the one that performs the **fewest exchanges**, and, unlike the previous two, it is **not stable**.
 
 :::note What you will learn in this lesson
 - How direct selection works, and how to trace it.
@@ -85,7 +85,7 @@ Each step performs **at most one** exchange, so there are at most $n - 1$ exchan
 In summary: selection sort has a **very high number of comparisons** but a **very small number of exchanges**, and it is **predictable**: the number of comparisons depends only on $n$. It is **in place**.
 
 :::tip When few exchanges matter
-Minimising exchanges is useful when **writing** is much more expensive than **reading**: for example, when sorting large records that must be physically moved (rather than references to them), or on storage technologies where each write has a high cost or wears the device out (some kinds of flash memory). In those situations, selection sort can beat algorithms that are better in terms of comparisons.
+Minimizing exchanges is useful when **writing** is much more expensive than **reading**: for example, when sorting large records that must be physically moved (rather than references to them), or on storage technologies where each write has a high cost or wears the device out (some kinds of flash memory). In those situations, selection sort can beat algorithms that are better in terms of comparisons.
 :::
 
 ---
@@ -114,13 +114,13 @@ The original order of the two 5s (5a before 5b) has been **reversed**: the algor
 
 ## From Selection to Heapsort
 
-The weak point of selection sort is the search for the minimum: each step scans the rest of the vector, which is linear, and it does not reuse anything learnt in previous scans. **Heapsort** improves selection by organising the remaining elements in a **heap**, a data structure that gives the maximum (or minimum) element at once and can be updated in $O(\log n)$ time. With that change, each selection costs $O(\log n)$ instead of $O(n)$, and the whole algorithm becomes $O(n \log n)$. We will study it in the lesson on efficient sorting algorithms.
+The weak point of selection sort is the search for the minimum: each step scans the rest of the vector, which is linear, and it does not reuse anything learnt in previous scans. **Heapsort** improves selection by organizing the remaining elements in a **heap**, a data structure that gives the maximum (or minimum) element at once and can be updated in $O(\log n)$ time. With that change, each selection costs $O(\log n)$ instead of $O(n)$, and the whole algorithm becomes $O(n \log n)$. We will study it in the lesson on efficient sorting algorithms.
 
 ---
 
 ## Measurements
 
-Times in milliseconds, **without optimisation** (`-Xint`), with the course implementation:
+Times in milliseconds, **without optimization** (`-Xint`), with the course implementation:
 
 | $n$ | Sorted | Random | Reverse |
 | ---: | ---: | ---: | ---: |

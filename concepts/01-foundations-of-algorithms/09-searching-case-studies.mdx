@@ -7,9 +7,9 @@ tags: [Searching, Case Study, Binary Search, Best Case, Worst Case, Average Case
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# Case Studies: Analysing Search Algorithms
+# Case Studies: Analyzing Search Algorithms
 
-Searching is one of the most frequent operations in computing: looking up a user in a database, a word in a dictionary, a file in a directory, a value in a cache. In this final lesson of the chapter we apply **everything** we have learnt to three classic search algorithms. For each one we count instructions exactly, analyse the best, worst and average cases, express the result with asymptotic notation and connect it with real measurements.
+Searching is one of the most frequent operations in computing: looking up a user in a database, a word in a dictionary, a file in a directory, a value in a cache. In this final lesson of the chapter we apply **everything** we have learnt to three classic search algorithms. For each one we count instructions exactly, analyze the best, worst and average cases, express the result with asymptotic notation and connect it with real measurements.
 
 The problem is simple to state:
 
@@ -44,7 +44,7 @@ public static boolean search(int[] list, int value) {
 
 The `while` condition contains two comparisons. The first one, `i < n`, protects the array: thanks to the short-circuit evaluation of `&&`, `list[i]` is only accessed when `i` is a valid position. When `i` reaches `n`, the second comparison is not evaluated.
 
-We count each elementary instruction as one unit of time. The cost depends on **where** the value is, so we analyse the three cases.
+We count each elementary instruction as one unit of time. The cost depends on **where** the value is, so we analyze the three cases.
 
 <Tabs>
 <TabItem value="best" label="🟢 Best case" default>
@@ -213,7 +213,7 @@ The average case is also $O(n)$.
 
 The complexity is still $O(n)$ in the worst and average cases: the sentinel does **not** change the complexity class. What changes is the **constant**: about $2n$ operations instead of $3n$, so we expect the sentinel version to need roughly two thirds of the time.
 
-Measurements confirm it, with an important nuance. Searching for a missing value in an array of a million integers, the sentinel version took about **60-70 %** of the time of the standard version when running **without optimisation** (`-Xint`), just as the operation count predicts. With the **JIT compiler** enabled, the difference became small and irregular: the optimiser already makes the bounds check very cheap. Micro-optimisations that reduce the constant are real, but their effect depends heavily on the environment, and they never compensate for a worse complexity.
+Measurements confirm it, with an important nuance. Searching for a missing value in an array of a million integers, the sentinel version took about **60-70 %** of the time of the standard version when running **without optimization** (`-Xint`), just as the operation count predicts. With the **JIT compiler** enabled, the difference became small and irregular: the optimizer already makes the bounds check very cheap. Micro-optimizations that reduce the constant are real, but their effect depends heavily on the environment, and they never compensate for a worse complexity.
 
 :::caution The price of the sentinel
 - **It modifies the input.** The version above leaves the sentinel at the end of the list. A correct implementation must **remove it** before returning (one more operation), and it is not safe if other threads are reading the list at the same time.
@@ -276,7 +276,7 @@ $$
 T_{worst}(n) \approx 5 (\lfloor \log_2 n \rfloor + 1) + 4 \;\in\; O(\log n)
 $$
 
-(the final $+4$ accounts for the initialisations, the last evaluation of the condition and the `return`). For $n = 1{,}000$ the loop runs at most 10 times, and for $n = 1{,}000{,}000$ at most 20 times, as we checked by instrumenting the code.
+(the final $+4$ accounts for the initializations, the last evaluation of the condition and the `return`). For $n = 1{,}000$ the loop runs at most 10 times, and for $n = 1{,}000{,}000$ at most 20 times, as we checked by instrumenting the code.
 
 </TabItem>
 <TabItem value="baverage" label="🟡 Average case">
@@ -352,9 +352,9 @@ If we search only once or twice, sorting first is not worth it: sorting alone is
 
 ## Looking Ahead: Sorting
 
-Binary search showed us how much sorted data is worth. The next chapter focuses on **sorting algorithms**, and analyses them with all the tools of this chapter. Besides their time complexity in the best, worst and average cases, three properties will be important:
+Binary search showed us how much sorted data is worth. The next chapter focuses on **sorting algorithms**, and analyzes them with all the tools of this chapter. Besides their time complexity in the best, worst and average cases, three properties will be important:
 
-1. **Space (in place or not):** does the algorithm reorganise the elements inside the original array, using only a constant amount of extra memory, or does it need auxiliary arrays proportional to $n$?
+1. **Space (in place or not):** does the algorithm reorganize the elements inside the original array, using only a constant amount of extra memory, or does it need auxiliary arrays proportional to $n$?
 2. **Stability:** if two elements have the same key (for example, two students with the same grade), does the algorithm preserve their original relative order? This matters when sorting by several criteria in successive passes.
 3. **Adaptivity:** does the algorithm take advantage of data that is already partially sorted, finishing faster, or does it perform the same work regardless of the input?
 

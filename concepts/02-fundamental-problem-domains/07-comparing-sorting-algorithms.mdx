@@ -6,7 +6,7 @@ tags: [Sorting, Comparison, Benchmarking, External Sorting]
 
 # Comparing Sorting Algorithms
 
-We have studied many sorting algorithms. This lesson brings them together: we compare their behaviour with measurements, summarise their properties, give practical guidelines for choosing one, and introduce the sorting of data that does not fit in main memory.
+We have studied many sorting algorithms. This lesson brings them together: we compare their behavior with measurements, summarize their properties, give practical guidelines for choosing one, and introduce the sorting of data that does not fit in main memory.
 
 :::note What you will learn in this lesson
 - How the algorithms of the chapter compare in practice, for sorted, random and reverse inputs.
@@ -54,9 +54,9 @@ The course slides include a classic comparison of execution times for $n = 256$ 
 - **Shellsort**, **Heapsort** and **Quicksort** are much faster than the simple algorithms already with a few hundred elements: with 512 random elements, between 4 and 10 times faster than direct insertion, and between 10 and 30 times faster than bubble sort. **Heapsort** is remarkably stable across the three inputs, and **Quicksort** is the fastest on random data.
 - Going from 256 to 512 elements, the times of the simple algorithms multiply by about **4**, and those of the efficient ones by a little more than **2**, as their complexities predict.
 
-### Medium sizes, without optimisation
+### Medium sizes, without optimization
 
-We measured the course implementations for $n = 8{,}000$, **without optimisation** (`-Xint`, times in milliseconds):
+We measured the course implementations for $n = 8{,}000$, **without optimization** (`-Xint`, times in milliseconds):
 
 | Algorithm | Sorted | Random | Reverse |
 | :--- | ---: | ---: | ---: |
@@ -74,9 +74,9 @@ We measured the course implementations for $n = 8{,}000$, **without optimisation
 
 The same patterns appear, and the gap between the families is now enormous: on random data, Quicksort is about **300 times faster** than bubble sort. (Many values of the efficient algorithms are below the 50 ms reliability threshold; they indicate orders of magnitude, not precise times.)
 
-### Large sizes, with optimisation
+### Large sizes, with optimization
 
-The simple algorithms are hopeless for large inputs: extrapolating, bubble sort would need hours for a million random elements. For the efficient algorithms, we measured with the JIT optimiser enabled (best of three runs, milliseconds), and included Java's `Arrays.sort` as a reference:
+The simple algorithms are hopeless for large inputs: extrapolating, bubble sort would need hours for a million random elements. For the efficient algorithms, we measured with the JIT optimizer enabled (best of three runs, milliseconds), and included Java's `Arrays.sort` as a reference:
 
 | Algorithm | $n$ | Sorted | Random | Reverse |
 | :--- | ---: | ---: | ---: | ---: |
@@ -135,7 +135,7 @@ All the algorithms of this chapter are **internal**: they assume that the whole 
 - access is much **slower** than in memory, by several orders of magnitude;
 - **sequential** access (reading or writing consecutive blocks) is much faster than **random** access.
 
-Quicksort or Heapsort, which access elements all over the array, would be extremely slow on disk. **External sorting** algorithms are designed to minimise the number of passes over the data and to access it **sequentially**. They are based on the principle of **divide and conquer**, using the same basic principles as internal algorithms (especially **merging**):
+Quicksort or Heapsort, which access elements all over the array, would be extremely slow on disk. **External sorting** algorithms are designed to minimize the number of passes over the data and to access it **sequentially**. They are based on the principle of **divide and conquer**, using the same basic principles as internal algorithms (especially **merging**):
 
 1. **Generate sorted runs:** read the file in chunks that fit in memory, sort each chunk with an internal algorithm, and write it back to disk as a sorted **run**.
 2. **Merge the runs:** merge the sorted runs, reading them sequentially, into longer and longer runs, until a single sorted file remains. Merging many runs at once (a **$k$-way merge**, using a heap to find the smallest current element among the $k$ runs) reduces the number of passes.
@@ -146,7 +146,7 @@ There are several classic variants of the merging phase: **direct merge** (runs 
 
 ## Learn More
 
-- **Visualise the algorithms.** The [Comparison Sorting Visualization](https://www.cs.usfca.edu/~galles/visualization/ComparisonSort.html) by David Galles lets you watch bubble, selection, insertion, Shellsort, Quicksort, Mergesort and Heapsort step by step, with your own data.
+- **Visualize the algorithms.** The [Comparison Sorting Visualization](https://www.cs.usfca.edu/~galles/visualization/ComparisonSort.html) by David Galles lets you watch bubble, selection, insertion, Shellsort, Quicksort, Mergesort and Heapsort step by step, with your own data.
 - **Videos.** [Common sorting algorithms](https://www.youtube.com/watch?v=pkkFqlG0Hds&list=PL2_aWCzGMAwKedT2KfDMB9YA5DgASZb3U) (a series explaining the main algorithms), and [Visualization and comparison of sorting algorithms](https://www.youtube.com/watch?v=ZZuD6iUe3Pc), which shows many algorithms running side by side.
 
 ---

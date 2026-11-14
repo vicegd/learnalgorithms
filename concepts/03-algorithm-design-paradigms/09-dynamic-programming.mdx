@@ -128,7 +128,7 @@ long fibonacciMemo(int n) {
 </TabItem>
 </Tabs>
 
-Both approaches have the same asymptotic complexity: **the number of different subproblems multiplied by the cost of computing each one** from the solutions of smaller subproblems. This is the general rule to analyse dynamic programming algorithms.
+Both approaches have the same asymptotic complexity: **the number of different subproblems multiplied by the cost of computing each one** from the solutions of smaller subproblems. This is the general rule to analyze dynamic programming algorithms.
 
 ---
 
@@ -153,7 +153,7 @@ Compare with greedy algorithms: both require **optimal substructure**, but a gre
 3. **Choose the table and the order.** Store the solution of each subproblem in a table (a vector, a matrix...) and decide the order in which to fill it, so that every value needed has already been computed.
 4. **Compute the value of the optimal solution**, usually in the last cell filled.
 5. **Reconstruct the solution itself**, if needed, by tracing back through the table which choice produced each optimal value (for example, *which* objects go in the knapsack, not only their total value).
-6. **Analyse the complexity:** number of cells × cost per cell, both in time and in memory.
+6. **Analyze the complexity:** number of cells × cost per cell, both in time and in memory.
 
 :::tip Saving memory
 Often a cell depends only on the previous row (or the previous few values). Then it is enough to keep **one or two rows** instead of the whole table: the iterative Fibonacci that keeps only the last two values is the dynamic programming solution with the table reduced to two variables, $O(1)$ memory. The price is that reconstructing the solution (not just its value) usually needs the whole table.
@@ -179,7 +179,7 @@ Dynamic programming appears in many fields:
 - Divide and conquer is **descending**; dynamic programming is **ascending**: it starts from the smallest subproblems.
 - **Bottom-up** dynamic programming fills a table iteratively; **top-down** (memoization) adds a table to a recursive algorithm. Both cost (number of subproblems) × (cost per subproblem).
 - In optimization problems, dynamic programming relies on the **principle of optimality**: optimal solutions are made of optimal solutions of subproblems.
-- Design: characterise the subproblems, write the recurrence with its base cases, choose the table and its filling order, compute the value, reconstruct the solution, and analyse the cost.
+- Design: characterise the subproblems, write the recurrence with its base cases, choose the table and its filling order, compute the value, reconstruct the solution, and analyze the cost.
 
 ---
 

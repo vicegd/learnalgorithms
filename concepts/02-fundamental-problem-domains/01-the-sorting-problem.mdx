@@ -8,12 +8,12 @@ tags: [Sorting, Stability, In-place, Comparisons]
 
 Sorting is one of the most frequent operations in any information system, and one of the most thoroughly studied problems in computer science. When there is a certain volume of data, keeping it sorted makes searching (and many other operations) much faster: we saw in the previous chapter that binary search needs about 20 steps to search a million sorted elements, while sequential search may need a million.
 
-Sorting is also one of the problems with the **largest number of known algorithms**. This makes it an ideal laboratory for everything we learnt in the previous chapter: the same problem, solved by strategies whose costs range from quadratic to linearithmic (and even linear, under certain conditions), with very different behaviours depending on the input.
+Sorting is also one of the problems with the **largest number of known algorithms**. This makes it an ideal laboratory for everything we learnt in the previous chapter: the same problem, solved by strategies whose costs range from quadratic to linearithmic (and even linear, under certain conditions), with very different behaviors depending on the input.
 
 :::note What you will learn in this chapter
 - How to state the sorting problem precisely, and why sorting integers is enough to understand sorting in general.
 - The criteria used to classify and compare sorting algorithms: complexity, comparisons, moves, stability, memory, adaptivity.
-- Three **simple** algorithms (bubble, insertion and selection), and how to analyse their best, worst and average cases exactly.
+- Three **simple** algorithms (bubble, insertion and selection), and how to analyze their best, worst and average cases exactly.
 - **Quicksort**, the most widely used general-purpose sorting algorithm, and the importance of choosing a good pivot.
 - Other efficient algorithms (Shellsort, Heapsort, Mergesort, Radix sort), the theoretical limit of comparison-based sorting, and how to choose an algorithm in practice.
 :::
@@ -56,7 +56,7 @@ Sorting algorithms are compared according to several criteria.
 
 ### 1. Total number of steps: complexity
 
-The complexity in the best, worst and average cases, which we will analyse with the tools of the previous chapter. Simple algorithms are $O(n^2)$ in their worst case; efficient ones reach $O(n \log n)$.
+The complexity in the best, worst and average cases, which we will analyze with the tools of the previous chapter. Simple algorithms are $O(n^2)$ in their worst case; efficient ones reach $O(n \log n)$.
 
 ### 2. Number of comparisons
 
@@ -86,7 +86,7 @@ Stability is what makes it possible to sort by several criteria in successive pa
 ### 5. Type of memory used: internal and external algorithms
 
 - **Internal algorithms** sort data that fits entirely in **main memory**, where any element can be accessed directly at a similar cost. All the algorithms in this chapter, except the last section, are internal.
-- **External algorithms** sort data that does **not fit** in main memory and must stay in secondary storage (disks), where access is much slower and sequential access is much cheaper than random access. They are designed to minimise the number of disk accesses.
+- **External algorithms** sort data that does **not fit** in main memory and must stay in secondary storage (disks), where access is much slower and sequential access is much cheaper than random access. They are designed to minimize the number of disk accesses.
 
 ### 6. Additional criteria
 
@@ -135,10 +135,10 @@ public final class Util {
 }
 ```
 
-Note that `findPosMin` and `findPosMax` are not elementary operations: each one inspects all the elements from `firstElement` to the end, so its cost is linear in the number of elements inspected. When we analyse an algorithm that calls them, we must take that into account.
+Note that `findPosMin` and `findPosMax` are not elementary operations: each one inspects all the elements from `firstElement` to the end, so its cost is linear in the number of elements inspected. When we analyze an algorithm that calls them, we must take that into account.
 
 :::caution Avoid "magic" initial values
-A tempting way of writing `findPosMin` is to start with `value = Integer.MAX_VALUE` and update it whenever a smaller element appears. It works for most inputs, but if all the remaining elements are equal to `Integer.MAX_VALUE`, no element is ever "smaller", and the method returns an invalid position. Initialising with the **first element of the range**, as above, is correct for every input.
+A tempting way of writing `findPosMin` is to start with `value = Integer.MAX_VALUE` and update it whenever a smaller element appears. It works for most inputs, but if all the remaining elements are equal to `Integer.MAX_VALUE`, no element is ever "smaller", and the method returns an invalid position. Initializing with the **first element of the range**, as above, is correct for every input.
 :::
 
 All the sorting algorithms of the repository implement a common interface, which makes it easy to test and compare them:

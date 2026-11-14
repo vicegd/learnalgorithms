@@ -9,7 +9,7 @@ import TabItem from '@theme/TabItem';
 
 # Divide and Conquer in Action: Classic Problems
 
-This lesson presents some of the most famous divide and conquer algorithms. Two of them, Mergesort and Quicksort, we already know from the sorting chapter; now we can analyse them with the formulas of this chapter. The others (the Towers of Hanoi, the multiplication of large integers, the tennis tournament and the Tromino puzzle) show how the paradigm solves problems that would be hard to approach in any other way.
+This lesson presents some of the most famous divide and conquer algorithms. Two of them, Mergesort and Quicksort, we already know from the sorting chapter; now we can analyze them with the formulas of this chapter. The others (the Towers of Hanoi, the multiplication of large integers, the tennis tournament and the Tromino puzzle) show how the paradigm solves problems that would be hard to approach in any other way.
 
 :::note What you will learn in this lesson
 - How Mergesort and Quicksort fit the division and subtraction schemes.
@@ -198,13 +198,13 @@ LargeInteger multiply(LargeInteger u, LargeInteger v) {      // n digits each
 
 ### What does Java use?
 
-Java's `BigInteger` combines several algorithms depending on the size of the operands: the classic $O(n^2)$ method for small numbers (where its low overhead wins), **Karatsuba** ($O(n^{1.585})$) for larger numbers and **Toom-Cook** ($O(n^{1.465})$, a generalisation that splits into three parts) for the largest ones. Even faster algorithms, based on the fast Fourier transform, exist for gigantic numbers.
+Java's `BigInteger` combines several algorithms depending on the size of the operands: the classic $O(n^2)$ method for small numbers (where its low overhead wins), **Karatsuba** ($O(n^{1.585})$) for larger numbers and **Toom-Cook** ($O(n^{1.465})$, a generalization that splits into three parts) for the largest ones. Even faster algorithms, based on the fast Fourier transform, exist for gigantic numbers.
 
 ---
 
 ## The Tennis Tournament
 
-We must organise a tennis tournament with $n$ players. Each player must play **exactly once against each of the $n - 1$ other players**, and **one match per day**. The goal is to build the calendar of the tournament in $n - 1$ days (when $n$ is even, everyone plays every day; when $n$ is odd, each player has one day off).
+We must organize a tennis tournament with $n$ players. Each player must play **exactly once against each of the $n - 1$ other players**, and **one match per day**. The goal is to build the calendar of the tournament in $n - 1$ days (when $n$ is even, everyone plays every day; when $n$ is odd, each player has one day off).
 
 To simplify, consider first $n = 2^k$. The solution can be represented as a table of $n$ rows and $n - 1$ columns, where the element $(i, j)$ is the player that faces player $i$ on day $j$.
 
@@ -256,7 +256,7 @@ Days 1 to 3 contain the two calendars of 4 players (1-4 and 5-8), built recursiv
 A **tromino** is an L-shaped figure formed by three $1 \times 1$ squares. We have a board of $n \times n$ cells, with $n$ a power of 2, in which **one cell is missing** (or blocked). The goal is to cover all the other cells with trominoes, without overlaps. Is it always possible, wherever the missing cell is? Divide and conquer answers yes, and gives the construction at the same time:
 
 - **Base case** ($n = 2$): a $2 \times 2$ board with one missing cell is exactly one tromino.
-- **Recursive case:** divide the board into four quadrants of $\frac{n}{2} \times \frac{n}{2}$. The missing cell is in one of them. Place **one tromino at the centre of the board**, covering the corner cell of each of the **other three** quadrants that touches the centre. Now each of the four quadrants has exactly one cell that is missing or covered, so each one is a smaller instance of the same problem, and can be tiled recursively.
+- **Recursive case:** divide the board into four quadrants of $\frac{n}{2} \times \frac{n}{2}$. The missing cell is in one of them. Place **one tromino at the center of the board**, covering the corner cell of each of the **other three** quadrants that touches the center. Now each of the four quadrants has exactly one cell that is missing or covered, so each one is a smaller instance of the same problem, and can be tiled recursively.
 
 The number of cells to cover is $n^2 - 1$, which is always divisible by 3 when $n$ is a power of 2, and the algorithm uses exactly $\frac{n^2 - 1}{3}$ trominoes.
 

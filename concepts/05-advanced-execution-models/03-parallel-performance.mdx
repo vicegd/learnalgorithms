@@ -12,7 +12,7 @@ A parallel program is only worth its extra complexity if it is **faster**. But h
 - Why parallelism does not change the asymptotic complexity of an algorithm, and how to estimate its parallel execution time.
 - The concepts of **speedup** and **efficiency**, with real measurements.
 - **Amdahl's law**: why the sequential part of a program limits its maximum speedup.
-- Which problems parallelise well, and which do not.
+- Which problems parallelize well, and which do not.
 :::
 
 ---
@@ -48,7 +48,7 @@ This model already shows the main trade-off: if the threshold is too low, or the
 
 ### Work and span
 
-A more general way of analysing a parallel algorithm uses two quantities:
+A more general way of analyzing a parallel algorithm uses two quantities:
 
 - the **work** $W$: the total number of operations, that is, the time with a single processor;
 - the **span** $S$ (or depth): the length of the longest chain of operations that must be executed one after another, that is, the time with an unlimited number of processors.
@@ -59,7 +59,7 @@ $$
 T_p \approx \frac{W}{p} + S
 $$
 
-The span is the part of the algorithm that **cannot** be accelerated by adding processors. An algorithm parallelises well when its span is much smaller than its work.
+The span is the part of the algorithm that **cannot** be accelerated by adding processors. An algorithm parallelizes well when its span is much smaller than its work.
 
 ---
 
@@ -98,14 +98,14 @@ Occasionally, the speedup can even exceed $p$ (*superlinear speedup*), for examp
 
 **Amdahl's law** (Gene Amdahl, 1967) calculates the **maximum theoretical speedup** of a system when only a part of it is improved. In our case, the "improvement" is adding more cores.
 
-The key idea is that the performance of a parallel algorithm is **limited by its sequential part**. No matter how much of the work is parallelised, there are always fragments that a single thread must execute, such as:
+The key idea is that the performance of a parallel algorithm is **limited by its sequential part**. No matter how much of the work is parallelized, there are always fragments that a single thread must execute, such as:
 
 - the creation of the `ForkJoinPool`;
 - the initial division of the tasks;
 - the final combination of the results (the joins);
 - reading the input and writing the output.
 
-If $f$ is the **fraction** of the execution time that can be parallelised and $1 - f$ is the **sequential fraction**, then with $p$ processors the time becomes $(1 - f) + \frac{f}{p}$ (relative to the sequential time), and the speedup is:
+If $f$ is the **fraction** of the execution time that can be parallelized and $1 - f$ is the **sequential fraction**, then with $p$ processors the time becomes $(1 - f) + \frac{f}{p}$ (relative to the sequential time), and the speedup is:
 
 $$
 S(p) = \frac{1}{(1 - f) + \dfrac{f}{p}}
@@ -132,7 +132,7 @@ Amdahl's law assumes a **fixed problem size**. In practice, when we have more pr
 
 ---
 
-## What Parallelises Well?
+## What Parallelizes Well?
 
 - **Independent operations on many elements** (*embarrassingly parallel* problems): transforming each pixel of an image, each element of an array, each file of a directory. The parts do not interact at all.
 - **Divide and conquer with independent subproblems:** the sum of an array, Mergesort (both halves can be sorted in parallel), Quicksort (after partitioning, both parts are independent). The combination step must be cheap, or itself parallel.
@@ -156,7 +156,7 @@ Parallelism divides the time by (at most) a constant, the number of processors. 
 - The **work** is the total number of operations; the **span** is the longest sequential chain, which no number of processors can shorten.
 - **Speedup** $S(p) = T_1 / T_p$; **efficiency** $E(p) = S(p) / p$. Overheads, load imbalance, memory bandwidth and sequential parts keep speedups below the ideal.
 - **Amdahl's law**: $S(p) = \frac{1}{(1 - f) + f/p}$, with limit $\frac{1}{1-f}$. The sequential fraction limits the benefit of adding processors.
-- Parallelise large, independent work; prefer a better algorithm before adding cores.
+- Parallelize large, independent work; prefer a better algorithm before adding cores.
 
 ---
 
@@ -164,7 +164,7 @@ Parallelism divides the time by (at most) a constant, the number of processors. 
 
 :::tip Exercises
 - **📈 Measure speedup.** Measure the parallel sum and the parallel cube root of the course repository with `ForkJoinPool(p)` for $p = 1, 2, 4, \dots$ up to the number of cores of your computer. Compute the speedup and the efficiency for each $p$. Which one scales better, and why?
-- **🧮 Amdahl.** A program takes 100 seconds, of which 20 seconds are sequential and the rest can be parallelised perfectly. What is its time with 4, 16 and infinite processors? What is the maximum speedup?
+- **🧮 Amdahl.** A program takes 100 seconds, of which 20 seconds are sequential and the rest can be parallelized perfectly. What is its time with 4, 16 and infinite processors? What is the maximum speedup?
 - **🔍 Estimate the parallel fraction.** If a program achieves a speedup of 3 with 4 processors, what fraction $f$ is parallel according to Amdahl's law? What speedup would you expect with 16 processors?
 - **⚖️ Algorithm or cores?** Compare the time of the naive Fibonacci with Fork/Join on all your cores for $n = 40$ with the iterative sequential version. Then compare the parallel sum of an array with `Arrays.stream(array).sum()` and with `Arrays.stream(array).parallel().sum()`.
 :::

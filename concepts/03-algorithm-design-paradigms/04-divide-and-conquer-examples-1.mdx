@@ -12,7 +12,7 @@ import TabItem from '@theme/TabItem';
 This lesson applies the paradigm and its analysis to a first set of classic problems: the factorial, sequential and binary search, the Fibonacci numbers and the greatest common divisor. Some of them show the strength of divide and conquer; others, especially Fibonacci, show what happens when it is applied badly. All of them are implemented, with tests, in the [course repository](https://github.com/vicegd/algorithms/tree/master/src/topics/divideconquer).
 
 :::note What you will learn in this lesson
-- How to write and analyse recursive versions of simple problems (factorial, searches).
+- How to write and analyze recursive versions of simple problems (factorial, searches).
 - Why the naive recursive Fibonacci is exponential, how much work it repeats, and several much better alternatives, down to a logarithmic one.
 - Why Euclid's algorithm for the greatest common divisor is so fast, and why "fast" must be measured in the size of the input.
 :::
@@ -146,7 +146,7 @@ $F(3)$ is computed twice, $F(2)$ three times, $F(1)$ five times... The subproble
 We measured it: $F(30)$ took 7 ms, $F(35)$ 49 ms, $F(40)$ 558 ms and $F(45)$ 6.3 seconds. Each time $n$ increases by 5, the time is multiplied by about 11, which is $\varphi^5 \approx 11.09$. At that rate, $F(100)$ would take millions of years.
 
 :::info A lesson that leads to dynamic programming
-Repeating the solution of the same subproblems is the hallmark of problems for which divide and conquer is **not** the right tool. The remedy, storing the solutions of subproblems so that each one is computed only once, is the core idea of **dynamic programming**, which you will study later. You can watch the difference in the [Fibonacci visualisation](https://www.cs.usfca.edu/~galles/visualization/DPFib.html) by David Galles.
+Repeating the solution of the same subproblems is the hallmark of problems for which divide and conquer is **not** the right tool. The remedy, storing the solutions of subproblems so that each one is computed only once, is the core idea of **dynamic programming**, which you will study later. You can watch the difference in the [Fibonacci visualization](https://www.cs.usfca.edu/~galles/visualization/DPFib.html) by David Galles.
 :::
 
 ### Better implementations
@@ -205,7 +205,7 @@ private long tailHelper(long n1, long n2, int n) {
 }
 ```
 
-The recursive call is the **last** operation of the method (a *tail call*). Some languages optimise such calls so that they use no extra stack; Java does not, so the recursion depth is still $n$.
+The recursive call is the **last** operation of the method (a *tail call*). Some languages optimize such calls so that they use no extra stack; Java does not, so the recursion depth is still $n$.
 
 </TabItem>
 <TabItem value="log" label="Logarithmic: O(log n)">
