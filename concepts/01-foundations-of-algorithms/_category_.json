@@ -2,6 +2,6 @@
   "label": "1. Foundations of Algorithms",
   "link": {
     "type": "generated-index",
-    "description": "Master the core principles of algorithmics. Learn to analyze computational complexity, understand mathematical limits using asymptotic notation, and evaluate resource efficiency through real-world case studies."
+    "description": "The foundations of algorithmics: what an algorithm is and how to specify it, the data structures that support efficient processing, and the tools to measure and analyse the cost of algorithms (empirical measurement, counting operations, asymptotic notation, growth rates and loop analysis), applied to classic case studies such as the maximum pairwise product and searching."
   }
 }
