@@ -1,225 +1,193 @@
 ---
 title: Dynamic Programming
 sidebar_position: 9
-tags: [Paradigms, Dynamic Programming, Optimization, Memoization, Tabulation]
+tags: [Paradigms, Dynamic Programming, Memoization, Principle of Optimality]
 ---
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-# The Dynamic Programming Paradigm
+# Dynamic Programming
 
-The **Dynamic Programming (DP)** paradigm stands as one of the most advanced and elegant optimization frameworks in Computer Science. Its core engineering philosophy can be summarized by a classic software axiom: *those who cannot remember the past are condemned to repeat it*. 
+Divide and conquer breaks a problem into subproblems and combines their solutions. It works beautifully when the subproblems are **independent**. But we saw in the divide and conquer chapter that the naive recursive Fibonacci solves the same subproblems again and again, and becomes exponential. **Dynamic programming** keeps the idea of solving a problem through its subproblems, but solves **each subproblem only once**, storing its solution in a table for later use.
 
-This strategy was specifically engineered to overcome the structural limitations that the Divide and Conquer approach encounters when applied to complex problems where subproblems are heavily interdependent.
+The name comes from Richard Bellman, who developed the technique in the 1950s; "programming" refers to filling in a table (as in "planning"), not to writing code.
 
----
-
-## The Structural Limits of Divide and Conquer
-
-The Divide and Conquer paradigm is exceptionally efficient when a problem can be decomposed into completely isolated, disjoint subproblems (such as sorting independent halves in *MergeSort*). However, it catastrophically collapses under two specific architectural conditions:
-
-* **Overlapping Subproblems:** This occurs when the recursive decomposition scheme repeatedly generates the exact same subproblem instances across different branches of the execution tree.
-* **Non-Polynomial Combinatorial Explosion:** Because the system blindly recalculates the same partial solutions over and over, the time complexity shifts from polynomial to exponential. This rapidly exhausts the thread stack and locks up the hardware environment indefinitely.
-
-Dynamic Programming bypasses this execution bottleneck by introducing a systematic storage rule: **each unique subproblem is solved exactly once, and its result is cached inside an indexed data structure (a table or matrix) for instant, constant-time ($O(1)$) retrieval.**
+:::note What you will learn in these lessons
+- When divide and conquer is not suitable, and how dynamic programming fixes it.
+- The two ways of applying dynamic programming: **bottom-up** (tables) and **top-down** (memoization).
+- The **principle of optimality** and the steps to design a dynamic programming algorithm.
+- Classic examples: Fibonacci, combinations, the 0/1 knapsack problem, the longest common subsequence and the edit distance.
+:::
 
 ---
 
-## Mathematical Prerequisites for DP
+## Problems with Divide and Conquer
 
-To confidently classify an optimization problem as a candidate for Dynamic Programming, it must rigorously satisfy two fundamental mathematical properties:
+Divide and conquer divides the original problem into subproblems and combines their solutions. It has two drawbacks:
 
-* **Optimal Substructure:** An optimal solution to the global problem instance must inherently contain within itself the absolute optimal solutions to each of its constituent subproblems.
-* **Overlapping Subproblems:** The execution tree must manifest severe structural redundancy, proving that the absolute catalog of unique subproblems is drastically smaller than the total volume of recursive calls.
+- It is **not suitable when the number of subproblems is very high**, because the complexity becomes non-polynomial (remember the subtraction schemes with $a \gt 1$).
+- It is **not suitable when the subproblems are repeated**, because the same subproblem is then solved several times in the same execution.
 
-### Architectural Approaches: Top-Down vs. Bottom-Up
+### Fibonacci again
 
-Engineers rely on two distinct implementation strategies to deploy a Dynamic Programming pipeline:
+```java
+long fibonacci_dv(int n) {
+    if (n == 0) return 0;
+    else if (n == 1) return 1;
+    else return fibonacci_dv(n - 1) + fibonacci_dv(n - 2);
+}
+```
 
-| Approach | Operational Mechanism | Engineering Trade-offs |
+For $n = 6$, the call tree contains **25 calls**, but only **7 different subproblems**: $F(0), F(1), \dots, F(6)$. $F(2)$ is computed 5 times, $F(1)$ 8 times and $F(0)$ 5 times:
+
+```
+                                fib(6)=8
+                 ┌────────────────┴────────────────┐
+             fib(5)=5                           fib(4)=3
+          ┌─────┴──────┐                     ┌─────┴─────┐
+      fib(4)=3      fib(3)=2             fib(3)=2      fib(2)=1
+       ┌──┴──┐       ┌──┴──┐              ┌──┴──┐        ...
+  fib(3)=2 fib(2)=1  ...   ...           ...   ...
+     ...      ...
+```
+
+The time is $\Theta(\varphi^n) \approx O(1.6^n)$, exponential, but there are only $n + 1$ different subproblems. If we store each result the first time we compute it, the exponential explosion disappears.
+
+---
+
+## The Idea of Dynamic Programming
+
+Dynamic programming, like divide and conquer, divides the original problem into subproblems and combines their solutions. The improvement is:
+
+- **each subproblem is solved only once**, and its solution is **stored** for later use;
+- the goal is to avoid calculating the same subproblem twice, usually by maintaining a **table of known results**.
+
+### Fibonacci with a table
+
+```java
+long fibonacci_dp(int n) {
+    long[] f = new long[n + 1];
+    f[0] = 0;
+    f[1] = 1;                              // we know them
+    for (int i = 2; i <= n; i++)
+        f[i] = f[i - 1] + f[i - 2];        // each value is computed once, from known values
+    return f[n];
+}
+```
+
+| $i$ | 0 | 1 | 2 | 3 | 4 | 5 | 6 |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| $f[i]$ | 0 | 1 | 1 | 2 | 3 | 5 | 8 |
+
+Each cell is computed from the two previous ones: $f[2] = 1 + 0$, $f[3] = 1 + 1$, $f[4] = 2 + 1$, $f[5] = 3 + 2$, $f[6] = 5 + 3$. The time drops from $O(1.6^n)$ to $O(n)$.
+
+### Divide and conquer versus dynamic programming
+
+| | Divide and conquer | Dynamic programming |
 | :--- | :--- | :--- |
-| **Top-Down (Memoization)** | Maintains the natural recursive structure of the problem. Before executing any state computation, it queries the lookup table; if the result is cached, it returns instantly; if not, it computes it recursively and updates the cache. | **Advantages:** Only computes the subproblems strictly necessary to reach the root solution. <br/>**Disadvantages:** Retains the high call-stack overhead of nested activation records. |
-| **Bottom-Up (Tabulation)** | Eliminates recursion entirely. The pipeline is built iteratively using nested loops, solving the smallest, trivial base-case subproblems first and progressively filling the table upward toward the target state. | **Advantages:** Highly efficient at the CPU level due to the removal of recursive stack-frame controls. <br/>**Disadvantages:** Forces the complete resolution of the state matrix, even if some cells do not influence the final root solution. |
+| Direction | **Descending** (top-down): starts with the whole problem and divides it into subproblems | **Ascending** (bottom-up): starts with the smallest subproblems and composes their solutions until reaching the whole problem |
+| Subproblems | Should be independent | Overlap: the same subproblems appear many times |
+| Repeated work | Recomputes repeated subproblems | Solves each subproblem once, storing its solution |
+| Memory | The recursion stack | A table of results (plus, possibly, the stack) |
+| Typical examples | Binary search, Mergesort, Quicksort | Fibonacci, combinations, knapsack, shortest paths |
 
 ---
 
-## Case Study: The Fibonacci Sequence
-
-The Fibonacci recurrence relation perfectly showcases the performance disparity between pure recursive decomposition and a stabilized Dynamic Programming pipeline:
-
-$$F(n) = F(n-1) + F(n-2), \quad \forall n > 1$$
-
-When evaluating a moderate state like $n = 6$, a pure Divide and Conquer approach expands into a tree containing **18 total subproblem executions**. However, an analytical audit reveals that **only 7 of these are unique subproblems**. The remaining 11 calls are completely redundant calculations that waste CPU cycles.
+## Two Ways of Applying It
 
 <Tabs>
-  <TabItem value="dv-fib" label="❌ Divide and Conquer Approach" default>
+<TabItem value="bottomup" label="Bottom-up (tabulation)" default>
 
-```java
-public long fibonacciDV(int n) {
-    if (n == 0) return 0;
-    if (n == 1) return 1;
-    return fibonacciDV(n - 1) + fibonacciDV(n - 2);
-}
-```
+The classic form of dynamic programming. The table is filled **iteratively**, from the smallest subproblems to the largest, in an order that guarantees that every value needed is already available. The `fibonacci_dp` method above is an example.
 
-#### Performance Profile
-* **Time Complexity:** Exponential, bounded between $O(2^{n/2})$ and $O(2^n)$.
-* **System Impact:** Evaluating $n = 50$ requires days of continuous processing because the runtime tree duplicates billions of identical state computations.
+- No recursion, so no risk of stack overflow, and no function call overhead.
+- Every subproblem is computed, even those that are not needed for the final answer.
+- Requires thinking about the **order** in which the table is filled.
 
 </TabItem>
-  <TabItem value="pd-fib" label="✅ Dynamic Programming Approach">
+<TabItem value="topdown" label="Top-down (memoization)">
+
+Keep the **recursive** divide and conquer algorithm, but **remember** (memoize) the result of each call: before computing a subproblem, check whether it is already in the table.
 
 ```java
-public long fibonacciPD(int n) {
+long[] memo;                                       // memo[i] = -1 means "not computed yet"
+
+long fibonacciMemo(int n) {
     if (n <= 1) return n;
-    
-    // Lookup table to store verified states and block duplication
-    long[] table = new long[n + 1];
-    table[0] = 0;
-    table[1] = 1;
-    
-    // Iterative incremental construction (Bottom-Up Tabulation)
-    for (int i = 2; i <= n; i++) {
-        table[i] = table[i - 1] + table[i - 2];
-    }
-    
-    return table[n];
+    if (memo[n] != -1) return memo[n];             // already known: reuse it
+    memo[n] = fibonacciMemo(n - 1) + fibonacciMemo(n - 2);
+    return memo[n];
 }
 ```
 
-#### Performance Profile
-* **Time Complexity:** Perfectly linear, **$O(n)$**.
-* **Space Complexity:** **$O(n)$** to maintain the structural state table (which can be optimized down to $O(1)$ space by tracking only the two preceding states in scalar variables).
-* **System Impact:** Computes $n = 50$ and far beyond instantaneously in microseconds.
+- Very easy to obtain from a recursive solution: the recursion is unchanged.
+- Only the subproblems that are really needed are computed.
+- Uses the call stack, so the recursion depth can be a problem for large inputs.
 
 </TabItem>
 </Tabs>
 
----
-
-## Case Study: The Combinations Problem
-
-Computing binomial coefficients—determining how many unique subsets of size $k$ can be formed from a total set of $n$ elements—relies on the recursive properties of Pascal's Triangle:
-
-$$C(n, k) = C(n-1, k-1) + C(n-1, k), \quad \text{where } 0 < k < n$$
-
-To map this problem to a Bottom-Up Dynamic Programming architecture, we construct a two-dimensional grid where rows represent the total set size ($n$) and columns represent the subset selection size ($k$).
-
-```java
-public class CombinationsDP {
-    public static long computeCoefficient(int n, int k) {
-        if (k == 0 || k == n) return 1;
-        
-        long[][] matrix = new long[n + 1][k + 1];
-        
-        // Populate boundary conditions of the state space
-        for (int i = 0; i <= n; i++) {
-            matrix[i][0] = 1;
-            if (i <= k) {
-                matrix[i][i] = 1;
-            }
-        }
-        
-        // Iteratively compute the matrix layers bottom-up
-        for (int i = 2; i <= n; i++) {
-            for (int j = 1; j <= Math.min(i - 1, k); j++) {
-                matrix[i][j] = matrix[i - 1][j - 1] + matrix[i - 1][j];
-            }
-        }
-        
-        return matrix[n][k];
-    }
-}
-```
+Both approaches have the same asymptotic complexity: **the number of different subproblems multiplied by the cost of computing each one** from the solutions of smaller subproblems. This is the general rule to analyse dynamic programming algorithms.
 
 ---
 
-## Case Study: The 0/1 Discrete Knapsack Problem
+## The Principle of Optimality
 
-In our previous module, we mathematically proved that Greedy Algorithms fail to solve the **Discrete (0/1) Knapsack Problem**, as early, irreversible choices trap the execution inside sub-optimal configurations. Dynamic Programming provides the definitive exact solver for this challenge.
+Dynamic programming is widely used to solve **optimization problems**, and here it relies on a key property, formulated by Bellman as the **principle of optimality**:
 
-### Design of the Matrix Optimization Space
-Given a set of $n$ indivisible objects and a maximum weight boundary $W$, we construct a state matrix `M[i][w]`. This grid stores the maximum attainable profit value utilizing a subset of the first $i$ items under a transient, intermediate weight constraint $w$.
+> In an optimal sequence of decisions, every subsequence must also be optimal.
 
-For every single item encountered, the algorithm evaluates an optimal binary choice:
-1. **Exclude the Item:** The profit value is inherited directly from the cell immediately above it: `M[i-1][w]`.
-2. **Include the Item:** The profit of the current item is added to the optimal profit achievable with the remaining capacity: `profit[i] + M[i-1][w - weight[i]]`.
+In other words, an optimal solution of a problem is built from **optimal solutions of its subproblems**. For example, if the shortest route from Oviedo to Madrid goes through León, then its part from Oviedo to León must be the shortest route from Oviedo to León (otherwise, replacing it with a shorter one would give a shorter route to Madrid).
 
-The formal state transition equation is defined as:
+When the principle holds, we can write a **recurrence** that expresses the optimal value of a problem in terms of the optimal values of its subproblems, and then fill a table with it. When it does not hold, dynamic programming cannot be applied in this way. For example, the *longest* simple path between two cities does not satisfy it: the longest path from A to C through B is not necessarily formed by the longest paths from A to B and from B to C, which may share cities.
 
-$$M[i][w] = \max\left(M[i-1][w], \text{profit}[i] + M[i-1][w - \text{weight}[i]]\right)$$
-
-```java
-public class KnapsackDP {
-    public static int solveKnapsack(int maxWeight, int[] weights, int[] profits, int objects) {
-        int[][] M = new int[objects + 1][maxWeight + 1];
-        
-        // Initialize base conditions with zero (trivial states)
-        for (int w = 0; w <= maxWeight; w++) M[0][w] = 0;
-        for (int i = 0; i <= objects; i++) M[i][0] = 0;
-        
-        // Systematic evaluation of the combinatorial space
-        for (int i = 1; i <= objects; i++) {
-            for (int w = 1; w <= maxWeight; w++) {
-                if (weights[i - 1] <= w) {
-                    // Evaluate opportunity cost: is inclusion superior?
-                    M[i][w] = Math.max(M[i - 1][w], profits[i - 1] + M[i - 1][w - weights[i - 1]]);
-                } else {
-                    // Item exceeds transient capacity, force exclusion
-                    M[i][w] = M[i - 1][w];
-                }
-            }
-        }
-        return M[objects][maxWeight];
-    }
-}
-```
+Compare with greedy algorithms: both require **optimal substructure**, but a greedy algorithm commits to one choice at each step, while dynamic programming considers **all** the choices and keeps the best one, using the stored solutions of the subproblems.
 
 ---
 
-## Lecture Hall Interactive Checkpoints
+## How to Design a Dynamic Programming Algorithm
 
-Validate your analytical grasp using the actual interactive questions pulled directly from our Vevox lecture slides:
+1. **Characterise the subproblems.** Decide what a subproblem is and what its parameters are. For example: "the maximum value that can be carried using only the first $i$ objects with a capacity $j$".
+2. **Write the recurrence.** Express the solution of a subproblem in terms of the solutions of smaller subproblems, including the **base cases**.
+3. **Choose the table and the order.** Store the solution of each subproblem in a table (a vector, a matrix...) and decide the order in which to fill it, so that every value needed has already been computed.
+4. **Compute the value of the optimal solution**, usually in the last cell filled.
+5. **Reconstruct the solution itself**, if needed, by tracing back through the table which choice produced each optimal value (for example, *which* objects go in the knapsack, not only their total value).
+6. **Analyse the complexity:** number of cells × cost per cell, both in time and in memory.
 
-<details>
-  <summary>📊 <strong>Vevox Slide Case 1: Complexity of the Combinations Grid</strong></summary>
-
-**Question:** What is the exact asymptotic time complexity for solving the Combinations problem (given $n$ elements taken $k$ at a time) using Tabulation-based Dynamic Programming?
-
-* **Option A:** $O(n \cdot \log n)$
-* **Option B:** $O(n^2)$
-* **Option C:** $O(n)$
-* **Option D:** $O(n \cdot k)$
-
-**Detailed Solution:**
-The correct answer is **Option D: $O(n \cdot k)$**. 
-When tabulating the state space of the binomial coefficient, the algorithm executes a nested double loop that systematically fills a matrix of dimensions $n \times k$. Because each cell computation executes an elementary scalar addition taking constant time ($O(1)$), the total execution scaling is strictly determined by the product of the structural dimensions of the matrix.
-
-</details>
-
-<details>
-  <summary>📊 <strong>Vevox Slide Case 2: The Discrete Knapsack Boundary</strong></summary>
-
-**Question:** What is the exact structural runtime complexity for solving the 0/1 Discrete Knapsack problem using a tabulated matrix approach?
-
-* **Option A:** $O(n)$
-* **Option B:** $O(n \cdot \log n)$
-* **Option C:** $O(n^3)$
-* **Option D:** $O(\text{maxWeight} \cdot \text{objects})$
-
-**Detailed Solution:**
-The correct answer is **Option D: $O(\text{maxWeight} \cdot \text{objects})$**.
-Unlike purely polynomial complexities, the Dynamic Programming solver for the 0/1 Knapsack depends directly on the magnitude of the numerical integer provided as the maximum capacity weight (`maxWeight`). This specific operational signature is classified as **Pseudo-polynomial time**. If the weight capacity scales to extreme proportions, the storage matrix scales along with it, highlighting the memory-for-time trade-off core to DP design.
-
-</details>
+:::tip Saving memory
+Often a cell depends only on the previous row (or the previous few values). Then it is enough to keep **one or two rows** instead of the whole table: the iterative Fibonacci that keeps only the last two values is the dynamic programming solution with the table reduced to two variables, $O(1)$ memory. The price is that reconstructing the solution (not just its value) usually needs the whole table.
+:::
 
 ---
 
-## Ecosystem Integration & Active Review
+## Beyond the Course: Dynamic Programming Everywhere
 
-:::tip Technical Lab Session
-* **💻 Profiling Cache Memory:** Navigate to the `Paradigms/DynamicProgramming` package inside the repository. Execute the `FibonacciBenchmark` harness and modify the thread stack boundaries (`-Xss`) to observe how Tabulation completely insulates the operating system from call-stack exhaustion while maintaining linear processing metrics.
-* **🤖 Query Your AI Tutor:** Open your **NotebookLM** environment and pass this precise verification prompt to test your architectural awareness:  
-  > *"Analyze the transition rule of the 0/1 Knapsack problem implemented via Tabulation. Explain how the historical records stored inside the matrix prevent the system from getting trapped by local optima, and discuss the architectural implications of pseudo-polynomial growth on RAM consumption."*
+Dynamic programming appears in many fields:
+
+- **Route planning and robotics:** from a map of the environment and a goal, dynamic programming computes the best path **from every possible starting location** at once (a *policy*), which is valuable when movements may fail and the robot or the car must re-plan constantly. The short film *Dynamic Programming - Artificial Intelligence for Robotics* explains it with the example of a self-driving car.
+- **Bioinformatics:** aligning DNA or protein sequences (a variant of the edit distance of the next lesson).
+- **Text processing:** spelling correctors, the `diff` tool that compares files, line breaking in word processors.
+- **Shortest paths:** the Floyd-Warshall and Bellman-Ford algorithms.
+- **Operations research and economics:** inventory management, resource allocation, investment planning.
+
+---
+
+## Summary
+
+- Divide and conquer is not suitable when subproblems are **numerous and repeated**. Dynamic programming solves **each subproblem once** and stores its solution in a table.
+- Divide and conquer is **descending**; dynamic programming is **ascending**: it starts from the smallest subproblems.
+- **Bottom-up** dynamic programming fills a table iteratively; **top-down** (memoization) adds a table to a recursive algorithm. Both cost (number of subproblems) × (cost per subproblem).
+- In optimization problems, dynamic programming relies on the **principle of optimality**: optimal solutions are made of optimal solutions of subproblems.
+- Design: characterise the subproblems, write the recurrence with its base cases, choose the table and its filling order, compute the value, reconstruct the solution, and analyse the cost.
+
+---
+
+## Practice
+
+:::tip Exercises
+- **🌳 Count the repetitions.** Draw the full call tree of the naive Fibonacci for $n = 6$ and check that it has 25 calls and 7 different subproblems.
+- **📝 Memoize.** Add memoization to the naive recursive Fibonacci, using a `HashMap<Integer, Long>`, and compare its times with the naive version for $n = 30, 40, 50$.
+- **🔁 Two variables.** Write the bottom-up Fibonacci keeping only the last two values. What is its memory complexity?
+- **🗺️ Principle of optimality.** Draw a small graph with four nodes in which the longest simple path from A to C passes through B, but is not formed by the longest simple paths from A to B and from B to C. Why does this not happen with shortest paths?
 :::
