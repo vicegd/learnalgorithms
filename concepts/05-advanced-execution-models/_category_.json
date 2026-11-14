@@ -2,6 +2,6 @@
   "label": "5. Advanced Execution Models",
   "link": {
     "type": "generated-index",
-    "description": "Explore advanced execution models and their applications in modern computing environments."
+    "description": "Parallel algorithms: concurrency and parallelism, processes, threads and tasks, the Java Fork/Join framework for parallel divide and conquer, sequential thresholds, and how to measure and predict performance with speedup, efficiency and Amdahl's law."
   }
 }
