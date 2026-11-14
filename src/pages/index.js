@@ -23,7 +23,7 @@ const CHAPTERS = [
     description:
       'Sorting, one of the most studied problems in computing: the simple algorithms, Quicksort, the efficient alternatives and how to choose one in practice.',
     topics: ['Bubble', 'Insertion', 'Selection', 'Quicksort', 'Mergesort', 'Heapsort', 'Radix sort'],
-    cta: '7 lessons',
+    cta: '7 lessons + exercises',
     to: '/concepts/category/2-fundamental-problem-domains',
   },
   {
