@@ -2,6 +2,6 @@
   "label": "4. State Space Search and Optimization",
   "link": {
     "type": "generated-index",
-    "description": "Explore state space search techniques and optimization strategies for solving complex computational problems."
+    "description": "Backtracking and branch and bound: exploring implicit trees of states, pruning hopeless branches, and using bounds and heuristics to find exact solutions to hard combinatorial problems."
   }
 }
