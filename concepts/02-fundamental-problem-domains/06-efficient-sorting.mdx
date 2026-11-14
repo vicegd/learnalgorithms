@@ -1,0 +1,235 @@
+---
+title: Beyond Quadratic Sorting
+sidebar_position: 6
+tags: [Sorting, Shellsort, Heapsort, Mergesort, Radix Sort, Lower Bound]
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Beyond Quadratic Sorting
+
+Quicksort is not the only way to sort faster than $O(n^2)$. Each of the three basic ideas (exchange, insertion and selection) has an efficient counterpart, and there are also algorithms based on completely different principles. This lesson presents the most important ones, explains the theoretical limit that all comparison-based algorithms share, and shows how some algorithms manage to go **below** that limit.
+
+:::note What you will learn in this lesson
+- **Shellsort**, which improves insertion by moving elements over long distances first.
+- **Heapsort**, which improves selection by using a heap, and guarantees $O(n \log n)$ in place.
+- **Mergesort**, which sorts by merging, guarantees $O(n \log n)$ and is stable.
+- Why no algorithm based on comparisons can beat $O(n \log n)$ in the worst case.
+- **Counting and radix sort**, which sort in linear time by not comparing elements at all.
+- What the sorting methods of real libraries use.
+:::
+
+| Basic idea | Simple algorithm | Efficient algorithm |
+| :--- | :--- | :--- |
+| Exchange | Bubble sort | Quicksort |
+| Insertion | Direct insertion | Shellsort |
+| Selection | Direct selection | Heapsort |
+| Merging | | Mergesort |
+| Distribution (no comparisons) | | Counting sort, Radix sort |
+
+---
+
+## Shellsort: Insertion over Long Distances
+
+Insertion sort is slow on random data because it moves elements **one position at a time**, removing a single inversion per shift. Donald Shell proposed (in 1959) to apply insertion sort first to elements that are **far apart**, so that elements can travel long distances in a few moves, and then progressively reduce the distance.
+
+The algorithm uses a decreasing sequence of **gaps** (increments) $h_1 \gt h_2 \gt \cdots \gt h_t = 1$. For each gap $h$, it performs an insertion sort on each of the subsequences formed by elements $h$ positions apart (the vector becomes "$h$-sorted"). The last pass, with $h = 1$, is an ordinary insertion sort, which guarantees that the result is sorted; but by then the vector is almost sorted, and insertion sort is very fast on almost sorted data.
+
+```java
+public void sort(int[] elements) {
+    int n = elements.length;
+    for (int gap = n / 2; gap > 0; gap /= 2) {          // gaps n/2, n/4, ..., 1
+        for (int i = gap; i < n; i++) {                 // insertion sort with step "gap"
+            int key = elements[i];
+            int j = i - gap;
+            while (j >= 0 && key < elements[j]) {
+                elements[j + gap] = elements[j];
+                j -= gap;
+            }
+            elements[j + gap] = key;
+        }
+    }
+}
+```
+
+With **4 5 6 1 3 2 7 8** and the gaps 4, 2, 1:
+
+| Gap | Subsequences sorted | Vector after the pass | Shifts |
+| :---: | :--- | :--- | :---: |
+| 4 | (4, 3), (5, 2), (6, 7), (1, 8) | 3 2 6 1 4 5 7 8 | 2 |
+| 2 | (3, 6, 4, 7), (2, 1, 5, 8) | 3 1 4 2 6 5 7 8 | 2 |
+| 1 | the whole vector | 1 2 3 4 5 6 7 8 | 4 |
+
+A total of 8 shifts, compared with the 10 of direct insertion. The advantage grows quickly with $n$.
+
+The analysis of Shellsort is notoriously difficult and depends on the gap sequence. With Shell's original sequence ($n/2, n/4, \dots$), the worst case is still $O(n^2)$; with better sequences, such as Knuth's ($1, 4, 13, 40, \dots$, each one three times the previous plus one), the worst case is $O(n^{3/2})$, and some sequences achieve even better bounds. In practice, Shellsort is fast for medium-sized arrays, very short to implement and **in place**, but it is **not stable** (elements jump over others that may have equal keys). With $n = 10{,}000$ random elements and Shell's gaps, it performed about 260,000 comparisons in our tests, compared with about 25 million for insertion sort.
+
+---
+
+## Heapsort: Selection with a Heap
+
+Selection sort spends linear time finding each maximum (or minimum). **Heapsort** keeps the unsorted part organised as a **heap**, which provides the maximum immediately and can be repaired in logarithmic time.
+
+### Binary heaps
+
+A **max-heap** is a complete binary tree in which every node is **greater than or equal to its children**, so the maximum is always at the **root**. A complete binary tree can be stored in an array without any pointers: the root is at position 0, and the children of the node at position $i$ are at positions $2i + 1$ and $2i + 2$. The height of the tree is about $\log_2 n$.
+
+The key operation is **sinking** (down-heap): if a node is smaller than one of its children, it is exchanged with its larger child, and the process continues downwards until the heap property is restored. It costs at most one step per level: $O(\log n)$.
+
+### The algorithm
+
+1. **Build a heap** with all the elements, sinking every internal node from the last one up to the root. (This phase costs only $O(n)$, a remarkable result.)
+2. Repeat $n - 1$ times: **exchange the root** (the maximum) with the last element of the heap, **reduce** the size of the heap by one (the maximum is now in its final position at the end of the array), and **sink** the new root to restore the heap.
+
+```java
+public void sort(int[] elements) {
+    int n = elements.length;
+    for (int i = n / 2 - 1; i >= 0; i--)        // 1. build the heap
+        downHeap(elements, i, n);
+    while (n > 1) {                             // 2. extract the maximum n - 1 times
+        n--;
+        Util.swap(elements, 0, n);              // the maximum goes to its final position
+        downHeap(elements, 0, n);               // restore the heap in elements[0..n-1]
+    }
+}
+
+private void downHeap(int[] elements, int parent, int heapSize) {
+    int child = 2 * parent + 1;                 // left child
+    while (child < heapSize) {
+        if (child + 1 < heapSize && elements[child + 1] > elements[child])
+            child++;                            // the larger of the two children
+        if (elements[parent] >= elements[child])
+            break;                              // the heap property holds
+        Util.swap(elements, parent, child);
+        parent = child;
+        child = 2 * parent + 1;
+    }
+}
+```
+
+With **4 5 6 1 3 2 7 8**:
+
+| Phase | Heap \| sorted part |
+| :--- | :--- |
+| Heap built | 8 5 7 4 3 2 6 1 |
+| Extract 8 | 7 5 6 4 3 2 1 \| 8 |
+| Extract 7 | 6 5 2 4 3 1 \| 7 8 |
+| Extract 6 | 5 4 2 1 3 \| 6 7 8 |
+| Extract 5 | 4 3 2 1 \| 5 6 7 8 |
+| Extract 4 | 3 1 2 \| 4 5 6 7 8 |
+| Extract 3 | 2 1 \| 3 4 5 6 7 8 |
+| Extract 2 | 1 \| 2 3 4 5 6 7 8 |
+
+Heapsort is **$O(n \log n)$ in all cases** (best, worst and average), **in place**, but **not stable**. Its running time is very predictable: in the table of the course slides, its times for sorted, random and reverse inputs are almost identical. In practice it is usually slower than Quicksort, because its accesses jump around the array (parent to child), which uses the processor cache poorly. It is used as a safety net in **Introsort**, and heaps are, in their own right, the structure behind `PriorityQueue`.
+
+---
+
+## Mergesort: Sorting by Merging
+
+**Mergesort** is based on a different idea: **merging** two sorted sequences into a single sorted sequence is easy and fast, since it only requires comparing the first elements of both and taking the smaller one, repeatedly. So:
+
+1. **Divide** the vector into two halves.
+2. **Sort** each half, recursively.
+3. **Merge** the two sorted halves.
+
+```java
+private void mergeSort(int[] elements, int[] aux, int left, int right) {
+    if (left < right) {
+        int center = left + (right - left) / 2;
+        mergeSort(elements, aux, left, center);
+        mergeSort(elements, aux, center + 1, right);
+        merge(elements, aux, left, center, right);     // linear in (right - left + 1)
+    }
+}
+```
+
+The recursion always divides the vector into **halves**, regardless of the data, so there are always about $\log_2 n$ levels, each with a total merging cost of $O(n)$. Mergesort is therefore **$O(n \log n)$ in all cases**, like Heapsort, and, unlike Quicksort and Heapsort, it is **stable** (when the two candidates are equal, the merge takes the one from the left half). Its drawback is memory: merging arrays requires an **auxiliary array** of size $n$, so it is **not in place**.
+
+Mergesort is a classic example of **divide and conquer**, and you will study it in detail (with its recurrence, its variants and its applications) in that chapter. It is also the basis of **external sorting** algorithms (see the next lesson) and of **TimSort**, the algorithm used by Java to sort objects and by Python to sort lists.
+
+---
+
+## The Limit of Comparison-Based Sorting
+
+All the algorithms we have seen so far sort by **comparing pairs of elements**. Can such an algorithm be faster than $O(n \log n)$? The answer is **no**, and the argument is one of the most elegant results in computer science.
+
+Any comparison-based algorithm can be represented as a **decision tree**: each internal node is a comparison ("is $a_i \lt a_j$?"), and the two branches correspond to its two possible outcomes. Each leaf is a final arrangement of the input. Then:
+
+- To sort correctly, the algorithm must be able to produce **every** possible order of the input, so the tree needs at least $n!$ leaves (one per permutation).
+- A binary tree of height $h$ has at most $2^h$ leaves, so $2^h \ge n!$, that is, $h \ge \log_2 (n!)$.
+- The height $h$ is the number of comparisons in the worst case, and $\log_2(n!)$ grows like $n \log_2 n$ (more precisely, $\log_2(n!) \approx n \log_2 n - 1.44\,n$).
+
+> Every comparison-based sorting algorithm needs $\Omega(n \log n)$ comparisons in the worst case.
+
+This is a statement about the **problem**, not about a particular algorithm: no one will ever find a comparison-based algorithm that does better. Heapsort and Mergesort, which are $O(n \log n)$ in the worst case, are therefore **asymptotically optimal**.
+
+---
+
+## Sorting Without Comparisons
+
+The lower bound only applies to algorithms that obtain information exclusively by comparing elements. If we know something more about the keys (for example, that they are integers in a small range), we can do better.
+
+### Counting sort and Binsort
+
+If the keys are integers between $0$ and $k - 1$, we can **count** how many times each value appears, using an array of $k$ counters, and then write each value as many times as it was counted (or, for records, compute the final position of each one from the counts). This takes $O(n + k)$ time and $O(k)$ extra memory: **linear** when $k$ is $O(n)$. The related **Binsort** (bucket sort) distributes the elements into "bins" according to their key and then concatenates the bins.
+
+### Radix sort
+
+**Radix sort** sorts integers **digit by digit**, from the least significant to the most significant. In each pass, it distributes the elements into 10 queues (one per digit value) according to the current digit, and then collects them in order. Because each pass is **stable**, the order established by the previous digits is preserved among elements with the same current digit.
+
+| Pass | After distributing by... | Vector |
+| :--- | :--- | :--- |
+| | (initial) | 170 45 75 90 802 24 2 66 |
+| 1 | units | 170 90 802 2 24 45 75 66 |
+| 2 | tens | 802 2 24 45 66 170 75 90 |
+| 3 | hundreds | 2 24 45 66 75 90 170 802 |
+
+With $d$ digits per key, radix sort performs $d$ passes of $O(n)$ each: $O(d \cdot n)$. For keys with a bounded number of digits, this is **linear** in $n$. The price is extra memory for the queues, and the restriction to keys that can be decomposed into digits (integers, fixed-length strings...).
+
+:::caution Negative numbers
+The simple radix sort above assumes **non-negative** integers. In Java, `-1 % 10` is `-1`, so a negative number produces a negative "digit" and an invalid queue index. To support negative values, the usual solutions are to sort negative and non-negative numbers separately, or to add an offset to all the keys.
+:::
+
+---
+
+## What Real Libraries Use
+
+Real sorting libraries combine several algorithms to get the best of each:
+
+- **Java, primitive types** (`Arrays.sort(int[])`, etc.): a **dual-pivot Quicksort**, with insertion sort for small parts. Stability does not matter for primitives, and Quicksort is the fastest in practice.
+- **Java, objects** (`Arrays.sort(Object[])`, `Collections.sort`, `List.sort`): **TimSort**, a hybrid of Mergesort and insertion sort that detects already sorted runs in the data. It is **stable**, which is essential for objects, and very fast on partially sorted data.
+- **Python** (`sorted`, `list.sort`): TimSort as well (it was designed for Python).
+- **C++** (`std::sort`): typically **Introsort** (Quicksort + Heapsort + insertion sort), and `std::stable_sort` for a stable sort.
+
+The lesson is that there is no single "best" sorting algorithm: each one has strengths, and good engineering combines them.
+
+---
+
+## Summary
+
+| Algorithm | Best | Average | Worst | Extra memory | Stable |
+| :--- | :--- | :--- | :--- | :--- | :---: |
+| Shellsort | $O(n \log n)$ | depends on the gaps | $O(n^2)$ (Shell's gaps), $O(n^{3/2})$ (Knuth's) | $O(1)$ | No |
+| Heapsort | $O(n \log n)$ | $O(n \log n)$ | $O(n \log n)$ | $O(1)$ | No |
+| Mergesort | $O(n \log n)$ | $O(n \log n)$ | $O(n \log n)$ | $O(n)$ | Yes |
+| Quicksort | $O(n \log n)$ | $O(n \log n)$ | $O(n^2)$ | $O(\log n)$ stack | No |
+| Counting sort | $O(n + k)$ | $O(n + k)$ | $O(n + k)$ | $O(k)$ | Yes (in its record version) |
+| Radix sort | $O(d \cdot n)$ | $O(d \cdot n)$ | $O(d \cdot n)$ | $O(n)$ | Yes |
+
+- Each basic idea has an efficient version: Quicksort (exchange), Shellsort (insertion) and Heapsort (selection). Mergesort sorts by merging.
+- No comparison-based algorithm can beat $\Omega(n \log n)$ comparisons in the worst case; Heapsort and Mergesort reach that limit.
+- Counting sort and radix sort avoid the limit by exploiting the structure of the keys.
+
+---
+
+## Practice
+
+:::tip Exercises
+- **✍️ Trace Shellsort and Heapsort.** Sort **5 6 1 3 9 8 7 4 2** with Shellsort (gaps 4, 2, 1) and with Heapsort, writing the state after each pass or extraction.
+- **🌲 Draw the heap.** Draw the heap built from **4 5 6 1 3 2 7 8** as a tree, and check the heap property at every node.
+- **💻 Run them.** The [course repository](https://github.com/vicegd/algorithms/tree/master/src/topics/sorting) contains `Shellsort`, `Heapsort`, `Mergesort` and `Radix`. Measure them with sorted, random and reverse data. Which one is the most predictable?
+- **📉 Gap sequences.** Replace Shell's gaps with Knuth's sequence ($h = 3h + 1$: 1, 4, 13, 40...) and compare the number of comparisons for $n = 100{,}000$.
+- **🧮 The lower bound.** Compute $\lceil \log_2 (n!) \rceil$ for $n = 3, 4, 5$. Can you find an algorithm that sorts 4 elements with exactly that number of comparisons in the worst case?
+- **➖ Negative keys.** Modify radix sort so that it also sorts negative integers correctly, and validate it with a stress test against `Arrays.sort`.
+:::

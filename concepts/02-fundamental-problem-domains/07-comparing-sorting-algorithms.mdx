@@ -1,0 +1,170 @@
+---
+title: Comparing Sorting Algorithms
+sidebar_position: 7
+tags: [Sorting, Comparison, Benchmarking, External Sorting]
+---
+
+# Comparing Sorting Algorithms
+
+We have studied many sorting algorithms. This lesson brings them together: we compare their behaviour with measurements, summarise their properties, give practical guidelines for choosing one, and introduce the sorting of data that does not fit in main memory.
+
+:::note What you will learn in this lesson
+- How the algorithms of the chapter compare in practice, for sorted, random and reverse inputs.
+- How to interpret those measurements in the light of their theoretical complexity.
+- Practical criteria to choose a sorting algorithm.
+- The basic ideas of **external sorting**.
+:::
+
+---
+
+## The Complexity of Each Algorithm
+
+<details>
+  <summary>🧠 <strong>Checkpoint: Before looking at the table</strong></summary>
+
+  **Question:** For each algorithm, choose one option: "$O(n^2)$ in all cases", "between $O(n)$ and $O(n^2)$, depending on the case", or "between $O(n \log n)$ and $O(n^2)$, depending on the case". (a) Bubble; (b) bubble with sentinel; (c) direct insertion; (d) direct selection; (e) Quicksort.
+
+  **Answer:** (a) $O(n^2)$ in all cases; (b) between $O(n)$ and $O(n^2)$; (c) between $O(n)$ and $O(n^2)$; (d) $O(n^2)$ in all cases; (e) between $O(n \log n)$ and $O(n^2)$.
+
+</details>
+
+| Algorithm | Best | Average | Worst | Comparisons | Moves | In place | Stable | Adaptive |
+| :--- | :--- | :--- | :--- | :--- | :--- | :---: | :---: | :---: |
+| Bubble | $O(n^2)$ | $O(n^2)$ | $O(n^2)$ | always $\frac{n(n-1)}{2}$ | many swaps | Yes | Yes | No |
+| Bubble with sentinel | $O(n)$ | $O(n^2)$ | $O(n^2)$ | from $n-1$ to $\frac{n(n-1)}{2}$ | many swaps | Yes | Yes | Partly |
+| Direct insertion | $O(n)$ | $O(n^2)$ | $O(n^2)$ | from $n-1$ to $\frac{n(n-1)}{2}$ | shifts = inversions | Yes | Yes | Yes |
+| Direct selection | $O(n^2)$ | $O(n^2)$ | $O(n^2)$ | always $\frac{n(n-1)}{2}$ | at most $n - 1$ swaps | Yes | No | No |
+| Shellsort | $O(n \log n)$ | between $O(n \log n)$ and $O(n^2)$, depends on the gaps | $O(n^2)$ (Shell's gaps) | | | Yes | No | Yes |
+| Heapsort | $O(n \log n)$ | $O(n \log n)$ | $O(n \log n)$ | | | Yes | No | No |
+| Mergesort | $O(n \log n)$ | $O(n \log n)$ | $O(n \log n)$ | | | No ($O(n)$) | Yes | No (basic version) |
+| Quicksort | $O(n \log n)$ | $O(n \log n)$ | $O(n^2)$ | | | Yes (stack) | No | No |
+| Radix sort | $O(d \cdot n)$ | $O(d \cdot n)$ | $O(d \cdot n)$ | none | | No | Yes | No |
+
+---
+
+## Measurements
+
+### Small sizes: the classic comparison
+
+The course slides include a classic comparison of execution times for $n = 256$ and $n = 512$ elements, with sorted, random and inverse (reverse-sorted) inputs. Some of the most interesting patterns:
+
+- **Bubble sort** is the slowest in almost every case, and it is slow even on sorted data. With a sentinel (or in its bidirectional version), the sorted case becomes almost free.
+- **Direct insertion** is about 3 times faster than bubble on random data, and practically instantaneous on sorted data. **Binary insertion** reduces comparisons, which helps a little on inverse data, but it is clearly slower on sorted data.
+- **Direct selection** takes about the same time in the three cases: its comparisons do not depend on the input.
+- **Shellsort**, **Heapsort** and **Quicksort** are much faster than the simple algorithms already with a few hundred elements: with 512 random elements, between 4 and 10 times faster than direct insertion, and between 10 and 30 times faster than bubble sort. **Heapsort** is remarkably stable across the three inputs, and **Quicksort** is the fastest on random data.
+- Going from 256 to 512 elements, the times of the simple algorithms multiply by about **4**, and those of the efficient ones by a little more than **2**, as their complexities predict.
+
+### Medium sizes, without optimisation
+
+We measured the course implementations for $n = 8{,}000$, **without optimisation** (`-Xint`, times in milliseconds):
+
+| Algorithm | Sorted | Random | Reverse |
+| :--- | ---: | ---: | ---: |
+| Bubble | 542 | 1,132 | 1,592 |
+| Bubble with sentinel | 0.1 | 1,151 | 1,684 |
+| Bidirectional bubble | 0.1 | 1,080 | 1,746 |
+| Direct insertion | 0.2 | 329 | 670 |
+| Binary insertion | 2.4 | 227 | 430 |
+| Direct selection | 509 | 507 | 540 |
+| Shellsort | 2.5 | 6.0 | 3.7 |
+| Heapsort | 7.5 | 7.8 | 6.7 |
+| Mergesort | 3.1 | 4.5 | 3.8 |
+| Quicksort | 1.6 | 3.7 | 1.8 |
+| Radix | 11.7 | 17.8 | 13.1 |
+
+The same patterns appear, and the gap between the families is now enormous: on random data, Quicksort is about **300 times faster** than bubble sort. (Many values of the efficient algorithms are below the 50 ms reliability threshold; they indicate orders of magnitude, not precise times.)
+
+### Large sizes, with optimisation
+
+The simple algorithms are hopeless for large inputs: extrapolating, bubble sort would need hours for a million random elements. For the efficient algorithms, we measured with the JIT optimiser enabled (best of three runs, milliseconds), and included Java's `Arrays.sort` as a reference:
+
+| Algorithm | $n$ | Sorted | Random | Reverse |
+| :--- | ---: | ---: | ---: | ---: |
+| Shellsort | 1,000,000 | 5 | 210 | 30 |
+| | 4,000,000 | 84 | 1,084 | 112 |
+| Heapsort | 1,000,000 | 82 | 159 | 74 |
+| | 4,000,000 | 351 | 771 | 391 |
+| Mergesort | 1,000,000 | 32 | 149 | 56 |
+| | 4,000,000 | 151 | 663 | 279 |
+| Quicksort | 1,000,000 | 11 | 127 | 11 |
+| | 4,000,000 | 63 | 564 | 47 |
+| Radix | 1,000,000 | 133 | 93 | 102 |
+| | 4,000,000 | 922 | 951 | 849 |
+| `Arrays.sort` | 1,000,000 | 0 | 85 | 0 |
+| | 4,000,000 | 2 | 398 | 4 |
+
+Some observations:
+
+- Multiplying $n$ by 4 multiplies the random times by a little more than 4 for the $O(n \log n)$ algorithms, as expected.
+- **Quicksort** is the fastest of the course implementations on random data, with Mergesort and Heapsort behind it. Heapsort suffers from its scattered memory accesses.
+- **Radix sort** is linear in theory, but this implementation stores the numbers in queues of `Integer` objects, and the cost of creating and moving those objects makes it slower than Quicksort here. Asymptotic advantages need efficient implementations to show up in practice.
+- `Arrays.sort` (dual-pivot Quicksort, heavily tuned) beats all of them, and it detects already sorted (and reverse-sorted) inputs, sorting them almost instantly. Library implementations are the result of decades of engineering: use them unless you have a good reason not to.
+
+---
+
+## Choosing a Sorting Algorithm
+
+There is no algorithm that is best in every situation. Some practical guidelines:
+
+- **In real programs, use the library**: `Arrays.sort`, `Collections.sort` or `List.sort` in Java. They are correct, fast and well tested. Implement your own algorithm only for learning, or for very special needs.
+- **Small arrays** (a few dozen elements): **insertion sort**. Its low overhead beats the efficient algorithms for small $n$.
+- **Almost sorted data**: **insertion sort** (or an adaptive algorithm such as TimSort). Avoid Quicksort with the first or last element as pivot.
+- **Large arrays, general case**: **Quicksort** with a good pivot strategy, usually the fastest in practice.
+- **A guaranteed worst case** (real-time systems, or inputs that could be chosen by an adversary): **Heapsort** or **Mergesort**, which are $O(n \log n)$ in every case. Introsort combines Quicksort's speed with Heapsort's guarantee.
+- **Stability required** (sorting records by several criteria): **Mergesort** (or insertion sort for small inputs). Quicksort, Heapsort, Shellsort and selection sort are not stable.
+- **Very little extra memory**: **Heapsort** (or Quicksort, which only needs its stack). Mergesort needs $O(n)$ extra memory.
+- **Very expensive moves** (large records that must be physically moved): **selection sort** for small inputs, since it moves each element at most once; for large inputs, sort an array of indices or references instead.
+- **Integer keys in a limited range, or with few digits**: **counting sort** or **radix sort**, which run in linear time.
+- **Data that does not fit in memory**: **external sorting** (next section).
+
+<details>
+  <summary>🧠 <strong>Checkpoint: Choose the algorithm</strong></summary>
+
+  **Question:** Which algorithm would you use in each case? (a) A list of 30 students to be sorted by grade, keeping the alphabetical order of students with the same grade. (b) 50 million random integers in an embedded device with almost no free memory. (c) The ages (0 to 120) of the 47 million inhabitants of a country.
+
+  **Answer:** (a) A **stable** algorithm: with only 30 elements, insertion sort is perfect (or the library's stable sort for objects). (b) **Heapsort**: $O(n \log n)$ guaranteed and in place. Quicksort would also work if its stack depth is controlled. (c) **Counting sort**: there are only 121 possible keys, so it sorts the data in linear time, $O(n + 121)$, much faster than any comparison-based algorithm.
+
+</details>
+
+---
+
+## External Sorting
+
+All the algorithms of this chapter are **internal**: they assume that the whole array is in main memory, where any element can be accessed quickly. When the data **does not fit in memory** (for example, a file of hundreds of gigabytes), it must stay on disk, where:
+
+- access is much **slower** than in memory, by several orders of magnitude;
+- **sequential** access (reading or writing consecutive blocks) is much faster than **random** access.
+
+Quicksort or Heapsort, which access elements all over the array, would be extremely slow on disk. **External sorting** algorithms are designed to minimise the number of passes over the data and to access it **sequentially**. They are based on the principle of **divide and conquer**, using the same basic principles as internal algorithms (especially **merging**):
+
+1. **Generate sorted runs:** read the file in chunks that fit in memory, sort each chunk with an internal algorithm, and write it back to disk as a sorted **run**.
+2. **Merge the runs:** merge the sorted runs, reading them sequentially, into longer and longer runs, until a single sorted file remains. Merging many runs at once (a **$k$-way merge**, using a heap to find the smallest current element among the $k$ runs) reduces the number of passes.
+
+There are several classic variants of the merging phase: **direct merge** (runs of fixed, doubling length), **natural merge** (takes advantage of the runs already present in the data), **balanced merge** (distributes the runs evenly among several files) and **polyphase merge** (distributes the runs unevenly to reduce the number of files needed). The cost of external sorting is measured mainly in the **number of passes** over the data, since each pass means reading and writing the whole file.
+
+---
+
+## Learn More
+
+- **Visualise the algorithms.** The [Comparison Sorting Visualization](https://www.cs.usfca.edu/~galles/visualization/ComparisonSort.html) by David Galles lets you watch bubble, selection, insertion, Shellsort, Quicksort, Mergesort and Heapsort step by step, with your own data.
+- **Videos.** [Common sorting algorithms](https://www.youtube.com/watch?v=pkkFqlG0Hds&list=PL2_aWCzGMAwKedT2KfDMB9YA5DgASZb3U) (a series explaining the main algorithms), and [Visualization and comparison of sorting algorithms](https://www.youtube.com/watch?v=ZZuD6iUe3Pc), which shows many algorithms running side by side.
+
+---
+
+## Summary
+
+- The simple algorithms are $O(n^2)$ (insertion and bubble with sentinel are linear on sorted data); the efficient ones are $O(n \log n)$ (Quicksort only on average); radix and counting sort are linear for suitable keys.
+- Measurements confirm the theory: doubling $n$ quadruples the time of the simple algorithms and roughly doubles that of the efficient ones. The differences between both families become enormous as $n$ grows.
+- Choose according to the size, the initial order of the data, the need for stability, the available memory and the cost of moves, and prefer the library implementation in real programs.
+- **External sorting** handles data that does not fit in memory, by generating sorted runs and merging them with sequential accesses.
+
+---
+
+## Practice
+
+:::tip Exercises
+- **💻 Complete lab session 2.** Measure bubble, selection, insertion and Quicksort with sorted, reverse and random data, and check that the times agree with the complexity studied for each case.
+- **⚖️ Compare with ratios.** Using the times of two algorithms with different complexities (for example, insertion sort and Quicksort on random data), compute the ratio of their times for increasing $n$. Does it tend to 0 or to infinity? And for two algorithms with the same complexity, such as Heapsort and Mergesort?
+- **🧪 Partially sorted data.** Generate sorted arrays and swap $k$ random pairs of elements. For $k = 0, 10, 1{,}000, n/2$, measure insertion sort, Quicksort and `Arrays.sort`. Which one benefits most from the existing order?
+- **📦 Simulate external sorting.** Sort a file of 10 million integers using only an array of 1 million elements: generate 10 sorted runs in temporary files and merge them with a $k$-way merge. How many times is each element read and written?
+:::
