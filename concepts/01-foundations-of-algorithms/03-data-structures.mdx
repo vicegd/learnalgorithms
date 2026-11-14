@@ -1,0 +1,473 @@
+---
+title: Data Structures
+sidebar_position: 3
+tags: [Foundations, Data Structures, Java Collections, Graphs, Trees]
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Data Structures: The Other Half of Every Program
+
+In the previous lessons we saw that the efficiency of a solution depends on the strategy we choose. It also depends, just as much, on **how the data is organised in memory**. The maximum pairwise product already gave us a hint: the same algorithm used several times more memory with a `List<Integer>` than with an `int[]`.
+
+Algorithms require an adequate **representation of the data** to achieve efficient results. Such representations, together with the operations allowed on them, are called **data structures**. Most current programming languages offer a very similar set of them, so what you learn here with Java transfers almost directly to other languages.
+
+:::note What you will learn in this lesson
+- Why data structures remain essential even though computers keep getting faster.
+- The difference between an **abstract data type** (what operations are offered) and a **data structure** (how they are implemented).
+- The primitive types of Java and their limits, and the strengths and weaknesses of arrays.
+- The main interfaces and implementations of the **Java Collections Framework**, the cost of their operations and how they behave in practice.
+- How these structures map to C# (.NET) and Python.
+- The basic vocabulary of **graphs** and **trees**, which will appear throughout the course.
+:::
+
+---
+
+## Program = Data Structures + Algorithms
+
+Niklaus Wirth's famous formula, *Algorithms + Data Structures = Programs*, expresses an idea that you will see in every chapter of this course: the two cannot be designed separately. An algorithm that needs to check many times whether an element belongs to a collection will be slow on a list and fast on a hash set. A sorting algorithm that is excellent on arrays may be poor on linked lists. Choosing the data structure **is** part of designing the algorithm.
+
+### Are data structures really that important?
+
+Processor speed and memory size keep increasing. A natural question is whether any challenging problem we face today will simply be solved by tomorrow's hardware, making careful data organisation unnecessary.
+
+History says no. As computers become more powerful, we have always used the additional power to tackle **more complex problems**:
+
+- **Bigger problem sizes:** more users, more transactions, higher resolutions, larger genomes, larger language models.
+- **New problems** that were previously considered computationally infeasible.
+
+As we saw in the case study, a better machine cannot compensate for a bad growth rate. The same applies to data structures: a structure whose operations become slower as the collection grows will eventually be the bottleneck, whatever the hardware.
+
+### Abstract data types and data structures
+
+It is useful to distinguish two levels:
+
+- An **abstract data type (ADT)** describes a collection of values and the **operations** allowed on them, without saying how they are implemented. For example, a *stack* is defined by `push`, `pop` and `peek`, with the rule that the last element pushed is the first one popped (LIFO).
+- A **data structure** is a concrete **implementation** of an ADT in memory: an array, a chain of linked nodes, a tree, a hash table...
+
+The same ADT can be implemented by several data structures with very different costs. In Java this distinction appears naturally as **interfaces** (`List`, `Set`, `Map`...) and **classes** that implement them (`ArrayList`, `LinkedList`, `HashSet`, `TreeSet`...). This is the principle of abstraction from the first lesson: we program against the interface and choose the implementation that best fits the operations we will perform most often.
+
+---
+
+## Primitive Types in Java
+
+The most basic data structures are the primitive types offered by the language. In Java, their sizes and ranges are fixed by the language specification, independently of the hardware:
+
+| Type | Category | Size | Range |
+| :--- | :--- | :--- | :--- |
+| `boolean` | Logical | not specified (usually 1 byte) | `true`, `false` |
+| `char` | Character | 2 bytes | Unicode characters (UTF-16 code units) |
+| `byte` | Integer | 1 byte | $-128$ to $127$ |
+| `short` | Integer | 2 bytes | $-32{,}768$ to $32{,}767$ |
+| `int` | Integer | 4 bytes | $-2^{31}$ to $2^{31}-1$ (about $\pm 2.1 \times 10^{9}$) |
+| `long` | Integer | 8 bytes | $-2^{63}$ to $2^{63}-1$ (about $\pm 9.2 \times 10^{18}$) |
+| `float` | Real | 4 bytes | up to about $\pm 3.4 \times 10^{38}$, about 7 significant digits |
+| `double` | Real | 8 bytes | up to about $\pm 1.8 \times 10^{308}$, about 15-16 significant digits |
+
+Two practical consequences, both relevant for algorithms:
+
+- **Integer overflow is silent**, as we saw in the case study: if a result does not fit, it wraps around without warning.
+- **Real numbers are approximate.** `float` and `double` store binary approximations, so `0.1 + 0.2 == 0.3` is `false` in Java. Never compare real numbers with `==`; compare their difference with a small tolerance, and never use them for money.
+
+---
+
+## Arrays
+
+The **array** is the most fundamental data structure: a fixed number of elements of the same type stored in **consecutive memory positions**. It exists in virtually every programming language.
+
+Because elements are contiguous and all have the same size, the address of element $i$ can be computed directly as *start address + i × element size*. That is why accessing any position takes the **same time** regardless of the size of the array, a property called **random access** (or constant-time access).
+
+Arrays also have important limitations:
+
+- **Fixed size.** You cannot resize an array once created; growing it means creating a larger one and copying everything.
+- **Homogeneous elements.** All elements must have the same type.
+- **Positional access only.** Elements are accessed by their index; finding an element by its value requires inspecting the array (unless it is sorted, as you will see with binary search).
+- **Costly insertions and deletions.** Inserting or removing an element in the middle requires shifting all the elements after it.
+- **No higher-level operations.** Arrays do not directly provide sets (without duplicates), stacks, queues, priority queues or dictionaries.
+
+These limitations are exactly what the collection libraries of modern languages solve.
+
+---
+
+## The Java Collections Framework
+
+Java offers a powerful library for working with collections, the **Java Collections Framework** (in the `java.util` package). It improves productivity and quality, because the structures are well tested and optimised, and it is organised around a set of **interfaces** and their **implementations**.
+
+### Interfaces
+
+| Interface | Description |
+| :--- | :--- |
+| `Iterable` | Allows iterating over the elements in a forward direction (and using the *for-each* loop). |
+| `Collection` | Extends `Iterable` to work with groups of objects (add, remove, contains, size...). |
+| `List` | Extends `Collection` to handle **sequences**: ordered elements, accessible by position, duplicates allowed. |
+| `Queue` | Extends `Collection` for collections whose elements are retrieved from the head, usually in FIFO order (first in, first out). |
+| `Deque` | Extends `Queue` to handle **double-ended queues**: insertion and removal at both ends, so it can work as FIFO or LIFO. |
+| `Set` | Extends `Collection` to handle **sets**: no duplicate elements. |
+| `SortedSet` | Extends `Set` to keep the elements sorted in ascending order. |
+| `Map` | Not a `Collection`: stores **key-value pairs** with unique keys (dictionaries). `SortedMap` keeps the keys sorted. |
+
+### Implementations
+
+| Class | Implements | Internal structure | Main features |
+| :--- | :--- | :--- | :--- |
+| `ArrayList` | `List` | Dynamic (resizable) array | Fast access by position; slow insertions in the middle. The default choice for lists. |
+| `LinkedList` | `List`, `Deque` | Doubly linked list | Fast insertion and removal at the ends; slow access by position. |
+| `Vector` | `List` | Dynamic array | Like `ArrayList` but synchronised (thread-safe). Legacy class. |
+| `Stack` | `List` | Dynamic array (extends `Vector`) | LIFO operations `push`, `pop`, `peek`. Legacy class. |
+| `PriorityQueue` | `Queue` | Binary heap | Always retrieves the **smallest** element first (or according to a `Comparator`). |
+| `ArrayDeque` | `Deque` | Circular resizable array | Efficient FIFO queue and LIFO stack. Preferred over `Stack` and usually over `LinkedList`. |
+| `HashSet` | `Set` | Hash table | Very fast add, remove and contains; **no guaranteed order**. |
+| `LinkedHashSet` | `Set` | Hash table + linked list | Like `HashSet`, but iterates in **insertion order**. |
+| `TreeSet` | `SortedSet` | Balanced binary search tree (red-black tree) | Keeps elements **sorted**; operations slower than hashing but still fast. |
+| `HashMap` / `LinkedHashMap` / `TreeMap` | `Map` | Same ideas as the corresponding sets | Dictionaries with unordered, insertion-ordered or sorted keys. |
+
+### The cost of the operations
+
+The following table summarises how the cost of the most common operations grows with the number of elements $n$. We describe it informally here; in the following lessons you will learn the precise notation ($O(1)$, $O(\log n)$, $O(n)$) used to express these costs.
+
+| Structure | Access by position | Search by value | Insert / remove at the end | Insert / remove at the beginning or middle |
+| :--- | :--- | :--- | :--- | :--- |
+| Array / `ArrayList` | constant | linear | constant (amortised)¹ | linear (shifting) |
+| `LinkedList` | linear | linear | constant | constant at the ends; linear to reach the middle |
+| `ArrayDeque` | not available | linear | constant (amortised) | constant at the beginning |
+| `PriorityQueue` | not available | linear | insert: logarithmic; remove the minimum: logarithmic | not available |
+| `HashSet` / `HashMap` | not available | constant on average² | constant on average | constant on average |
+| `TreeSet` / `TreeMap` | not available | logarithmic | logarithmic | logarithmic |
+
+¹ When the internal array of an `ArrayList` is full, it is replaced by a larger one (about 1.5 times larger) and all elements are copied. That copy is expensive, but it happens so rarely that, **on average over a long sequence of insertions**, each insertion costs a constant amount of work. This is called **amortised** cost.
+
+² Hash tables are constant on average if the hash function distributes the elements well. In unfavourable cases, many elements may collide in the same position and operations become slower.
+
+:::tip Choosing a collection
+Ask yourself which operations your algorithm will perform **most often**:
+- Mostly access by position and appends? `ArrayList`.
+- Queue (FIFO) or stack (LIFO)? `ArrayDeque`.
+- Always need the smallest (or largest) element? `PriorityQueue`.
+- Membership tests ("have I seen this before?")? `HashSet`.
+- Need the elements sorted, or ranges like "all elements between B and E"? `TreeSet` / `TreeMap`.
+:::
+
+---
+
+## Collections in Action: What Is the Output?
+
+The best way to understand the behaviour of each collection is to predict the output of small programs. Try to answer each question **before** opening the solution. All these examples are in the course repository.
+
+<Tabs>
+  <TabItem value="arraylist" label="ArrayList" default>
+
+```java
+var collection = new ArrayList<String>();
+collection.add("A");
+collection.add("B");
+collection.add("C");
+collection.add("D");
+collection.add(1, "A2");                 // insert at position 1
+System.out.println(collection.size() + " " + collection);
+
+collection.remove("A2");                 // remove by value
+collection.remove(3);                    // remove by position
+System.out.println(collection.size() + " " + collection);
+```
+
+<details>
+  <summary>Show output</summary>
+
+```text
+5 [A, A2, B, C, D]
+3 [A, B, C]
+```
+
+`add(1, "A2")` shifts B, C and D one position to the right. After removing `"A2"` the list is `[A, B, C, D]`, and `remove(3)` removes the element at **index** 3, which is D. Note that `remove` is overloaded: with an `Object` it removes by value, with an `int` it removes by position. With a `List<Integer>` this overloading is a classic source of bugs!
+
+A `Vector` produces exactly the same output: the difference is not in the behaviour but in synchronisation.
+
+</details>
+
+  </TabItem>
+  <TabItem value="linkedlist" label="LinkedList">
+
+```java
+var collection = new LinkedList<String>();
+collection.add("B");
+collection.add("C");
+collection.add("D");
+collection.addLast("E");
+collection.addFirst("A");
+collection.add(1, "A2");
+System.out.println(collection.size() + " " + collection);
+
+collection.remove("A2");
+collection.remove(3);
+collection.removeFirst();
+collection.removeLast();
+System.out.println(collection.size() + " " + collection);
+```
+
+<details>
+  <summary>Show output</summary>
+
+```text
+6 [A, A2, B, C, D, E]
+2 [B, C]
+```
+
+After the additions the list is `[A, A2, B, C, D, E]`. Removing `"A2"` gives `[A, B, C, D, E]`; `remove(3)` removes D; `removeFirst()` removes A and `removeLast()` removes E. Operations at the ends of a linked list are cheap, but `remove(3)` must walk through the nodes to reach position 3.
+
+</details>
+
+  </TabItem>
+  <TabItem value="stack" label="Stack">
+
+```java
+var collection = new Stack<String>();
+collection.add("A");
+collection.add("B");
+collection.add("C");
+collection.add("D");
+collection.add(1, "A2");
+collection.pop();
+collection.pop();
+System.out.println(collection.size() + " " + collection);
+
+collection.remove("A2");
+collection.remove(3);
+System.out.println(collection.size() + " " + collection);
+```
+
+<details>
+  <summary>Show output</summary>
+
+```text
+3 [A, A2, B]
+Exception in thread "main" java.lang.ArrayIndexOutOfBoundsException: Array index out of range: 3
+```
+
+The two `pop()` calls remove the **last** elements added at the top: D and then C. After removing `"A2"`, the stack contains only `[A, B]`, so `remove(3)` fails because position 3 does not exist.
+
+This example also shows a design flaw of `Stack`: because it extends `Vector`, it allows operations such as `add(1, ...)` or `remove(3)` that break the LIFO discipline. That is one reason why `ArrayDeque` is recommended for stacks.
+
+</details>
+
+  </TabItem>
+  <TabItem value="pq" label="PriorityQueue">
+
+```java
+var queue = new PriorityQueue<String>();
+queue.add("B");
+queue.add("A");
+queue.add("C");
+queue.add("D");
+queue.add("A");
+queue.remove("A");
+System.out.println(queue.size());
+while (!queue.isEmpty()) {
+    System.out.print(queue.poll());
+}
+```
+
+<details>
+  <summary>Show output</summary>
+
+```text
+4
+ABCD
+```
+
+`remove("A")` removes only **one** of the two A's. Then `poll()` always extracts the smallest remaining element, so the elements come out in alphabetical order. Be careful: if you print the queue directly (`System.out.println(queue)`), the order you see is the internal order of the heap, which is **not** necessarily sorted.
+
+</details>
+
+  </TabItem>
+  <TabItem value="deque" label="ArrayDeque">
+
+```java
+var queue = new ArrayDeque<String>();      // used as a FIFO queue
+queue.add("B"); queue.add("A"); queue.add("C"); queue.add("D"); queue.add("A");
+while (!queue.isEmpty()) System.out.print(queue.poll());
+System.out.println();
+
+var stack = new ArrayDeque<String>();      // used as a LIFO stack
+stack.push("B"); stack.push("A"); stack.push("C"); stack.push("D"); stack.push("A");
+stack.add("Z");                            // add at the TAIL
+stack.push("J");                           // push at the HEAD
+while (!stack.isEmpty()) System.out.print(stack.pop());
+```
+
+<details>
+  <summary>Show output</summary>
+
+```text
+BACDA
+JADCABZ
+```
+
+As a queue, elements come out in the same order they went in (FIFO). As a stack, `push` and `pop` work on the head, so elements come out in reverse order (LIFO). The `Z`, added at the tail with `add`, is the last one to come out.
+
+</details>
+
+  </TabItem>
+  <TabItem value="sets" label="Sets">
+
+```java
+var hash = new HashSet<String>();
+hash.add("A"); hash.add("B"); hash.add("C"); hash.add("D");
+System.out.println(hash.add("B"));          // a duplicate
+hash.remove("A"); hash.remove("C");
+System.out.println(hash);
+
+var linked = new LinkedHashSet<String>();
+linked.add("B"); linked.add("A"); linked.add("C"); linked.add("D");
+linked.remove("A"); linked.remove("D");
+System.out.println(linked);
+
+var tree = new TreeSet<String>();
+tree.add("D"); tree.add("A"); tree.add("B"); tree.add("C"); tree.add("E");
+tree.remove("A");
+System.out.println(tree + " " + tree.subSet("B", "E"));
+```
+
+<details>
+  <summary>Show output</summary>
+
+```text
+false
+[B, D]
+[B, C]
+[B, C, D, E] [B, C, D]
+```
+
+- `add` returns `false` when the element was already present: sets never store duplicates.
+- A `HashSet` gives **no ordering guarantees**. Here it happens to print `[B, D]` because of how one-letter strings are hashed, but you must never rely on that order.
+- A `LinkedHashSet` remembers the **insertion order** (B, A, C, D), so after the removals it prints `[B, C]`.
+- A `TreeSet` keeps the elements **sorted**, regardless of the insertion order, and supports range operations: `subSet("B", "E")` includes B and excludes E.
+
+</details>
+
+  </TabItem>
+</Tabs>
+
+---
+
+## Working with Maps
+
+A **map** (or dictionary) associates **keys** with **values**. Keys are unique: putting a value with an existing key replaces the old value. The two most common implementations are `HashMap` and `LinkedHashMap`, together with `TreeMap` when the keys must be sorted.
+
+```java
+Map<String, Integer> stock = new HashMap<>();   // try LinkedHashMap and TreeMap too
+stock.put("pear", 3);
+stock.put("apple", 7);
+stock.put("kiwi", 1);
+stock.put("apple", 9);                          // replaces 7
+stock.merge("kiwi", 1, Integer::sum);           // kiwi = 1 + 1
+System.out.println(stock + " " + stock.get("apple") + " " + stock.get("fig"));
+```
+
+Running it with the three implementations gives:
+
+```text
+HashMap:       {apple=9, pear=3, kiwi=2} 9 null
+LinkedHashMap: {pear=3, apple=9, kiwi=2} 9 null
+TreeMap:       {apple=9, kiwi=2, pear=3} 9 null
+```
+
+The contents are the same; only the **iteration order** changes: unspecified for `HashMap`, insertion order for `LinkedHashMap`, and alphabetical order of the keys for `TreeMap`. Note also that `get` returns `null` for a missing key.
+
+Maps are one of the most useful tools for designing efficient algorithms. For example, counting how many times each word appears in a text takes a single pass with a `HashMap`, while doing it with lists would require searching the list for every word.
+
+---
+
+## Equivalents in Other Languages
+
+The same abstract data types exist in most languages, often with different names:
+
+| Java | C# (.NET) | Python |
+| :--- | :--- | :--- |
+| `ArrayList<E>` | `List<T>` | `list` |
+| `LinkedList<E>` | `LinkedList<T>` | (no direct equivalent; `collections.deque` for the ends) |
+| `ArrayDeque<E>` as a stack / queue | `Stack<T>` / `Queue<T>` | `collections.deque` |
+| `PriorityQueue<E>` | `PriorityQueue<TElement, TPriority>` | `heapq` module |
+| `HashSet<E>` | `HashSet<T>` | `set` |
+| `TreeSet<E>` | `SortedSet<T>` | (not in the standard library) |
+| `HashMap<K, V>` | `Dictionary<TKey, TValue>` | `dict` (keeps insertion order) |
+| `TreeMap<K, V>` | `SortedDictionary<TKey, TValue>` | (not in the standard library) |
+
+The names change, but the trade-offs remain the same: dynamic arrays for positional access, hash tables for fast membership, balanced trees for sorted data and heaps for priorities.
+
+---
+
+## Graphs
+
+Many problems in this course are naturally modelled as **graphs**: road networks, social networks, dependencies between tasks, states of a game...
+
+A **graph** is a set of **nodes** (or vertices) connected by a set of **edges** (or arcs). Formally, a graph is a pair $G = \langle N, A \rangle$, where $N$ is a set of nodes and $A$ is a set of edges, each connecting two nodes.
+
+- In a **directed graph**, edges have a direction: an edge from $u$ to $v$ does not imply an edge from $v$ to $u$ (for example, one-way streets, or "follows" in a social network).
+- In an **undirected graph**, edges have no direction (for example, two-way roads, or friendship).
+- In a **weighted graph**, each edge has an associated value: a distance, a cost, a time...
+
+A sequence of consecutive edges forms a **path**. A path that starts and ends at the same node is a **cycle**. A graph is **connected** if there is a path between every pair of nodes.
+
+### Representing a graph
+
+The two classical representations have different costs, which is another example of how the data structure affects the algorithm:
+
+- **Adjacency matrix:** an $|N| \times |N|$ matrix where cell $(u, v)$ indicates whether there is an edge (or its weight). Checking whether two nodes are connected is immediate, but the memory grows with $|N|^2$, even if the graph has few edges.
+- **Adjacency lists:** for each node, a list of its neighbours. The memory grows with $|N| + |A|$, which is much better for **sparse** graphs (few edges), and traversing the neighbours of a node is efficient. Checking whether a specific edge exists, however, requires searching a list.
+
+### Some algorithms on graphs
+
+Some of the classic graph algorithms that you may meet in this course and in your degree are:
+
+- **Shortest paths:** breadth-first search (for unweighted graphs), Dijkstra's algorithm (non-negative weights), the Bellman-Ford algorithm (which allows negative weights) and the Floyd-Warshall algorithm (shortest paths between all pairs of nodes).
+- **Minimum spanning trees** (connecting all nodes with the minimum total weight): Prim's and Kruskal's algorithms.
+
+---
+
+## Trees
+
+A **tree** consists of a set of nodes and a set of edges connecting pairs of nodes that form a **hierarchical** structure. It has the following features:
+
+- It has a distinguished node called the **root**.
+- Every node $c$ except the root is connected by an edge to exactly one node $p$: $p$ is the **parent** of $c$, and $c$ is one of the **children** of $p$.
+- There is **exactly one path** from the root to each node.
+- The number of edges traversed along a path is its **length**.
+
+Some additional vocabulary: nodes without children are **leaves**; the **depth** of a node is the length of the path from the root to it; and the **height** of the tree is the maximum depth of its nodes. A tree is a special case of a graph: a connected graph without cycles.
+
+### Some types of trees
+
+- **Binary trees**, where each node has at most two children:
+  - **Perfectly balanced trees**, where, for every node, the number of nodes in its left and right subtrees differ by at most one.
+  - **Binary search trees**, where every node is greater than all the nodes of its left subtree and smaller than all the nodes of its right subtree, which allows searching by following a single path from the root. Variants include **balanced** search trees (such as AVL and red-black trees, used by `TreeSet` and `TreeMap`), **optimal** trees (built according to the frequency with which each key is searched) and **splay** trees (which move recently accessed elements towards the root).
+  - **Expression trees**, which represent arithmetic expressions: operators in internal nodes, operands in the leaves.
+  - **Binary heaps**, where every node is smaller than (or equal to) its children, so the minimum is always at the root. They are the structure behind `PriorityQueue`.
+- **Multiway trees**, where nodes can have many children, such as **B-trees**, widely used in databases and file systems because they minimise disk accesses.
+
+:::info Why balance matters
+In a search tree, the cost of an operation depends on the **height** of the tree. A balanced tree with $n$ nodes has a height of about $\log_2 n$: about 20 levels for a million elements. A degenerate tree (for example, one built by inserting already sorted keys into a plain binary search tree) can have height $n$, and then it is no better than a linked list. Keeping the tree balanced is what makes `TreeSet` and `TreeMap` efficient.
+:::
+
+---
+
+## Summary
+
+- Data structures and algorithms are designed together: the same algorithm can be fast or slow depending on how the data is organised.
+- An **abstract data type** defines operations; a **data structure** implements them. In Java: interfaces and classes.
+- Primitive types have fixed limits: integers overflow silently and real numbers are approximate.
+- Arrays offer constant-time access by position but have a fixed size and expensive insertions in the middle.
+- The Java Collections Framework provides lists, queues, deques, sets and maps with different cost profiles. Choose according to the operations you perform most often.
+- Graphs and trees model relationships and hierarchies, and their representation affects the cost of the algorithms that use them.
+
+---
+
+## Practice
+
+:::tip Technical lab
+- **💻 Run the examples.** All the "What is the output?" programs are in the [course repository](https://github.com/vicegd/algorithms), in [`src/topics/foundation/structures`](https://github.com/vicegd/algorithms/tree/master/src/topics/foundation/structures). Modify them and predict the new output before running them.
+- **👀 Visualise the structures.** The [Data Structure Visualizations](https://www.cs.usfca.edu/~galles/visualization/Algorithms.html) by David Galles let you watch step by step how stacks and queues behave when implemented with [arrays](https://www.cs.usfca.edu/~galles/visualization/StackArray.html) or [linked lists](https://www.cs.usfca.edu/~galles/visualization/StackLL.html), as well as heaps, search trees and hash tables.
+- **⏱️ Measure the difference.** Insert 100,000 integers at position 0 of an `ArrayList` and of a `LinkedList`, and measure the time of each. Then access 100,000 random positions in each. Explain the results using the cost table above.
+- **🔍 List or set?** Write a program that checks, for each number of a list of $n$ random integers, whether it has appeared before. Implement it with a `List` (using `contains`) and with a `HashSet`, and compare the times for $n = 10{,}000$, $20{,}000$ and $40{,}000$. How does the time grow in each case?
+- **📺 Learn more.** The playlist [Collection and Generics Framework in Java](https://www.youtube.com/playlist?list=PLGwb7xZHg-oPmcfRxORRiv5jrUoT0zFLq) explains the framework in more depth.
+:::
