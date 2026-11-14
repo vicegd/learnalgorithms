@@ -1,0 +1,221 @@
+---
+title: Growth Rates and Predictions
+sidebar_position: 7
+tags: [Complexity Classes, Scaling, Predictions, Invariance Principle]
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Growth Rates: What Complexity Means in Practice
+
+Asymptotic notation gives us a precise language. This lesson turns it into **practical intuition**: what the most common complexity classes mean in real time, how to **predict** the time an algorithm will need for a larger input, how to estimate the **largest input** it can handle in a given time, and why no improvement in hardware can change the complexity of an algorithm.
+
+Asymptotic analysis allows us:
+
+- to **measure the inherent difficulty** of a problem;
+- to **estimate the time and space** required by an algorithm before running it;
+- to **compare** algorithms that solve the same problem in terms of efficiency.
+
+:::note What you will learn in this lesson
+- The main complexity classes, from $O(1)$ to $O(n^n)$, and which ones are acceptable in practice.
+- How dramatically the classes differ when $n$ grows, and where the "small $n$" exceptions are.
+- How to calculate the expected execution time for a new problem size, and the largest problem size solvable in a given time.
+- The **principle of invariance** and its consequences.
+:::
+
+---
+
+## The Basic Complexity Classes
+
+| Class | Name | Comment | Typical example |
+| :--- | :--- | :--- | :--- |
+| $O(1)$ | Constant | Optimal, but almost always impossible for problems that must look at their input. | Accessing an element of an array by position. |
+| $O(\log n)$ | Logarithmic | Excellent: the time barely grows. | Binary search in a sorted array. |
+| $O(n)$ | Linear | A good and quite usual complexity. Often optimal, since reading the input already takes $n$ steps. | Sequential search; maximum of a vector. |
+| $O(n \log n)$ | Linearithmic | A good complexity, typical of efficient recursive (divide and conquer) algorithms. | Mergesort; Quicksort on average. |
+| $O(n^2)$ | Quadratic | Appears with two nested loops and similar cases. Acceptable for moderate sizes. | Simple sorting algorithms (bubble, insertion, selection). |
+| $O(n^3)$ | Cubic | Grows excessively for large values. | Naive multiplication of matrices. |
+| $O(n^k)$ | Polynomial | General case of polynomial complexity, for a constant $k$. | |
+| $O(2^n)$ | Exponential | Avoid it if possible. | Generating all the subsets of a set. |
+| $O(k^n)$ | Exponential | General case of exponential complexity, for a constant $k \gt 1$. | |
+| $O(n!)$ | Factorial | A bad complexity; it should be avoided. | Generating all the permutations of $n$ elements. |
+| $O(n^n)$ | | A bad complexity; it should be avoided. | |
+
+The classes up to $O(n^k)$ are **polynomial**; from $O(2^n)$ onwards they are **not polynomial**. This border is very significant in computer science: problems that can be solved in polynomial time are usually considered **tractable**, while those that seem to require exponential time are considered **intractable** for large inputs. Some of the most famous open questions in computer science (such as whether P equals NP) are about exactly this border. Several design techniques of this course, such as backtracking and branch and bound, exist precisely to deal with problems for which no polynomial algorithm is known, trying to avoid exploring the whole exponential search space.
+
+---
+
+## How Fast Do They Grow?
+
+The following table shows the **time** that an algorithm would need for different input sizes, assuming that each elementary operation takes **one nanosecond** (a billion operations per second, a reasonable order of magnitude for a modern processor executing simple instructions):
+
+| $n$ | $\log_2 n$ | $n$ | $n \log_2 n$ | $n^2$ | $n^3$ | $2^n$ | $n!$ |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 10 | 3 ns | 10 ns | 33 ns | 100 ns | 1 µs | 1 µs | 4 ms |
+| 20 | 4 ns | 20 ns | 86 ns | 400 ns | 8 µs | 1 ms | 77 years |
+| 50 | 6 ns | 50 ns | 282 ns | 2.5 µs | 125 µs | 13 days | $10^{47}$ years |
+| 100 | 7 ns | 100 ns | 664 ns | 10 µs | 1 ms | $10^{13}$ years | $10^{141}$ years |
+| 1,000 | 10 ns | 1 µs | 10 µs | 1 ms | 1 s | $10^{284}$ years | — |
+| 10,000 | 13 ns | 10 µs | 133 µs | 100 ms | 17 min | — | — |
+| 1,000,000 | 20 ns | 1 ms | 20 ms | 17 min | 32 years | — | — |
+
+For comparison, the age of the universe is about $1.4 \times 10^{10}$ years. Some observations:
+
+- **Logarithmic** algorithms are practically insensitive to the size: going from a thousand to a million elements only doubles the time.
+- **Linear** and **linearithmic** algorithms handle millions of elements in milliseconds.
+- **Quadratic** algorithms are fine for thousands of elements but take minutes for millions.
+- **Exponential and factorial** algorithms are only usable for very small inputs. Note that $2^n$ goes from a millisecond to 13 days when $n$ goes from 20 to 50.
+
+### How large a problem can we solve in one second?
+
+Reversing the question gives a very practical rule of thumb. With about $10^9$ simple operations per second:
+
+| Complexity | Largest $n$ in about one second |
+| :--- | ---: |
+| $O(n)$ | about $10^9$ |
+| $O(n \log n)$ | about $4 \times 10^7$ |
+| $O(n^2)$ | about $30{,}000$ |
+| $O(n^3)$ | about $1{,}000$ |
+| $O(2^n)$ | about $30$ |
+| $O(n!)$ | about $12$ |
+
+Real programs perform several machine instructions per "operation", access memory, allocate objects... so these limits are optimistic, but the **orders of magnitude** are very useful. Competitive programmers use exactly this kind of table to decide, from the size of the input, which complexity their solution needs.
+
+### Small values of $n$
+
+The asymptotic order describes what happens for large $n$, and for small values the picture can be surprising. Compare, for example, $\log_2 n$ with $n^{0.4}$, or $n \log_2 n$ with $n^{1.6}$:
+
+| $n$ | $n^{0.4}$ | $\log_2 n$ | $n^{0.6}$ | $n$ | $n^{1.4}$ | $n \log_2 n$ | $n^{1.6}$ | $n^2$ |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 2 | 1.32 | 1.00 | 1.52 | 2 | 2.64 | 2.0 | 3.03 | 4 |
+| 8 | 2.30 | 3.00 | 3.48 | 8 | 18.4 | 24.0 | 27.9 | 64 |
+| 16 | 3.03 | 4.00 | 5.28 | 16 | 48.5 | 64.0 | 84.4 | 256 |
+| 160 | 7.61 | 7.32 | 21.0 | 160 | 1,218 | 1,172 | 3,362 | 25,600 |
+| 1,280 | 17.5 | 10.3 | 73.2 | 1,280 | 22,392 | 13,212 | 93,656 | 1,638,400 |
+| 41,943,040 | 1,120 | 25.3 | 37,462 | 41,943,040 | $4.7 \times 10^{10}$ | $1.1 \times 10^{9}$ | $1.6 \times 10^{12}$ | $1.8 \times 10^{15}$ |
+
+For small $n$, $\log_2 n$ is **larger** than $n^{0.4}$ and $n \log_2 n$ is larger than $n^{1.4}$. The polynomial functions only overtake the logarithmic ones from about $n = 132$, and from then on the gap grows without limit. Asymptotic conclusions are always about the **long run**.
+
+---
+
+## Predicting Execution Times
+
+Suppose that a program with complexity $O(f(n))$ takes $t_1$ seconds for a problem of size $n_1$. How long will it take for a larger size $n_2$?
+
+Since the time is (approximately) proportional to $f(n)$, with the same constant for both sizes:
+
+$$
+\frac{t_2}{t_1} = \frac{f(n_2)}{f(n_1)} \qquad\Longrightarrow\qquad t_2 = \frac{f(n_2)}{f(n_1)} \cdot t_1
+$$
+
+Writing $n_2 = k \cdot n_1$, with $k = n_2 / n_1$, we obtain simple formulas for the most common classes:
+
+| $f(n)$ | $t_2$ | Explanation |
+| :--- | :--- | :--- |
+| $n$ | $k \cdot t_1$ | The time grows in the same proportion as the size. |
+| $n^c$ | $k^c \cdot t_1$ | Doubling the size multiplies the time by $2^c$. |
+| $\log n$ | $\dfrac{\log n_2}{\log n_1} \cdot t_1$ | Any base can be used, as long as it is the same in both logarithms. |
+| $n \log n$ | $k \cdot \dfrac{\log n_2}{\log n_1} \cdot t_1$ | A little more than linear. |
+| $n^{c_1} \log^{c_2} n$ | $k^{c_1} \cdot \left(\dfrac{\log n_2}{\log n_1}\right)^{c_2} \cdot t_1$ | Combination of the previous ones. |
+| $c^n$ | $c^{\,n_2 - n_1} \cdot t_1$ | Depends on the **difference** of the sizes, not on their ratio. |
+| $n!$ | $\dfrac{n_2!}{n_1!} \cdot t_1 = (n_1 + 1)(n_1 + 2) \cdots n_2 \cdot t_1$ | Grows even faster than exponential. |
+
+For example, if a program takes **1 unit of time** for $n_1 = 1{,}000$:
+
+| Complexity | $n_2 = 10{,}000$ | $n_2 = 10^6$ |
+| :--- | ---: | ---: |
+| $O(1)$ | 1 | 1 |
+| $O(\log n)$ | ≈ 1.3 | 2 |
+| $O(n)$ | 10 | 1,000 |
+| $O(n \log n)$ | ≈ 13 | ≈ 2,000 |
+| $O(n^2)$ | 100 | $10^6$ |
+| $O(n^2 \log n)$ | ≈ 133 | ≈ $2 \times 10^6$ |
+| $O(n^3)$ | 1,000 | $10^9$ |
+| $O(2^n)$ | $2^{9000}$ | $2^{999000}$ |
+| $O(n!)$ | $\prod_{i=1001}^{10000} i$ | $\prod_{i=1001}^{10^6} i$ |
+
+<details>
+  <summary>🧠 <strong>Checkpoint: Predict the time</strong></summary>
+
+  **Question:** A cubic algorithm takes 2 seconds for $n = 500$. How long will it take for $n = 2{,}000$? And an $O(n \log_2 n)$ algorithm that takes 2 seconds for $n = 1{,}024$, for $n = 4{,}096$?
+
+  **Answer:** For the cubic one, $k = 4$ and $t_2 = 4^3 \cdot 2 = 128$ seconds. For the linearithmic one, $k = 4$ and $\frac{\log_2 4096}{\log_2 1024} = \frac{12}{10} = 1.2$, so $t_2 = 4 \cdot 1.2 \cdot 2 = 9.6$ seconds.
+
+</details>
+
+---
+
+## Predicting the Largest Solvable Problem
+
+The reverse question is just as useful: if a program with complexity $O(f(n))$ solves a problem of size $n_1$ in time $t_1$, what size $n_2$ can it solve in a larger time $t_2$? (Equivalently: what size could it solve in the same time on a computer $k$ times faster?)
+
+With $t_2 = k \cdot t_1$, i.e. $k = t_2 / t_1$:
+
+$$
+f(n_2) = \frac{t_2}{t_1} \cdot f(n_1) = k \cdot f(n_1) \qquad\Longrightarrow\qquad n_2 = f^{-1}\big(k \cdot f(n_1)\big)
+$$
+
+| $f(n)$ | $n_2$ | Effect of $k$ times more time (or a $k$ times faster computer) |
+| :--- | :--- | :--- |
+| $n$ | $k \cdot n_1$ | The size grows by the same factor $k$. |
+| $n^c$ | $k^{1/c} \cdot n_1$ | The size grows only by $\sqrt[c]{k}$. |
+| $\log n$ | $n_1^{\,k}$ | The size grows enormously. |
+| $c^n$ | $n_1 + \log_c k$ | The size only **increases by a constant amount**. |
+
+For example, if a program solves a problem of size $n_1 = 10$ in 1 unit of time:
+
+| Complexity | With 1,000 units of time | With $10^6$ units of time |
+| :--- | ---: | ---: |
+| $O(1)$ | any size | any size |
+| $O(\log_2 n)$ | $10^{1000}$ ($\approx 2^{3322}$) | $10^{1000000}$ |
+| $O(n)$ | $10^4$ | $10^7$ |
+| $O(n^2)$ | ≈ 316 | $10^4$ |
+| $O(n^3)$ | 100 | 1,000 |
+| $O(2^n)$ | ≈ 20 | ≈ 30 |
+
+The last row is the most important one: with an exponential algorithm, a computer **a million times faster** only lets us go from 10 to about 30 elements. Exponential complexity cannot be defeated with hardware.
+
+<details>
+  <summary>🧠 <strong>Checkpoint: A faster computer</strong></summary>
+
+  **Question:** An $O(n^2)$ program processes 5,000 records per night. The company buys a server 16 times faster. How many records can it process per night now? And if the program were $O(2^n)$ and processed 40 records?
+
+  **Answer:** For the quadratic program, $n_2 = \sqrt{16} \cdot 5{,}000 = 20{,}000$ records: 16 times more power, but only 4 times more data. For the exponential one, $n_2 = 40 + \log_2 16 = 44$ records: a 16 times faster server only adds 4 records.
+
+</details>
+
+---
+
+## The Principle of Invariance
+
+> Given an algorithm of complexity $O(f(n))$, it will **always** have that complexity, regardless of the language in which it is programmed, the quality of the compiler, the speed of the computer, etc. These factors affect the **implementation constant**, but never the complexity $O(f(n))$.
+
+More formally: two different implementations of the same algorithm, on any two machines, will never differ in efficiency by more than a **constant factor**. If one takes $t_1(n)$ and the other $t_2(n)$, there is a constant $c$ such that $t_1(n) \le c \cdot t_2(n)$ for large enough $n$.
+
+This principle has three important consequences:
+
+1. **It justifies the asymptotic approach.** Since languages, compilers and machines only change the constant, studying the order of growth tells us something true about the algorithm itself, valid on any computer, present or future.
+2. **It explains the time ratios of the lab.** When we compare the same algorithm in two environments (for example, Python and Java), the ratio of their times tends to a constant: the implementation constant.
+3. **It sets the limits of hardware.** Better hardware divides the time by a constant. As the previous tables show, that can compensate for a better algorithm only for small inputs: for large inputs, the algorithm with the better growth rate always wins.
+
+---
+
+## Summary
+
+- The common complexity classes are, from best to worst: $O(1)$, $O(\log n)$, $O(n)$, $O(n \log n)$, $O(n^2)$, $O(n^3)$, $O(n^k)$, $O(2^n)$, $O(n!)$ and $O(n^n)$. Polynomial classes are considered tractable; exponential ones are not.
+- With about $10^9$ operations per second, a quadratic algorithm handles tens of thousands of elements per second, an exponential one only a few dozen.
+- To predict times: $t_2 = \frac{f(n_2)}{f(n_1)} \cdot t_1$. To predict sizes: $n_2 = f^{-1}\left(\frac{t_2}{t_1} \cdot f(n_1)\right)$.
+- For exponential algorithms, more time or faster hardware only adds a **constant** to the solvable size.
+- The **principle of invariance**: implementation, language and hardware change only the constant, never the complexity.
+
+---
+
+## Practice
+
+:::tip Concept consolidation
+- **⏱️ Predict times.** An $O(n^2 \log_2 n)$ algorithm takes 3 seconds for $n = 1{,}024$. Estimate its time for $n = 4{,}096$ and $n = 16{,}384$.
+- **📏 Predict sizes.** An algorithm takes 1 minute for $n = 2{,}000$. What is the largest $n$ it can process in 1 hour if it is $O(n)$? And if it is $O(n^3)$? And $O(3^n)$, if it took 1 minute for $n = 20$?
+- **🧪 Check with experiments.** Take one of the algorithms you measured in the lab sessions. From the time of one size, predict the time for a size 4 times larger, then measure it. How close was the prediction? What could explain the difference?
+- **🗺️ Choose a complexity.** For each input size, which is the highest complexity that would still solve the problem in about one second: $n = 15$, $n = 500$, $n = 10^5$, $n = 10^8$?
+:::
