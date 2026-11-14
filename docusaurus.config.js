@@ -12,6 +12,10 @@ import pluginSiteData from './src/plugins/docusaurus-plugin-site-data.js';
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
+// Toggle the "Algorithm Sheets" section (navbar, homepage card, /algorithms
+// routes, stats and cross-references). Content in ./algorithms is preserved.
+const SHOW_ALGORITHMS = false;
+
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Learn Algorithms',
@@ -30,6 +34,10 @@ const config = {
 
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
+
+  customFields: {
+    showAlgorithms: SHOW_ALGORITHMS,
+  },
   // ... (deja el resto del archivo hacia abajo tal y como está por ahora)
 
   // Even if you don't use internationalization, you can use this field to set
@@ -82,13 +90,17 @@ const config = {
             position: 'left',
             label: 'Concepts',
           },
-          {
-            type: 'docSidebar',
-            sidebarId: 'algorithmsSidebar',
-            docsPluginId: 'algorithms',
-            position: 'left',
-            label: 'Algorithms',
-          },
+          ...(SHOW_ALGORITHMS
+            ? [
+                {
+                  type: 'docSidebar',
+                  sidebarId: 'algorithmsSidebar',
+                  docsPluginId: 'algorithms',
+                  position: 'left',
+                  label: 'Algorithms',
+                },
+              ]
+            : []),
           {
             to: '/stats',
             position: 'left',
@@ -132,18 +144,22 @@ const config = {
   ],
 
   plugins: [
-    pluginSiteData,
-    [
-      '@docusaurus/plugin-content-docs',
-      {
-        id: 'algorithms',
-        path: './algorithms',
-        routeBasePath: 'algorithms',
-        sidebarPath: './sidebarsAlgorithms.js',
-        remarkPlugins: [remarkMath, remarkAutolinkConcepts],
-        rehypePlugins: [rehypeKatex],
-      },
-    ],
+    [pluginSiteData, {includeAlgorithms: SHOW_ALGORITHMS}],
+    ...(SHOW_ALGORITHMS
+      ? [
+          [
+            '@docusaurus/plugin-content-docs',
+            {
+              id: 'algorithms',
+              path: './algorithms',
+              routeBasePath: 'algorithms',
+              sidebarPath: './sidebarsAlgorithms.js',
+              remarkPlugins: [remarkMath, remarkAutolinkConcepts],
+              rehypePlugins: [rehypeKatex],
+            },
+          ],
+        ]
+      : []),
   ],
 };
 
