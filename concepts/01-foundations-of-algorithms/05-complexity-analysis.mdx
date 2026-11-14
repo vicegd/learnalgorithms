@@ -174,21 +174,21 @@ public static boolean contains(int[] list, int value) {
 If the value is in the first position, the method returns after one iteration. If it is not in the vector, it must inspect all $n$ elements. To characterise algorithms like this one, we distinguish three cases:
 
 <Tabs>
-  <TabItem value="worst" label="🔴 Worst case" default>
+<TabItem value="worst" label="🔴 Worst case" default>
 
 **Definition:** $T_{worst}(n)$ is the **maximum** time of the algorithm over all inputs of size $n$. For `contains`, it corresponds to the value not being present (or being in the last position): all $n$ elements are inspected.
 
 **Value:** it is a **guarantee**: the algorithm will never take longer, whatever the input. This is the case that is analysed most often, and the essential one in critical systems that must respond within a deadline (aircraft, medical devices, industrial control).
 
-  </TabItem>
-  <TabItem value="best" label="🟢 Best case">
+</TabItem>
+<TabItem value="best" label="🟢 Best case">
 
 **Definition:** $T_{best}(n)$ is the **minimum** time over all inputs of size $n$. For `contains`, it is the value being in the first position: one iteration, whatever the value of $n$.
 
 **Value:** limited, and sometimes deceptive. Some "best cases" are very unlikely to happen in practice. However, it can be informative: some sorting algorithms, for example, are very fast on data that is already sorted or almost sorted, and that situation does happen in real applications.
 
-  </TabItem>
-  <TabItem value="average" label="🟡 Average case">
+</TabItem>
+<TabItem value="average" label="🟡 Average case">
 
 **Definition:** $T_{average}(n)$ is the **expected** time over the inputs of size $n$. If the possible situations (cases) are numbered $1, 2, \dots, N$, and case $i$ happens with probability $P_i$ and takes time $T_i(n)$, then:
 
@@ -198,7 +198,7 @@ $$
 
 **Value:** apparently, it is the most reasonable measure, because it describes what we should expect "normally". But it has two difficulties: it requires knowing (or assuming) the **probability distribution** of the inputs, which may not reflect reality, and the calculation is usually harder than for the other cases.
 
-  </TabItem>
+</TabItem>
 </Tabs>
 
 ### A small average-case calculation
