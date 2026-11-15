@@ -1,0 +1,18 @@
+name: 💡 Suggest an improvement
+description: An idea to make a lesson clearer, or something you miss.
+title: "[Suggestion] "
+labels: ["enhancement"]
+body:
+  - type: input
+    id: page
+    attributes:
+      label: Page
+      description: The page your suggestion is about (leave empty if it is about the whole site).
+      placeholder: https://learnalgorithms.dev/concepts/...
+  - type: textarea
+    id: description
+    attributes:
+      label: Suggestion
+      description: What would you improve or add, and why?
+    validations:
+      required: true
