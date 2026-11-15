@@ -16,6 +16,7 @@ import remarkCodeLineNumbers from './src/plugins/remark-code-line-numbers.js';
 // Toggle the "Algorithm Sheets" section (navbar, homepage card, /algorithms
 // routes, stats and cross-references). Content in ./algorithms is preserved.
 const SHOW_ALGORITHMS = false;
+const SHOW_NAV_SECTIONS = false;
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
@@ -85,12 +86,20 @@ const config = {
           src: 'img/logo.svg',
         },
         items: [
-          {
-            type: 'docSidebar',
-            sidebarId: 'tutorialSidebar',
-            position: 'left',
-            label: 'Concepts',
-          },
+          // The "Concepts" and "Stats" menu entries are hidden for now: the
+          // concepts are reached from the home page, and the stats page will
+          // return when there is more to show. Set SHOW_NAV_SECTIONS to true
+          // to bring them back.
+          ...(SHOW_NAV_SECTIONS
+            ? [
+                {
+                  type: 'docSidebar',
+                  sidebarId: 'tutorialSidebar',
+                  position: 'left',
+                  label: 'Concepts',
+                },
+              ]
+            : []),
           ...(SHOW_ALGORITHMS
             ? [
                 {
@@ -102,11 +111,15 @@ const config = {
                 },
               ]
             : []),
-          {
-            to: '/stats',
-            position: 'left',
-            label: 'Stats',
-          },
+          ...(SHOW_NAV_SECTIONS
+            ? [
+                {
+                  to: '/stats',
+                  position: 'left',
+                  label: 'Stats',
+                },
+              ]
+            : []),
           {
             href: 'https://github.com/vicegd/learnalgorithms',
             label: 'GitHub',
