@@ -54,21 +54,21 @@ When the records are large, moving them is expensive. A common technique is to s
 
 Sorting algorithms are compared according to several criteria.
 
-### 1. Total number of steps: complexity
+### Total number of steps: complexity
 
 The complexity in the best, worst and average cases, which we will analyze with the tools of the previous chapter. Simple algorithms are $O(n^2)$ in their worst case; efficient ones reach $O(n \log n)$.
 
-### 2. Number of comparisons
+### Number of comparisons
 
 How many times two **keys** are compared. Comparisons are the "decisions" of the algorithm, and for complex keys (strings, objects) they can be the dominant cost. We will write $C(n)$ for the number of comparisons.
 
-### 3. Number of moves (interchanges)
+### Number of moves (interchanges)
 
 How many times elements are moved or exchanged. An **interchange** (swap) of two elements requires three assignments, so it is usually **much more expensive than a comparison**, especially when the elements are large records. We will write $M(n)$ for the number of moves or swaps.
 
 Counting comparisons and moves separately is more informative than counting all operations together: two algorithms with the same complexity may be very different in practice if one performs many more swaps than the other.
 
-### 4. Stability
+### Stability
 
 A sorting algorithm is **stable** if it preserves the relative order of elements with **equal keys**.
 
@@ -83,12 +83,12 @@ Suppose we have a list of students already sorted alphabetically by name, and we
 
 Stability is what makes it possible to sort by several criteria in successive passes: first by the secondary criterion, then (stably) by the primary one. It does not matter when sorting plain integers, because equal integers are indistinguishable, but it is essential when sorting records.
 
-### 5. Type of memory used: internal and external algorithms
+### Type of memory used: internal and external algorithms
 
 - **Internal algorithms** sort data that fits entirely in **main memory**, where any element can be accessed directly at a similar cost. All the algorithms in this chapter, except the last section, are internal.
 - **External algorithms** sort data that does **not fit** in main memory and must stay in secondary storage (disks), where access is much slower and sequential access is much cheaper than random access. They are designed to minimize the number of disk accesses.
 
-### 6. Additional criteria
+### Additional criteria
 
 Two more properties will help us describe the algorithms:
 
