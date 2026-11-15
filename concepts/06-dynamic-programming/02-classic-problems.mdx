@@ -113,11 +113,19 @@ The first rows of the table (Pascal's triangle):
 
 <ProofLink to="/concepts/dynamic-programming/proofs#pascals-rule" title="Pascal's rule" />
 
+<Origin who="Blaise Pascal" year="1654" title="Traité du triangle arithmétique" venue="Published in 1665">
+  The triangle was known centuries earlier in China, India and Persia; Pascal’s treatise systematized its properties.
+</Origin>
+
 ---
 
 ## The 0/1 Knapsack Problem
 
 We met the knapsack problem in the greedy chapter. Now the objects **cannot be fragmented**: each object is either taken entirely or left. We have $n$ objects, each with a weight $w_i$ and a value $v_i$, and a backpack that can carry a total weight not exceeding $W$; we want to maximize the total value. We saw that no greedy heuristic is optimal for this version. Dynamic programming is.
+
+<Origin who="George B. Dantzig" year="1957" title="Discrete-variable extremum problems" venue="Operations Research 5(2):266–288" url="https://doi.org/10.1287/opre.5.2.266">
+  One of the first applications of Bellman’s multistage approach to the knapsack problem.
+</Origin>
 
 ### Data
 
@@ -323,7 +331,7 @@ public int[][] minimumCosts(int[][] fee) {
 }
 ```
 
-**Complexity.** There are about $n^2 / 2$ pairs, and each one tries up to $n$ intermediate docks: $O(n^3)$ time and $O(n^2)$ memory. It is the same idea as Floyd's algorithm for shortest paths between all pairs of nodes of a graph, simplified by the fact that the boats only go downstream.
+**Complexity.** There are about $n^2 / 2$ pairs, and each one tries up to $n$ intermediate docks: $O(n^3)$ time and $O(n^2)$ memory. It is the same idea as Floyd's algorithm ([Floyd, 1962](https://doi.org/10.1145/367766.368168)) for shortest paths between all pairs of nodes of a graph, simplified by the fact that the boats only go downstream.
 
 <RepoCode files={['dynamic/river/RiverTravel.java']} />
 
@@ -376,6 +384,10 @@ with $D(i, 0) = i$ and $D(0, j) = j$. The complete table for `KITTEN` (rows) and
 | N | 6 | 6 | 5 | 4 | 3 | 3 | 2 | **3** |
 
 Spelling correctors use it to suggest the closest dictionary words, and bioinformatics uses weighted variants to align DNA sequences.
+
+<Origin who="Robert A. Wagner and Michael J. Fischer" year="1974" title="The string-to-string correction problem" venue="Journal of the ACM 21(1):168–173" url="https://doi.org/10.1145/321796.321811">
+  The distance itself was defined by Vladimir Levenshtein in 1965; Wagner and Fischer gave the dynamic programming algorithm (also for the LCS).
+</Origin>
 
 ---
 

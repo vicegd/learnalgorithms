@@ -71,6 +71,10 @@ Taking `x[i]` when `x[i] <= y[j]` (that is, preferring the left half in case of 
 
 <ProofLink to="/concepts/sorting/proofs#mergesort-is-correct-and-costs-n-log-n" title="Mergesort is correct and costs n log n" />
 
+<Origin who="John von Neumann" year="1945" venue="Unpublished manuscript on sorting programs for the EDVAC">
+  There is no published paper: the attribution comes from Knuth, The Art of Computer Programming, vol. 3, §5.2.4.
+</Origin>
+
 ---
 
 ## Quicksort, Revisited
@@ -94,6 +98,8 @@ There are three vertical rods and $n$ discs of different sizes, initially stacke
 - a disc can never be placed on top of a smaller one.
 
 The puzzle was invented by the French mathematician Édouard Lucas in 1883, together with a legend: in a temple, monks are moving a tower of 64 golden discs, and when they finish, the world will end.
+
+<Origin who="Édouard Lucas" year="1883" venue="Sold as a puzzle under the pseudonym “N. Claus de Siam”" />
 
 ### The recursive strategy
 
@@ -212,6 +218,10 @@ LargeInteger multiply(LargeInteger u, LargeInteger v) {      // n digits each
 
 <ProofLink to="/concepts/divide-and-conquer/proofs#karatsubas-identity" title="Karatsuba's identity" />
 
+<Origin who="A. Karatsuba and Yu. Ofman" year="1962" title="Multiplication of many-digital numbers by automatic computers" venue="Doklady Akademii Nauk SSSR 145(2):293–294 (in Russian)" url="https://www.mathnet.ru/eng/dan26729">
+  The algorithm is Karatsuba’s; the paper, written by Kolmogorov, also contained a separate result by Ofman.
+</Origin>
+
 ### What does Java use?
 
 Java's `BigInteger` combines several algorithms depending on the size of the operands: the classic $O(n^2)$ method for small numbers (where its low overhead wins), **Karatsuba** ($O(n^{1.585})$) for larger numbers and **Toom-Cook** ($O(n^{1.465})$, a generalization that splits into three parts) for the largest ones. Even faster algorithms, based on the fast Fourier transform, exist for gigantic numbers.
@@ -283,6 +293,8 @@ The number of cells to cover is $n^2 - 1$, which is always divisible by 3 when $
 **Analysis.** With $n$ as the side of the board: $a = 4$ subproblems, $b = 2$, and placing the central tromino is constant, $k = 0$. Since $a \gt b^k$: $O(n^{\log_2 4}) = O(n^2)$, proportional to the number of cells, which is optimal. You can try the puzzle interactively at the [Tromino puzzle page](http://www3.amherst.edu/~nstarr/trom/puzzle-8by8/) by Norton Starr.
 
 The Tromino puzzle is also a beautiful example of a **proof by induction**: the recursive algorithm is, at the same time, a proof that the tiling always exists.
+
+<Origin who="Solomon W. Golomb" year="1954" title="Checker boards and polyominoes" venue="The American Mathematical Monthly 61(10):675–682" url="https://doi.org/10.2307/2307321" />
 
 ---
 

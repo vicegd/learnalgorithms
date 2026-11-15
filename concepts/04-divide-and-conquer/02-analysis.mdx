@@ -178,7 +178,7 @@ Notice how Quicksort appears in both tables: with perfectly balanced partitions,
 
   **Question:** Give the complexity of (1) an algorithm that splits a problem of size $n$ into 8 subproblems of size $n/2$ and combines them in $O(n^2)$, and (2) the same with 7 subproblems.
 
-  **Answer:** (1) $a = 8$, $b = 2$, $k = 2$: $a = 8 \gt b^k = 4$, so $O(n^{\log_2 8}) = O(n^3)$. This is the divide and conquer multiplication of $n \times n$ matrices with 8 products of half-size blocks: no better than the classic algorithm. (2) With $a = 7$: $O(n^{\log_2 7}) \approx O(n^{2.81})$. This is **Strassen's algorithm**, which saves one block multiplication at the cost of more additions, and beats the classic cubic algorithm for large matrices. The same trick, saving one recursive call, makes Karatsuba's multiplication faster.
+  **Answer:** (1) $a = 8$, $b = 2$, $k = 2$: $a = 8 \gt b^k = 4$, so $O(n^{\log_2 8}) = O(n^3)$. This is the divide and conquer multiplication of $n \times n$ matrices with 8 products of half-size blocks: no better than the classic algorithm. (2) With $a = 7$: $O(n^{\log_2 7}) \approx O(n^{2.81})$. This is **Strassen's algorithm** ([Strassen, 1969](https://doi.org/10.1007/BF02165411)), which saves one block multiplication at the cost of more additions, and beats the classic cubic algorithm for large matrices. The same trick, saving one recursive call, makes Karatsuba's multiplication faster.
 
 </details>
 

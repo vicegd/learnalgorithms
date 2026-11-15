@@ -10,6 +10,10 @@ import FigForkJoin from './img/fork-join.svg';
 import FigWorkStealing from './img/work-stealing.svg';
 import FigSumTasks from './img/sum-tasks.svg';
 
+<Origin who="Doug Lea" year="2000" title="A Java fork/join framework" venue="Proceedings of the ACM Java Grande Conference, 36–43" url="https://gee.cs.oswego.edu/dl/papers/fj.pdf">
+  The design that became java.util.concurrent.ForkJoinPool in Java 7.
+</Origin>
+
 # The Fork/Join Framework
 
 Creating and coordinating threads by hand is laborious and error-prone. Since Java 7, the package `java.util.concurrent` includes the **Fork/Join framework**, designed precisely to execute **divide and conquer** algorithms in parallel, using all the available processors automatically. This lesson explains how it works and how to use it, with the examples of the course repository.
@@ -117,6 +121,10 @@ Each worker thread of a `ForkJoinPool` keeps its own queue of tasks. When a thre
 <Figure caption="Work stealing in a ForkJoinPool. Each worker takes its own tasks from one end of its queue; an idle worker steals from the other end of a busy worker's queue, where the oldest and usually largest tasks are.">
   <FigWorkStealing />
 </Figure>
+
+<Origin who="Robert D. Blumofe and Charles E. Leiserson" year="1999" title="Scheduling multithreaded computations by work stealing" venue="Journal of the ACM 46(5):720–748" url="https://doi.org/10.1145/324133.324234">
+  The analysis of the work-stealing scheduler of Cilk, which Fork/Join adapts.
+</Origin>
 
 ### Information about the parallelism
 
