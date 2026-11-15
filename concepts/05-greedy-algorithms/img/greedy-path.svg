@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 680 250" width="680" height="250" role="img">
+  <title>A greedy algorithm follows a single path in the tree of states and discards the other branches</title>
+  <line class="ln-mut" x1="300.0" y1="43.0" x2="150.0" y2="87.0"/>
+  <line class="ln-hl" x1="300.0" y1="43.0" x2="300.0" y2="87.0"/>
+  <line class="ln-mut" x1="300.0" y1="43.0" x2="450.0" y2="87.0"/>
+  <line class="ln-mut" x1="300.0" y1="113.0" x2="230.0" y2="157.0"/>
+  <line class="ln-hl" x1="300.0" y1="113.0" x2="370.0" y2="157.0"/>
+  <line class="ln-hl" x1="370.0" y1="183.0" x2="370.0" y2="217.0"/>
+  <rect class="box-blue" x="250.0" y="17.0" width="100.0" height="26.0" rx="6"/>
+  <text class="t-s" x="300.0" y="30.5" text-anchor="middle" dominant-baseline="central">initial state</text>
+  <rect class="box-mut" x="100.0" y="87.0" width="100.0" height="26.0" rx="6"/>
+  <text class="t-s t-mut" x="150.0" y="100.5" text-anchor="middle" dominant-baseline="central">state A</text>
+  <rect class="box-hl" x="250.0" y="87.0" width="100.0" height="26.0" rx="6"/>
+  <text class="t-s" x="300.0" y="100.5" text-anchor="middle" dominant-baseline="central">state B</text>
+  <rect class="box-mut" x="400.0" y="87.0" width="100.0" height="26.0" rx="6"/>
+  <text class="t-s t-mut" x="450.0" y="100.5" text-anchor="middle" dominant-baseline="central">state C</text>
+  <rect class="box-mut" x="180.0" y="157.0" width="100.0" height="26.0" rx="6"/>
+  <text class="t-s t-mut" x="230.0" y="170.5" text-anchor="middle" dominant-baseline="central">state D</text>
+  <rect class="box-hl" x="320.0" y="157.0" width="100.0" height="26.0" rx="6"/>
+  <text class="t-s" x="370.0" y="170.5" text-anchor="middle" dominant-baseline="central">state E</text>
+  <rect class="box-hl" x="320.0" y="217.0" width="100.0" height="26.0" rx="6"/>
+  <text class="t-s" x="370.0" y="230.5" text-anchor="middle" dominant-baseline="central">solution</text>
+  <text class="t-xs t-hl" x="520.0" y="100.0" text-anchor="start" dominant-baseline="central">← the heuristic picks B</text>
+  <text class="t-xs t-hl" x="440.0" y="170.0" text-anchor="start" dominant-baseline="central">← and then E</text>
+  <text class="t-xs t-mut" x="60.0" y="170.0" text-anchor="start" dominant-baseline="central">discarded forever</text>
+</svg>

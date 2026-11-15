@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 680 210" width="680" height="210" role="img">
+  <title>Greedy coloring of a crown graph: 2 colors in one order, 4 colors in another</title>
+  <text class="t-s t-b" x="155.0" y="16.0" text-anchor="middle" dominant-baseline="central">order u0, u1, u2, u3, v0, ...: 2 colors</text>
+  <line class="ln" x1="50.0" y1="55.0" x2="125.0" y2="150.0"/>
+  <line class="ln" x1="50.0" y1="55.0" x2="200.0" y2="150.0"/>
+  <line class="ln" x1="50.0" y1="55.0" x2="275.0" y2="150.0"/>
+  <line class="ln" x1="125.0" y1="55.0" x2="50.0" y2="150.0"/>
+  <line class="ln" x1="125.0" y1="55.0" x2="200.0" y2="150.0"/>
+  <line class="ln" x1="125.0" y1="55.0" x2="275.0" y2="150.0"/>
+  <line class="ln" x1="200.0" y1="55.0" x2="50.0" y2="150.0"/>
+  <line class="ln" x1="200.0" y1="55.0" x2="125.0" y2="150.0"/>
+  <line class="ln" x1="200.0" y1="55.0" x2="275.0" y2="150.0"/>
+  <line class="ln" x1="275.0" y1="55.0" x2="50.0" y2="150.0"/>
+  <line class="ln" x1="275.0" y1="55.0" x2="125.0" y2="150.0"/>
+  <line class="ln" x1="275.0" y1="55.0" x2="200.0" y2="150.0"/>
+  <circle class="box-blue" cx="50.0" cy="55.0" r="15.0"/>
+  <text class="t-xs" x="50.0" y="55.0" text-anchor="middle" dominant-baseline="central">u0</text>
+  <circle class="box-ac" cx="50.0" cy="150.0" r="15.0"/>
+  <text class="t-xs" x="50.0" y="150.0" text-anchor="middle" dominant-baseline="central">v0</text>
+  <circle class="box-blue" cx="125.0" cy="55.0" r="15.0"/>
+  <text class="t-xs" x="125.0" y="55.0" text-anchor="middle" dominant-baseline="central">u1</text>
+  <circle class="box-ac" cx="125.0" cy="150.0" r="15.0"/>
+  <text class="t-xs" x="125.0" y="150.0" text-anchor="middle" dominant-baseline="central">v1</text>
+  <circle class="box-blue" cx="200.0" cy="55.0" r="15.0"/>
+  <text class="t-xs" x="200.0" y="55.0" text-anchor="middle" dominant-baseline="central">u2</text>
+  <circle class="box-ac" cx="200.0" cy="150.0" r="15.0"/>
+  <text class="t-xs" x="200.0" y="150.0" text-anchor="middle" dominant-baseline="central">v2</text>
+  <circle class="box-blue" cx="275.0" cy="55.0" r="15.0"/>
+  <text class="t-xs" x="275.0" y="55.0" text-anchor="middle" dominant-baseline="central">u3</text>
+  <circle class="box-ac" cx="275.0" cy="150.0" r="15.0"/>
+  <text class="t-xs" x="275.0" y="150.0" text-anchor="middle" dominant-baseline="central">v3</text>
+  <text class="t-xs t-mut" x="155.0" y="188.0" text-anchor="middle" dominant-baseline="central">all the u first: optimal</text>
+  <text class="t-s t-b" x="505.0" y="16.0" text-anchor="middle" dominant-baseline="central">order u0, v0, u1, v1, ...: 4 colors</text>
+  <line class="ln" x1="400.0" y1="55.0" x2="475.0" y2="150.0"/>
+  <line class="ln" x1="400.0" y1="55.0" x2="550.0" y2="150.0"/>
+  <line class="ln" x1="400.0" y1="55.0" x2="625.0" y2="150.0"/>
+  <line class="ln" x1="475.0" y1="55.0" x2="400.0" y2="150.0"/>
+  <line class="ln" x1="475.0" y1="55.0" x2="550.0" y2="150.0"/>
+  <line class="ln" x1="475.0" y1="55.0" x2="625.0" y2="150.0"/>
+  <line class="ln" x1="550.0" y1="55.0" x2="400.0" y2="150.0"/>
+  <line class="ln" x1="550.0" y1="55.0" x2="475.0" y2="150.0"/>
+  <line class="ln" x1="550.0" y1="55.0" x2="625.0" y2="150.0"/>
+  <line class="ln" x1="625.0" y1="55.0" x2="400.0" y2="150.0"/>
+  <line class="ln" x1="625.0" y1="55.0" x2="475.0" y2="150.0"/>
+  <line class="ln" x1="625.0" y1="55.0" x2="550.0" y2="150.0"/>
+  <circle class="box-blue" cx="400.0" cy="55.0" r="15.0"/>
+  <text class="t-xs" x="400.0" y="55.0" text-anchor="middle" dominant-baseline="central">u0</text>
+  <circle class="box-blue" cx="400.0" cy="150.0" r="15.0"/>
+  <text class="t-xs" x="400.0" y="150.0" text-anchor="middle" dominant-baseline="central">v0</text>
+  <circle class="box-ac" cx="475.0" cy="55.0" r="15.0"/>
+  <text class="t-xs" x="475.0" y="55.0" text-anchor="middle" dominant-baseline="central">u1</text>
+  <circle class="box-ac" cx="475.0" cy="150.0" r="15.0"/>
+  <text class="t-xs" x="475.0" y="150.0" text-anchor="middle" dominant-baseline="central">v1</text>
+  <circle class="box-hl" cx="550.0" cy="55.0" r="15.0"/>
+  <text class="t-xs" x="550.0" y="55.0" text-anchor="middle" dominant-baseline="central">u2</text>
+  <circle class="box-hl" cx="550.0" cy="150.0" r="15.0"/>
+  <text class="t-xs" x="550.0" y="150.0" text-anchor="middle" dominant-baseline="central">v2</text>
+  <circle class="box-pur" cx="625.0" cy="55.0" r="15.0"/>
+  <text class="t-xs" x="625.0" y="55.0" text-anchor="middle" dominant-baseline="central">u3</text>
+  <circle class="box-pur" cx="625.0" cy="150.0" r="15.0"/>
+  <text class="t-xs" x="625.0" y="150.0" text-anchor="middle" dominant-baseline="central">v3</text>
+  <text class="t-xs t-mut" x="505.0" y="188.0" text-anchor="middle" dominant-baseline="central">alternating: twice as many colors</text>
+</svg>

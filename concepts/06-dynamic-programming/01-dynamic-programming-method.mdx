@@ -6,6 +6,8 @@ tags: [Paradigms, Dynamic Programming, Memoization, Principle of Optimality]
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import FigFibonacciCalls from './img/fibonacci-calls.svg';
+import FigFibonacciTable from './img/fibonacci-table.svg';
 
 # The Dynamic Programming Method
 
@@ -41,16 +43,9 @@ long fibonacci_dv(int n) {
 
 For $n = 6$, the call tree contains **25 calls**, but only **7 different subproblems**: $F(0), F(1), \dots, F(6)$. $F(2)$ is computed 5 times, $F(1)$ 8 times and $F(0)$ 5 times:
 
-```
-                                fib(6)=8
-                 ┌────────────────┴────────────────┐
-             fib(5)=5                           fib(4)=3
-          ┌─────┴──────┐                     ┌─────┴─────┐
-      fib(4)=3      fib(3)=2             fib(3)=2      fib(2)=1
-       ┌──┴──┐       ┌──┴──┐              ┌──┴──┐        ...
-  fib(3)=2 fib(2)=1  ...   ...           ...   ...
-     ...      ...
-```
+<Figure caption="The complete call tree for F(6): 25 calls for only 7 different subproblems. F(3) is computed three times and F(2) five times.">
+  <FigFibonacciCalls />
+</Figure>
 
 The time is $\Theta(\varphi^n) \approx O(1.6^n)$, exponential, but there are only $n + 1$ different subproblems. If we store each result the first time we compute it, the exponential explosion disappears.
 
@@ -79,6 +74,10 @@ long fibonacci_dp(int n) {
 | $i$ | 0 | 1 | 2 | 3 | 4 | 5 | 6 |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | $f[i]$ | 0 | 1 | 1 | 2 | 3 | 5 | 8 |
+
+<Figure caption="The table fills from left to right; each cell uses the two cells before it, already computed. Every value is computed exactly once.">
+  <FigFibonacciTable />
+</Figure>
 
 Each cell is computed from the two previous ones: $f[2] = 1 + 0$, $f[3] = 1 + 1$, $f[4] = 2 + 1$, $f[5] = 3 + 2$, $f[6] = 5 + 3$. The time drops from $O(1.6^n)$ to $O(n)$.
 

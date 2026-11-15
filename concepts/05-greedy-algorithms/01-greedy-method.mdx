@@ -6,6 +6,8 @@ tags: [Paradigms, Greedy, Heuristics, Optimization]
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import FigGreedyPath from './img/greedy-path.svg';
+import FigChangeCounterexample from './img/change-counterexample.svg';
 
 # The Greedy Method
 
@@ -42,15 +44,9 @@ The process can be seen as a path through the **tree of states** of the problem:
 
 For this to work, every state that is developed must be **achievable**: from it, it must still be possible to reach a solution of the problem.
 
-```
-                    initial state
-                   /      |      \
-              state A   state B   state C        ← the heuristic picks B
-                         /    \
-                    state D   state E            ← and then E
-                               |
-                            solution
-```
+<Figure caption="A greedy algorithm develops a single path in the tree of states. At each state the heuristic chooses one child, and the other branches are never explored.">
+  <FigGreedyPath />
+</Figure>
 
 ---
 
@@ -143,6 +139,10 @@ Depending on the monetary system and on the **availability** of coins, this heur
 - Available coins: **€0.50, €0.20, €0.02**.
 - Greedy solution: €0.50 + 5 × €0.02 = **6 coins**.
 - Optimal solution: 3 × €0.20 = **3 coins**.
+
+<Figure caption="The counterexample: with coins of 50, 20 and 2 cents, taking the 50 first forces five 2-cent coins, while three 20-cent coins were enough.">
+  <FigChangeCounterexample />
+</Figure>
 
 The first choice (the 50-cent coin) looked best, but it led to a bad solution, and a greedy algorithm never goes back. This problem can be solved optimally with other techniques: backtracking, which explores all the possibilities, or dynamic programming, which is the usual choice for it.
 

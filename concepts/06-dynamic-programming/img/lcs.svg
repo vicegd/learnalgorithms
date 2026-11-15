@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 520 140" width="520" height="140" role="img">
+  <title>The longest common subsequence of ALGORITHM and ALTRUISM: ALRIM</title>
+  <rect class="box-hl" x="60.0" y="20.0" width="40.0" height="30.0" rx="3"/>
+  <text class="t-m" x="80.0" y="35.5" text-anchor="middle" dominant-baseline="central">A</text>
+  <rect class="box-hl" x="100.0" y="20.0" width="40.0" height="30.0" rx="3"/>
+  <text class="t-m" x="120.0" y="35.5" text-anchor="middle" dominant-baseline="central">L</text>
+  <rect class="box" x="140.0" y="20.0" width="40.0" height="30.0" rx="3"/>
+  <text class="t-m" x="160.0" y="35.5" text-anchor="middle" dominant-baseline="central">G</text>
+  <rect class="box" x="180.0" y="20.0" width="40.0" height="30.0" rx="3"/>
+  <text class="t-m" x="200.0" y="35.5" text-anchor="middle" dominant-baseline="central">O</text>
+  <rect class="box-hl" x="220.0" y="20.0" width="40.0" height="30.0" rx="3"/>
+  <text class="t-m" x="240.0" y="35.5" text-anchor="middle" dominant-baseline="central">R</text>
+  <rect class="box-hl" x="260.0" y="20.0" width="40.0" height="30.0" rx="3"/>
+  <text class="t-m" x="280.0" y="35.5" text-anchor="middle" dominant-baseline="central">I</text>
+  <rect class="box" x="300.0" y="20.0" width="40.0" height="30.0" rx="3"/>
+  <text class="t-m" x="320.0" y="35.5" text-anchor="middle" dominant-baseline="central">T</text>
+  <rect class="box" x="340.0" y="20.0" width="40.0" height="30.0" rx="3"/>
+  <text class="t-m" x="360.0" y="35.5" text-anchor="middle" dominant-baseline="central">H</text>
+  <rect class="box-hl" x="380.0" y="20.0" width="40.0" height="30.0" rx="3"/>
+  <text class="t-m" x="400.0" y="35.5" text-anchor="middle" dominant-baseline="central">M</text>
+  <rect class="box-hl" x="80.0" y="90.0" width="40.0" height="30.0" rx="3"/>
+  <text class="t-m" x="100.0" y="105.5" text-anchor="middle" dominant-baseline="central">A</text>
+  <rect class="box-hl" x="120.0" y="90.0" width="40.0" height="30.0" rx="3"/>
+  <text class="t-m" x="140.0" y="105.5" text-anchor="middle" dominant-baseline="central">L</text>
+  <rect class="box" x="160.0" y="90.0" width="40.0" height="30.0" rx="3"/>
+  <text class="t-m" x="180.0" y="105.5" text-anchor="middle" dominant-baseline="central">T</text>
+  <rect class="box-hl" x="200.0" y="90.0" width="40.0" height="30.0" rx="3"/>
+  <text class="t-m" x="220.0" y="105.5" text-anchor="middle" dominant-baseline="central">R</text>
+  <rect class="box" x="240.0" y="90.0" width="40.0" height="30.0" rx="3"/>
+  <text class="t-m" x="260.0" y="105.5" text-anchor="middle" dominant-baseline="central">U</text>
+  <rect class="box-hl" x="280.0" y="90.0" width="40.0" height="30.0" rx="3"/>
+  <text class="t-m" x="300.0" y="105.5" text-anchor="middle" dominant-baseline="central">I</text>
+  <rect class="box" x="320.0" y="90.0" width="40.0" height="30.0" rx="3"/>
+  <text class="t-m" x="340.0" y="105.5" text-anchor="middle" dominant-baseline="central">S</text>
+  <rect class="box-hl" x="360.0" y="90.0" width="40.0" height="30.0" rx="3"/>
+  <text class="t-m" x="380.0" y="105.5" text-anchor="middle" dominant-baseline="central">M</text>
+  <line class="ln-hl" x1="80.0" y1="50.0" x2="100.0" y2="90.0"/>
+  <line class="ln-hl" x1="120.0" y1="50.0" x2="140.0" y2="90.0"/>
+  <line class="ln-hl" x1="240.0" y1="50.0" x2="220.0" y2="90.0"/>
+  <line class="ln-hl" x1="280.0" y1="50.0" x2="300.0" y2="90.0"/>
+  <line class="ln-hl" x1="400.0" y1="50.0" x2="380.0" y2="90.0"/>
+  <text class="t-s t-hl t-b" x="500.0" y="70.0" text-anchor="end" dominant-baseline="central">ALRIM: length 5</text>
+</svg>
