@@ -6,6 +6,9 @@ tags: [Sorting, Sophisticated Algorithms, Quicksort, Divide and Conquer, Recursi
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import FigQuicksortIdea from './img/quicksort-idea.svg';
+import FigQuicksortPartition from './img/quicksort-partition.svg';
+import FigQuicksortCalls from './img/quicksort-calls.svg';
 
 # Quicksort
 
@@ -33,13 +36,9 @@ Quicksort is based on **partitioning**. Choose an element of the vector, called 
 
 After partitioning, the pivot is in its **final position**: it will not move again. And the two parts on each side can be sorted **independently**, because no element will ever need to cross from one side to the other. So we apply the same idea to each part, recursively, until the parts have one element (or none), which are trivially sorted.
 
-```
-                 2  3  1 [4] 7  6           partition around 4
-                /                \
-         1 [2] 3                   [6] 7    partition each part
-        /       \                  
-      [1]       [3]                   [7]  
-```
+<Figure caption="The tree of partitions. After each partition the pivot (orange) is in its final position, and the two parts on each side are sorted independently.">
+  <FigQuicksortIdea />
+</Figure>
 
 The sequence of partitions forms a **tree**. If each pivot divides its part into two halves of similar size, the tree is balanced and has about $\log_2 n$ levels. If the pivot is always at one end of its part (the smallest or the largest element), one of the parts is empty and the "tree" degenerates into a **list** of $n$ levels. This is the key to the efficiency of Quicksort, as we will see in the analysis: **the choice of the pivot is crucial**.
 
@@ -125,6 +124,10 @@ Let us sort **4 5 6 1 3 2 7 8** (positions 0 to 7).
 | `i` stops at 8 (position 3), `j` stops at 3 (position 2): they cross | 1 2 3 8 6 5 7 4 | No swap. |
 | Place the pivot at position `i` = 3 | 1 2 3 **4** 6 5 7 **8** | The 4 is in its final position. |
 
+<Figure caption="The first partition step by step. The index i (blue) looks for elements greater than the pivot and j (purple) for smaller ones; each pair found is exchanged, and when they cross the pivot moves to position i.">
+  <FigQuicksortPartition />
+</Figure>
+
 </TabItem>
 <TabItem value="left" label="2. Left part">
 
@@ -149,14 +152,9 @@ Then the left part **5** has a single element (nothing to do), and the right par
 
 The recursive calls form this tree (each node shows the part it sorts):
 
-```
-                     4 5 6 1 3 2 7 8
-                    /               \
-               1 2 3                 6 5 7 8
-          (≤ 3 elements)            /       \
-                                   5         7 8
-                            (1 element) (≤ 3 elements)
-```
+<Figure caption="The recursive calls of Quicksort on 4 5 6 1 3 2 7 8. Green parts are finished without partitioning.">
+  <FigQuicksortCalls />
+</Figure>
 
 Only **two** partitions were needed. The median-of-three chose good pivots, and the parts with three elements or fewer were finished without further recursion.
 
