@@ -46,7 +46,7 @@ We have studied many sorting algorithms. This lesson brings them together: we co
 
 ### Small sizes: the classic comparison
 
-The course slides include a classic comparison of execution times for $n = 256$ and $n = 512$ elements, with sorted, random and inverse (reverse-sorted) inputs. Some of the most interesting patterns:
+A classic comparison measures the execution times for $n = 256$ and $n = 512$ elements, with sorted, random and inverse (reverse-sorted) inputs. Some of the most interesting patterns:
 
 - **Bubble sort** is the slowest in almost every case, and it is slow even on sorted data. With a sentinel (or in its bidirectional version), the sorted case becomes almost free.
 - **Direct insertion** is about 3 times faster than bubble on random data, and practically instantaneous on sorted data. **Binary insertion** reduces comparisons, which helps a little on inverse data, but it is clearly slower on sorted data.

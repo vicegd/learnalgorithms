@@ -343,7 +343,7 @@ In our measurements, it processes the 100,000 numbers in about a **tenth of a mi
 
 ## Reducing Memory Consumption
 
-So far we have focused on time, but the slides also ask how to **reduce memory consumption**. There are two sources of memory use to consider.
+So far we have focused on time, but an efficient solution must also take care of **memory consumption**. There are two sources of memory use to consider.
 
 **1. Auxiliary memory of the algorithm.** Brute force and the linear scan need only a few variables. Sorting a list of objects in Java, on the other hand, uses an algorithm (TimSort) that may need temporary space for up to about $n/2$ elements, that is, memory proportional to $n$. (Sorting an `int[]` with `Arrays.sort` uses a variant of Quicksort that works almost in place.) If we sort a copy to avoid the side effect described in Step 5, we need yet another $n$ elements.
 
