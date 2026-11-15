@@ -85,7 +85,7 @@ Each cell is computed from the two previous ones: $f[2] = 1 + 0$, $f[3] = 1 + 1$
 
 | | Divide and conquer | Dynamic programming |
 | :--- | :--- | :--- |
-| Direction | **Descending** (top-down): starts with the whole problem and divides it into subproblems | **Ascending** (bottom-up): starts with the smallest subproblems and composes their solutions until reaching the whole problem |
+| Direction | **Descending** (top-down): starts with the whole problem and divides it into subproblems | Usually **ascending** (bottom-up): starts with the smallest subproblems and composes their solutions until reaching the whole problem (memoization, below, is a top-down variant) |
 | Subproblems | Should be independent | Overlap: the same subproblems appear many times |
 | Repeated work | Recomputes repeated subproblems | Solves each subproblem once, storing its solution |
 | Memory | The recursion stack | A table of results (plus, possibly, the stack) |
@@ -156,6 +156,8 @@ Compare with greedy algorithms: both require **optimal substructure**, but a gre
 5. **Reconstruct the solution itself**, if needed, by tracing back through the table which choice produced each optimal value (for example, *which* objects go in the knapsack, not only their total value).
 6. **Analyze the complexity:** number of cells × cost per cell, both in time and in memory.
 
+The next lesson follows these six steps for every problem, starting with simple ones (binomial coefficients) and ending with the knapsack and string problems.
+
 :::tip Saving memory
 Often a cell depends only on the previous row (or the previous few values). Then it is enough to keep **one or two rows** instead of the whole table: the iterative Fibonacci that keeps only the last two values is the dynamic programming solution with the table reduced to two variables, $O(1)$ memory. The price is that reconstructing the solution (not just its value) usually needs the whole table.
 :::
@@ -186,9 +188,11 @@ Dynamic programming appears in many fields:
 
 ## Practice
 
-:::tip Exercises
-- **🌳 Count the repetitions.** Draw the full call tree of the naive Fibonacci for $n = 6$ and check that it has 25 calls and 7 different subproblems.
+<div className="practice-box">
+
+- **🌳 Count the repetitions.** Draw the full call tree of the naive Fibonacci for $n = 7$. How many calls does it have, and how many different subproblems? (You should find 41 calls for only 8 subproblems.)
 - **📝 Memoize.** Add memoization to the naive recursive Fibonacci, using a `HashMap<Integer, Long>`, and compare its times with the naive version for $n = 30, 40, 50$.
 - **🔁 Two variables.** Write the bottom-up Fibonacci keeping only the last two values. What is its memory complexity?
 - **🗺️ Principle of optimality.** Draw a small graph with four nodes in which the longest simple path from A to C passes through B, but is not formed by the longest simple paths from A to B and from B to C. Why does this not happen with shortest paths?
-:::
+
+</div>

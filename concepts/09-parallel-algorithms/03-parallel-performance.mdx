@@ -179,9 +179,11 @@ Parallelism divides the time by (at most) a constant, the number of processors. 
 
 ## Practice
 
-:::tip Exercises
+<div className="practice-box">
+
 - **📈 Measure speedup.** Measure the parallel sum and the parallel cube root of the course repository with `ForkJoinPool(p)` for $p = 1, 2, 4, \dots$ up to the number of cores of your computer. Compute the speedup and the efficiency for each $p$. Which one scales better, and why?
 - **🧮 Amdahl.** A program takes 100 seconds, of which 20 seconds are sequential and the rest can be parallelized perfectly. What is its time with 4, 16 and infinite processors? What is the maximum speedup?
 - **🔍 Estimate the parallel fraction.** If a program achieves a speedup of 3 with 4 processors, what fraction $f$ is parallel according to Amdahl's law? What speedup would you expect with 16 processors?
 - **⚖️ Algorithm or cores?** Compare the time of the naive Fibonacci with Fork/Join on all your cores for $n = 40$ with the iterative sequential version. Then compare the parallel sum of an array with `Arrays.stream(array).sum()` and with `Arrays.stream(array).parallel().sum()`.
-:::
+
+</div>

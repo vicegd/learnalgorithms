@@ -10,11 +10,11 @@ import TabItem from '@theme/TabItem';
 
 # Introduction to Algorithmic Thinking
 
-In computer science, programming syntax is merely a vehicle for execution. The true engineering core lies in **Algorithmics**: the systematic study, design and analysis of correct and efficient computational strategies.
+A programming language is only the vehicle we use to give instructions to a computer. What really decides whether a program is good is the **method** it follows to solve the problem. **Algorithmics** is the discipline that studies those methods: how to design them, how to be sure that they are correct, and how to predict how much time and memory they need.
 
-As software engineers, our primary challenge shifts from making a program "just work" to ensuring, with arguments we can defend, that a strategy executes correctly for every valid input and makes a reasonable use of hardware resources as the size of the problem grows.
+As software engineers, it is not enough that a program "works" on the examples we tried. We must be able to argue that it gives the right answer for **every** valid input, and that it will still run in a reasonable time and memory when the data grows from a hundred elements to a hundred million.
 
-:::note What you will learn in this chapter
+:::note What you will learn in this lesson
 - Where the word *algorithm* comes from, and how the idea evolved from medieval arithmetic to modern computing.
 - How to move from an intuitive definition ("a recipe") to a formal one, based on Knuth's five properties and on the notion of a **problem specification**.
 - Why a piece of code that works on a few examples is not necessarily an algorithm, illustrated with several versions of the factorial.
@@ -482,9 +482,11 @@ Studying algorithmics is not about memorizing a catalog of programming tricks. I
 
 ## Practice
 
-:::tip Technical lab
+<div className="practice-box">
+
 - **💻 Explore the code.** The course repository ([documentation](https://vicegd.github.io/algorithms/) and [source code](https://github.com/vicegd/algorithms)) contains the factorial examples of this lesson in [`src/topics/foundation/factorial`](https://github.com/vicegd/algorithms/tree/master/src/topics/foundation/factorial). Run the unsafe version with a negative argument and observe the `StackOverflowError`.
 - **🔬 Experiment with the stack.** Run the recursive factorial with large values of `n` and change the stack size of the JVM with the `-Xss` option (for example, `-Xss256k` and `-Xss8m`). How does the maximum recursion depth change? Does the iterative version care?
 - **🧮 Find the overflow.** Write a loop that prints $n!$ for $n = 0, 1, \dots, 25$ using `int`, then `long`. Identify the exact point where each type overflows and compare with the values given in Version 4. Then repeat the experiment using `Math.multiplyExact`, which throws an exception instead of overflowing silently.
 - **✍️ Write specifications.** Write a precondition and a postcondition for: (a) Euclid's algorithm; (b) finding the maximum of a list; (c) finding the position of an element in a list. In (c), what should happen if the element appears twice? And if it does not appear at all?
-:::
+
+</div>

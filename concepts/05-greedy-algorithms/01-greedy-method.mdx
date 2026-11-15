@@ -162,7 +162,7 @@ With the previous heuristic, the solution is always optimal if two conditions ho
 - the monetary system is composed of coins with values $1, p, p^2, p^3, \dots, p^n$, where $p \gt 1$ and $n \gt 0$ (for example, 1, 2, 4, 8, 16... or 1, 10, 100...);
 - we have an **unlimited** number of coins of each value.
 
-There is a mathematical proof of this. These conditions are **sufficient, but not necessary**: many real systems, like the euro (1, 2, 5, 10, 20, 50, 100, 200 cents) or the US dollar, are not of this form, but they are designed so that the greedy algorithm is still optimal (they are called **canonical** coin systems). The system 50, 20, 2 of the counterexample is not canonical.
+This can be proved (the proof is linked at the end of this section). These conditions are **sufficient, but not necessary**: many real systems, like the euro (1, 2, 5, 10, 20, 50, 100, 200 cents) or the US dollar, are not of this form, but they are designed so that the greedy algorithm is still optimal (they are called **canonical** coin systems). The system 50, 20, 2 of the counterexample is not canonical.
 
 :::danger Never use `double` for money
 The pseudocode of this problem is often written with the amount as a real number (`double amount = 2.89`). But real numbers are stored in binary and most decimal amounts **cannot be represented exactly**. We tried it with the euro coins written as `double` values (2, 1, 0.5, 0.2...):
@@ -226,9 +226,11 @@ while there are decompositions with only three terms and much smaller denominato
 
 ## Practice
 
-:::tip Exercises
+<div className="practice-box">
+
 - **💰 Change.** Run the [course implementation](https://github.com/vicegd/algorithms/tree/master/src/topics/greedy/change) with euro coins for several amounts. Then find, for the coin system 1, 3, 4, an amount for which the greedy algorithm is not optimal.
 - **🐞 The floating-point trap.** Implement the change algorithm with `double` values, and write a loop that checks every amount from €0.01 to €5.00. For how many amounts is the result wrong?
 - **🔍 Stress test.** Write a brute-force (or dynamic programming) solution for the change problem, and compare it with the greedy one on all amounts up to 100 for random coin systems. How often is the greedy algorithm optimal?
 - **🏺 Egyptian fractions.** Implement Fibonacci's greedy algorithm with `BigInteger` and decompose $\frac{5}{121}$. How many digits has the largest denominator?
-:::
+
+</div>

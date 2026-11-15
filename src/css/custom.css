@@ -158,3 +158,16 @@ svg.dg .ln-strong { stroke: var(--dg-fg); stroke-width: 2.2; fill: none; }
   .dg-figure { overflow-x: auto; }
   .dg-figure svg.dg { max-width: none; width: max(100%, 520px); }
 }
+
+/* ── Practice suggestions at the end of each lesson (green box, no title) ── */
+.practice-box {
+  background-color: var(--ifm-color-success-contrast-background);
+  border-left: 5px solid var(--ifm-color-success-dark);
+  border-radius: var(--ifm-alert-border-radius, 0.4rem);
+  color: var(--ifm-color-success-contrast-foreground);
+  padding: 1rem 1.25rem;
+  margin-bottom: var(--ifm-leading, 1.25rem);
+}
+.practice-box > :last-child { margin-bottom: 0; }
+.practice-box a { color: var(--ifm-color-success-darkest); text-decoration: underline; }
+[data-theme='dark'] .practice-box a { color: var(--ifm-color-success-lightest); }

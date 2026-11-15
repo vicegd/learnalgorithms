@@ -395,11 +395,13 @@ Spelling correctors use it to suggest the closest dictionary words, and bioinfor
 
 ## Practice
 
-:::tip Exercises
+<div className="practice-box">
+
 - **🔺 Pascal.** Run `combinationsDP` and `combinationsRecursive` from the [course repository](https://github.com/vicegd/algorithms/tree/master/src/topics/dynamic/combinations) for increasing $n$ with $k = n/2$, and check the number of calls $2\,C(n, k) - 1$.
 - **🎒 Knapsack by hand.** Fill the knapsack table for the data of the checkpoint ($W = 6$), and recover the objects chosen by tracing back from $V(4, 6)$. Which of the two optimal combinations do you obtain?
 - **💾 One row.** Rewrite the knapsack algorithm using a single array of $W + 1$ positions. In which direction must the inner loop run so that each object is used at most once?
 - **💰 The change with one array.** Rewrite the change algorithm with a single array of $A + 1$ positions. Why can the inner loop go from left to right here, while in the knapsack it had to go the other way?
 - **🚣 The route on the river.** Extend the river algorithm to store the intermediate dock of each minimum, and write a method that prints the cheapest route between two docks.
 - **🔤 LCS.** Implement the LCS algorithm, including the reconstruction of the subsequence, and test it with two versions of a short text.
-:::
+
+</div>

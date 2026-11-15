@@ -294,10 +294,12 @@ For $n = 8{,}000$ random elements, Quicksort takes about **4 ms**, while inserti
 
 ## Practice
 
-:::tip Exercises
+<div className="practice-box">
+
 - **✍️ Trace it.** Sort **5 6 1 3 9 8 7 4 2** by hand with the course version of Quicksort (median-of-three, hiding the pivot at the end). Draw the tree of recursive calls.
 - **🔴 Find the worst case.** Using the first element as pivot, which inputs of size 8 make Quicksort perform the maximum number of comparisons? Implement this version and count the comparisons for sorted data with $n = 1{,}000, 2{,}000, 4{,}000$.
 - **🟰 Repeated keys.** Measure the course implementation on arrays of equal elements and on arrays with only 3 different values, for increasing sizes. Then implement a three-way partition and repeat the measurements.
 - **📏 Limit the stack.** Modify the implementation so that it recurses only on the smaller part. Check, by counting the maximum depth, that it never exceeds $\log_2 n$.
 - **🧩 Hybrid.** Add a threshold $k$ below which parts are sorted with insertion sort. Measure the total time for $k = 0, 5, 10, 20, 50$. Which threshold works best on your machine?
-:::
+
+</div>

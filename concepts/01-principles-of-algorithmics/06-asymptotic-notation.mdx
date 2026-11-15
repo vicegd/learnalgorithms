@@ -210,7 +210,7 @@ and two general facts:
 - **Any power of $n$** (even a tiny one, such as $n^{0.1}$) eventually grows faster than **any power of $\log n$**.
 - **Any exponential** $c^n$ with $c \gt 1$ eventually grows faster than **any polynomial** $n^k$.
 
-The following examples apply these ideas. Try to find the order of each expression before opening the answers.
+The following examples apply these ideas. Cover the "Order" column and try to find the order of each expression yourself; the "Why?" tab explains the ones that hide a trap.
 
 <Tabs>
 <TabItem value="set1" label="Examples (I)" default>
@@ -279,10 +279,12 @@ Some of these examples contain a trap:
 
 ## Practice
 
-:::tip Concept consolidation
+<div className="practice-box">
+
 - **✍️ Prove it.** Using the definition, find constants $c$ and $n_0$ that prove that $3n^2 + 59n$ is $O(n^2)$. Then prove that it is also $\Omega(n^2)$, and conclude that it is $\Theta(n^2)$.
 - **❌ Disprove it.** Show that $n^2$ is **not** $O(n)$. (Hint: assume that constants $c$ and $n_0$ exist and find an $n \ge n_0$ that breaks the inequality.)
 - **🔁 Logarithms.** Simplify $2^{\log_2 n}$, $4^{\log_2 n}$ and $n^{\log_n 2}$. Which of them grow polynomially?
 - **📊 Visualize.** Plot $100n$, $n^2$ and $n \log_2 n$ for $n$ between 1 and 200 (with a spreadsheet or any plotting tool). Where does each curve overtake the others?
 - **🎯 Tight bounds.** For each of the methods you analyzed in the previous lesson (maximum of a vector, checking if a vector is sorted), give the tightest bound for the best and the worst case.
-:::
+
+</div>
