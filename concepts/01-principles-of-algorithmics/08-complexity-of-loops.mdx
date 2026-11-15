@@ -6,6 +6,8 @@ tags: [Analysis, Loops, Patterns, Summations]
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import FigTriangularLoop from './img/triangular-loop.svg';
+import FigDoublingLoop from './img/doubling-loop.svg';
 
 # Complexity of Loops: A Catalog of Patterns
 
@@ -69,6 +71,10 @@ for (i = 1; i <= n*n*n/2; i *= c) { O(1) }     // logc(n³/2)              → O
 
 **Why?** After $k$ iterations of the first loop, $i = 2^k$. The loop stops when $2^k \gt n$, that is, when $k \gt \log_2 n$. So it runs $\lfloor \log_2 n \rfloor + 1$ times. The same reasoning with base $c$ gives $\log_c n$ iterations for the third loop.
 
+<Figure caption="Doubling the counter: the jumps grow so fast that only 7 iterations fit below n = 100. Doubling n adds just one more jump.">
+  <FigDoublingLoop />
+</Figure>
+
 The last two examples show the power of the logarithm rules from the asymptotic notation lesson: going up to $n^2$ or $n^3/2$ instead of $n$ only multiplies the number of iterations by a constant, since $\log(n^k) = k \log n$ and $\log(n^3/2) = 3 \log n - \log 2$. All of them are $O(\log n)$.
 
 :::danger A classic infinite loop
@@ -105,6 +111,10 @@ For each $i$, the inner loop runs $n - i$ times:
 $$
 \sum_{i=1}^{n} (n - i) = (n-1) + (n-2) + \cdots + 1 + 0 = \frac{n(n-1)}{2} \in O(n^2)
 $$
+
+<Figure caption="The triangular loop for n = 6. Each green cell is one execution of the body: row i has n − i of them, and together they fill half of the n × n square.">
+  <FigTriangularLoop />
+</Figure>
 
 The inner loop is shorter on average (about $n/2$ iterations instead of $n$), but that only affects the constant: the result is still quadratic.
 

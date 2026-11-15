@@ -6,6 +6,7 @@ tags: [Big-O, Big-Omega, Big-Theta, Math, Logarithms]
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import FigBigO from './img/big-o.svg';
 
 # Asymptotic Notation: Describing How Cost Grows
 
@@ -32,6 +33,10 @@ T(n) \le c \cdot f(n) \qquad \text{for all } n \ge n_0
 $$
 
 In words: from some point $n_0$ onwards, $T(n)$ never exceeds a constant multiple of $f(n)$. If $T(n)$ is $O(f(n))$, we say that $T(n)$ has, **at most**, a growth rate of $f(n)$.
+
+<Figure caption="The definition of Big-O in a picture. Before n₀ anything can happen; from n₀ onwards, T(n) never rises above the curve c · f(n).">
+  <FigBigO />
+</Figure>
 
 Two details of the definition are important:
 

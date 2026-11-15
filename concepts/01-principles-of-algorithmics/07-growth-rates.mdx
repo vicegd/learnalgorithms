@@ -6,6 +6,7 @@ tags: [Complexity Classes, Scaling, Predictions, Invariance Principle]
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import FigGrowthRates from './img/growth-rates.svg';
 
 # Growth Rates: What Complexity Means in Practice
 
@@ -59,6 +60,10 @@ The following table shows the **time** that an algorithm would need for differen
 | 1,000 | 10 ns | 1 µs | 10 µs | 1 ms | 1 s | $10^{284}$ years | — |
 | 10,000 | 13 ns | 10 µs | 133 µs | 100 ms | 17 min | — | — |
 | 1,000,000 | 20 ns | 1 ms | 20 ms | 17 min | 32 years | — | — |
+
+<Figure caption="The basic complexity classes for n up to 20. Even at this tiny scale, 2ⁿ and n² leave the chart while n log n, n and log n stay close to the axis.">
+  <FigGrowthRates />
+</Figure>
 
 For comparison, the age of the universe is about $1.4 \times 10^{10}$ years. Some observations:
 

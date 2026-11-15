@@ -6,6 +6,7 @@ tags: [Searching, Case Study, Binary Search, Best Case, Worst Case, Average Case
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import FigBinarySearch from './img/binary-search.svg';
 
 # Case Studies: Searching
 
@@ -257,6 +258,10 @@ public static boolean search(int[] list, int value) {     // precondition: list 
     return false;                                          // empty interval: not found
 }
 ```
+
+<Figure caption="Binary search for 56 in a sorted array of 16 elements. Each comparison with the central element (blue) discards half of the remaining interval (gray); the value is found in the fourth iteration.">
+  <FigBinarySearch />
+</Figure>
 
 The variables `left` and `right` delimit the part of the array where the value can still be. The loop continues while that interval is **non-empty** (`left <= right`).
 
