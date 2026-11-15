@@ -69,6 +69,8 @@ Taking `x[i]` when `x[i] <= y[j]` (that is, preferring the left half in case of 
 
 <RepoCode files={['sorting/mergesort/Mergesort.java']} />
 
+<ProofLink to="/concepts/fundamental-problem-domains/proofs#mergesort-is-correct-and-costs-n-log-n" title="Mergesort is correct and costs n log n" />
+
 ---
 
 ## Quicksort, Revisited
@@ -199,6 +201,8 @@ LargeInteger multiply(LargeInteger u, LargeInteger v) {      // n digits each
 ```
 
 **Analysis:** $a = 3$, $b = 2$, $k = 1$. Since $a \gt b^k$ ($3 \gt 2$): $O(n^{\log_2 3}) \approx O(n^{1.585})$. Saving a single multiplication in each call changes the exponent, which makes a huge difference for large numbers: for numbers of a million digits, $n^2 = 10^{12}$ while $n^{1.585} \approx 3 \times 10^9$. We implemented this algorithm on binary numbers and checked it against Java's `BigInteger` on 200 random pairs of 2,000-bit numbers.
+
+<ProofLink to="/concepts/algorithm-design-paradigms/proofs#karatsubas-identity" title="Karatsuba's identity" />
 
 ### What does Java use?
 

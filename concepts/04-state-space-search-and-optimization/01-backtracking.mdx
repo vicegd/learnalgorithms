@@ -204,6 +204,8 @@ The two versions differ in very little: the `found` flag. Two details deserve at
 
 For optimization, the "all solutions" scheme keeps a variable with the **best solution found so far** and its value. Every time a complete solution is reached, it is compared with the best one and replaces it if it is better. This variable is also the basis of the most powerful kind of pruning, described below.
 
+<ProofLink to="/concepts/state-space-search-and-optimization/proofs#backtracking-finds-every-solution" title="Backtracking finds every solution" />
+
 ***
 
 ## Designing a backtracking algorithm
@@ -231,6 +233,8 @@ Without pruning, backtracking is just brute force written recursively. Pruning m
 The choice of pruning tests involves a trade-off. Each test costs time at every node where it is evaluated. A test that rarely rejects anything can make the algorithm slower. As a rule of thumb, simple tests are almost always worth it; expensive tests pay off only when the tree is very large.
 
 The **order** in which children are tried also matters. Trying the most promising candidate first finds good solutions earlier, which makes bound pruning more effective. Choosing the most constrained variable first (the one with fewest candidates left) detects dead ends earlier. In the [knight's tour](./02-backtracking-examples.mdx#knights-tour), a simple ordering rule reduces 27 million recursive calls to 64.
+
+<ProofLink to="/concepts/state-space-search-and-optimization/proofs#bound-pruning-never-loses-the-optimum" title="Bound pruning never loses the optimum" />
 
 ***
 

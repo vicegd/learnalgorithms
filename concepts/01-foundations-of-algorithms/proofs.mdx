@@ -1,0 +1,136 @@
+---
+title: "Proofs: Foundations"
+sidebar_position: 98
+tags: [Proofs, Correctness, Asymptotic Notation, Searching]
+---
+
+# Proofs: Foundations
+
+This page collects the proofs behind the claims of the chapter. The lessons state the results and use them; here they are justified. Each section is self-contained, and the lessons link to the section they need. The proof techniques (induction and loop invariants) are explained in [Induction, Correctness and Recurrences](../06-mathematical-background/02-induction-and-recurrences.mdx).
+
+***
+
+## Rules of the big O notation
+
+The lessons simplify expressions such as $3n^2 + 5n \log n + 7$ to $O(n^2)$ without hesitation. These rules justify it. Throughout, all functions are positive for large $n$, and $f \in O(g)$ means that there are constants $c \gt 0$ and $n_0$ with $f(n) \le c \, g(n)$ for every $n \ge n_0$.
+
+**Constant factors.** If $f \in O(g)$ and $k \gt 0$ is a constant, then $k f \in O(g)$.
+
+*Proof.* If $f(n) \le c \, g(n)$ for $n \ge n_0$, then $k f(n) \le (k c) \, g(n)$ for the same $n$. The constant $k c$ works. $\blacksquare$
+
+**Sum rule.** If $f_1 \in O(g_1)$ and $f_2 \in O(g_2)$, then $f_1 + f_2 \in O(\max(g_1, g_2))$.
+
+*Proof.* Take $c_1, n_1$ for the first bound and $c_2, n_2$ for the second. For $n \ge \max(n_1, n_2)$:
+
+$$
+f_1(n) + f_2(n) \le c_1 g_1(n) + c_2 g_2(n) \le (c_1 + c_2) \max(g_1(n), g_2(n))
+$$
+
+$\blacksquare$
+
+This is why a sequence of program fragments costs as much as its most expensive fragment.
+
+**Product rule.** If $f_1 \in O(g_1)$ and $f_2 \in O(g_2)$, then $f_1 \cdot f_2 \in O(g_1 \cdot g_2)$.
+
+*Proof.* For $n \ge \max(n_1, n_2)$, multiplying the two inequalities (all terms are positive) gives $f_1(n) f_2(n) \le (c_1 c_2) \, g_1(n) g_2(n)$. $\blacksquare$
+
+This is why a loop that runs $O(f)$ times with a body of cost $O(g)$ costs $O(f \cdot g)$.
+
+**Transitivity.** If $f \in O(g)$ and $g \in O(h)$, then $f \in O(h)$.
+
+*Proof.* For $n$ larger than both thresholds, $f(n) \le c_1 g(n) \le c_1 c_2 \, h(n)$. $\blacksquare$
+
+**Polynomials.** If $p(n) = a_k n^k + a_{k-1} n^{k-1} + \dots + a_0$ with $a_k \gt 0$, then $p \in \Theta(n^k)$.
+
+*Proof.* Upper bound: for $n \ge 1$, every power $n^i$ with $i \le k$ is at most $n^k$, so $p(n) \le (\lvert a_k \rvert + \dots + \lvert a_0 \rvert) \, n^k$. Lower bound: write $p(n) = n^k \left( a_k + \frac{a_{k-1}}{n} + \dots + \frac{a_0}{n^k} \right)$. The terms in parentheses other than $a_k$ tend to 0, so for $n$ large enough their sum is at least $-a_k / 2$, and $p(n) \ge \frac{a_k}{2} n^k$. $\blacksquare$
+
+### The limit criterion
+
+A practical way to compare two functions is to compute the limit of their quotient:
+
+$$
+L = \lim_{n \to \infty} \frac{f(n)}{g(n)}
+$$
+
+- If $L = 0$, then $f \in O(g)$ but $g \notin O(f)$: $f$ grows strictly more slowly.
+- If $0 \lt L \lt \infty$, then $f \in \Theta(g)$.
+- If $L = \infty$, then $g \in O(f)$ but $f \notin O(g)$.
+
+*Proof of the middle case.* By the definition of limit, for $n$ large enough the quotient lies between $L/2$ and $2L$, that is, $\frac{L}{2} g(n) \le f(n) \le 2L \, g(n)$: both bounds of $\Theta$ hold. The other cases are similar. $\blacksquare$
+
+***
+
+## Logarithms grow more slowly than any power
+
+**Claim.** For every constant $\varepsilon \gt 0$, $\log n \in O(n^{\varepsilon})$, and $n^{\varepsilon} \notin O(\log n)$.
+
+*Proof.* Apply the limit criterion and L'Hôpital's rule (with natural logarithms, which only changes a constant factor):
+
+$$
+\lim_{n \to \infty} \frac{\ln n}{n^{\varepsilon}} = \lim_{n \to \infty} \frac{1/n}{\varepsilon \, n^{\varepsilon - 1}} = \lim_{n \to \infty} \frac{1}{\varepsilon \, n^{\varepsilon}} = 0
+$$
+
+$\blacksquare$
+
+The same argument, applied $k$ times, shows that $(\log n)^k \in O(n^{\varepsilon})$ for every $k$: any power of a logarithm is eventually beaten by any power of $n$. Similarly, $n^k / c^n \to 0$ for every $c \gt 1$, so every polynomial is eventually beaten by every exponential.
+
+***
+
+## The linear maximum pairwise product is correct
+
+The [optimal linear solution](./02-case-study-pairwise.mdx#step-7-the-optimal-linear-solution) scans the numbers once, keeping `max1` and `max2`.
+
+**Claim.** For non-negative numbers $a_0, \dots, a_{n-1}$ with $n \ge 2$, the method returns the maximum product of two elements at different positions.
+
+*Loop invariant.* After processing the first $i$ elements ($i \ge 2$), `max1` is the largest of them and `max2` is the largest of the remaining ones, that is, the second largest **counting repetitions** (if the maximum appears twice, `max2` equals `max1`).
+
+*Initialization.* Both variables start at $-1$, smaller than any element. After the first element $a_0$, `max1` $= a_0$ and `max2` $= -1$ (there is no second element yet). After the second, one of the two cases of the loop places the larger in `max1` and the smaller in `max2`. The invariant holds for $i = 2$.
+
+*Maintenance.* Let the next element be $x$.
+- If $x \gt$ `max1`, then $x$ is the new maximum, and the old maximum becomes the largest of the rest: the code assigns exactly `max2 = max1; max1 = x`.
+- If $x \le$ `max1` but $x \gt$ `max2`, the maximum does not change and $x$ is the new second largest: `max2 = x`.
+- Otherwise, $x$ is not larger than either, and nothing changes.
+
+The strict comparison in the first case matters: when $x$ equals `max1`, it goes to the second case and becomes `max2`, which is correct, because the two equal values occupy different positions.
+
+*Termination.* After the $n$ elements, `max1` and `max2` are the two largest values (counting repetitions). Since all values are non-negative, any product $a_i a_j$ with $i \ne j$ has one factor at most `max1` and the other at most `max2`, so $a_i a_j \le$ `max1` $\cdot$ `max2`, and this product is achieved. $\blacksquare$
+
+*Optimality.* Any correct algorithm must read every element: if an element were never read, changing it to a huge value would change the answer without the algorithm noticing. So no algorithm can be faster than $\Omega(n)$, and this one is optimal.
+
+***
+
+## The average case of sequential search
+
+**Claim.** If the value is in the array and is equally likely to be at any of the $n$ positions, sequential search makes $\frac{n+1}{2}$ comparisons on average.
+
+*Proof.* If the value is at position $i$ (counting from 1), the search makes exactly $i$ comparisons. Each position has probability $1/n$, so the expected number is
+
+$$
+\sum_{i=1}^{n} \frac{1}{n} \cdot i = \frac{1}{n} \cdot \frac{n(n+1)}{2} = \frac{n+1}{2}
+$$
+
+$\blacksquare$
+
+***
+
+## Binary search is correct
+
+**Claim.** If `list` is sorted in ascending order, the [binary search](./09-searching-case-studies.mdx#binary-dichotomous-search) of the lesson returns `true` if and only if `value` is in `list`.
+
+*Loop invariant.* If `value` is in `list`, then it is in the interval `list[left..right]`.
+
+*Initialization.* At the start the interval is the whole array.
+
+*Maintenance.* Let `k` be the central position. If `list[k] == value`, the method returns `true`, which is correct. If `value > list[k]`, then, since the array is sorted, every element in `list[left..k]` is at most `list[k]`, hence smaller than `value`; if `value` is in the interval, it must be in `list[k+1..right]`, which is the new interval after `left = k + 1`. The case `value < list[k]` is symmetric.
+
+*Termination.* Each iteration either returns or makes the interval strictly smaller (it removes at least position `k`), so the loop ends. If it ends because `left > right`, the interval is empty, and by the invariant `value` is not in the array: returning `false` is correct. $\blacksquare$
+
+***
+
+## Binary search needs a logarithmic number of iterations
+
+**Claim.** On an array of $n \ge 1$ elements, binary search performs at most $\lfloor \log_2 n \rfloor + 1$ iterations.
+
+*Proof.* Let $m$ be the size of the interval at the start of an iteration. The central position splits the other $m - 1$ elements into two parts of sizes $\lfloor (m-1)/2 \rfloor$ and $\lceil (m-1)/2 \rceil$, and the next interval is one of them, so its size is at most $\lfloor m/2 \rfloor$. Starting from $n$, after $t$ iterations the size is at most $\lfloor n / 2^t \rfloor$. The loop can only continue while the size is at least 1, that is, while $2^t \le n$, or $t \le \log_2 n$. So the number of iterations is at most $\lfloor \log_2 n \rfloor + 1$. $\blacksquare$
+
+For $n = 10^6$ that is 20 iterations, and for $n = 10^9$, 30. And no algorithm that only compares elements can do better in the worst case: each comparison with an element has at most three outcomes, so with $t$ comparisons at most $3^t$ different answers can be told apart, and $n + 1$ answers are possible (each position, or "not present"). Hence $t \ge \log_3 (n + 1)$, which is also $\Omega(\log n)$.

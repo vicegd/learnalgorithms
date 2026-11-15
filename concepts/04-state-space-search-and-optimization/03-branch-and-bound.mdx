@@ -180,6 +180,8 @@ Writing a new B&B algorithm therefore reduces to designing the **state**, its **
 
 <RepoCode files={['branchandbound/utils/BranchAndBound.java', 'branchandbound/utils/Heap.java', 'branchandbound/utils/Node.java']} />
 
+<ProofLink to="/concepts/state-space-search-and-optimization/proofs#best-first-branch-and-bound-stops-at-the-optimum" title="Best-first branch and bound stops at the optimum" />
+
 ***
 
 ## Branch and bound and A\*
@@ -193,6 +195,8 @@ $$
 best-first branch and bound becomes the famous **A\*** search algorithm (Hart, Nilsson and Raphael, 1968), used in route planning, video games and robotics. When $h$ never overestimates the remaining cost (an *admissible* heuristic), the first solution extracted from the priority queue is optimal.
 
 A common mistake is to order the nodes **only** by the estimate of the remaining cost, $h(x)$, forgetting the cost already paid. The search becomes a greedy best-first search: it reaches *a* solution very quickly, but not necessarily the best one. In the 8-puzzle we measured this effect: ordering by $h$ alone found solutions with about 65 moves on average, while ordering by $g + h$ found the optimal ones, with about 22 moves (see the [next lesson](./04-branch-and-bound-examples.mdx#sliding-puzzles)).
+
+<ProofLink to="/concepts/state-space-search-and-optimization/proofs#a-with-an-admissible-heuristic-finds-an-optimal-path" title="A* with an admissible heuristic finds an optimal path" />
 
 ***
 

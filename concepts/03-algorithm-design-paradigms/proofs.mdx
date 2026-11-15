@@ -1,0 +1,191 @@
+---
+title: "Proofs: Design Paradigms"
+sidebar_position: 98
+tags: [Proofs, Divide and Conquer, Greedy Algorithms, Dynamic Programming, Recurrences]
+---
+
+# Proofs: Design Paradigms
+
+This page proves the claims of the chapter: the formulas used to analyze divide and conquer, the correctness and cost of several divide and conquer algorithms, the optimality of the greedy algorithms that the lessons call optimal, and the recurrences of dynamic programming. The general techniques (induction, recursion trees, geometric series) are in the [Mathematical Background](../06-mathematical-background/01-sums-and-logarithms.mdx) chapter.
+
+***
+
+## The division formula
+
+**Claim.** If $T(n) = a \, T(n/b) + c \, n^k$ for $n$ larger than the base case, with constants $a \ge 1$, $b \gt 1$, $k \ge 0$ and $c \gt 0$, then
+
+$$
+T(n) \in \begin{cases} O(n^k) & \text{if } a \lt b^k \\ O(n^k \log n) & \text{if } a = b^k \\ O(n^{\log_b a}) & \text{if } a \gt b^k \end{cases}
+$$
+
+*Proof.* Assume $n$ is a power of $b$ (other sizes only change constants). Draw the recursion tree. At level $i$ (the root is level 0) there are $a^i$ calls, each on a problem of size $n / b^i$, and each does $c \, (n/b^i)^k$ non-recursive work. So level $i$ costs
+
+$$
+a^i \cdot c \left( \frac{n}{b^i} \right)^k = c \, n^k \left( \frac{a}{b^k} \right)^i
+$$
+
+The tree has $\log_b n + 1$ levels, so $T(n) = c \, n^k \sum_{i=0}^{\log_b n} r^i$ with ratio $r = a / b^k$. This is a [geometric series](../06-mathematical-background/01-sums-and-logarithms.mdx#geometric-series):
+
+- If $r \lt 1$ ($a \lt b^k$), the sum is at most $\frac{1}{1 - r}$, a constant: $T(n) \in O(n^k)$. The root dominates.
+- If $r = 1$ ($a = b^k$), all $\log_b n + 1$ terms equal 1: $T(n) = c \, n^k (\log_b n + 1) \in O(n^k \log n)$. Every level costs the same.
+- If $r \gt 1$ ($a \gt b^k$), the last term dominates: the sum is at most $\frac{r}{r - 1} r^{\log_b n}$, and $T(n) \in O\!\left(n^k \, r^{\log_b n}\right)$. Since $r^{\log_b n} = n^{\log_b r} = n^{\log_b a - k}$, this is $O(n^{\log_b a})$. The leaves dominate: there are $a^{\log_b n} = n^{\log_b a}$ of them.
+
+$\blacksquare$
+
+The same argument with $\ge$ instead of $\le$ shows that each bound is in fact $\Theta$.
+
+***
+
+## The subtraction formula
+
+**Claim.** If $T(n) = a \, T(n - b) + c \, n^k$ for $n$ larger than the base case, with $b \ge 1$, then $T(n) \in O(n^{k+1})$ if $a = 1$, and $T(n) \in O(a^{n/b})$ if $a \gt 1$.
+
+*Proof.* The recursion has about $n / b$ levels. **If $a = 1$**, there is a single call per level, with sizes $n, n - b, n - 2b, \dots$, each costing at most $c \, n^k$: in total at most $\frac{n}{b} \cdot c \, n^k \in O(n^{k+1})$. (It is also $\Omega(n^{k+1})$, because the first half of the levels have sizes at least $n/2$.)
+
+**If $a \gt 1$**, level $i$ has $a^i$ calls, each of cost at most $c \, n^k$, so
+
+$$
+T(n) \le c \, n^k \sum_{i=0}^{n/b} a^i = c \, n^k \cdot \frac{a^{n/b + 1} - 1}{a - 1} \in O(n^k a^{n/b})
+$$
+
+A more careful count, using that the calls at the deep levels have small sizes, removes the factor $n^k$ and gives $O(a^{n/b})$; the polynomial factor is irrelevant anyway next to an exponential. $\blacksquare$
+
+***
+
+## Karatsuba's identity
+
+[Karatsuba's algorithm](./05-divide-and-conquer-examples-2.mdx#karatsubas-algorithm) multiplies two numbers of $n$ digits by splitting each one in halves, $x = x_1 B + x_0$ and $y = y_1 B + y_0$, where $B$ is a power of the base with $n/2$ zeros.
+
+**Claim.** $x \cdot y$ can be computed with only **three** products of half-size numbers.
+
+*Proof.* Expanding, $x y = x_1 y_1 B^2 + (x_1 y_0 + x_0 y_1) B + x_0 y_0$, which seems to need four products. But
+
+$$
+(x_1 + x_0)(y_1 + y_0) = x_1 y_1 + (x_1 y_0 + x_0 y_1) + x_0 y_0
+$$
+
+so the middle coefficient is $(x_1 + x_0)(y_1 + y_0) - x_1 y_1 - x_0 y_0$. With $P_1 = x_1 y_1$, $P_2 = x_0 y_0$ and $P_3 = (x_1 + x_0)(y_1 + y_0)$, we get $x y = P_1 B^2 + (P_3 - P_1 - P_2) B + P_2$: three products, plus additions and shifts, which are $O(n)$. $\blacksquare$
+
+The recurrence is $T(n) = 3T(n/2) + O(n)$, with $a = 3 \gt b^k = 2$, so $T(n) \in O(n^{\log_2 3}) \approx O(n^{1.585})$ by the division formula.
+
+***
+
+## Euclid's algorithm is correct and fast
+
+**Claim 1.** For integers $a \ge 0$ and $b \gt 0$, $\gcd(a, b) = \gcd(b, a \bmod b)$.
+
+*Proof.* Write $a = q b + r$ with $r = a \bmod b$. Any common divisor of $a$ and $b$ divides $r = a - q b$, so it is a common divisor of $b$ and $r$. Conversely, any common divisor of $b$ and $r$ divides $a = q b + r$. The two pairs have exactly the same common divisors, so the same greatest one. $\blacksquare$
+
+Since $\gcd(a, 0) = a$, repeating the step until the second number is 0 gives the gcd. The algorithm terminates because the second number is a non-negative integer that strictly decreases ($a \bmod b \lt b$).
+
+**Claim 2.** Every two iterations, the first number is at least halved, so the algorithm performs $O(\log a)$ iterations.
+
+*Proof.* After one iteration the pair $(a, b)$ becomes $(b, r)$ with $r = a \bmod b$; after two, the first number is $r$. If $b \le a/2$, then $r \lt b \le a/2$. If $b \gt a/2$, then $a \bmod b = a - b \lt a/2$. Either way, $r \lt a/2$. $\blacksquare$
+
+(The worst case is two consecutive Fibonacci numbers, a result due to Lamé, 1844: the number of iterations is at most about five times the number of decimal digits of the smaller number.)
+
+***
+
+## Quickselect runs in expected linear time
+
+[Quickselect](./06-divide-and-conquer-statistics.mdx#divide-and-conquer-quickselect) partitions the array around a pivot, as Quicksort does, but recurses only into the part that contains the position it is looking for.
+
+**Claim.** With a random pivot, the expected number of comparisons is $O(n)$ (at most $8n$).
+
+*Proof.* Call a pivot **good** if it falls in the middle half of the current range (between the 25% and the 75% positions in sorted order). A random pivot is good with probability $1/2$, and after a good pivot the remaining range has at most $3/4$ of the elements. Divide the execution into **phases**: phase $j$ lasts while the range has between $(3/4)^{j+1} n$ and $(3/4)^j n$ elements. Each partition in phase $j$ costs at most $(3/4)^j n$ comparisons, and the phase ends at the first good pivot, so its expected number of partitions is at most 2 (the expected number of tries until a success with probability $1/2$). Adding over the phases:
+
+$$
+\mathbb{E}[\text{comparisons}] \le \sum_{j \ge 0} 2 \left( \frac{3}{4} \right)^j n = 2 \cdot 4 \cdot n = 8n
+$$
+
+$\blacksquare$
+
+A more precise analysis gives at most about $3.4\,n$ comparisons for the median. In the worst case (always the smallest or largest pivot) Quickselect is still $O(n^2)$; the median-of-medians algorithm of Blum, Floyd, Pratt, Rivest and Tarjan guarantees $O(n)$ in every case.
+
+***
+
+## The greedy change is optimal for powers of a base
+
+The [change lesson](./07-greedy-algorithms.mdx#when-is-the-greedy-change-optimal) states that the greedy algorithm is optimal when the coins are $1, p, p^2, \dots, p^m$. We prove a slightly more general result.
+
+**Claim.** If every coin value divides the next one ($c_1 = 1$, and $c_{i+1}$ is a multiple of $c_i$), and there is an unlimited supply of each coin, the greedy algorithm uses the minimum number of coins for every amount.
+
+*Proof.* Take an optimal solution and let $x_i$ be the number of coins of value $c_i$ it uses. For every $i \lt m$, $x_i \cdot c_i \lt c_{i+1}$: otherwise, the coins of value $c_i$ would add up to at least $c_{i+1}$, and since $c_{i+1} / c_i$ is an integer, $c_{i+1} / c_i \ge 2$ of them could be replaced by a single coin of value $c_{i+1}$, using fewer coins. So the coins smaller than $c_{i+1}$ add up to
+
+$$
+\sum_{j \le i} x_j c_j \le \sum_{j \le i} (c_{j+1} - c_j) = c_{i+1} - 1 \lt c_{i+1}
+$$
+
+(using $x_j c_j \le c_{j+1} - c_j$, which holds because $x_j c_j$ is a multiple of $c_j$ smaller than $c_{j+1}$). This means that, in an optimal solution, the number of coins of the largest value $c_m$ is exactly $\lfloor A / c_m \rfloor$, the maximum that fits, because the rest of the coins add up to less than $c_m$. That is the greedy choice. Repeating the argument with the remaining amount and the smaller coins, the optimal solution coincides with the greedy one. $\blacksquare$
+
+The condition is sufficient but not necessary: the euro system (1, 2, 5, 10, ...) does not satisfy it, since 2 does not divide 5, and the greedy algorithm is still optimal for it.
+
+***
+
+## The fractional knapsack: highest value per weight first
+
+**Claim.** If objects can be split, taking them in decreasing order of $v_i / w_i$ (and a fraction of the last one) maximizes the value.
+
+*Proof* (exchange argument). Sort the objects so that $\frac{v_1}{w_1} \ge \frac{v_2}{w_2} \ge \dots$, and let $G$ be the greedy solution and $O$ any optimal solution, both filling the knapsack completely (if the objects do not fill it, both take everything). Let $i$ be the first object that $O$ takes in a smaller amount than $G$. Since $G$ takes as much as possible of each object in order, $O$ must use the missing weight $\delta$ on objects $j \gt i$. Replace in $O$ a weight $\delta$ of those objects by the same weight of object $i$: the value changes by
+
+$$
+\delta \cdot \frac{v_i}{w_i} - \delta \cdot \frac{v_j}{w_j} \ge 0
+$$
+
+so the new solution is still optimal and agrees with $G$ on one more object. Repeating, we transform $O$ into $G$ without ever decreasing its value, so $G$ is optimal. $\blacksquare$
+
+The argument fails for the 0/1 knapsack because there we cannot move an arbitrary weight $\delta$: objects are taken whole.
+
+***
+
+## The plumber: shortest tasks first
+
+**Claim.** Doing the tasks in increasing order of duration minimizes the total waiting time $W = \sum w_i$ of the [plumber's](./08-greedy-examples.mdx#the-diligent-plumber) customers.
+
+*Proof.* If the tasks are done in the order $t_{(1)}, t_{(2)}, \dots, t_{(n)}$, the task in position $k$ is counted in its own waiting time and in that of the $n - k$ customers after it:
+
+$$
+W = \sum_{k=1}^{n} (n - k + 1) \, t_{(k)}
+$$
+
+The coefficients $n, n-1, \dots, 1$ decrease. Suppose that in some order a longer task comes immediately before a shorter one, $t_{(k)} \gt t_{(k+1)}$. Swapping them changes $W$ by $(n - k + 1) t_{(k+1)} + (n - k) t_{(k)} - (n - k + 1) t_{(k)} - (n - k) t_{(k+1)} = t_{(k+1)} - t_{(k)} \lt 0$: the total decreases. So an optimal order has no such pair, which means it is sorted by increasing duration. $\blacksquare$
+
+***
+
+## Files on a disk: smallest files first
+
+**Claim.** To store the **largest number** of files on a disk of capacity $D$, taking the files from smallest to largest while they fit is optimal.
+
+*Proof.* Let the files sorted by size be $s_1 \le s_2 \le \dots \le s_n$, and suppose the greedy algorithm stores the first $g$. Any set of $m$ files has total size at least $s_1 + \dots + s_m$, since those are the $m$ smallest. If $m \gt g$, this sum is at least $s_1 + \dots + s_{g+1} \gt D$ (the greedy algorithm stopped because file $g + 1$ did not fit). So no set of more than $g$ files fits. $\blacksquare$
+
+(The same rule does **not** minimize the free space; that problem is the 0/1 knapsack with $v_i = w_i$.)
+
+***
+
+## The 0/1 knapsack recurrence is correct
+
+**Claim.** The value $V(i, j)$ defined by the [recurrence of the lesson](./10-dynamic-programming-examples.mdx#the-subproblems-and-the-recurrence) is the maximum value obtainable with the first $i$ objects and capacity $j$.
+
+*Proof.* By induction on $i$. For $i = 0$ there are no objects and the value is 0. For $i \gt 0$, consider an optimal selection $S$ for $(i, j)$. Either object $i$ is not in $S$, and then $S$ is a selection of the first $i - 1$ objects with capacity $j$, so its value is at most $V(i-1, j)$; or object $i$ is in $S$, and then $S \setminus \{i\}$ is a selection of the first $i - 1$ objects with capacity $j - w_i$, so its value is at most $V(i-1, j - w_i) + v_i$. In both cases the value is at most the maximum of the recurrence. Conversely, both options of the maximum correspond to valid selections. So the maximum is exactly the optimal value. $\blacksquare$
+
+This is the **principle of optimality** in action: the part of an optimal solution that concerns the first $i - 1$ objects is itself optimal for the capacity it leaves. Filling the $(n+1) \times (W+1)$ table costs $O(nW)$.
+
+***
+
+## Pascal's rule
+
+**Claim.** $\binom{n}{k} = \binom{n-1}{k-1} + \binom{n-1}{k}$ for $0 \lt k \lt n$.
+
+*Proof.* Count the subsets of $k$ elements of $\{1, \dots, n\}$ according to whether they contain element $n$. Those that contain it are formed by $n$ plus $k - 1$ of the other $n - 1$ elements: $\binom{n-1}{k-1}$. Those that do not are $k$ of the other $n - 1$: $\binom{n-1}{k}$. $\blacksquare$
+
+The recursive algorithm that applies this rule reaches the base cases $\binom{m}{0} = \binom{m}{m} = 1$ exactly $\binom{n}{k}$ times (each base case returns 1, and the result is their sum), so it makes $2\binom{n}{k} - 1$ calls, which is exponential for $k = n/2$. The table of dynamic programming has only $O(nk)$ cells.
+
+***
+
+## The LCS recurrence is correct
+
+Let $L(i, j)$ be the length of the longest common subsequence of the prefixes $X[1..i]$ and $Y[1..j]$, with $L(i, 0) = L(0, j) = 0$.
+
+**Claim.** If $x_i = y_j$, then $L(i, j) = L(i-1, j-1) + 1$; otherwise $L(i, j) = \max(L(i-1, j), L(i, j-1))$.
+
+*Proof.* If $x_i = y_j$: an LCS of the two prefixes can always be chosen to end with that common character (if it does not use it, its last character can be replaced by it, or it can be appended), and removing it leaves a common subsequence of $X[1..i-1]$ and $Y[1..j-1]$. So $L(i, j) = L(i-1, j-1) + 1$. If $x_i \ne y_j$: a common subsequence cannot end with both $x_i$ and $y_j$, so it does not use $x_i$ or it does not use $y_j$, and it is a common subsequence of $(X[1..i-1], Y[1..j])$ or of $(X[1..i], Y[1..j-1])$. The maximum of the two is the answer. $\blacksquare$

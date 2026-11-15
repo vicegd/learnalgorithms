@@ -68,6 +68,8 @@ The total time is the sum of all levels: $c \cdot n^k$ multiplied by a **geometr
 
 So the three cases correspond to three situations: the cost is concentrated at the **top** of the tree, **evenly spread** over all levels, or concentrated at the **bottom**.
 
+<ProofLink to="/concepts/algorithm-design-paradigms/proofs#the-division-formula" title="The division formula" />
+
 ---
 
 ## Subtraction Scheme
@@ -92,6 +94,8 @@ The intuition is again in the recursion tree, which now has about $n / b$ levels
 :::danger Avoid subtraction with several subproblems
 An algorithm with $a \gt 1$ in a subtraction scheme is exponential, and therefore unusable except for very small inputs. If you find yourself writing two or more recursive calls on $n - 1$ (or $n - 2$...), stop and think: most likely the same subproblems are being solved many times, and a different technique (an iterative version, or dynamic programming) is needed.
 :::
+
+<ProofLink to="/concepts/algorithm-design-paradigms/proofs#the-subtraction-formula" title="The subtraction formula" />
 
 ---
 

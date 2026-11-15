@@ -163,6 +163,8 @@ Only **two** partitions were needed. The median-of-three chose good pivots, and 
 </TabItem>
 </Tabs>
 
+<ProofLink to="/concepts/fundamental-problem-domains/proofs#quicksorts-partition-is-correct" title="Quicksort's partition is correct" />
+
 ---
 
 ## Analysis
@@ -220,6 +222,8 @@ With the first element as pivot, sorted and reverse inputs trigger the worst cas
 | Adaptive | Not in general |
 
 In practice, Quicksort is **very fast for $n \gt 20$**: its inner loops are very simple and it accesses memory sequentially, which modern processors handle very efficiently. For very small parts, simple algorithms are faster.
+
+<ProofLink to="/concepts/fundamental-problem-domains/proofs#the-average-cost-of-quicksort" title="The average cost of Quicksort" />
 
 ---
 

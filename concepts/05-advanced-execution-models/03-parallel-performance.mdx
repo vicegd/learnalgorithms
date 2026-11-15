@@ -61,6 +61,8 @@ $$
 
 The span is the part of the algorithm that **cannot** be accelerated by adding processors. An algorithm parallelizes well when its span is much smaller than its work.
 
+<ProofLink to="/concepts/advanced-execution-models/proofs#work-span-and-the-time-with-p-processors" title="Work, span and the time with p processors" />
+
 ---
 
 ## Speedup and Efficiency
@@ -129,6 +131,10 @@ The conclusion is striking: **if 10 % of an algorithm is intrinsically sequentia
 :::info Gustafson's law: a more optimistic view
 Amdahl's law assumes a **fixed problem size**. In practice, when we have more processors, we usually solve **bigger problems** (higher resolution, more data), and in many algorithms the parallel part grows with the size while the sequential part stays almost constant. **Gustafson's law** (1988) models this situation and shows that, for growing problems, the speedup can keep increasing with the number of processors. Both laws are right; they answer different questions.
 :::
+
+<ProofLink to="/concepts/advanced-execution-models/proofs#amdahls-law" title="Amdahl's law" />
+
+<ProofLink to="/concepts/advanced-execution-models/proofs#gustafsons-law" title="Gustafson's law" />
 
 ---
 
