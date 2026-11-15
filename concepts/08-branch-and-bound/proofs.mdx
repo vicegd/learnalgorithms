@@ -1,0 +1,77 @@
+---
+title: "Proofs: Branch and Bound"
+sidebar_label: Proofs
+sidebar_position: 98
+tags: [Proofs, Branch and Bound, Heuristics, A*]
+---
+
+# Proofs: Branch and Bound
+
+Branch and bound finds the optimal solution only if its bounds and heuristics are valid. This page proves the facts used in the lessons: why the bounds of the examples are valid, why best-first branch and bound and A\* stop at the optimum, and why the puzzle heuristics and the parity condition work. Safe pruning with a bound is proved in the [backtracking chapter](../07-backtracking/proofs.mdx#bound-pruning-never-loses-the-optimum).
+
+***
+
+## The bounds used in the examples are valid
+
+**Task assignment.** The bound of the [B&B example](./02-classic-problems.mdx#task-assignment) is the cost so far plus, for each free task, the minimum cost in its column among the free agents.
+
+*Proof.* In any complete assignment that extends the current one, each free task $j$ is done by some free agent $i$, at cost $C[i][j] \ge \min_{\text{free } i'} C[i'][j]$. Adding over the free tasks, the remaining cost is at least the sum of the column minima. $\blacksquare$
+
+The same argument works with the row minima (each free agent does some free task), and the maximum of two lower bounds is also a lower bound.
+
+**0/1 knapsack.** The bound of the [knapsack example](./02-classic-problems.mdx#01-knapsack) is the value obtained by filling the remaining capacity greedily by value per weight, allowing a fraction of the last object.
+
+*Proof.* Any way of completing the current selection with whole objects is, in particular, a valid solution of the **fractional** knapsack on the remaining objects and capacity. The greedy algorithm solves the fractional knapsack [optimally](../05-greedy-algorithms/proofs.mdx#the-fractional-knapsack-highest-value-per-weight-first), so its value is at least the value of any completion with whole objects. It is therefore an upper bound. $\blacksquare$
+
+***
+
+## Best-first branch and bound stops at the optimum
+
+**Claim.** In the [general scheme](./01-branch-and-bound-scheme.mdx#general-scheme), with a valid lower bound in every node and the exact cost in every solution, when the loop stops (the heap is empty or its best estimate is at least $U$), `bestNode` is an optimal solution (or there is none, if $U$ is still the initial limit and no solution was found).
+
+*Proof.* At any moment, every unexplored solution lies in the subtree of some live node in the heap, or of a node that was pruned. Pruned nodes contain no solution cheaper than the value of $U$ at the moment they were pruned, which is at least the final $U$ (since $U$ only decreases). When the loop stops, every live node has estimate at least $U$, because the heap returns its minimum, so their subtrees contain nothing cheaper than $U$ either. So no solution is cheaper than $U$, and `bestNode` has cost $U$. $\blacksquare$
+
+The order of the heap affects **how fast** the bound $U$ improves, and therefore how much is pruned, but not the correctness.
+
+***
+
+## A\* with an admissible heuristic finds an optimal path
+
+Consider a search where each node $x$ has $g(x)$, the cost of the path from the start to $x$, and $h(x)$, an estimate of the cost from $x$ to the goal. The live nodes are ordered by $f(x) = g(x) + h(x)$.
+
+**Claim.** If $h$ is **admissible** ($h(x) \le h^*(x)$, the true remaining cost, for every $x$, and in particular $h = 0$ at the goal), the first goal node extracted from the priority queue has minimum cost.
+
+*Proof.* Let $C^*$ be the cost of an optimal solution, and suppose that a goal node $t$ with cost $g(t) \gt C^*$ is extracted first. At that moment, some node $x$ on an optimal path is still live (the start node is on it, and each time a node of the path is expanded, its successor on the path enters the queue). For that node, $g(x)$ is its cost along the optimal path, so
+
+$$
+f(x) = g(x) + h(x) \le g(x) + h^*(x) = C^* \lt g(t) = f(t)
+$$
+
+The queue would have extracted $x$ before $t$: a contradiction. $\blacksquare$
+
+The proof assumes that a node reached later by a cheaper path is updated or reinserted (as in the 8-puzzle measurements of the lessons). Ordering by $h$ alone breaks the inequality, because $g$ is missing, which is why the "greedy" version found much longer solutions in the [measurements](./02-classic-problems.mdx#ordering-the-live-nodes-g--h).
+
+***
+
+## The puzzle heuristics are admissible
+
+**Misplaced tiles.** Each tile that is not in its final cell must move at least once, and each move moves one tile. So the number of moves is at least the number of misplaced tiles. $\blacksquare$
+
+**Manhattan distance.** Each move slides one tile to an adjacent cell, which changes that tile's Manhattan distance by exactly 1 and leaves the others unchanged. So the total distance decreases by at most 1 per move, and reaching total distance 0 needs at least as many moves as the initial distance. $\blacksquare$
+
+Both arguments count only the numbered tiles. If the empty cell is counted, the first argument fails: a board solved in one move can have two "misplaced" pieces (the tile and the gap).
+
+***
+
+## The parity condition of the 15-puzzle
+
+The [reachability test](./02-classic-problems.mdx#reachability-test) says that the goal can be reached if and only if $\sum \text{smaller}(i) + x$ is even. We prove that the condition is **necessary**: if the sum is odd, no sequence of moves reaches the goal.
+
+*Proof.* Read the board row by row, with the empty cell as tile 16. Then $\sum \text{smaller}(i)$ is the number of inversions of that sequence, and $x$ indicates the color of the empty cell on a checkerboard. Every move swaps the empty cell with a neighbor:
+
+- A **horizontal** move swaps two adjacent elements of the sequence: the number of inversions changes by exactly 1.
+- A **vertical** move swaps the empty cell with the tile 4 positions before or after it in the sequence, with 3 tiles in between. The moving tile passes over those 3 tiles (3 pairs change order), the empty cell passes over the same 3 tiles in the other direction (3 more pairs), and the pair formed by the moving tile and the empty cell also changes order. In total, 7 pairs change order: an odd number.
+
+So every move changes the parity of the number of inversions. Every move also changes the color of the empty cell's square ($x$ flips between 0 and 1). The parity of the sum therefore never changes. The goal has 0 inversions and the empty cell on an unshaded square, so its sum is 0, even. A board with an odd sum can never reach it. $\blacksquare$
+
+The converse (every board with an even sum can reach the goal) is also true, but its proof is constructive and longer: it shows how to move any tile to its place without disturbing the ones already placed. It was published by Johnson and Story in 1879.

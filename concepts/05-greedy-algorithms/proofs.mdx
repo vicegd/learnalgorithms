@@ -1,0 +1,82 @@
+---
+title: "Proofs: Greedy Algorithms"
+sidebar_label: Proofs
+sidebar_position: 98
+tags: [Proofs, Greedy Algorithms, Exchange Argument]
+---
+
+# Proofs: Greedy Algorithms
+
+A greedy algorithm is only useful if we can **prove** that its choices lead to an optimal solution. This page proves the optimality of the greedy algorithms that the lessons call optimal, mostly with **exchange arguments**: take any optimal solution and show that it can be changed, step by step, into the greedy one without getting worse.
+
+***
+
+## The greedy change is optimal for powers of a base
+
+The [change lesson](./01-greedy-method.mdx#when-is-the-greedy-change-optimal) states that the greedy algorithm is optimal when the coins are $1, p, p^2, \dots, p^m$. We prove a slightly more general result.
+
+**Claim.** If every coin value divides the next one ($c_1 = 1$, and $c_{i+1}$ is a multiple of $c_i$), and there is an unlimited supply of each coin, the greedy algorithm uses the minimum number of coins for every amount.
+
+*Proof.* Take an optimal solution and let $x_i$ be the number of coins of value $c_i$ it uses. For every $i \lt m$, $x_i \cdot c_i \lt c_{i+1}$: otherwise, the coins of value $c_i$ would add up to at least $c_{i+1}$, and since $c_{i+1} / c_i$ is an integer, $c_{i+1} / c_i \ge 2$ of them could be replaced by a single coin of value $c_{i+1}$, using fewer coins. So the coins smaller than $c_{i+1}$ add up to
+
+$$
+\sum_{j \le i} x_j c_j \le \sum_{j \le i} (c_{j+1} - c_j) = c_{i+1} - 1 \lt c_{i+1}
+$$
+
+(using $x_j c_j \le c_{j+1} - c_j$, which holds because $x_j c_j$ is a multiple of $c_j$ smaller than $c_{j+1}$). This means that, in an optimal solution, the number of coins of the largest value $c_m$ is exactly $\lfloor A / c_m \rfloor$, the maximum that fits, because the rest of the coins add up to less than $c_m$. That is the greedy choice. Repeating the argument with the remaining amount and the smaller coins, the optimal solution coincides with the greedy one. $\blacksquare$
+
+The condition is sufficient but not necessary: the euro system (1, 2, 5, 10, ...) does not satisfy it, since 2 does not divide 5, and the greedy algorithm is still optimal for it.
+
+***
+
+## The fractional knapsack: highest value per weight first
+
+**Claim.** If objects can be split, taking them in decreasing order of $v_i / w_i$ (and a fraction of the last one) maximizes the value.
+
+*Proof* (exchange argument). Sort the objects so that $\frac{v_1}{w_1} \ge \frac{v_2}{w_2} \ge \dots$, and let $G$ be the greedy solution and $O$ any optimal solution, both filling the knapsack completely (if the objects do not fill it, both take everything). Let $i$ be the first object that $O$ takes in a smaller amount than $G$. Since $G$ takes as much as possible of each object in order, $O$ must use the missing weight $\delta$ on objects $j \gt i$. Replace in $O$ a weight $\delta$ of those objects by the same weight of object $i$: the value changes by
+
+$$
+\delta \cdot \frac{v_i}{w_i} - \delta \cdot \frac{v_j}{w_j} \ge 0
+$$
+
+so the new solution is still optimal and agrees with $G$ on one more object. Repeating, we transform $O$ into $G$ without ever decreasing its value, so $G$ is optimal. $\blacksquare$
+
+The argument fails for the 0/1 knapsack because there we cannot move an arbitrary weight $\delta$: objects are taken whole.
+
+***
+
+## The plumber: shortest tasks first
+
+**Claim.** Doing the tasks in increasing order of duration minimizes the total waiting time $W = \sum w_i$ of the [plumber's](./02-classic-problems.mdx#the-diligent-plumber) customers.
+
+*Proof.* If the tasks are done in the order $t_{(1)}, t_{(2)}, \dots, t_{(n)}$, the task in position $k$ is counted in its own waiting time and in that of the $n - k$ customers after it:
+
+$$
+W = \sum_{k=1}^{n} (n - k + 1) \, t_{(k)}
+$$
+
+The coefficients $n, n-1, \dots, 1$ decrease. Suppose that in some order a longer task comes immediately before a shorter one, $t_{(k)} \gt t_{(k+1)}$. Swapping them changes $W$ by $(n - k + 1) t_{(k+1)} + (n - k) t_{(k)} - (n - k + 1) t_{(k)} - (n - k) t_{(k+1)} = t_{(k+1)} - t_{(k)} \lt 0$: the total decreases. So an optimal order has no such pair, which means it is sorted by increasing duration. $\blacksquare$
+
+***
+
+## Files on a disk: smallest files first
+
+**Claim.** To store the **largest number** of files on a disk of capacity $D$, taking the files from smallest to largest while they fit is optimal.
+
+*Proof.* Let the files sorted by size be $s_1 \le s_2 \le \dots \le s_n$, and suppose the greedy algorithm stores the first $g$. Any set of $m$ files has total size at least $s_1 + \dots + s_m$, since those are the $m$ smallest. If $m \gt g$, this sum is at least $s_1 + \dots + s_{g+1} \gt D$ (the greedy algorithm stopped because file $g + 1$ did not fit). So no set of more than $g$ files fits. $\blacksquare$
+
+(The same rule does **not** minimize the free space; that problem is the 0/1 knapsack with $v_i = w_i$.)
+
+***
+
+## Prim and Kruskal are optimal
+
+Both algorithms for [minimum spanning trees](./02-classic-problems.mdx#minimum-spanning-trees-prim-and-kruskal) rely on one property. A **cut** of a graph is a division of its nodes into two non-empty groups $S$ and $V \setminus S$; an edge **crosses** the cut if it has one end in each group.
+
+**Cut property.** Let $F$ be a set of edges contained in some minimum spanning tree, and let $(S, V \setminus S)$ be a cut that no edge of $F$ crosses. If $e$ is a cheapest edge crossing the cut, then $F \cup \{e\}$ is also contained in some minimum spanning tree.
+
+*Proof.* Let $T$ be a minimum spanning tree that contains $F$. If $e \in T$, we are done. Otherwise, adding $e = (u, v)$ to $T$ creates a cycle, because $T$ already connects $u$ and $v$. The path of $T$ from $u$ (in $S$) to $v$ (outside $S$) must cross the cut at some edge $e'$. Replace $e'$ by $e$: the result $T' = T - e' + e$ is still connected (any path that used $e'$ can go around the cycle through $e$) and has $n - 1$ edges, so it is a spanning tree. Its weight is $w(T) - w(e') + w(e) \le w(T)$, because $e$ is a cheapest crossing edge. So $T'$ is also a minimum spanning tree, and it contains $F \cup \{e\}$ ($e'$ is not in $F$, because no edge of $F$ crosses the cut). $\blacksquare$
+
+**Prim.** At each step, let $S$ be the set of nodes of the current tree. No edge of the tree crosses the cut $(S, V \setminus S)$, and Prim adds a cheapest crossing edge. By induction on the steps, using the cut property, the tree is always contained in a minimum spanning tree; when it has $n - 1$ edges, it is one.
+
+**Kruskal.** When Kruskal accepts the edge $e = (u, v)$, let $S$ be the set of nodes of the current tree that contains $u$. No accepted edge crosses the cut $(S, V \setminus S)$, and every lighter edge that crosses it was considered earlier and rejected, which only happens if both its ends were already connected, contradicting that it crosses the cut. So $e$ is a cheapest crossing edge, and the cut property applies again. $\blacksquare$

@@ -1,0 +1,392 @@
+---
+title: "Case Studies: Searching"
+sidebar_position: 9
+tags: [Searching, Case Study, Binary Search, Best Case, Worst Case, Average Case]
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Case Studies: Searching
+
+Searching is one of the most frequent operations in computing: looking up a user in a database, a word in a dictionary, a file in a directory, a value in a cache. In this final lesson of the chapter we apply **everything** we have learnt to three classic search algorithms. For each one we count instructions exactly, analyze the best, worst and average cases, express the result with asymptotic notation and connect it with real measurements.
+
+The problem is simple to state:
+
+- **Input:** a sequence $A$ of $n$ integers and a value $x$.
+- **Output:** `true` if $x$ appears in $A$, and `false` otherwise.
+
+:::note What you will learn in this lesson
+- How to count the exact cost of sequential search in its best, worst and average cases, including a complete average-case derivation.
+- How the **sentinel** technique reduces the constant of an algorithm without changing its complexity, and what it costs.
+- How **binary search** achieves logarithmic time when the data is sorted, and why it is notoriously easy to get wrong.
+- When it pays off to sort the data first in order to search faster.
+:::
+
+---
+
+## Sequential Search
+
+The most direct strategy inspects the elements one by one, from the first to the last, until it finds the value or runs out of elements. It works on **any** sequence, sorted or not.
+
+```java showLineNumbers
+public static boolean search(int[] list, int value) {
+    int i = 0;
+    int n = list.length;
+    while ((i < n) && (list[i] != value))
+        i++;
+    if (i == n)
+        return false;     // we went past the last element: not found
+    else
+        return true;      // we stopped at position i: found
+}
+```
+
+The `while` condition contains two comparisons. The first one, `i < n`, protects the array: thanks to the short-circuit evaluation of `&&`, `list[i]` is only accessed when `i` is a valid position. When `i` reaches `n`, the second comparison is not evaluated.
+
+We count each elementary instruction as one unit of time. The cost depends on **where** the value is, so we analyze the three cases.
+
+<Tabs>
+<TabItem value="best" label="🟢 Best case" default>
+
+**When:** the value is in the **first** position.
+
+| Instruction | Times |
+| :--- | :--- |
+| `i = 0` | 1 |
+| `n = list.length` | 1 |
+| `i < n` | 1 |
+| `list[i] != value` | 1 (it is `false`: the loop ends) |
+| `i++` | 0 |
+| `i == n` | 1 |
+| `return false` | 0 |
+| `return true` | 1 |
+
+$$
+T_{best}(n) = 1 + 1 + 1 + 1 + 1 + 1 = 6 \;\in\; O(1)
+$$
+
+The cost does not depend on $n$: whether the array has ten or ten million elements, finding the value in the first position takes the same time.
+
+</TabItem>
+<TabItem value="worst" label="🔴 Worst case">
+
+**When:** the value is **not** in the array (finding it in the last position is almost as expensive).
+
+| Instruction | Times |
+| :--- | :--- |
+| `i = 0` | 1 |
+| `n = list.length` | 1 |
+| `i < n` | $n + 1$ (the last one is `false`) |
+| `list[i] != value` | $n$ (not evaluated when `i < n` is `false`) |
+| `i++` | $n$ |
+| `i == n` | 1 |
+| `return false` | 1 |
+| `return true` | 0 |
+
+$$
+T_{worst}(n) = 1 + 1 + (n + 1) + n + n + 1 + 1 = 3n + 5 \;\in\; O(n)
+$$
+
+</TabItem>
+<TabItem value="position" label="📍 Found at position p">
+
+**When:** the value is found at position $p$ (counting from 1), with $1 \le p \le n$.
+
+| Instruction | Times |
+| :--- | :--- |
+| `i = 0`, `n = list.length` | 1 + 1 |
+| `i < n` | $p$ |
+| `list[i] != value` | $p$ (the last one is `false`) |
+| `i++` | $p - 1$ |
+| `i == n`, `return true` | 1 + 1 |
+
+$$
+T_p(n) = 2 + p + p + (p - 1) + 2 = 3p + 3
+$$
+
+For $p = 1$ this gives 6, the best case. We will use this expression to compute the average case.
+
+</TabItem>
+</Tabs>
+
+### The average case
+
+To compute the average, we need a model of how likely each situation is. There are $n + 1$ possible cases: the value is at position $1, 2, \dots, n$, or it does not exist. To make the calculation concrete, we assume that:
+
+- the value **exists** with probability $\frac{1}{2}$ and **does not exist** with probability $\frac{1}{2}$;
+- when it exists, it is **equally likely** to be in any position, so each position has probability $\frac{1}{2} \cdot \frac{1}{n} = \frac{1}{2n}$.
+
+Applying the definition $T_{average}(n) = \sum_{i} P_i \cdot T_i(n)$:
+
+$$
+T_{average}(n) = \sum_{p=1}^{n} \frac{1}{2n} (3p + 3) \;+\; \frac{1}{2} (3n + 5)
+$$
+
+The first sum, using $\sum_{p=1}^{n} p = \frac{n(n+1)}{2}$:
+
+$$
+\frac{1}{2n} \left( 3 \cdot \frac{n(n+1)}{2} + 3n \right) = \frac{3(n+1)}{4} + \frac{3}{2} = \frac{3n}{4} + \frac{9}{4}
+$$
+
+Adding the second term, $\frac{3n}{2} + \frac{5}{2}$:
+
+$$
+T_{average}(n) = \frac{3n}{4} + \frac{9}{4} + \frac{3n}{2} + \frac{5}{2} = \frac{9n}{4} + \frac{19}{4} \;\in\; O(n)
+$$
+
+On average, the search costs about $2.25n$ operations: less than the worst case ($3n$), because half of the time the value is found, on average, halfway through the array. But the average is still **linear**: changing the probabilities changes the constant, not the complexity.
+
+<details>
+  <summary>🧠 <strong>Checkpoint: Other assumptions</strong></summary>
+
+  **Question:** Repeat the average-case calculation assuming that the value **always** exists (and is equally likely to be in any position). What is the order?
+
+  **Answer:** Each position now has probability $\frac{1}{n}$:
+  $T_{average}(n) = \sum_{p=1}^{n} \frac{1}{n}(3p + 3) = \frac{3(n+1)}{2} + 3 = \frac{3n}{2} + \frac{9}{2}$, which is still $O(n)$. The average case always depends on the assumed probability distribution, which is one of its weaknesses: if the real distribution is different (for example, if most searches are for recently inserted elements at the end), the prediction will be wrong.
+
+</details>
+
+<RepoCode files={['foundation/search/Search.java']} />
+
+<ProofLink to="/concepts/principles-of-algorithmics/proofs#the-average-case-of-sequential-search" title="The average case of sequential search" />
+
+---
+
+## Sequential Search with a Sentinel
+
+Look again at the loop of the sequential search: in every iteration it checks **two** conditions, `i < n` and `list[i] != value`. The first one is only needed to avoid running past the end of the array. Can we get rid of it?
+
+The **sentinel** technique does exactly that: before searching, we add the value we are looking for **at the end** of the sequence. Now the loop is guaranteed to find it, either in its original position or in the extra position, so the bounds check is no longer necessary.
+
+```java showLineNumbers
+public static boolean search(List<Integer> list, int value) {
+    list.add(value);                    // the sentinel: now the value is surely in the list
+    int i = 0;
+    while (list.get(i) != value)
+        i++;
+    if (i == list.size() - 1)           // we stopped at the sentinel
+        return false;
+    else
+        return true;
+}
+```
+
+<Tabs>
+<TabItem value="sbest" label="🟢 Best case" default>
+
+The value is in the first position.
+
+| Instruction | Times |
+| :--- | :--- |
+| `list.add(value)` | 1 |
+| `i = 0` | 1 |
+| `list.get(i) != value` | 1 |
+| `i++` | 0 |
+| `i == list.size() - 1` | 1 |
+| `return true` | 1 |
+
+$$
+T_{best}(n) = 5 \;\in\; O(1)
+$$
+
+</TabItem>
+<TabItem value="sworst" label="🔴 Worst case">
+
+The value is not in the original list, so the loop stops at the sentinel, in position $n + 1$.
+
+| Instruction | Times |
+| :--- | :--- |
+| `list.add(value)` | 1 |
+| `i = 0` | 1 |
+| `list.get(i) != value` | $n + 1$ |
+| `i++` | $n$ |
+| `i == list.size() - 1` | 1 |
+| `return false` | 1 |
+
+$$
+T_{worst}(n) = 1 + 1 + (n + 1) + n + 1 + 1 = 2n + 5 \;\in\; O(n)
+$$
+
+The average case is also $O(n)$.
+
+</TabItem>
+</Tabs>
+
+### What have we gained?
+
+The complexity is still $O(n)$ in the worst and average cases: the sentinel does **not** change the complexity class. What changes is the **constant**: about $2n$ operations instead of $3n$, so we expect the sentinel version to need roughly two thirds of the time.
+
+Measurements confirm it, with an important nuance. Searching for a missing value in an array of a million integers, the sentinel version took about **60-70 %** of the time of the standard version when running **without optimization** (`-Xint`), just as the operation count predicts. With the **JIT compiler** enabled, the difference became small and irregular: the optimizer already makes the bounds check very cheap. Micro-optimizations that reduce the constant are real, but their effect depends heavily on the environment, and they never compensate for a worse complexity.
+
+:::caution The price of the sentinel
+- **It modifies the input.** The version above leaves the sentinel at the end of the list. A correct implementation must **remove it** before returning (one more operation), and it is not safe if other threads are reading the list at the same time.
+- **It needs a free position.** With a plain array, there must be space for one more element. With an `ArrayList`, adding at the end is cheap (amortised constant time), but with other implementations it may not be.
+- **Beware of `get(i)` on linked lists.** If the list were a `LinkedList`, each `get(i)` would traverse the list from the beginning, making the search quadratic! The analysis assumes constant-time access by position.
+:::
+
+<RepoCode files={['foundation/search/Search.java']} />
+
+---
+
+## Binary (Dichotomous) Search
+
+Sequential search is the best we can do when the data has no particular order: every element could be the one we are looking for, so in the worst case we must inspect all of them ($\Omega(n)$). But if the array is **sorted**, a single comparison tells us much more.
+
+Compare the value with the **central** element:
+
+- if they are equal, we have found it;
+- if the value is **greater**, it can only be in the **right half**, so we discard the left half;
+- if it is **smaller**, it can only be in the **left half**.
+
+Each comparison **halves** the search space. It is the strategy we use when looking up a word in a paper dictionary.
+
+```java showLineNumbers
+public static boolean search(int[] list, int value) {     // precondition: list is sorted
+    int left = 0;
+    int right = list.length - 1;
+    while (left <= right) {
+        int k = left + (right - left) / 2;                 // central position
+        if (list[k] == value)
+            return true;
+        if (value > list[k])
+            left = k + 1;                                  // discard the left half
+        else
+            right = k - 1;                                 // discard the right half
+    }
+    return false;                                          // empty interval: not found
+}
+```
+
+The variables `left` and `right` delimit the part of the array where the value can still be. The loop continues while that interval is **non-empty** (`left <= right`).
+
+### Analysis
+
+<Tabs>
+<TabItem value="bbest" label="🟢 Best case" default>
+
+The value is in the central position of the whole array, and it is found in the first iteration:
+
+$$
+T_{best}(n) = \underbrace{2}_{\text{left, right}} + \underbrace{1}_{\text{condition}} + \underbrace{1}_{k} + \underbrace{1}_{==} + \underbrace{1}_{\text{return}} = 6 \;\in\; O(1)
+$$
+
+</TabItem>
+<TabItem value="bworst" label="🔴 Worst case">
+
+The value is not in the array. Each iteration costs a constant number of operations: the loop condition, the calculation of `k`, two comparisons and one assignment, that is, **5 operations**. The question is how many iterations there are.
+
+The size of the interval goes $n \to \frac{n}{2} \to \frac{n}{4} \to \cdots \to 1 \to 0$. The number of times we can halve $n$ before reaching an empty interval is $\lfloor \log_2 n \rfloor + 1$. Therefore:
+
+$$
+T_{worst}(n) \approx 5 (\lfloor \log_2 n \rfloor + 1) + 4 \;\in\; O(\log n)
+$$
+
+(the final $+4$ accounts for the initializations, the last evaluation of the condition and the `return`). For $n = 1{,}000$ the loop runs at most 10 times, and for $n = 1{,}000{,}000$ at most 20 times, as we checked by instrumenting the code.
+
+</TabItem>
+<TabItem value="baverage" label="🟡 Average case">
+
+A detailed analysis, assuming that the value is present and equally likely to be in any position, shows that binary search needs about $\log_2 n - 1$ iterations on average: only **one iteration less** than in the worst case. This is because half of the positions are only reached in the last iteration, a quarter in the one before, and so on. The average case is therefore also $O(\log n)$.
+
+</TabItem>
+</Tabs>
+
+:::tip The scale of O(log n)
+For an array of **one billion** elements, sequential search may need a billion comparisons. Binary search needs **at most 30** iterations ($2^{30} \approx 1.07 \times 10^9$). Doubling the size of the array adds just **one** more iteration.
+:::
+
+<ProofLink to="/concepts/principles-of-algorithmics/proofs#binary-search-needs-a-logarithmic-number-of-iterations" title="Binary search needs a logarithmic number of iterations" />
+
+### Binary search is easy to get wrong
+
+Binary search is famous for being simple to describe and surprisingly hard to implement correctly. Small changes in the conditions break it. Consider this variant, which looks reasonable:
+
+```java
+int left = 0, right = list.length - 1, k;
+do {
+    k = (left + right) / 2;
+    if (value > list[k]) left = k + 1;
+    else right = k - 1;
+} while ((list[k] != value) && (left < right));    // BUG
+return list[k] == value;
+```
+
+<details>
+  <summary>🧠 <strong>Checkpoint: Find the bug</strong></summary>
+
+  **Question:** Trace this variant searching for 3 in `[1, 2, 3]`. What does it return?
+
+  **Answer:** It returns `false`, although 3 is in the array. In the first iteration, $k = 1$ and $3 \gt 2$, so `left = 2`. Now `left` and `right` are both 2: the interval still contains one candidate (position 2), but the condition `left < right` is false and the loop stops **without examining it**. The function then checks `list[1]`, which is 2, and reports that the value is not present.
+
+  We ran a stress test (as in the case study) comparing this variant with the correct version on 20,000 random sorted arrays, always searching for values that **were** present: the variant failed in about **45 %** of the searches. The correct condition is `left <= right` (the interval is non-empty), and the element at the central position must be compared with the value in the **same** iteration in which it is computed.
+
+</details>
+
+Two more details of the correct version deserve attention:
+
+- **The central position** is computed as `left + (right - left) / 2` instead of `(left + right) / 2`. Both are mathematically equivalent, but with very large arrays the sum `left + right` can exceed the maximum `int` value and **overflow**, producing a negative index. This bug was present for years in the binary search of widely used libraries, including Java's own.
+- **The loop invariant.** At the start of every iteration, *if the value is in the array, it is between positions `left` and `right`*. Checking that each branch preserves this invariant, and that the interval shrinks in every iteration, is the way to convince yourself that the algorithm is correct and terminates.
+
+<RepoCode files={['foundation/search/Search.java']} />
+
+<ProofLink to="/concepts/principles-of-algorithmics/proofs#binary-search-is-correct" title="Binary search is correct" />
+
+---
+
+## Comparing the Three Algorithms
+
+| Algorithm | Requires | Best case | Worst case | Average case | Extra memory |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| Sequential search | nothing | $O(1)$ | $O(n)$: $3n + 5$ | $O(n)$ | $O(1)$ |
+| Sequential search with sentinel | a free position at the end | $O(1)$ | $O(n)$: $2n + 5$ | $O(n)$ | $O(1)$ |
+| Binary search | **sorted** data with direct access | $O(1)$ | $O(\log n)$ | $O(\log n)$ | $O(1)$ |
+
+### Is it worth sorting the data first?
+
+Binary search needs sorted data, and sorting has a cost: about $n \log n$ operations with a good algorithm, as you will see in the next chapter. Whether it pays off depends on **how many searches** we will perform on the same data.
+
+- To perform $m$ searches with sequential search, we need about $m \cdot n$ operations in the worst case.
+- To sort once and then perform $m$ binary searches, we need about $n \log n + m \log n$ operations.
+
+If we search only once or twice, sorting first is not worth it: sorting alone is already more expensive than one sequential search. But as soon as the number of searches $m$ is larger than about $\log n$ (around 20 for a million elements), sorting first and using binary search wins, and the advantage grows with every additional search. This kind of reasoning, which weighs a **one-time cost** against the cost of **repeated operations**, is very common in algorithm and system design (for example, when deciding whether to create an index in a database).
+
+<details>
+  <summary>🧠 <strong>Checkpoint: Why not always binary search?</strong></summary>
+
+  **Question:** Give three situations in which sequential search is a better choice than binary search.
+
+  **Answer:** (1) The data is **not sorted** and we only need to search a few times, so sorting would cost more than searching. (2) The data is stored in a structure **without direct access by position**, such as a linked list, where reaching the central element already takes linear time. (3) The collection is **very small** (a few dozen elements), where the simpler loop may be faster in practice because of its lower constants. A fourth one: the data changes constantly, and keeping it sorted after every insertion would be too expensive.
+
+</details>
+
+---
+
+## Looking Ahead: Sorting
+
+Binary search showed us how much sorted data is worth. The next chapter focuses on **sorting algorithms**, and analyzes them with all the tools of this chapter. Besides their time complexity in the best, worst and average cases, three properties will be important:
+
+1. **Space (in place or not):** does the algorithm reorganize the elements inside the original array, using only a constant amount of extra memory, or does it need auxiliary arrays proportional to $n$?
+2. **Stability:** if two elements have the same key (for example, two students with the same grade), does the algorithm preserve their original relative order? This matters when sorting by several criteria in successive passes.
+3. **Adaptivity:** does the algorithm take advantage of data that is already partially sorted, finishing faster, or does it perform the same work regardless of the input?
+
+---
+
+## Summary
+
+- **Sequential search** works on any sequence. Exactly: $T_{best} = 6$, $T_{worst} = 3n + 5$ and, with the probabilities assumed above, $T_{average} = \frac{9n}{4} + \frac{19}{4}$. It is $O(1)$ in the best case and $O(n)$ in the worst and average cases.
+- The **sentinel** removes the bounds check and reduces the worst case to $2n + 5$: a better constant, the same complexity, and some practical costs (modifying the input, needing space).
+- **Binary search** requires sorted data and direct access, and runs in $O(\log n)$ time in the worst and average cases. It is easy to get wrong: use `left <= right`, compare the central element in the same iteration and compute the middle without overflow.
+- Sorting first pays off when the number of searches is large enough compared with $\log n$.
+
+---
+
+## Practice
+
+:::tip Technical lab
+- **💻 Run the course code.** The [course repository](https://github.com/vicegd/algorithms) contains the three search algorithms in [`src/topics/foundation/search`](https://github.com/vicegd/algorithms/tree/master/src/topics/foundation/search), with their tests. Note how the sentinel version removes the sentinel before returning.
+- **⏱️ Measure.** Measure the worst case of sequential search, with and without sentinel, for sizes from 1 to 64 million elements (doubling each time), with and without `-Xint`. Do the times double? Is the ratio between the two versions close to $2/3$?
+- **📈 Logarithms in practice.** Instrument binary search to count iterations and run it for $n = 2^{10}, 2^{11}, \dots, 2^{25}$ searching for a value smaller than all the elements. Plot the number of iterations against $n$.
+- **🐞 Stress test.** Write a stress test that compares your binary search with sequential search on thousands of small random sorted arrays, searching for values that are present and values that are not. Introduce the bug described in this lesson and check that your test detects it.
+- **🔍 First occurrence.** Modify binary search so that, if the value appears several times, it returns the position of its **first** occurrence (or $-1$ if it does not appear), still in $O(\log n)$ time.
+:::

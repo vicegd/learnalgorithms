@@ -1,0 +1,456 @@
+---
+title: The Fork/Join Framework
+sidebar_position: 2
+tags: [Parallelism, Fork-Join, Java, Divide and Conquer, RecursiveTask, RecursiveAction]
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# The Fork/Join Framework
+
+Creating and coordinating threads by hand is laborious and error-prone. Since Java 7, the package `java.util.concurrent` includes the **Fork/Join framework**, designed precisely to execute **divide and conquer** algorithms in parallel, using all the available processors automatically. This lesson explains how it works and how to use it, with the examples of the course repository.
+
+:::note What you will learn in this lesson
+- The general idea of Fork/Join and the five steps of the approach.
+- The main classes: `ForkJoinTask`, `RecursiveAction`, `RecursiveTask` and `ForkJoinPool`, and the methods `fork`, `join`, `invoke` and `invokeAll`.
+- How to write parallel versions of simple algorithms: squaring the elements of an array, summing them, processing files.
+- How to combine `fork`, `join` and `compute` correctly, and the most common mistake.
+- How to choose the **sequential threshold**.
+:::
+
+---
+
+## The General Idea
+
+The aim of Fork/Join is to use the full power of parallel processing to improve the performance of applications. Its general idea is a divide and conquer scheme in which the subproblems are solved **in parallel**:
+
+```
+if (the work is small enough)
+    perform the work directly (sequentially)
+else
+    break up the work into smaller components
+    solve the components in parallel
+    wait for the results and combine them
+```
+
+In pseudocode, for a problem that is split into two halves:
+
+```java
+<T> solve(Problem problem) {
+    if (problem.size < SEQUENTIAL_THRESHOLD)
+        return solveSequentially(problem);
+    else {
+        <T> left, right;
+        // invoked in parallel:
+        left = solve(extractLeftHalf(problem));
+        right = solve(extractRightHalf(problem));
+        return combine(left, right);
+    }
+}
+```
+
+The framework has two important advantages:
+
+1. It makes it **easy to create and use multiple threads**: the programmer defines tasks, not threads.
+2. It **automatically uses the available processors** in parallel.
+
+### The approach in five steps
+
+1. **Partition into subproblems:** divide a large problem into smaller ones.
+2. **Create subtasks:** define a task for each subproblem, which can be solved independently.
+3. **Fork the subtasks:** indicate that they should start running. The subtasks are sent to a **pool of threads**, whose size depends on the number of processors and other considerations.
+4. **Join the subtasks:** wait until the subtasks finish (usually, all of them).
+5. **Compose the solution** from the partial solutions.
+
+```
+                         Main task
+                 ┌───────────┼───────────┐
+          fork   ▼           ▼           ▼
+             Subtask 1   Subtask 2 … Subtask n      (running in parallel)
+                 └───────────┼───────────┘
+          join               ▼
+                    Main task: combine
+```
+
+---
+
+## The Main Components
+
+| Class | Role |
+| :--- | :--- |
+| `ForkJoinTask<V>` | Abstract class that defines a task that can be managed by a `ForkJoinPool`. `V` is the type of its result. |
+| `RecursiveAction` | Subclass of `ForkJoinTask` for tasks that **do not return** a value. You implement `protected void compute()`. |
+| `RecursiveTask<V>` | Subclass of `ForkJoinTask` for tasks that **return** a value of type `V`. You implement `protected V compute()`. |
+| `ForkJoinPool` | Manages the execution of `ForkJoinTask`s, with a pool of worker threads. |
+
+### Tasks: `ForkJoinTask<V>`
+
+A `ForkJoinTask` raises the level of abstraction of a `Thread`: we think in terms of **tasks** (units of work), not threads of execution. Tasks are executed by the threads of a `ForkJoinPool`, and they are much lighter and more efficient than threads: a program can create millions of tasks, but not millions of threads. Its key methods are:
+
+| Method | Description |
+| :--- | :--- |
+| `ForkJoinTask<V> fork()` | Submits the task for **asynchronous** execution, and returns immediately. |
+| `V join()` | **Waits** until the task finishes, and returns its result. |
+| `V invoke()` | Combines `fork` and `join` in a single call: executes the task and waits for its result. |
+| `static void invokeAll(task1, task2)` and `invokeAll(tasks...)` | Executes several tasks in parallel and waits until **all** of them finish. |
+
+`RecursiveAction` and `RecursiveTask<V>` are the classes we extend in practice: both are designed to implement a recursive, divide and conquer strategy in their `compute` method.
+
+### The pool: `ForkJoinPool`
+
+A `ForkJoinPool` launches and manages the execution of the tasks. Its two most common constructors are:
+
+- `ForkJoinPool()`: supports a **level of parallelism** equal to the number of processors available in the system;
+- `ForkJoinPool(int parallelism)`: lets you specify the level of parallelism.
+
+The **level of parallelism** is the number of threads that can execute in parallel. It does **not** limit the number of tasks that the pool can manage (there can be many more tasks than threads), but the number of tasks that execute **simultaneously** cannot exceed the number of processors, and the level of parallelism is a **target, not a guarantee**.
+
+To start the computation, the pool offers:
+
+- `<T> T invoke(ForkJoinTask<T> task)`: the calling code **waits** until the task finishes, and gets its result;
+- `void execute(ForkJoinTask<?> task)`: the calling code **continues** its execution (asynchronous).
+
+Java also provides a shared pool, `ForkJoinPool.commonPool()`, used by default by parallel streams and other parallel features of the standard library.
+
+:::info Work stealing
+Each worker thread of a `ForkJoinPool` keeps its own queue of tasks. When a thread runs out of work, instead of waiting idle, it **steals** pending tasks from the queues of other threads. This **work-stealing** strategy balances the load automatically, even when the subproblems have very different sizes, and it is one of the reasons why Fork/Join is efficient with recursive algorithms.
+:::
+
+### Information about the parallelism
+
+You can know the number of processors available and the level of parallelism of a pool with two simple calls:
+
+```java
+int processors = Runtime.getRuntime().availableProcessors();
+int parallelism = new ForkJoinPool().getParallelism();     // equal to processors by default
+```
+
+(The common pool, `ForkJoinPool.commonPool()`, usually has a parallelism of one less than the number of processors, because the thread that submits the work also takes part in it.)
+
+---
+
+## Example 1: Squaring the Elements of an Array
+
+We want to replace each element of an array with its square:
+
+```
+76    13    97    90    48    76    94    59    42    5
+5776  169   9409  8100  2304  5776  8836  3481  1764  25
+```
+
+Each element is independent of the others, so the array can be divided into parts that are processed in parallel. The task does not return anything (it modifies the array in place), so it extends **`RecursiveAction`**:
+
+```java
+public class RecursiveActionSquare extends RecursiveAction {
+    private static final int SEQUENTIAL_THRESHOLD = 100;
+    private final int[] data;
+    private final int start, end;              // the task processes data[start..end-1]
+
+    public RecursiveActionSquare(int[] data, int start, int end) {
+        this.data = data;
+        this.start = start;
+        this.end = end;
+    }
+
+    @Override
+    protected void compute() {
+        if (end - start < SEQUENTIAL_THRESHOLD) {           // small enough: do it directly
+            for (int i = start; i < end; i++)
+                data[i] = data[i] * data[i];
+        } else {                                            // divide into two halves
+            int middle = start + (end - start) / 2;
+            var leftTask = new RecursiveActionSquare(data, start, middle);
+            var rightTask = new RecursiveActionSquare(data, middle, end);
+            invokeAll(leftTask, rightTask);                 // run both in parallel and wait
+        }
+    }
+}
+```
+
+To run it, create a pool and invoke the task covering the whole array:
+
+```java
+int[] data = ...;
+ForkJoinPool pool = new ForkJoinPool();
+pool.invoke(new RecursiveActionSquare(data, 0, data.length));
+```
+
+Notice that the tasks share the array, but each one writes **only its own range** of positions, so no synchronisation is needed.
+
+<RepoCode files={['parallel/square/RecursiveActionSquare.java']} />
+
+---
+
+## Example 2: Summing the Elements of an Array
+
+Now each task must **return** the sum of its part, so it extends **`RecursiveTask<Double>`**. The sums of both halves are combined by adding them:
+
+```
+76  13  97  90  48  76  94  59  42  52   →   647
+```
+
+```java
+public class RecursiveTaskSum extends RecursiveTask<Double> {
+    private static final int SEQUENTIAL_THRESHOLD = 10_000;
+    private final double[] data;
+    private final int start, end;
+
+    public RecursiveTaskSum(double[] data, int start, int end) {
+        this.data = data;
+        this.start = start;
+        this.end = end;
+    }
+
+    @Override
+    protected Double compute() {
+        if (end - start < SEQUENTIAL_THRESHOLD) {           // sequential sum of a small part
+            double partialSum = 0;
+            for (int i = start; i < end; i++)
+                partialSum += data[i];
+            return partialSum;
+        }
+        int middle = start + (end - start) / 2;
+        var leftTask = new RecursiveTaskSum(data, start, middle);
+        var rightTask = new RecursiveTaskSum(data, middle, end);
+        leftTask.fork();                                    // left half: asynchronously
+        double rightResult = rightTask.compute();           // right half: in this thread
+        double leftResult = leftTask.join();                // wait for the left half
+        return leftResult + rightResult;                    // combine
+    }
+}
+```
+
+This is exactly the "sum by division" of the divide and conquer chapter, with the two halves solved in parallel.
+
+### Alternatives for obtaining the results
+
+There are several correct ways of launching two subtasks and collecting their results:
+
+<Tabs>
+<TabItem value="mixed" label="fork + compute + join" default>
+
+```java
+leftTask.fork();                          // the left task goes to the pool
+double right = rightTask.compute();       // the current thread works on the right one
+double left = leftTask.join();            // then waits for the left one
+```
+
+The current thread does not stay idle: it computes one of the halves itself, while another thread may take the other one. This is the most efficient pattern, and the one used in the example.
+
+</TabItem>
+<TabItem value="invokeall" label="invokeAll + join">
+
+```java
+invokeAll(leftTask, rightTask);           // runs both and waits for both
+double left = leftTask.join();            // already finished: join just returns the result
+double right = rightTask.join();
+```
+
+Simple and clear, and efficient, because `invokeAll` also makes the current thread work on one of the tasks.
+
+</TabItem>
+<TabItem value="forkboth" label="fork + fork + join + join">
+
+```java
+leftTask.fork();
+rightTask.fork();
+double right = rightTask.join();          // join in the reverse order of the forks
+double left = leftTask.join();
+```
+
+Correct, but the current thread only waits. Joining in the **reverse** order of the forks (the most recently forked task first) works better with the framework's internal queues.
+
+</TabItem>
+</Tabs>
+
+:::danger The most common mistake
+```java
+leftTask.fork();
+double left = leftTask.join();            // waits for the left task to finish...
+double right = rightTask.compute();       // ...and only then starts the right one!
+```
+Calling `join` immediately after `fork` makes the current thread wait for the left half **before** starting the right half: the two halves are computed one after the other, and the parallelism is lost. Always start (or compute) the other subtask **before** joining.
+:::
+
+<RepoCode files={['parallel/sum/RecursiveTaskSum.java']} />
+
+<ProofLink to="/concepts/parallel-algorithms/proofs#forkjoin-computes-the-same-result-as-the-sequential-algorithm" title="Fork/Join computes the same result as the sequential algorithm" />
+
+---
+
+## Example 3: Processing Files in Parallel
+
+File processing tasks are good candidates for parallelism, because there can be a very large number of files, and each one can usually be processed independently. Examples include version control systems, data processing pipelines and search engines that index documents.
+
+The course repository divides the list of files of a directory in halves until each task has a small batch (at most 5 files), which is processed directly:
+
+```java
+@Override
+protected void compute() {
+    if (filesToProcess.size() <= THRESHOLD) {
+        processFiles(filesToProcess);                      // a small batch: process it
+    } else {
+        int center = filesToProcess.size() / 2;
+        var part1 = new FileProcessingTask(filesToProcess.subList(0, center));
+        var part2 = new FileProcessingTask(filesToProcess.subList(center, filesToProcess.size()));
+        invokeAll(part1, part2);
+    }
+}
+```
+
+The same scheme applies to processing the lines of a large log, the images of a folder or the records of a dataset.
+
+:::caution Input/output and parallelism
+When the bottleneck is reading from a disk or a network, adding threads may not help much: they will simply wait for the same device. Parallelism pays off most when each piece of work requires significant **computation** (parsing, compressing, analyzing...) once the data has been read.
+:::
+
+<RepoCode files={['parallel/fileprocessing/FileProcessingTask.java']} />
+
+---
+
+## Example 4: Parallel Fibonacci
+
+The naive recursive Fibonacci makes two recursive calls, $F(n-1)$ and $F(n-2)$, which are independent: a perfect shape for Fork/Join. Each task forks one call, computes the other, and joins; below a threshold it uses the sequential recursive version.
+
+```java
+public class FibonacciTask extends RecursiveTask<Long> {
+    private static final int THRESHOLD = 30;
+    private final int n;
+
+    public FibonacciTask(int n) {
+        this.n = n;
+    }
+
+    @Override
+    protected Long compute() {
+        if (n < THRESHOLD)
+            return fibonacci(n);                         // sequential naive recursion
+        FibonacciTask f1 = new FibonacciTask(n - 1);
+        FibonacciTask f2 = new FibonacciTask(n - 2);
+        f1.fork();                                       // F(n-1) in another worker
+        long b = f2.compute();                           // F(n-2) in this thread
+        long a = f1.join();
+        return a + b;
+    }
+
+    private static long fibonacci(int n) {
+        return n < 2 ? n : fibonacci(n - 1) + fibonacci(n - 2);
+    }
+}
+```
+
+We computed $F(40) = 102{,}334{,}155$ in several ways on a computer with 2 cores:
+
+| Version | Time |
+| :--- | ---: |
+| Sequential naive recursion | 402 ms |
+| Fork/Join, threshold 30 | 349 ms |
+| Fork/Join, threshold 15 | 435 ms |
+| Fork/Join, threshold 2 | 5,070 ms |
+| Iterative loop (or dynamic programming) | 0.02 ms |
+
+Three lessons come out of this table:
+
+- With a sensible threshold, the parallel version is somewhat faster, and on a machine with more cores the gain would be larger.
+- With a tiny threshold, the program creates hundreds of millions of tasks and is **more than 12 times slower** than the sequential version: the overhead of the tasks dwarfs the additions they perform.
+- Above all, **parallelism does not fix a bad algorithm**. The naive recursion is exponential, and no number of processors can compete with the linear iterative version, which is about 15,000 times faster than the best parallel time. The right fix is [dynamic programming](../06-dynamic-programming/01-dynamic-programming-method.mdx), not more cores.
+
+<RepoCode files={['parallel/fibonacci/FibonacciTask.java', 'parallel/fibonacci/FibonacciAlgorithm.java']} />
+
+***
+
+## Example 5: Parallel Quicksort
+
+After partitioning, Quicksort has two independent subproblems: the parts to the left and to the right of the pivot. Sorting them in parallel only requires turning the recursive calls into tasks. Since the parts are sorted in place and nothing is returned, the task is a `RecursiveAction`:
+
+```java
+public class ParallelQuicksort extends RecursiveAction {
+    private static final int THRESHOLD = 10_000;
+    private final int[] a;
+    private final int left, right;
+
+    public ParallelQuicksort(int[] a, int left, int right) {
+        this.a = a;
+        this.left = left;
+        this.right = right;
+    }
+
+    @Override
+    protected void compute() {
+        if (right - left < THRESHOLD) {
+            Arrays.sort(a, left, right + 1);             // small part: sequential
+            return;
+        }
+        int p = partition(a, left, right);               // sequential partition
+        invokeAll(new ParallelQuicksort(a, left, p - 1), // both parts in parallel
+                  new ParallelQuicksort(a, p + 1, right));
+    }
+}
+```
+
+`partition` is any of the partitions of the [Quicksort lesson](../02-sorting/05-quicksort.mdx). The two tasks work on **disjoint** parts of the array, so they never interfere, and no synchronization is needed.
+
+Two limits are worth noting. First, the partition of the whole array is **sequential**: the first level alone costs $O(n)$, so the span of the algorithm is at least linear, and the speedup is limited to $O(\log n)$ however many cores there are (see the [proofs of the chapter](./proofs.mdx#work-span-and-the-time-with-p-processors)). Second, the parts can be very unbalanced, which leaves some workers idle; work stealing mitigates this.
+
+Sorting 20 million random integers on our 2-core computer took 1.68 s with the sequential Quicksort and 1.59 s with the parallel one; `Arrays.parallelSort`, which uses a parallel Mergesort with a parallel merge, took 1.56 s. On a computer with 8 or more cores, the parallel versions pull clearly ahead. In practice, `Arrays.parallelSort` is the version to use: it is tuned, and it avoids the sequential partition at the top.
+
+***
+
+## Choosing the Threshold
+
+The essential design decision in a Fork/Join algorithm is the **sequential threshold**: the size below which a task stops dividing and does its work directly.
+
+- The idea is to reduce the size of the problem to one that can be managed **sequentially faster** than by creating another division.
+- The key is to find a balance between the cost of **dividing** the problem (creating and scheduling tasks, combining results) and the cost of **solving** it.
+- The threshold should **not** be based on the number of processors, because that number changes from one computer to another, and other applications may be using the processors at the same time. It is better to create many more tasks than processors, and let work stealing balance them.
+
+We measured the effect of the threshold by squaring 20 million integers on a computer with **2 cores**:
+
+| Version | Threshold | Approximate number of tasks | Time |
+| :--- | ---: | ---: | ---: |
+| Sequential loop | | | 12.8 ms |
+| Fork/Join, 2 threads | 2 | 20,000,000 | 506.6 ms |
+| | 10 | 4,000,000 | 90.7 ms |
+| | 100 | 400,000 | 12.8 ms |
+| | 1,000 | 40,000 | 5.8 ms |
+| | 100,000 | 400 | 4.1 ms |
+| | 5,000,000 | 8 | 4.1 ms |
+
+With tiny thresholds, the program creates **millions of tasks** whose management costs far more than squaring a number: the parallel version is up to **40 times slower** than the sequential one. With reasonable thresholds, it is about **3 times faster** (more than the number of cores, partly because the sequential and parallel loops are optimized differently by the compiler; with a heavier operation per element, the speedup approaches the number of cores, as the next lesson shows).
+
+A useful rule of thumb is that each task at the base case should perform **at least a few thousand** simple operations, or fewer if each operation is expensive.
+
+---
+
+## Parallelism in the Standard Library
+
+Many parallel algorithms are already available in Java, implemented with Fork/Join:
+
+- `Arrays.parallelSort(array)` sorts large arrays in parallel (a parallel merge sort).
+- **Parallel streams**: `IntStream.range(0, n).parallel().map(...).sum()`, or `list.parallelStream()`, divide the work among the threads of the common pool automatically.
+- `Arrays.parallelPrefix`, `Arrays.parallelSetAll` and similar methods.
+
+As with sequential algorithms, prefer the library when it solves your problem, and write your own tasks when it does not.
+
+---
+
+## Summary
+
+- The **Fork/Join** framework executes divide and conquer algorithms in parallel: if the work is small, solve it directly; otherwise divide it, solve the parts in parallel and combine the results.
+- Extend **`RecursiveAction`** when the task does not return a value, and **`RecursiveTask<V>`** when it does. Implement the algorithm in `compute()`.
+- `fork()` launches a subtask asynchronously; `join()` waits for its result; `invokeAll` runs several tasks and waits for all of them. Never `join` a task before starting the other ones.
+- A **`ForkJoinPool`** manages the tasks with a pool of threads and **work stealing**.
+- The **sequential threshold** balances the cost of dividing against the cost of solving; too small a threshold makes the parallel version slower than the sequential one.
+
+---
+
+## Practice
+
+:::tip Exercises
+- **💻 Run the examples.** The [course repository](https://github.com/vicegd/algorithms/tree/master/src/topics/parallel) contains the square, sum, cube root and file processing examples. Run them and find the processors and parallelism of your computer.
+- **📏 Find the best threshold.** Measure the parallel sum of 50 million `double` values with thresholds from 10 to 10,000,000. Plot the time against the threshold (with a logarithmic scale). Where is the minimum on your computer?
+- **🐞 Break it.** Change the sum so that it calls `leftTask.fork()` and `leftTask.join()` before computing the right task. How do the times change?
+- **🔢 Your own Fibonacci measurements.** Run the parallel Fibonacci of Example 4 on your computer with thresholds from 5 to 35. Where is the best threshold, and how does it relate to the number of cores?
+- **⚡ Parallel Mergesort.** Following Example 5, write a parallel Mergesort: the two halves are sorted as two tasks, and the merge is done when both have finished. Why is its span still linear?
+:::

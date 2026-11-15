@@ -1,7 +1,0 @@
-{
-  "label": "4. State Space Search and Optimization",
-  "link": {
-    "type": "generated-index",
-    "description": "Backtracking and branch and bound: exploring implicit trees of states, pruning hopeless branches, and using bounds and heuristics to find exact solutions to hard combinatorial problems."
-  }
-}

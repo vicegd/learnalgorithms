@@ -1,0 +1,99 @@
+---
+title: "Exercises: Backtracking"
+sidebar_label: Exercises
+sidebar_position: 3
+tags: [Exercises, Backtracking, Pruning]
+---
+
+# Exercises: Backtracking
+
+These exercises review the two lessons on [backtracking](./01-backtracking-scheme.mdx). They are different from the seminar activities (paths, Hamiltonian cycles and the traveling salesman) and from the lab problems, which are left for those sessions. Try each one before reading its solution: the solutions are grouped at the [end of the page](#solutions).
+
+***
+
+<span id="ex-7-1"></span>**7.1. Balanced parentheses.** Generate all the strings of $n$ pairs of balanced parentheses (for $n = 3$: `((()))`, `(()())`, `(())()`, `()(())`, `()()()`). Design a backtracking algorithm that never generates an invalid prefix. How many solutions are there for $n = 4$? How many nodes does your tree have, compared with generating every string of $2n$ parentheses and checking at the end?
+
+<ToSolution n="7.1" />
+
+<span id="ex-7-2"></span>**7.2. Derangements.** A **derangement** is a permutation in which no element stays in its original position (for example, a secret Santa where nobody gets themselves). Modify the permutation algorithm of the [examples lesson](./02-classic-problems.mdx#permutations) to generate only derangements. How many are there for $n = 5$?
+
+<ToSolution n="7.2" />
+
+<span id="ex-7-3"></span>**7.3. Splitting a text into words.** Given the string `catsanddog` and the dictionary formed by the words `cat`, `cats`, `and`, `sand` and `dog`, find every way to split the string into dictionary words. Design a backtracking algorithm. In the worst case it is exponential; how can dynamic programming help?
+
+<ToSolution n="7.3" />
+
+<span id="ex-7-4"></span>**7.4. Counting nodes.** A backtracking algorithm decides, for each of $n$ elements, whether to include it or not, and never prunes. How many nodes does its tree have? And an algorithm that generates every permutation of $n$ elements? Give both counts for $n = 10$.
+
+<ToSolution n="7.4" />
+
+<span id="ex-7-5"></span>**7.5. Which scheme?** For each task, would you use the "first solution" or the "all solutions" scheme, and what would you keep during the search?
+- (a) Is there any way to place 10 queens on a $10 \times 10$ board?
+- (b) How many solutions does a Sudoku have? (A well-posed Sudoku must have exactly one.)
+- (c) The cheapest way to assign 12 tasks to 12 agents.
+
+<ToSolution n="7.5" />
+
+***
+
+## Solutions
+
+<span id="sol-7-1"></span>**7.1.** Build the string character by character, keeping the number of opening (`o`) and closing (`c`) parentheses used. An opening parenthesis can be added if `o < n`; a closing one only if `c < o` (otherwise the prefix would have more closings than openings).
+
+```java
+void generate(String s, int o, int c, int n) {
+    if (s.length() == 2 * n) {
+        System.out.println(s);
+        return;
+    }
+    if (o < n) generate(s + "(", o + 1, c, n);
+    if (c < o) generate(s + ")", o, c + 1, n);
+}
+```
+
+There are **14** solutions for $n = 4$ (the Catalan numbers: 1, 2, 5, 14, 42, ...). Our implementation generated **64 nodes**, against the 511 nodes of the full binary tree of height 8 that generates all $2^8 = 256$ strings before checking them. For $n = 10$: 16,796 solutions, 82,499 nodes, against more than 2 million.
+
+<ToStatement n="7.1" />
+
+<span id="sol-7-2"></span>**7.2.** Add one condition to the candidates: element $i$ cannot be placed in position $k$ if $i = k$.
+
+```java
+for (int i = 0; i < n; i++)
+    if (!used[i] && i != level) { ... }
+```
+
+For $n = 5$ there are **44** derangements, out of $5! = 120$ permutations; our tree had 147 nodes. In general, the proportion of derangements tends to $1/e \approx 36.8\%$: the probability that nobody gets themselves in a random secret Santa is about 37% whatever the number of people.
+
+<ToStatement n="7.2" />
+
+<span id="sol-7-3"></span>**7.3.** At each position $i$, try every dictionary word that starts there, and recurse from the end of the word. A solution is reached at the end of the string.
+
+```java
+void split(String s, int i, List<String> words) {
+    if (i == s.length()) {
+        System.out.println(String.join(" ", words));
+        return;
+    }
+    for (int j = i + 1; j <= s.length(); j++)
+        if (dictionary.contains(s.substring(i, j))) {
+            words.add(s.substring(i, j));
+            split(s, j, words);
+            words.remove(words.size() - 1);
+        }
+}
+```
+
+There are **2** solutions: `cat sand dog` and `cats and dog`. The number of splittings can be exponential (with `aaaa...a` and the dictionary with the words `a` and `aa`, it grows like the Fibonacci numbers), and then no algorithm can list them faster. But if we only need to know **whether** a splitting exists, the question "can the suffix from $i$ be split?" has only $n$ distinct subproblems: storing their answers (memoization) or filling a table from the end gives an $O(n^2)$ dynamic programming algorithm (plus the cost of the dictionary lookups). Memoization also prunes the backtracking search: a position known to be a dead end is not explored again.
+
+<ToStatement n="7.3" />
+
+<span id="sol-7-4"></span>**7.4.** A binary tree of height $n$ has $1 + 2 + 4 + \dots + 2^n = 2^{n+1} - 1$ nodes: **2,047** for $n = 10$. The permutation tree has $1 + n + n(n-1) + \dots + n!$ nodes, less than $e \cdot n!$: for $n = 10$, **9,864,101** nodes. (This is exactly the number of calls counted for the task assignment without pruning in the [examples lesson](./02-classic-problems.mdx#task-assignment).)
+
+<ToStatement n="7.4" />
+
+<span id="sol-7-5"></span>**7.5.**
+- (a) **First solution**, with a `found` flag: we only need to know whether one exists (and it does: every $n \ge 4$ has solutions).
+- (b) **All solutions**, with a counter. In practice, we can stop as soon as the counter reaches 2: that is enough to know that the Sudoku is not well posed.
+- (c) **All solutions**, keeping the best assignment found so far and its cost, which is also used to prune.
+
+<ToStatement n="7.5" />

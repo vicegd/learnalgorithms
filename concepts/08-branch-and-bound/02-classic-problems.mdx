@@ -1,0 +1,329 @@
+---
+title: "Branch and Bound: Classic Problems"
+sidebar_label: Classic Problems
+sidebar_position: 2
+tags: [Paradigms, State Space Search, Branch and Bound, Optimization, Heuristics, A*]
+---
+
+# Branch and Bound: Classic Problems
+
+This lesson applies the [general scheme of branch and bound](./01-branch-and-bound-scheme.mdx) to several problems. In each one, the work consists of answering the same three questions:
+
+1. **What is a state**, and what are its children?
+2. **What is the heuristic** (the lower bound, for minimization) that orders the live nodes and decides what to prune?
+3. **What is the initial pruning limit**?
+
+| Problem | Type | Heuristic | What it illustrates |
+|---|---|---|---|
+| Task assignment | Minimization | Cost so far + cheapest remaining cost of each column | A complete trace; initial limit |
+| 0/1 knapsack | Maximization | Value so far + fractional (greedy) completion | Mirrored bounds; the power of a tight bound |
+| Sliding puzzles | Minimum number of moves | Moves made + Manhattan distance | Reachability test; repeated states; $g + h$ |
+| Rectangle placement | Minimization | Area of the bounding box so far | Geometric states |
+| N-queens | First solution | Queens left to place, then diagonal length | B&B used to find one solution fast |
+| Traveling salesman | Minimization | Length so far + cheapest exit of each city still to leave | A bound for a classic NP-hard problem |
+
+***
+
+## Task assignment
+
+**Problem.** There are $n$ agents and $n$ tasks. Each agent performs exactly one task and each task is performed by exactly one agent. The cost of agent $i$ performing task $j$ is $C[i][j]$. Find the assignment with **minimum total cost**. (This problem was solved by [backtracking in the previous lesson](../07-backtracking/02-classic-problems.mdx#task-assignment); now we solve it with branch and bound.)
+
+We use this cost matrix, with agents $a, b, c, d$ and tasks 1 to 4:
+
+| Agent \ Task | 1 | 2 | 3 | 4 |
+|---|---:|---:|---:|---:|
+| a | 11 | 12 | 18 | 40 |
+| b | 14 | 15 | 13 | 22 |
+| c | 11 | 17 | 19 | 23 |
+| d | 17 | 14 | 20 | 28 |
+
+### Design
+
+- **State**: the tasks assigned to the first $k$ agents. Level $k$ decides the task of agent $k + 1$, so each node has one child per task still free. When only one agent is left, its task is forced, so the last two agents are decided together.
+- **Heuristic (lower bound)**: the sum of the costs already assigned, **plus**, for each task still free, the **minimum cost in its column** among the agents still free. Each remaining task will be done by someone, and at best by its cheapest remaining agent, so this never overestimates. (It may be too optimistic: the same agent could be the cheapest for two tasks.)
+- **Initial pruning limit**: the cheaper of the two **diagonals** of the matrix. Each diagonal is a valid assignment (agent $i$ gets task $i$, or task $n + 1 - i$), so the optimum cannot be worse:
+
+$$
+U_0 = \min(11 + 15 + 19 + 28,\; 40 + 13 + 17 + 17) = \min(73, 87) = 73
+$$
+
+For example, the state "a gets task 1" has heuristic $11$ (assigned) $+ \min(15, 17, 14)$ (column 2) $+ \min(13, 19, 20)$ (column 3) $+ \min(22, 23, 28)$ (column 4) $= 11 + 14 + 13 + 22 = 60$.
+
+### Trace
+
+The live nodes are kept in a priority queue ordered by heuristic. The search proceeds as follows (the limit is shown after each step):
+
+| Step | Node expanded | Children generated (heuristic) | Limit |
+|---:|---|---|---:|
+| 1 | root | a1 (60), a2 (58), a3 (65), a4 (78, pruned: 78 ≥ 73) | 73 |
+| 2 | a2 (58) | b1 (68), b3 (59), b4 (64) | 73 |
+| 3 | a2 b3 (59) | c1 d4: **solution, cost 64**; c4 d1: solution, cost 65 | **64** |
+| 4 | a1 (60) | b2 (68, pruned), b3 (61), b4 (66, pruned) | 64 |
+| 5 | a1 b3 (61) | c2 d4: solution, cost 69; c4 d2: **solution, cost 61** | **61** |
+| 6 | | The best live node is a2 b4 (64) ≥ 61: **stop** | 61 |
+
+The optimal solution is **(a, 1), (b, 3), (c, 4), (d, 2)**, with cost $11 + 13 + 23 + 14 = 61$.
+
+Only **4 complete assignments** were generated (6 if we count the two diagonals used for the initial limit), instead of the $4! = 24$ that exhaustive backtracking examines. Nodes a3, a4, a2 b1, a1 b2 and a1 b4 were never expanded.
+
+### At scale
+
+On random $n \times n$ matrices with costs between 1 and 99, we compared this B&B with the [backtracking algorithm](../07-backtracking/02-classic-problems.mdx#task-assignment) of the previous chapter (which prunes only when the cost so far reaches the best cost):
+
+| $n$ | Backtracking: recursive calls | B&B: nodes expanded | B&B: nodes generated |
+|---:|---:|---:|---:|
+| 10 | 12,739 | 218 | 1,420 |
+| 12 | 77,412 | 69 | 565 |
+| 14 | 194,179 | 41 | 332 |
+
+Both return the same optimum. The difference comes from the **estimate of the future cost**: backtracking only knows what has already been spent, while the B&B bound also accounts for what must still be spent, so it detects hopeless branches much earlier. For a walkthrough of the same technique, see [Assignment Problem using Branch and Bound](https://www.youtube.com/watch?v=BV2MIZna6PI).
+
+<RepoCode files={['branchandbound/agents/AgentsTasks.java']} />
+
+<ProofLink to="/concepts/branch-and-bound/proofs#the-bounds-used-in-the-examples-are-valid" title="The bounds used in the examples are valid" />
+
+***
+
+## 0/1 knapsack
+
+**Problem.** We have $n$ objects with weights $w_i$ and values $v_i$, and a knapsack with capacity $W$. Choose objects (each one entirely or not at all) to **maximize** the total value without exceeding the capacity. We solved it with [dynamic programming](../06-dynamic-programming/02-classic-problems.mdx) in pseudo-polynomial time; branch and bound solves it without depending on the size of $W$.
+
+### Design
+
+- **State**: decisions taken for the first $k$ objects (take it or leave it), with the weight and value accumulated. Each node has at most two children.
+- **This is a maximization problem**, so everything is mirrored: the bound is an **optimistic upper bound** on the value reachable from the node, the benchmark is the **best value found so far**, and a node is pruned when its bound is **less than or equal to** that value.
+- **Bound**: sort the objects by value per unit of weight $v_i / w_i$, decreasing. From the current state, keep adding the remaining objects in that order while they fit, and fill the remaining capacity with a **fraction** of the next one. This is the greedy solution of the [fractional knapsack](../05-greedy-algorithms/02-classic-problems.mdx#the-knapsack-problem), which is optimal for the relaxed problem, so it can never be worse than the true best completion.
+
+### Example
+
+Use the instance from the dynamic programming lesson: $W = 10$, and three objects with weights $6, 5, 5$ and values $8, 5, 5$ (ratios $1.33$, $1$, $1$, already sorted).
+
+- **Root**: take object 1 (weight 6, value 8), 4 units of capacity left, take $4/5$ of object 2 (value 4): bound $= 12$.
+- Expand the root:
+  - "take 1": value 8, bound $8 + 4 = 12$. The best value so far becomes 8.
+  - "leave 1": objects 2 and 3 fit: bound $= 10$.
+- Expand "take 1" (12). Object 2 does not fit. Leaving it gives bound $8 + \tfrac{4}{5} \cdot 5 = 12$; expanding that, object 3 does not fit either, and the complete solution has value 8.
+- Expand "leave 1" (its bound, 10, is greater than 8). "Take 2": value 5, bound 10. "Leave 2": bound 5 ≤ 8, **pruned**.
+- Expand "take 2" (10). "Take 3": value **10**, which becomes the best value. "Leave 3": bound 5, pruned.
+- No live node can beat 10: **stop**. The optimum is objects 2 and 3, value 10.
+
+The example also shows that the first branch explored (the one with the most attractive bound) does not always contain the optimum: the fractional bound of "take 1" was 12, but its true best completion is only 8. The bound was optimistic, as required, and the search corrected itself.
+
+### The power of a tight bound
+
+On 30 random objects (weights between 10 and 99, capacity half of the total weight):
+
+| Algorithm | Nodes or calls | Time |
+|---|---:|---:|
+| Backtracking, pruning only objects that do not fit | about 1,207 million calls | 2.3 s |
+| Backtracking + fractional bound | 251 calls | 0.2 ms |
+| Best-first B&B + fractional bound | 122 nodes expanded | 1.6 ms |
+
+All three return the same value. The bound is responsible for almost all of the improvement; the best-first order then halves the number of nodes, at the price of creating node objects and managing a priority queue. On instances with 40 and 50 objects, the bounded versions still need only a few hundred nodes.
+
+<ProofLink to="/concepts/branch-and-bound/proofs#the-bounds-used-in-the-examples-are-valid" title="The bounds used in the examples are valid" />
+
+***
+
+## Sliding puzzles
+
+**Problem.** The **15-puzzle** is played on a $4 \times 4$ board with 15 numbered tiles and one empty cell. A move slides a tile adjacent to the empty cell into it (equivalently, the empty cell moves to one of its up to four neighbors). Pieces cannot be lifted. Starting from a scrambled board, reach the goal state with the tiles in order and the empty cell in the last position, using **as few moves as possible**. The **8-puzzle** is the same game on a $3 \times 3$ board.
+
+```text
+Initial state           Goal state
+14  2  3 12              1  2  3  4
+ 9  .  4  8              5  6  7  8
+13 10 11  7              9 10 11 12
+ 5  1 15  6             13 14 15  .
+```
+
+### The state space
+
+The board can be in $16! \approx 2.1 \times 10^{13}$ configurations. Only **half** of them can be reached from a given initial state, but that is still about $10^{13}$ states: building and exploring the whole tree is unacceptable. Before searching, we should know whether the goal is reachable at all.
+
+### Reachability test
+
+Number the cells from 1 to 16, row by row, and treat the empty cell as tile 16. Define:
+
+- $\text{position}(i)$: the cell where tile $i$ is in the initial state;
+- $\text{smaller}(i)$: the number of tiles $j \lt i$ such that $\text{position}(j) \gt \text{position}(i)$ (smaller tiles that appear after tile $i$);
+- $x = 1$ if the empty cell is in one of the shaded cells of a checkerboard pattern (cells 2, 4, 5, 7, 10, 12, 13 and 15), and $x = 0$ otherwise.
+
+Then the goal state is reachable **if and only if**
+
+$$
+\sum_{i=1}^{16} \text{smaller}(i) + x \text{ is even.}
+$$
+
+The reason is a parity argument: every move changes the parity of the number of inversions (horizontal moves by exactly one inversion, vertical moves by an odd number) and also changes the color of the square where the empty cell is, so the parity of the total never changes. The goal has sum 0 and $x = 0$.
+
+**Example 1.** For the board
+
+```text
+ 1  3  4 15
+ 2  .  5 12
+ 7  6 11 14
+ 8  9 10 13
+```
+
+the values are $\text{smaller}(3) = \text{smaller}(4) = \text{smaller}(7) = 1$, $\text{smaller}(11) = 3$, $\text{smaller}(12) = 6$, $\text{smaller}(14) = 4$, $\text{smaller}(15) = 11$ and $\text{smaller}(16) = 10$, all the others 0. The sum is 37, and the empty cell is in cell 6, which is not shaded ($x = 0$). The total, 37, is odd: **the goal cannot be reached**, and the search should not even start.
+
+**Example 2.** For the board
+
+```text
+ 1  2  3  4
+ 5  6  7  8
+ 9 10  . 11
+13 14 15 12
+```
+
+$\text{smaller}(13) = \text{smaller}(14) = \text{smaller}(15) = 1$ and $\text{smaller}(16) = 5$, so the sum is 8, with $x = 0$ (cell 11 is not shaded). The total is even: **the goal is reachable** (in fact, with 2 moves). The initial state shown at the beginning of this section is also reachable (sum 64, $x = 0$).
+
+For the 8-puzzle (odd board width), the rule is simpler: the goal is reachable if and only if the number of inversions among the 8 tiles, ignoring the empty cell, is even.
+
+<ProofLink to="/concepts/branch-and-bound/proofs#the-parity-condition-of-the-15-puzzle" title="The parity condition of the 15-puzzle" />
+
+### Heuristics
+
+Two classic estimates of how far a board is from the goal:
+
+- **Misplaced tiles**: the number of tiles that are not in their final cell.
+- **Manhattan distance**: the sum, over all tiles, of the number of rows plus columns that separate each tile from its final cell.
+
+Both are **admissible**: each misplaced tile needs at least one move, and each move changes the Manhattan distance of only one tile by one. The empty cell must **not** be counted, or the estimate may exceed the true number of moves. Manhattan distance is always at least as large as the number of misplaced tiles, so it is the tighter (better) of the two.
+
+<ProofLink to="/concepts/branch-and-bound/proofs#the-puzzle-heuristics-are-admissible" title="The puzzle heuristics are admissible" />
+
+### Ordering the live nodes: $g + h$
+
+To find the solution with the **fewest moves**, the priority of a board $x$ must be
+
+$$
+f(x) = g(x) + h(x)
+$$
+
+where $g(x)$ is the number of moves already made from the initial state and $h(x)$ an admissible heuristic. This is the A\* algorithm described in the [previous lesson](./01-branch-and-bound-scheme.mdx#branch-and-bound-and-a). The B&B must also **discard repeated states**: otherwise it would keep generating boards it has already seen, moving tiles back and forth.
+
+We solved 200 random solvable 8-puzzles with four strategies:
+
+| Strategy | Average moves in the solution | Average boards expanded |
+|---|---:|---:|
+| Breadth-first (FIFO queue) | 22.3 (optimal) | 83,701 |
+| Best-first, $g$ + misplaced tiles | 22.3 (optimal) | 15,682 |
+| Best-first, $g$ + Manhattan distance | 22.3 (optimal) | 1,266 |
+| Best-first, Manhattan distance **only** (no $g$) | 64.7 | 292 |
+
+The three strategies that include $g$ always find the shortest solution, and the better the heuristic, the fewer boards they expand. The last one expands fewer boards still, but its solutions are almost three times longer than necessary: in 194 of the 200 puzzles it returned a non-optimal solution, in one case with 142 extra moves. Forgetting $g$ turns branch and bound into a greedy search.
+
+***
+
+## Rectangle placement
+
+**Problem.** We have $n$ flat rectangular pieces $p_1, \dots, p_n$, where piece $p_i$ measures $a_i \times b_i$. We want to place them on a flat board, without overlapping, so that the **area of the rectangle that encloses all of them is minimum**. A real application is arranging boxes in a warehouse with robotic arms, or cutting pieces from a sheet of material with minimum waste.
+
+For example, with $p_1 = 1 \times 2$, $p_2 = 2 \times 2$ and $p_3 = 1 \times 3$, different arrangements need enclosing boxes of $4 \times 3 = 12$, $7 \times 2 = 14$, $5 \times 2 = 10$ or $3 \times 3 = 9$. The last one is optimal: the pieces have a total area of $2 + 4 + 3 = 9$, so they fill the $3 \times 3$ square without gaps (the $2 \times 2$ piece in a corner, the $1 \times 2$ piece standing next to it, and the $1 \times 3$ piece along the remaining side).
+
+### Design
+
+- **State**: a matrix of integers representing the board, where 0 marks a free cell and a value $k \gt 0$ marks a cell occupied by piece $p_k$. At step $k$ the next piece not yet placed is added.
+- **Children**: one child for each **valid position** of the next piece, both horizontal and vertical. A position is valid if it does not overlap the pieces already placed and is **adjacent** to at least one of them (placing a piece far away can only make the box bigger).
+- **Solution**: a node at level $n$ (all pieces placed). The problem always has a solution if the board is large enough.
+- **Bound**: the area of the enclosing box of the pieces placed so far can only grow when more pieces are added, so it is a valid lower bound. A node is pruned when that area already reaches the area of the best solution found.
+
+A stronger bound uses the fact that the final box must also contain the area of the pieces not yet placed: $\max(\text{current box area}, \text{total area of all pieces})$.
+
+<RepoCode files={['branchandbound/rectangles/RectanglesPlacement.java', 'branchandbound/rectangles/Game.java', 'branchandbound/rectangles/Piece.java', 'branchandbound/rectangles/PieceOrientation.java']} />
+
+***
+
+## N-queens
+
+Branch and bound is not only for optimization. Here it is used to find **one** placement of $n$ non-attacking queens (the problem solved by [backtracking](../07-backtracking/02-classic-problems.mdx#n-queens)) as fast as possible. Only states in which no queen attacks another are generated.
+
+### Branching heuristic
+
+1. Develop first the state with **more queens placed**: it is closer to a solution.
+2. In case of a tie, prefer the state whose last queen is on a cell whose **longest diagonal is the shortest**. A queen on a short diagonal attacks fewer cells, so it leaves more room for the remaining queens.
+
+Let $\text{diagonal}(i, j)$ be the length of the longest diagonal passing through cell $(i, j)$. For a $5 \times 5$ board:
+
+| | | | | |
+|:---:|:---:|:---:|:---:|:---:|
+| 5 | 4 | 3 | 4 | 5 |
+| 4 | 5 | 4 | 5 | 4 |
+| 3 | 4 | 5 | 4 | 3 |
+| 4 | 5 | 4 | 5 | 4 |
+| 5 | 4 | 3 | 4 | 5 |
+
+To merge both criteria into one number (lower is better), the first criterion is multiplied by 10 so that it always dominates the second:
+
+$$
+h = (n - \text{queens placed}) \cdot 10 + \text{diagonal}(i, j)
+$$
+
+For $n = 5$, the five children of the root (one queen in the first column) get the values 45, 44, 43, 44 and 45, so the search starts with the queen in the middle row of the first column, on the short diagonal.
+
+### Effect
+
+We counted the states expanded to find the first solution, compared with the recursive calls of first-solution backtracking:
+
+| $n$ | Backtracking (calls) | B&B (states expanded) |
+|---:|---:|---:|
+| 8 | 114 | 31 |
+| 16 | 10,053 | 17 |
+| 20 | 199,636 | 59 |
+| 24 | 411,609 | 253 |
+| 28 | 3,006,299 | 92,956 |
+
+The heuristic guides the search towards a solution far more directly. It is not perfect (for $n = 28$ it needs many more states than for $n = 24$), which is a reminder that heuristics improve typical behavior, not the worst case.
+
+***
+
+## The traveling salesman
+
+**Problem.** A salesman must visit $n$ cities, each exactly once, and return to the city where he started. The distance $d(i, j)$ between every pair of cities is known. Find the **shortest tour**. It is the most famous NP-hard problem, and branch and bound is the basis of the exact methods used to solve it.
+
+### Design
+
+- **State**: a partial tour that starts at city A, with the cities visited so far in order, and its length. Each child adds one unvisited city at the end.
+- **Solution**: a state that has visited all $n$ cities; its cost includes the return to A.
+- **Lower bound**: in the final tour, every city that has not been left yet will have to be left exactly once. So a valid bound is the length so far, plus the cheapest edge from the **current city** to an unvisited city, plus, for each **unvisited city**, its cheapest edge to another unvisited city or back to A. Each term is a minimum over the edges that the tour could still use, so the sum never exceeds the length of any completion.
+
+### An example
+
+Five cities, A to E, with these symmetric distances:
+
+| | A | B | C | D | E |
+|---|---:|---:|---:|---:|---:|
+| **A** | | 12 | 10 | 19 | 8 |
+| **B** | 12 | | 3 | 7 | 2 |
+| **C** | 10 | 3 | | 6 | 20 |
+| **D** | 19 | 7 | 6 | | 4 |
+| **E** | 8 | 2 | 20 | 4 | |
+
+At the root nothing has been decided, and every city must still be left once: the bound is the sum of the smallest distance of each row, $8 + 2 + 3 + 4 + 2 = 19$. The best-first search expanded **13** nodes and generated 31, and found the optimal tour **A → C → B → D → E → A**, of length $10 + 3 + 7 + 4 + 8 = 32$. There are only 24 tours starting at A here, so the saving is modest; it grows quickly with $n$.
+
+### At scale
+
+On random instances with symmetric distances between 10 and 99, we compared this branch and bound with a backtracking search that prunes only when the length so far reaches the best tour found:
+
+| Cities | Backtracking: calls | B&B: nodes expanded | B&B: nodes generated |
+|---:|---:|---:|---:|
+| 10 | 115,173 | 454 | 2,118 |
+| 12 | 1,187,758 | 644 | 4,129 |
+| 13 | 12,072,124 | 4,230 | 26,759 |
+
+Both find the same optimum. As in the assignment problem, the difference comes from the bound, which accounts for the length still to travel. Real solvers such as Concorde use much stronger bounds (based on spanning trees and linear programming) and solve instances with tens of thousands of cities.
+
+***
+
+## Summary
+
+| Problem | State | Heuristic / bound | Initial limit |
+|---|---|---|---|
+| Task assignment | Tasks of the first $k$ agents | Cost so far + minimum of each free column | Cheaper diagonal |
+| 0/1 knapsack | Decisions on the first $k$ objects | Value so far + fractional greedy completion (upper bound) | Value of the greedy solution, or 0 |
+| Sliding puzzles | Board configuration | $g$ (moves made) + Manhattan distance | Infinite (stop at the first goal extracted) |
+| Rectangle placement | Board matrix with the pieces placed | Area of the enclosing box so far | Infinite, or any valid arrangement |
+| N-queens | Queens placed so far, without attacks | $(n - \text{placed}) \cdot 10 + \text{diagonal}$ | Not needed (first solution) |
+| Traveling salesman | Partial tour from A | Length so far + cheapest exit of the current and of each unvisited city | Infinite, or the length of a greedy tour |

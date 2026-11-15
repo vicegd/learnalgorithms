@@ -1,0 +1,160 @@
+---
+title: "Exercises: Dynamic Programming"
+sidebar_label: Exercises
+sidebar_position: 3
+tags: [Exercises, Dynamic Programming, Memoization, Principle of Optimality]
+---
+
+# Exercises: Dynamic Programming
+
+These exercises review the two lessons on [dynamic programming](./01-dynamic-programming-method.mdx). For each problem, follow the design steps of the first lesson: define the subproblems, write the recurrence with its base cases, decide the order in which to fill the table, and, when needed, recover the solution from the table. Try each one before reading its solution: the solutions are grouped at the [end of the page](#solutions).
+
+***
+
+## Counting
+
+<span id="ex-6-1"></span>**6.1. Stairs.** A child climbs a staircase of $n$ steps, taking 1, 2 or 3 steps at a time. In how many different ways can the child reach the top? Give the recurrence and compute the answer for $n = 10$.
+
+<ToSolution n="6.1" />
+
+<span id="ex-6-2"></span>**6.2. Paths in a grid.** A robot starts at the top-left cell of a grid with 4 rows and 5 columns and must reach the bottom-right cell, moving only right or down. How many different paths are there? And if the cells in row 1, column 2 and in row 2, column 1 (counting rows and columns from 0) are blocked?
+
+<ToSolution n="6.2" />
+
+## Optimization
+
+<span id="ex-6-3"></span>**6.3. Longest increasing subsequence.** Find the length of the longest strictly increasing subsequence (not necessarily contiguous) of `10 9 2 5 3 7 101 18`, and one such subsequence. Give an $O(n^2)$ algorithm.
+
+<ToSolution n="6.3" />
+
+<span id="ex-6-4"></span>**6.4. Cutting a rod.** A rod of length 8 can be cut into pieces of integer length and sold. A piece of length $i$ sells for $p_i$:
+
+| Length $i$ | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Price $p_i$ | 1 | 5 | 8 | 9 | 10 | 17 | 17 | 20 |
+
+What is the maximum income, and how should the rod be cut?
+
+<ToSolution n="6.4" />
+
+<span id="ex-6-5"></span>**6.5. Multiplying a chain of matrices.** Matrix multiplication is associative, but the cost depends on the order: multiplying a $p \times q$ matrix by a $q \times r$ matrix takes $p \cdot q \cdot r$ scalar multiplications.
+- (a) For $A_1$ ($10 \times 30$), $A_2$ ($30 \times 5$) and $A_3$ ($5 \times 60$), compare $(A_1 A_2) A_3$ with $A_1 (A_2 A_3)$.
+- (b) Design a dynamic programming algorithm for a chain of $n$ matrices, and apply it to dimensions $40 \times 20$, $20 \times 30$, $30 \times 10$ and $10 \times 30$.
+
+<ToSolution n="6.5" />
+
+<span id="ex-6-6"></span>**6.6. Non-adjacent sum.** Choose elements of `6 7 1 30 8 2 4` with the maximum sum, without choosing two adjacent elements. Solve it in $O(n)$ time and $O(1)$ extra memory.
+
+<ToSolution n="6.6" />
+
+<span id="ex-6-7"></span>**6.7. Palindromes.** What is the minimum number of characters that must be inserted (anywhere) into `ABRACADABRA` to turn it into a palindrome? *Hint*: relate it to the longest subsequence that is itself a palindrome, and to the [longest common subsequence](./02-classic-problems.mdx#longest-common-subsequence-lcs).
+
+<ToSolution n="6.7" />
+
+## Understanding the technique
+
+<span id="ex-6-8"></span>**6.8. Does the principle of optimality hold?** For each problem, say whether an optimal solution is made of optimal solutions to its subproblems:
+- (a) the shortest path between two nodes of a graph with positive weights;
+- (b) the longest simple path (without repeated nodes) between two nodes;
+- (c) the cheapest path between two nodes that uses at most $k$ edges.
+
+<ToSolution n="6.8" />
+
+<span id="ex-6-9"></span>**6.9. Memoization.** The recursive computation of $\binom{30}{15}$ by Pascal's rule makes $2\binom{30}{15} - 1 = 310{,}235{,}039$ calls. How many distinct subproblems does it have? How many times is the body of the method executed if the results are memoized?
+
+<ToSolution n="6.9" />
+
+<span id="ex-6-10"></span>**6.10. Saving memory.** The table of the [LCS](./02-classic-problems.mdx#longest-common-subsequence-lcs) of two strings of lengths $m$ and $n$ has $(m+1)(n+1)$ cells. Show how to compute the **length** of the LCS with only $O(\min(m, n))$ memory. What do you lose?
+
+<ToSolution n="6.10" />
+
+***
+
+## Solutions
+
+<span id="sol-6-1"></span>**6.1.** Let $W(n)$ be the number of ways. The last move is 1, 2 or 3 steps, so
+
+$$
+W(n) = W(n-1) + W(n-2) + W(n-3), \qquad W(0) = 1,\; W(1) = 1,\; W(2) = 2
+$$
+
+($W(0) = 1$ counts the empty climb). Filling a vector from 3 to $n$: 4, 7, 13, 24, 44, 81, 149, **274** for $n = 10$. $O(n)$ time, and only the last three values need to be stored. The naive recursion would make a number of calls that grows like $1.84^n$.
+
+<ToStatement n="6.1" />
+
+<span id="sol-6-2"></span>**6.2.** Without obstacles, each path is a sequence of 3 moves down and 4 moves right, in any order: $\binom{7}{3} = 35$ paths. With obstacles, let $P(i, j)$ be the number of paths from the start to cell $(i, j)$: $P(i, j) = P(i-1, j) + P(i, j-1)$, with $P = 0$ on blocked cells and $P(0, 0) = 1$. Filling row by row:
+
+```text
+1  1  1  1  1
+1  2  X  1  2
+1  X  0  1  3
+1  1  1  2  5
+```
+
+**5 paths**. The table is filled in $O(rows \cdot columns)$.
+
+<ToStatement n="6.2" />
+
+<span id="sol-6-3"></span>**6.3.** Let $L(i)$ be the length of the longest increasing subsequence that **ends** at position $i$: $L(i) = 1 + \max \{ L(j) : j \lt i,\; a_j \lt a_i \}$, or 1 if there is no such $j$. For the array: $L = 1, 1, 1, 2, 2, 3, 4, 4$. The answer is the maximum, **4**: for example `2 3 7 18` (or `2 5 7 101`). Storing, for each $i$, the $j$ that gave the maximum allows recovering the subsequence backwards. $O(n^2)$ time. (There is an $O(n \log n)$ algorithm that keeps, for each length, the smallest possible last element and uses binary search.)
+
+<ToStatement n="6.3" />
+
+<span id="sol-6-4"></span>**6.4.** Let $r(n)$ be the best income for a rod of length $n$: $r(n) = \max_{1 \le i \le n} (p_i + r(n - i))$, with $r(0) = 0$. The first piece has length $i$ and the rest is cut optimally. Filling the vector: $r = 1, 5, 8, 10, 13, 17, 18, 22$ for lengths 1 to 8. The maximum income is **22**, cutting the rod into pieces of **2 and 6** ($5 + 17$). $O(n^2)$.
+
+<ToStatement n="6.4" />
+
+<span id="sol-6-5"></span>**6.5.**
+- (a) $(A_1 A_2) A_3$: $10 \cdot 30 \cdot 5 + 10 \cdot 5 \cdot 60 = 1{,}500 + 3{,}000 = 4{,}500$. $A_1 (A_2 A_3)$: $30 \cdot 5 \cdot 60 + 10 \cdot 30 \cdot 60 = 9{,}000 + 18{,}000 = 27{,}000$, six times more.
+- (b) With dimensions $d_0, d_1, \dots, d_n$ (matrix $A_i$ is $d_{i-1} \times d_i$), let $m(i, j)$ be the minimum cost of $A_i \cdots A_j$. The last multiplication splits the chain at some $k$:
+
+$$
+m(i, j) = \min_{i \le k \lt j} \left( m(i, k) + m(k+1, j) + d_{i-1} d_k d_j \right), \qquad m(i, i) = 0
+$$
+
+The table is filled by increasing chain length (diagonals). For $d = 40, 20, 30, 10, 30$:
+
+| | $A_1$ | $A_2$ | $A_3$ | $A_4$ |
+|---|---:|---:|---:|---:|
+| $A_1$ | 0 | 24,000 | 14,000 | **26,000** |
+| $A_2$ | | 0 | 6,000 | 12,000 |
+| $A_3$ | | | 0 | 9,000 |
+| $A_4$ | | | | 0 |
+
+The minimum is **26,000**, with the order $(A_1 (A_2 A_3)) A_4$. Storing the best $k$ of each cell allows recovering the parenthesization. $O(n^3)$ time, $O(n^2)$ memory.
+
+<ToStatement n="6.5" />
+
+<span id="sol-6-6"></span>**6.6.** Keep two values while scanning: the best sum that **includes** the current element and the best that **excludes** it. For each element $x$: the new "include" is the old "exclude" plus $x$, and the new "exclude" is the maximum of the old two.
+
+```java
+int include = 0, exclude = 0;
+for (int x : a) {
+    int newInclude = exclude + x;
+    exclude = Math.max(include, exclude);
+    include = newInclude;
+}
+return Math.max(include, exclude);
+```
+
+The answer is **41**, choosing $7 + 30 + 4$. Note that greedily taking the largest element first (30) and then the largest allowed ones also gives 41 here, but fails in general: in `5 6 5` it takes 6, while the optimum is $5 + 5 = 10$.
+
+<ToStatement n="6.6" />
+
+<span id="sol-6-7"></span>**6.7.** The characters that do **not** need a partner are those of the **longest palindromic subsequence** (LPS); every other character needs one inserted copy. So the answer is $n - \text{LPS}$. The LPS of a string is the LCS of the string and its reverse. For `ABRACADABRA` ($n = 11$), the LPS has length 7 (for example `ABACABA`), so **4 insertions** are needed. $O(n^2)$ with the LCS table. (For `ALGORITHM`, with no repeated letters, the LPS has length 1, and 8 insertions are needed.)
+
+<ToStatement n="6.7" />
+
+<span id="sol-6-8"></span>**6.8.**
+- (a) **Yes**. If the shortest path from $u$ to $v$ passes through $w$, its part from $u$ to $w$ must be a shortest path from $u$ to $w$; otherwise, replacing it by a shorter one would shorten the whole path. This is what Floyd's and Dijkstra's algorithms exploit.
+- (b) **No**. The longest simple path from $u$ to $v$ through $w$ need not be made of longest simple paths from $u$ to $w$ and from $w$ to $v$: those two paths may share nodes, and joining them would not be a simple path. The [dynamic programming lesson](./01-dynamic-programming-method.mdx) discusses this example.
+- (c) **Yes**, if the subproblems include the number of edges allowed: the best path from $u$ to $v$ with at most $k$ edges is made of a best path from $u$ to some $w$ with at most $k - 1$ edges plus the edge from $w$ to $v$. Adding the right parameter to the subproblem is often what makes the principle hold.
+
+<ToStatement n="6.8" />
+
+<span id="sol-6-9"></span>**6.9.** The subproblems are the values $\binom{n'}{k'}$ reached from $\binom{30}{15}$: those with $k' \le 15$ and $n' - k' \le 15$, which are at most $16 \times 16 = 256$. With memoization, the body of the method executed exactly **255** times in our run, once per distinct subproblem reached; every other call returns a stored value immediately. Over a million times fewer than the 310 million calls of the plain recursion.
+
+<ToStatement n="6.9" />
+
+<span id="sol-6-10"></span>**6.10.** Each row of the LCS table depends only on the previous row. Keeping two arrays of length $\min(m, n) + 1$ (putting the shorter string along the columns), and swapping them after each row, computes the length with $O(\min(m, n))$ memory and the same $O(mn)$ time. What is lost is the ability to **recover the subsequence** by walking back through the table, because the earlier rows have been overwritten. (Hirschberg's algorithm recovers it in linear space by combining this idea with divide and conquer.)
+
+<ToStatement n="6.10" />

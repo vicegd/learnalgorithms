@@ -6,72 +6,75 @@ import Layout from '@theme/Layout';
 import styles from './index.module.css';
 import Icon from '@site/src/components/Icon';
 
-const CHAPTERS = [
+const card = (accentClass, icon, eyebrow, title, description, topics, cta, to) => ({
+  accentClass, icon: <Icon name={icon} size={30} />, eyebrow, title, description, topics, cta, to,
+});
+
+const PARTS = [
   {
-    accentClass: styles.accentPurple,
-    icon: <Icon name="bulb" size={30} />,
-    eyebrow: 'Chapter 1',
-    title: 'Foundations of Algorithms',
-    description:
-      'What an algorithm is, and how to measure and analyze its cost: empirical measurement, counting operations, asymptotic notation, growth rates and loops.',
-    topics: ['Algorithmic thinking', 'Data structures', 'Measuring efficiency', 'Complexity analysis', 'Big O', 'Searching'],
-    cta: '9 lessons + exercises',
-    to: '/concepts/category/1-foundations-of-algorithms',
+    title: 'Part I. Foundations',
+    chapters: [
+      card(styles.accentPurple, 'bulb', 'Chapter 1', 'Principles of Algorithmics',
+        'What an algorithm is, and how to measure and analyze its cost: empirical measurement, counting operations, asymptotic notation, growth rates and loops.',
+        ['Algorithmic thinking', 'Data structures', 'Measuring efficiency', 'Complexity analysis', 'Big O', 'Searching'],
+        '9 lessons + exercises', '/concepts/principles-of-algorithmics'),
+    ],
   },
   {
-    accentClass: styles.accentBlue,
-    icon: <Icon name="bars" size={30} />,
-    eyebrow: 'Chapter 2',
-    title: 'Fundamental Problem Domains',
-    description:
-      'Sorting, one of the most studied problems in computing: the simple algorithms, Quicksort, the efficient alternatives and how to choose one in practice.',
-    topics: ['Bubble', 'Insertion', 'Selection', 'Quicksort', 'Mergesort', 'Heapsort', 'Radix sort'],
-    cta: '7 lessons + exercises',
-    to: '/concepts/category/2-fundamental-problem-domains',
+    title: 'Part II. Problem Domains',
+    chapters: [
+      card(styles.accentBlue, 'bars', 'Chapter 2', 'Sorting',
+        'One of the most studied problems in computing: the simple algorithms, Quicksort, the efficient alternatives and how to choose one in practice.',
+        ['Bubble', 'Insertion', 'Selection', 'Quicksort', 'Mergesort', 'Heapsort', 'Radix sort'],
+        '7 lessons + exercises', '/concepts/sorting'),
+    ],
   },
   {
-    accentClass: styles.accentGreen,
-    icon: <Icon name="puzzle" size={30} />,
-    eyebrow: 'Chapter 3',
-    title: 'Algorithm Design Paradigms',
-    description:
-      'General strategies for designing algorithms, each one illustrated with classic problems and measured implementations.',
-    topics: ['Brute force', 'Divide and conquer', 'Recurrences', 'Greedy', 'Dynamic programming'],
-    cta: '10 lessons + exercises',
-    to: '/concepts/category/3-algorithm-design-paradigms',
+    title: 'Part III. Design Techniques',
+    chapters: [
+      card(styles.accentGreen, 'hammer', 'Chapter 3', 'Brute Force',
+        'Solving a problem in the most direct way, or by trying every candidate: its cost, when it is enough, and why it is the reference for every other technique.',
+        ['Exhaustive search', 'String matching', 'Subsets', 'Testing oracle'],
+        '1 lesson + exercises', '/concepts/brute-force'),
+      card(styles.accentGreen, 'split', 'Chapter 4', 'Divide and Conquer',
+        'Splitting a problem into smaller independent subproblems, analyzing the resulting recurrences, and many classic problems.',
+        ['Recurrences', 'Binary search', 'Mergesort', 'Karatsuba', 'Quickselect', 'Median'],
+        '5 lessons + exercises', '/concepts/divide-and-conquer'),
+      card(styles.accentGreen, 'coin', 'Chapter 5', 'Greedy Algorithms',
+        'One irrevocable choice per step: how to design the criterion, and how to prove that it is optimal or refute it with a counterexample.',
+        ['Change', 'Knapsack', 'Scheduling', 'Prim', 'Kruskal'],
+        '2 lessons + exercises', '/concepts/greedy-algorithms'),
+      card(styles.accentGreen, 'grid', 'Chapter 6', 'Dynamic Programming',
+        'Solving each subproblem only once and storing the result: the principle of optimality, recurrences and tables.',
+        ['Binomials', 'Knapsack', 'Change', 'River', 'LCS', 'Edit distance'],
+        '2 lessons + exercises', '/concepts/dynamic-programming'),
+      card(styles.accentOrange, 'tree', 'Chapter 7', 'Backtracking',
+        'Systematic search over a tree of states, abandoning partial solutions as soon as they cannot succeed.',
+        ['Pruning', 'N-queens', 'Subset sum', 'Coloring', 'Sudoku'],
+        '2 lessons + exercises', '/concepts/backtracking'),
+      card(styles.accentOrange, 'target', 'Chapter 8', 'Branch and Bound',
+        'Exploring the most promising states first, and discarding those that cannot beat the best solution found.',
+        ['Bounds', 'Heuristics', 'A*', 'Assignment', 'Puzzles', 'TSP'],
+        '2 lessons + exercises', '/concepts/branch-and-bound'),
+    ],
   },
   {
-    accentClass: styles.accentOrange,
-    icon: <Icon name="tree" size={30} />,
-    eyebrow: 'Chapter 4',
-    title: 'State Space Search and Optimization',
-    description:
-      'Exact search over huge spaces of candidate solutions: exploring implicit trees of states, pruning hopeless branches and using bounds and heuristics.',
-    topics: ['Backtracking', 'Pruning', 'N-queens', 'Branch and bound', 'A*'],
-    cta: '4 lessons + exercises',
-    to: '/concepts/category/4-state-space-search-and-optimization',
+    title: 'Part IV. Execution Models',
+    chapters: [
+      card(styles.accentTeal, 'cpu', 'Chapter 9', 'Parallel Algorithms',
+        'Using several processors at once: concurrency and parallelism, the Java Fork/Join framework, and how to measure and predict parallel performance.',
+        ['Threads', 'Fork/Join', 'Thresholds', 'Speedup', "Amdahl's law"],
+        '3 lessons + exercises', '/concepts/parallel-algorithms'),
+    ],
   },
   {
-    accentClass: styles.accentTeal,
-    icon: <Icon name="cpu" size={30} />,
-    eyebrow: 'Chapter 5',
-    title: 'Advanced Execution Models',
-    description:
-      'Using several processors at once: concurrency and parallelism, the Java Fork/Join framework, and how to measure and predict parallel performance.',
-    topics: ['Threads', 'Fork/Join', 'Thresholds', 'Speedup', "Amdahl's law"],
-    cta: '3 lessons + exercises',
-    to: '/concepts/category/5-advanced-execution-models',
-  },
-  {
-    accentClass: styles.accentRose,
-    icon: <Icon name="sigma" size={30} />,
-    eyebrow: 'Chapter 6',
-    title: 'Mathematical Background',
-    description:
-      'The mathematics behind the analysis of algorithms, explained rather than just stated: sums, logarithms, factorials, induction, loop invariants and recurrences.',
-    topics: ['Sums', 'Logarithms', 'Stirling', 'Induction', 'Invariants', 'Recurrences'],
-    cta: '2 lessons + exercises',
-    to: '/concepts/category/6-mathematical-background',
+    title: 'Appendices',
+    chapters: [
+      card(styles.accentRose, 'sigma', 'Appendix A', 'Mathematical Background',
+        'The mathematics behind the analysis of algorithms, explained rather than just stated: sums, logarithms, factorials, induction, loop invariants and recurrences.',
+        ['Sums', 'Logarithms', 'Stirling', 'Induction', 'Invariants', 'Recurrences'],
+        '2 lessons + exercises', '/concepts/mathematical-background'),
+    ],
   },
 ];
 
@@ -139,16 +142,28 @@ function SectionCard({ accentClass, icon, eyebrow, title, description, topics, c
 export default function Home() {
   const { siteConfig } = useDocusaurusContext();
   const showAlgorithms = siteConfig.customFields?.showAlgorithms !== false;
-  const sections = showAlgorithms ? [...CHAPTERS, ALGORITHMS_SECTION] : CHAPTERS;
   return (
     <Layout title="Home" description={siteConfig.tagline}>
       <main className={styles.main}>
         <Intro />
-        <div className={styles.grid}>
-          {sections.map((s) => (
-            <SectionCard key={s.title} {...s} />
-          ))}
-        </div>
+        {PARTS.map((p) => (
+          <section key={p.title} className={styles.part}>
+            <h2 className={styles.partTitle}>{p.title}</h2>
+            <div className={styles.grid}>
+              {p.chapters.map((s) => (
+                <SectionCard key={s.title} {...s} />
+              ))}
+            </div>
+          </section>
+        ))}
+        {showAlgorithms && (
+          <section className={styles.part}>
+            <h2 className={styles.partTitle}>Algorithm Collection</h2>
+            <div className={styles.grid}>
+              <SectionCard {...ALGORITHMS_SECTION} />
+            </div>
+          </section>
+        )}
       </main>
     </Layout>
   );

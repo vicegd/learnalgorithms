@@ -1,0 +1,40 @@
+---
+title: "Proofs: Dynamic Programming"
+sidebar_label: Proofs
+sidebar_position: 98
+tags: [Proofs, Dynamic Programming, Recurrences]
+---
+
+# Proofs: Dynamic Programming
+
+A dynamic programming algorithm is correct if its **recurrence** is correct: the optimal value of each subproblem must be obtained from the optimal values of smaller subproblems. This page proves the recurrences used in the lessons.
+
+***
+
+## The 0/1 knapsack recurrence is correct
+
+**Claim.** The value $V(i, j)$ defined by the [recurrence of the lesson](./02-classic-problems.mdx#the-subproblems-and-the-recurrence) is the maximum value obtainable with the first $i$ objects and capacity $j$.
+
+*Proof.* By induction on $i$. For $i = 0$ there are no objects and the value is 0. For $i \gt 0$, consider an optimal selection $S$ for $(i, j)$. Either object $i$ is not in $S$, and then $S$ is a selection of the first $i - 1$ objects with capacity $j$, so its value is at most $V(i-1, j)$; or object $i$ is in $S$, and then $S \setminus \{i\}$ is a selection of the first $i - 1$ objects with capacity $j - w_i$, so its value is at most $V(i-1, j - w_i) + v_i$. In both cases the value is at most the maximum of the recurrence. Conversely, both options of the maximum correspond to valid selections. So the maximum is exactly the optimal value. $\blacksquare$
+
+This is the **principle of optimality** in action: the part of an optimal solution that concerns the first $i - 1$ objects is itself optimal for the capacity it leaves. Filling the $(n+1) \times (W+1)$ table costs $O(nW)$.
+
+***
+
+## Pascal's rule
+
+**Claim.** $\binom{n}{k} = \binom{n-1}{k-1} + \binom{n-1}{k}$ for $0 \lt k \lt n$.
+
+*Proof.* Count the subsets of $k$ elements of $\{1, \dots, n\}$ according to whether they contain element $n$. Those that contain it are formed by $n$ plus $k - 1$ of the other $n - 1$ elements: $\binom{n-1}{k-1}$. Those that do not are $k$ of the other $n - 1$: $\binom{n-1}{k}$. $\blacksquare$
+
+The recursive algorithm that applies this rule reaches the base cases $\binom{m}{0} = \binom{m}{m} = 1$ exactly $\binom{n}{k}$ times (each base case returns 1, and the result is their sum), so it makes $2\binom{n}{k} - 1$ calls, which is exponential for $k = n/2$. The table of dynamic programming has only $O(nk)$ cells.
+
+***
+
+## The LCS recurrence is correct
+
+Let $L(i, j)$ be the length of the longest common subsequence of the prefixes $X[1..i]$ and $Y[1..j]$, with $L(i, 0) = L(0, j) = 0$.
+
+**Claim.** If $x_i = y_j$, then $L(i, j) = L(i-1, j-1) + 1$; otherwise $L(i, j) = \max(L(i-1, j), L(i, j-1))$.
+
+*Proof.* If $x_i = y_j$: an LCS of the two prefixes can always be chosen to end with that common character (if it does not use it, its last character can be replaced by it, or it can be appended), and removing it leaves a common subsequence of $X[1..i-1]$ and $Y[1..j-1]$. So $L(i, j) = L(i-1, j-1) + 1$. If $x_i \ne y_j$: a common subsequence cannot end with both $x_i$ and $y_j$, so it does not use $x_i$ or it does not use $y_j$, and it is a common subsequence of $(X[1..i-1], Y[1..j])$ or of $(X[1..i], Y[1..j-1])$. The maximum of the two is the answer. $\blacksquare$

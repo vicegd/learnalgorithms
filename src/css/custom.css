@@ -81,3 +81,21 @@
 .docs-doc-id-index .theme-doc-markdown h3::before {
   content: none;
 }
+
+/* ── Sidebar: part headings (Part I, Part II, ...) ── */
+.sidebar-part {
+  margin-top: 0.75rem;
+}
+.sidebar-part > .menu__list-item-collapsible > .menu__link,
+.sidebar-part > .menu__link {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ifm-color-emphasis-600);
+  cursor: default;
+  background: none !important;
+}
+.sidebar-part > .menu__list {
+  padding-left: 0;
+}

@@ -1,0 +1,114 @@
+---
+title: "Exercises: Branch and Bound"
+sidebar_label: Exercises
+sidebar_position: 3
+tags: [Exercises, Branch and Bound, Heuristics]
+---
+
+# Exercises: Branch and Bound
+
+These exercises review the two lessons on [branch and bound](./01-branch-and-bound-scheme.mdx). They are different from the seminar activities and from the lab problems, which are left for those sessions. Try each one before reading its solution: the solutions are grouped at the [end of the page](#solutions).
+
+***
+
+<span id="ex-8-1"></span>**8.1. Orders of exploration.** In this tree, the number in parentheses is the estimate of each node (lower is better):
+
+```text
+                A(8)
+         ┌───────┴───────┐
+       B(12)            C(9)
+     ┌───┴───┐       ┌───┴───┐
+   D(14)   E(12)   F(10)   G(11)
+                     │
+                   H(13)
+```
+
+Give the order in which the nodes are expanded with (a) depth-first search, (b) breadth-first search and (c) best-first search. (d) In best-first search, suppose that G turns out to be a solution with cost 11, and that the estimates are valid lower bounds. Which nodes are never expanded?
+
+<ToSolution n="8.1" />
+
+<span id="ex-8-2"></span>**8.2. Knapsack trace.** Solve the 0/1 knapsack with capacity $W = 16$ and four objects (weight, value): (2, 40), (5, 30), (10, 50), (5, 10), using best-first branch and bound with the fractional bound of the [examples lesson](./02-classic-problems.mdx#01-knapsack). Show the bound of the root and the order in which nodes are expanded.
+
+<ToSolution n="8.2" />
+
+<span id="ex-8-3"></span>**8.3. Valid bounds for assignment.** In the task assignment problem (minimize the total cost), three lower bounds for a partial assignment are proposed. For each, say whether it is valid (never overestimates) and why:
+- (a) cost so far plus the minimum of each free **column** (task) over the free agents;
+- (b) cost so far plus the minimum of each free **row** (agent) over the free tasks;
+- (c) cost so far plus the **maximum** of (a) and (b).
+
+<ToSolution n="8.3" />
+
+<span id="ex-8-4"></span>**8.4. Admissible heuristics.** For the 8-puzzle, say whether each heuristic is admissible (never exceeds the true number of moves): (a) the number of misplaced tiles; (b) twice the number of misplaced tiles; (c) the Manhattan distance, counting the empty cell as a tile. Give a counterexample for those that are not.
+
+<ToSolution n="8.4" />
+
+<span id="ex-8-5"></span>**8.5. Reachable or not?** Without searching, decide which of these 8-puzzle boards can reach the goal `1 2 3 / 4 5 6 / 7 8 .` (the dot is the empty cell, read row by row):
+- (a) `1 2 3 / 4 5 6 / 8 7 .`
+- (b) `1 2 3 / 4 5 6 / 7 . 8`
+- (c) `8 1 2 / . 4 3 / 7 6 5`
+
+<ToSolution n="8.5" />
+
+<span id="ex-8-6"></span>**8.6. Choosing the technique.** For each problem, would you use backtracking or branch and bound? Justify briefly.
+- (a) List every valid coloring of a map with 4 colors.
+- (b) Find the shortest sequence of moves that solves a 15-puzzle.
+- (c) Find any solution of a Sudoku on a device with very little memory.
+- (d) Find the cheapest assignment of 20 tasks, given a good lower bound.
+
+<ToSolution n="8.6" />
+
+***
+
+## Solutions
+
+<span id="sol-8-1"></span>**8.1.**
+- (a) Depth-first: A, B, D, E, C, F, H, G.
+- (b) Breadth-first: A, B, C, D, E, F, G, H.
+- (c) Best-first: A (8), C (9), F (10), G (11), B (12), E (12), H (13), D (14). After expanding F, its child H (13) enters the queue but waits behind G and B. Between B and E, both with 12, B goes first because E does not exist until B is expanded.
+- (d) Once G gives a solution of cost 11, every live node with estimate 11 or more can be discarded: **B, D, E and H are never expanded**. Only A, C, F and G are.
+
+<ToStatement n="8.1" />
+
+<span id="sol-8-2"></span>**8.2.** Sorted by value per unit of weight, the objects are already in order: 20, 6, 5 and 2. The bound of the root takes objects 1 and 2 (weight 7, value 70) and $9/10$ of object 3 ($45$): **115**. The search expands:
+
+| Step | Node expanded (bound) | What happens | Best |
+|---:|---|---|---:|
+| 1 | root (115) | "take 1": value 40, bound 115. "Leave 1": bound 82 | 40 |
+| 2 | take 1 (115) | "take 2": value 70, bound 115. "Leave 2": bound 98 | 70 |
+| 3 | take 1, 2 (115) | Object 3 does not fit. "Leave 3": bound 80 | 70 |
+| 4 | take 1, leave 2 (98) | "take 3": value **90**, bound 98. "Leave 3": bound 50, pruned | 90 |
+| 5 | take 1, 3 (98) | Object 4 does not fit. "Leave 4": value 90, not better | 90 |
+| 6 | | The best live bounds are 82 and 80, not above 90: **stop** | 90 |
+
+The optimum is **objects 1 and 3**, value 90 (weight 12). The most promising branch (objects 1 and 2) looked best until the end, but its true best value was only 80.
+
+<ToStatement n="8.2" />
+
+<span id="sol-8-3"></span>**8.3.**
+- (a) **Valid**: each free task will be done by some free agent, at least at the cheapest cost of its column. This is the bound of the lesson.
+- (b) **Valid**, by the same argument applied to agents: each free agent will do some free task, at least at the cheapest cost of its row.
+- (c) **Valid**: if two values are both lower bounds, their maximum is also a lower bound, and it is tighter (better) than either. It costs twice as much to compute.
+
+<ToStatement n="8.3" />
+
+<span id="sol-8-4"></span>**8.4.**
+- (a) **Admissible**: each misplaced tile needs at least one move.
+- (b) **Not admissible**: the board `1 2 3 / 4 5 6 / 7 . 8` has one misplaced tile and is solved in one move, but the heuristic gives 2.
+- (c) **Not admissible**: on the same board, the tiles contribute 1 (the 8) and the empty cell contributes 1 more (it is one column away from its place), so the heuristic gives 2 for a board solved in 1 move. That is why the empty cell must not be counted.
+
+<ToStatement n="8.4" />
+
+<span id="sol-8-5"></span>**8.5.** For the 3 × 3 board, the goal is reachable if and only if the number of inversions among the 8 tiles (ignoring the empty cell) is even.
+- (a) The tiles in order are 1 2 3 4 5 6 8 7: one inversion (8, 7). Odd: **not reachable**. This is the famous puzzle with which Sam Loyd, in its 15-puzzle version, offered a prize that nobody could claim.
+- (b) 1 2 3 4 5 6 7 8: no inversions. **Reachable** (in one move).
+- (c) 8 1 2 4 3 7 6 5: the 8 forms 7 inversions, (4, 3) one more, and among 7 6 5 there are 3. In total 11, odd: **not reachable**.
+
+<ToStatement n="8.5" />
+
+<span id="sol-8-6"></span>**8.6.**
+- (a) **Backtracking**: every solution must be listed, so the whole tree is explored anyway, and backtracking uses much less memory.
+- (b) **Branch and bound** (A\*) with priority $g + h$ and the Manhattan distance: it finds the shortest solution, while depth-first search could get lost in very long paths.
+- (c) **Backtracking**: it only stores the current path. Constraint pruning and choosing the cell with fewest candidates first make it fast for Sudoku.
+- (d) **Branch and bound**: with a good bound and a best-first order, it can discard most of the $20! \approx 2.4 \times 10^{18}$ assignments.
+
+<ToStatement n="8.6" />

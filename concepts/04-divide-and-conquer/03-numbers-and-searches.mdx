@@ -1,0 +1,329 @@
+---
+title: "Divide and Conquer: Numbers and Searches"
+sidebar_label: Numbers and Searches
+sidebar_position: 3
+tags: [Divide and Conquer, Recursion, Fibonacci, GCD, Binary Search]
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Divide and Conquer: Numbers and Searches
+
+This lesson applies the paradigm and its analysis to a first set of classic problems: the factorial, sequential and binary search, the Fibonacci numbers and the greatest common divisor. Some of them show the strength of divide and conquer; others, especially Fibonacci, show what happens when it is applied badly. All of them are implemented, with tests, in the [course repository](https://github.com/vicegd/algorithms/tree/master/src/topics/divideconquer).
+
+:::note What you will learn in this lesson
+- How to write and analyze recursive versions of simple problems (factorial, searches).
+- Why the naive recursive Fibonacci is exponential, how much work it repeats, and several much better alternatives, down to a logarithmic one.
+- Why Euclid's algorithm for the greatest common divisor is so fast, and why "fast" must be measured in the size of the input.
+:::
+
+---
+
+## Factorial of a Number
+
+The factorial has a natural recursive definition:
+
+$$
+n! = \begin{cases} 1 & \text{if } n = 0 \\ n \cdot (n-1)! & \text{if } n \gt 0 \end{cases}
+$$
+
+```java
+public long factorialRecursive(int n) {
+    if (n < 0) throw new IllegalArgumentException("Undefined for negative numbers");
+    if (n == 0 || n == 1) return 1;                    // base case
+    return n * factorialRecursive(n - 1);              // one subproblem of size n - 1
+}
+```
+
+**Analysis.** Divide and conquer by **subtraction**: $a = 1$ (one subproblem), $b = 1$ (size $n - 1$), $k = 0$ (a constant amount of work: one multiplication). Since $a = 1$: $O(n^{k+1}) = O(n)$.
+
+It is a **reduction** ($a = 1$), so it can easily be written as a loop, which avoids a recursion of depth $n$:
+
+```java
+public long factorialIterative(int n) {
+    long f = 1;
+    for (int i = 2; i <= n; i++) f *= i;
+    return f;
+}
+```
+
+Both are $O(n)$ in time, but the iterative version needs $O(1)$ extra memory instead of $O(n)$ stack frames. (And remember from the first chapter: with `long`, the result overflows for $n \gt 20$.)
+
+<RepoCode files={['divideconquer/factorial/Factorial.java']} />
+
+---
+
+## Sequential and Binary Search
+
+### Sequential search by subtraction
+
+To find the position of an element `x` in a vector, examine the first element of the remaining part; if it is not `x`, search in the rest:
+
+```java
+private int searchBySubtraction(int i, int[] v, int x) {
+    if (i == v.length) return Integer.MIN_VALUE;   // base case: nothing left, not found
+    if (v[i] == x) return i;                        // base case: found
+    return searchBySubtraction(i + 1, v, x);        // one subproblem of size n - 1
+}
+```
+
+$a = 1$, $b = 1$, $k = 0$: $O(n)$ in the worst case, like the iterative version, but with a recursion depth of up to $n$.
+
+<RepoCode files={['divideconquer/search/SequentialSearch.java']} />
+
+### Binary search by division
+
+If the vector is **sorted**, compare `x` with the central element, and search only in the half where it can be:
+
+```java
+private int searchByDivision(int left, int right, int[] v, int x) {
+    if (left > right) return Integer.MIN_VALUE;     // empty part: not found
+    int center = left + (right - left) / 2;
+    if (v[center] == x) return center;
+    else if (v[center] > x) return searchByDivision(left, center - 1, v, x);
+    else return searchByDivision(center + 1, right, v, x);
+}
+```
+
+Although the code contains **two** recursive calls, only **one** of them is executed in each invocation: $a = 1$, $b = 2$, $k = 0$. Since $a = b^k$ ($1 = 2^0$): $O(n^0 \log n) = O(\log n)$, the result we obtained by counting iterations in the first chapter.
+
+<RepoCode files={['divideconquer/search/BinarySearch.java']} />
+
+---
+
+## The Fibonacci Numbers
+
+The Fibonacci sequence is $0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, \dots$, where each number is the sum of the previous two:
+
+$$
+F(n) = \begin{cases} 0 & \text{if } n = 0 \\ 1 & \text{if } n = 1 \\ F(n-1) + F(n-2) & \text{if } n \gt 1 \end{cases}
+$$
+
+### A bit of history
+
+The sequence is named after Leonardo of Pisa, known as **Fibonacci**, who described it in his *Liber Abaci* (1202), the book that popularised Hindu-Arabic numerals in Europe (the same numerals that al-Khwarizmi had described four centuries earlier). He presented it as the solution of a puzzle about the growth of a **population of rabbits**: starting with one pair, if every pair produces a new pair each month from its second month of life, how many pairs are there after $n$ months? The number of pairs each month follows exactly the sequence $F(n)$. Similar sequences had already been described centuries earlier by Indian mathematicians, in the study of poetic metres.
+
+### Huge numbers
+
+Fibonacci numbers grow **exponentially**. It can be proved that $F(n) \ge 2^{n/2}$ for $n \ge 6$; more precisely, $F(n)$ is the nearest integer to $\frac{\varphi^n}{\sqrt{5}}$, where $\varphi = \frac{1 + \sqrt{5}}{2} \approx 1.618$ is the golden ratio.
+
+- $F(10) = 55$
+- $F(100) = 354{,}224{,}848{,}179{,}261{,}915{,}075$
+- $F(1000)$ has **209 digits**.
+
+In Java, a `long` can hold up to $F(92)$; $F(93)$ already overflows. For larger values, `BigInteger` is needed.
+
+### The naive recursive version
+
+The definition translates directly into code:
+
+```java
+public long fibonacciNaiveRecursive(int n) {
+    if (n <= 1) return n;
+    return fibonacciNaiveRecursive(n - 1) + fibonacciNaiveRecursive(n - 2);
+}
+```
+
+**Analysis.** It is divide and conquer by **subtraction** with two subproblems, but of **different sizes** ($n - 1$ and $n - 2$), so the formula does not apply directly. We can bound it:
+
+- If the recursive part were $F(n-1) + F(n-1)$: $a = 2$, $b = 1$, $k = 0$, so $O(2^{n/1}) = O(2^n)$.
+- If it were $F(n-2) + F(n-2)$: $a = 2$, $b = 2$, $k = 0$, so $O(2^{n/2})$.
+
+The real algorithm is between both: $O(2^{n/2}) \le T(n) \le O(2^n)$. Solving the recurrence exactly gives $T(n) \in \Theta(\varphi^n) \approx \Theta(1.618^n)$: **exponential**.
+
+### Why is it so slow? Repeated work
+
+Look at the calls for $F(5)$:
+
+```
+                          F(5)
+                  ┌─────────┴─────────┐
+                F(4)                 F(3)
+            ┌────┴────┐           ┌────┴────┐
+          F(3)       F(2)       F(2)       F(1)
+        ┌──┴──┐     ┌──┴──┐   ┌──┴──┐
+      F(2)  F(1)  F(1)  F(0) F(1)  F(0)
+     ┌──┴──┐
+   F(1)  F(0)
+```
+
+$F(3)$ is computed twice, $F(2)$ three times, $F(1)$ five times... The subproblems are **not independent**: the same ones are solved again and again. In total, computing $F(n)$ this way requires $2F(n+1) - 1$ calls: more than 2.6 million calls for $F(30)$, and more than 40,000 million for $F(50)$.
+
+We measured it: $F(30)$ took 7 ms, $F(35)$ 49 ms, $F(40)$ 558 ms and $F(45)$ 6.3 seconds. Each time $n$ increases by 5, the time is multiplied by about 11, which is $\varphi^5 \approx 11.09$. At that rate, $F(100)$ would take millions of years.
+
+:::info A lesson that leads to dynamic programming
+Repeating the solution of the same subproblems is the hallmark of problems for which divide and conquer is **not** the right tool. The remedy, storing the solutions of subproblems so that each one is computed only once, is the core idea of **dynamic programming**, which you will study later. You can watch the difference in the [Fibonacci visualization](https://www.cs.usfca.edu/~galles/visualization/DPFib.html) by David Galles.
+:::
+
+### Better implementations
+
+<Tabs>
+<TabItem value="iter" label="Iterative: O(n)" default>
+
+Compute the numbers from the bottom up, keeping only the last two:
+
+```java
+public long fibonacciIterative(int n) {
+    if (n == 0) return 0;
+    long n1 = 0, n2 = 1;
+    for (int i = 2; i <= n; i++) {
+        long sum = n1 + n2;
+        n1 = n2;
+        n2 = sum;
+    }
+    return n2;
+}
+```
+
+Linear time and constant memory. Each subproblem is solved exactly once.
+
+</TabItem>
+<TabItem value="array" label="With a table: O(n)">
+
+Store all the values in a vector. This uses $O(n)$ memory, but it is the typical structure of a dynamic programming solution, and it keeps every value available in case it is needed later:
+
+```java
+public long fibonacciArray(int n) {
+    if (n <= 1) return n;
+    long[] v = new long[n + 1];
+    v[0] = 0;
+    v[1] = 1;
+    for (int i = 2; i <= n; i++)
+        v[i] = v[i - 1] + v[i - 2];
+    return v[n];
+}
+```
+
+</TabItem>
+<TabItem value="tail" label="Tail recursive: O(n)">
+
+A recursive version that carries the last two values as parameters, so that there is a single recursive call ($a = 1$, $b = 1$, $k = 0$: $O(n)$):
+
+```java
+public long fibonacciTailRecursive(int n) {
+    return tailHelper(0, 1, n);
+}
+
+private long tailHelper(long n1, long n2, int n) {
+    if (n == 0) return n1;
+    if (n == 1) return n2;
+    return tailHelper(n2, n1 + n2, n - 1);
+}
+```
+
+The recursive call is the **last** operation of the method (a *tail call*). Some languages optimize such calls so that they use no extra stack; Java does not, so the recursion depth is still $n$.
+
+</TabItem>
+<TabItem value="log" label="Logarithmic: O(log n)">
+
+Fibonacci numbers satisfy a matrix identity:
+
+$$
+\begin{pmatrix} 1 & 1 \\ 1 & 0 \end{pmatrix}^n = \begin{pmatrix} F(n+1) & F(n) \\ F(n) & F(n-1) \end{pmatrix}
+$$
+
+So computing $F(n)$ reduces to raising a $2 \times 2$ matrix to the power $n$, and powers can be computed by **divide and conquer**: $M^n = (M^{n/2})^2$ if $n$ is even, and $M^n = M \cdot (M^{(n-1)/2})^2$ if it is odd. Each step halves the exponent: $a = 1$, $b = 2$, $k = 0$, so $O(\log n)$ multiplications. The course repository contains a compact iterative implementation of this idea, `fibonacciLogarithmic`, which processes the bits of $n$:
+
+```java
+public long fibonacciLogarithmic(int n) {
+    if (n == 0) return 0;
+    long i = 1, j = 0, k = 0, h = 1, t;
+    while (n > 0) {
+        if (n % 2 == 1) {          // odd exponent: multiply by the current power
+            t = j * h;
+            j = i * h + j * k + t;
+            i = i * k + t;
+        }
+        t = h * h;                 // square the current power
+        h = 2 * k * h + t;
+        k = k * k + t;
+        n = n / 2;                 // halve the exponent
+    }
+    return j;
+}
+```
+
+(With `long` values, all versions overflow beyond $F(92)$; the logarithmic algorithm shows its real advantage with `BigInteger` and very large $n$.)
+
+</TabItem>
+</Tabs>
+
+| Version | Time | Extra memory |
+| :--- | :--- | :--- |
+| Naive recursive | $\Theta(\varphi^n)$, exponential | $O(n)$ stack |
+| Iterative | $O(n)$ | $O(1)$ |
+| With a table | $O(n)$ | $O(n)$ |
+| Tail recursive | $O(n)$ | $O(n)$ stack in Java |
+| Logarithmic (fast exponentiation) | $O(\log n)$ | $O(1)$ |
+
+<RepoCode files={['divideconquer/fibonacci/Fibonacci.java']} />
+
+---
+
+## The Greatest Common Divisor
+
+The **greatest common divisor** of two integers $a$ and $b$ is the largest integer $d$ that divides both. It has many applications: simplifying fractions, cryptography (the RSA algorithm relies on it), or computing the least common multiple.
+
+### A first approach
+
+Try every candidate from 1 up to the smaller of the two numbers, and keep the largest that divides both:
+
+```java
+public long naiveGCD(long a, long b) {
+    long gcd = 1;
+    for (long d = 1; d <= Math.min(a, b); d++)
+        if (a % d == 0 && b % d == 0)
+            gcd = d;
+    return gcd;
+}
+```
+
+It is correct, and it looks linear, $O(\min(a, b))$. But what is the **size of the input** here? A number $a$ is written with about $\log_{10} a$ digits (or $\log_2 a$ bits). For numbers of 20 digits, the loop would run up to $10^{20}$ times: **exponential in the number of digits**. When the input is a number, the right measure of its size is the number of digits, not its value.
+
+### Euclid's algorithm
+
+We can do much better by knowing something about the problem. Euclid's key observation is that, for $b \ne 0$, $\gcd(a, b) = \gcd(b, a \bmod b)$: any common divisor of $a$ and $b$ also divides the remainder $a \bmod b$, and vice versa. And the remainder is smaller than $b$, so the problem shrinks:
+
+- If $b = 0$, then $\gcd(a, b) = a$, and we stop.
+- Otherwise, compute $r = a \bmod b$ and find $\gcd(b, r)$ with the same scheme.
+
+```java
+private long euclidean(long a, long b) {
+    if (b == 0) return a;               // base case
+    return euclidean(b, a % b);         // one subproblem, much smaller
+}
+```
+
+For example: $\gcd(300, 120) = \gcd(120, 60) = \gcd(60, 0) = 60$. Two divisions, three calls.
+
+**Analysis.** It can be shown that every **two** steps, the first argument is at least halved. So the scheme behaves like division by 2 with a single subproblem and constant work: $a = 1$, $b = 2$, $k = 0$, which gives $O(\log n)$, where $n$ is the value of the numbers. That is **linear in the number of digits**. The worst case occurs with two consecutive Fibonacci numbers, and **Lamé's theorem** states that the number of divisions is at most five times the number of decimal digits of the smaller number. For example, for two numbers of 100 digits, our tests needed 475 divisions in the worst case (consecutive Fibonacci numbers) and about 190 for random numbers, each one a single division. The naive approach would need up to $10^{100}$ iterations.
+
+:::tip Know your problem
+Euclid's algorithm illustrates an important lesson: **finding the best algorithm often requires knowing something interesting about the problem**. The naive approach only uses the definition of the GCD; Euclid's uses a mathematical property, and the gain is enormous.
+:::
+
+<RepoCode files={['divideconquer/gcd/GCD.java']} />
+
+<ProofLink to="/concepts/divide-and-conquer/proofs#euclids-algorithm-is-correct-and-fast" title="Euclid's algorithm is correct and fast" />
+
+---
+
+## Summary
+
+- The factorial and recursive sequential search are subtraction schemes with $a = 1$: $O(n)$, but with recursion depth $n$. Iterative versions are preferable.
+- Binary search is a division scheme with $a = 1$, $b = 2$, $k = 0$: $O(\log n)$. Count the calls executed, not the ones written.
+- The naive recursive Fibonacci is **exponential**, $\Theta(\varphi^n)$, because it solves the same subproblems many times. Iterative versions are $O(n)$, and fast exponentiation of a matrix gives $O(\log n)$.
+- For numerical inputs, the size is the number of digits. The naive GCD is exponential in the number of digits; Euclid's algorithm is linear in it.
+
+---
+
+## Practice
+
+:::tip Exercises
+- **🐇 Count the calls.** Instrument the naive Fibonacci to count its calls, and check the formula $2F(n+1) - 1$ for $n = 10, 20, 30$.
+- **⏱️ Measure.** Measure the naive, iterative and logarithmic versions of Fibonacci for increasing $n$ (lab session 3). For which $n$ does the naive version exceed one minute on your computer?
+- **🔢 BigInteger.** Rewrite the iterative and logarithmic versions with `BigInteger` and compute $F(100{,}000)$ with both. Which one is faster, and why is the difference smaller than $O(n)$ versus $O(\log n)$ suggests? (Hint: what is the cost of multiplying two numbers with thousands of digits?)
+- **➗ Euclid by hand.** Compute $\gcd(1071, 462)$ with Euclid's algorithm, writing each step. How many divisions are needed?
+- **⚡ Fast power.** Write a divide and conquer method that computes $x^n$ for an integer $n \ge 0$ with $O(\log n)$ multiplications, and identify $a$, $b$ and $k$.
+:::

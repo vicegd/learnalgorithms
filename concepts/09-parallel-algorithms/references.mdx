@@ -1,0 +1,29 @@
+---
+title: "References: Parallel Algorithms"
+sidebar_label: References
+sidebar_position: 99
+tags: [References, Bibliography]
+---
+
+# References: Parallel Algorithms
+
+Books, articles and resources to go deeper into the lessons of this chapter. The textbooks are listed in order of relevance to the course.
+
+## Textbooks
+
+- B. Goetz, T. Peierls, J. Bloch, J. Bowbeer, D. Holmes and D. Lea. *Java Concurrency in Practice*. Addison-Wesley, 2006. The reference on threads, shared data, race conditions and the `java.util.concurrent` library.
+- M. Herlihy, N. Shavit, V. Luchangco and M. Spear. *The Art of Multiprocessor Programming*, 2nd ed. Morgan Kaufmann, 2020. Its chapter on scheduling and work distribution explains work and span and work stealing.
+- T. H. Cormen, C. E. Leiserson, R. L. Rivest and C. Stein. *Introduction to Algorithms*, 4th ed. MIT Press, 2022. The chapter on parallel algorithms (fork-join parallelism, work, span, parallel Mergesort).
+
+## Original sources
+
+- G. M. Amdahl. "Validity of the single processor approach to achieving large scale computing capabilities". *AFIPS Spring Joint Computer Conference*, 30:483–485, 1967.
+- J. L. Gustafson. "Reevaluating Amdahl's law". *Communications of the ACM*, 31(5):532–533, 1988.
+- A. H. Karp and H. P. Flatt. "Measuring parallel processor performance". *Communications of the ACM*, 33(5):539–543, 1990. The experimentally determined serial fraction.
+- R. D. Blumofe and C. E. Leiserson. "Scheduling multithreaded computations by work stealing". *Journal of the ACM*, 46(5):720–748, 1999.
+- D. Lea. "A Java fork/join framework". *Proceedings of the ACM 2000 Conference on Java Grande*, 36–43, 2000. The design of the framework used in this chapter, by its author.
+
+## Online resources
+
+- [`ForkJoinPool` (Java 21 API documentation)](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/ForkJoinPool.html).
+- [`RecursiveTask` (Java 21 API documentation)](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/RecursiveTask.html).

@@ -1,0 +1,176 @@
+---
+title: Performance of Parallel Algorithms
+sidebar_position: 3
+tags: [Parallelism, Speedup, Amdahl's Law, Complexity]
+---
+
+# Performance of Parallel Algorithms
+
+A parallel program is only worth its extra complexity if it is **faster**. But how much faster can it be? Does doubling the number of cores halve the time? This lesson presents the tools to answer these questions: how the complexity of an algorithm relates to its parallel execution time, how to measure the benefit of parallelism, and **Amdahl's law**, which sets a hard limit on it.
+
+:::note What you will learn in this lesson
+- Why parallelism does not change the asymptotic complexity of an algorithm, and how to estimate its parallel execution time.
+- The concepts of **speedup** and **efficiency**, with real measurements.
+- **Amdahl's law**: why the sequential part of a program limits its maximum speedup.
+- Which problems parallelize well, and which do not.
+:::
+
+---
+
+## Complexity and Parallel Time
+
+### The complexity does not change
+
+A parallel algorithm performs (at least) the same **total work** as its sequential version: summing $n$ numbers requires $n - 1$ additions, whether one core does them or many. The theoretical complexity of the algorithm does **not** change: the parallel sum is still $O(n)$.
+
+What changes is the **real execution time**, because the work is distributed among $p$ processors. Ideally, the time decreases **in proportion to the number of cores**.
+
+### A simple model
+
+Suppose that the sum of $n$ elements is divided among $p$ processors. Each processor sums its part of $n/p$ elements, and then the $p$ partial results are combined in pairs, as in a tournament, which takes about $\log_2 p$ steps. The execution time is then about:
+
+$$
+T_p(n) \in O\left(\frac{n}{p} + \log p\right)
+$$
+
+where $\frac{n}{p}$ is the **distributed work** and $\log p$ represents the cost of combining the results and managing the threads. The memory needed is $O(\log n + p)$: the depth of the recursion tree on the call stack, plus the management of the pool of threads.
+
+This model already shows the main trade-off: if the threshold is too low, or the problem too small, the management cost dominates and the parallel algorithm becomes **slower** than the sequential one.
+
+<details>
+  <summary>🧠 <strong>Checkpoint: Food for thought</strong></summary>
+
+  **Question:** Imagine a very small array ($n = 100$) and a very large number of processors ($p = 64$). What weighs more in the total execution time: the computation work, $\frac{n}{p}$, or the management cost, $\log p$?
+
+  **Answer:** The management cost. $\frac{n}{p} = \frac{100}{64} \approx 1.56$, while $\log_2 64 = 6$. Each processor would sum one or two numbers, and the coordination would cost several times more than the work itself. For such a small array, the sequential loop is much faster. Parallelism pays off when there is **a lot of work** to distribute.
+
+</details>
+
+### Work and span
+
+A more general way of analyzing a parallel algorithm uses two quantities:
+
+- the **work** $W$: the total number of operations, that is, the time with a single processor;
+- the **span** $S$ (or depth): the length of the longest chain of operations that must be executed one after another, that is, the time with an unlimited number of processors.
+
+For the divide and conquer sum, $W \in O(n)$ and $S \in O(\log n)$ (the depth of the tree of additions). With $p$ processors, a good scheduler (such as Fork/Join's work stealing) achieves a time of about
+
+$$
+T_p \approx \frac{W}{p} + S
+$$
+
+The span is the part of the algorithm that **cannot** be accelerated by adding processors. An algorithm parallelizes well when its span is much smaller than its work.
+
+<ProofLink to="/concepts/parallel-algorithms/proofs#work-span-and-the-time-with-p-processors" title="Work, span and the time with p processors" />
+
+---
+
+## Speedup and Efficiency
+
+The benefit of parallelism is measured with two indicators:
+
+- **Speedup:** how many times faster the parallel version is than the sequential one, $S(p) = \dfrac{T_1}{T_p}$, where $T_1$ is the time with one processor and $T_p$ the time with $p$ processors.
+- **Efficiency:** how well the processors are used, between 0 and 1: $E(p) = \dfrac{S(p)}{p}$.
+
+The ideal is a **linear speedup**, $S(p) = p$, with efficiency 1: with twice as many processors, half the time.
+
+We measured the cube root of 20 million integers (an expensive operation per element) with the course implementation, on a computer with **2 cores**:
+
+| Version | Time | Speedup | Efficiency |
+| :--- | ---: | ---: | ---: |
+| Sequential loop | 928 ms | 1.0 | |
+| Fork/Join, 1 thread | about 935 ms | ≈ 1.0 | ≈ 1.0 |
+| Fork/Join, 2 threads | about 470 ms | ≈ 2.0 | ≈ 1.0 |
+| Fork/Join, 2 threads, threshold larger than the array | 959 ms | ≈ 1.0 | ≈ 0.5 |
+
+With 2 threads, the time is halved: an almost perfect speedup, because the work per element is large and the elements are independent. With a threshold larger than the whole array, the task never divides, and only one core works: no gain at all. And with a single thread, Fork/Join costs practically the same as the sequential loop: its overhead is negligible when the threshold is reasonable.
+
+In practice, speedups are usually **below** the ideal, because of:
+
+- the cost of creating, scheduling and joining tasks;
+- **load imbalance**: some processors finish earlier and wait (work stealing reduces this);
+- **memory bandwidth**: when the operation per element is very cheap (like squaring a number), the processors spend most of the time waiting for data from memory, and adding cores helps little;
+- the **sequential parts** of the program, which the next section discusses.
+
+Occasionally, the speedup can even exceed $p$ (*superlinear speedup*), for example because the data of each part fits better in the processor caches.
+
+---
+
+## Amdahl's Law
+
+**Amdahl's law** (Gene Amdahl, 1967) calculates the **maximum theoretical speedup** of a system when only a part of it is improved. In our case, the "improvement" is adding more cores.
+
+The key idea is that the performance of a parallel algorithm is **limited by its sequential part**. No matter how much of the work is parallelized, there are always fragments that a single thread must execute, such as:
+
+- the creation of the `ForkJoinPool`;
+- the initial division of the tasks;
+- the final combination of the results (the joins);
+- reading the input and writing the output.
+
+If $f$ is the **fraction** of the execution time that can be parallelized and $1 - f$ is the **sequential fraction**, then with $p$ processors the time becomes $(1 - f) + \frac{f}{p}$ (relative to the sequential time), and the speedup is:
+
+$$
+S(p) = \frac{1}{(1 - f) + \dfrac{f}{p}}
+$$
+
+As $p$ grows to infinity, $\frac{f}{p}$ disappears and the speedup approaches a **limit**:
+
+$$
+S_{max} = \frac{1}{1 - f}
+$$
+
+| Parallel fraction $f$ | $p = 2$ | $p = 4$ | $p = 8$ | $p = 16$ | $p = 64$ | $p = 1024$ | Limit |
+| :---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 50 % | 1.33 | 1.60 | 1.78 | 1.88 | 1.97 | 2.00 | 2 |
+| 90 % | 1.82 | 3.08 | 4.71 | 6.40 | 8.77 | 9.91 | 10 |
+| 95 % | 1.90 | 3.48 | 5.93 | 9.14 | 15.42 | 19.64 | 20 |
+| 99 % | 1.98 | 3.88 | 7.48 | 13.91 | 39.26 | 91.18 | 100 |
+
+The conclusion is striking: **if 10 % of an algorithm is intrinsically sequential, the program will never be more than 10 times faster, even with a million processors**. To benefit from many cores, the sequential part must be tiny.
+
+:::info Gustafson's law: a more optimistic view
+Amdahl's law assumes a **fixed problem size**. In practice, when we have more processors, we usually solve **bigger problems** (higher resolution, more data), and in many algorithms the parallel part grows with the size while the sequential part stays almost constant. **Gustafson's law** (1988) models this situation and shows that, for growing problems, the speedup can keep increasing with the number of processors. Both laws are right; they answer different questions.
+:::
+
+<ProofLink to="/concepts/parallel-algorithms/proofs#amdahls-law" title="Amdahl's law" />
+
+<ProofLink to="/concepts/parallel-algorithms/proofs#gustafsons-law" title="Gustafson's law" />
+
+---
+
+## What Parallelizes Well?
+
+- **Independent operations on many elements** (*embarrassingly parallel* problems): transforming each pixel of an image, each element of an array, each file of a directory. The parts do not interact at all.
+- **Divide and conquer with independent subproblems:** the sum of an array, Mergesort (both halves can be sorted in parallel), Quicksort (after partitioning, both parts are independent). The combination step must be cheap, or itself parallel.
+- **Large amounts of work:** the more work per task, the smaller the relative overhead.
+
+And what does not:
+
+- **Inherently sequential computations**, where each step needs the result of the previous one: the iterative Fibonacci, or simulating a process step by step.
+- **Algorithms with very little work**, such as binary search: $O(\log n)$ steps, each one depending on the previous comparison.
+- **Small inputs**, where coordination costs more than computation.
+
+:::tip A better algorithm beats more cores
+Parallelism divides the time by (at most) a constant, the number of processors. It **does not change the complexity**. A parallel version of the naive Fibonacci with 64 cores is still exponential, and the sequential iterative version, $O(n)$, will beat it for any reasonable $n$. As with faster hardware in the first chapter, the first step is always to choose a good algorithm; parallelism comes after.
+:::
+
+---
+
+## Summary
+
+- Parallelism does not change the asymptotic complexity, but it can divide the execution time by up to the number of processors: for the sum, $T_p \in O\left(\frac{n}{p} + \log p\right)$.
+- The **work** is the total number of operations; the **span** is the longest sequential chain, which no number of processors can shorten.
+- **Speedup** $S(p) = T_1 / T_p$; **efficiency** $E(p) = S(p) / p$. Overheads, load imbalance, memory bandwidth and sequential parts keep speedups below the ideal.
+- **Amdahl's law**: $S(p) = \frac{1}{(1 - f) + f/p}$, with limit $\frac{1}{1-f}$. The sequential fraction limits the benefit of adding processors.
+- Parallelize large, independent work; prefer a better algorithm before adding cores.
+
+---
+
+## Practice
+
+:::tip Exercises
+- **📈 Measure speedup.** Measure the parallel sum and the parallel cube root of the course repository with `ForkJoinPool(p)` for $p = 1, 2, 4, \dots$ up to the number of cores of your computer. Compute the speedup and the efficiency for each $p$. Which one scales better, and why?
+- **🧮 Amdahl.** A program takes 100 seconds, of which 20 seconds are sequential and the rest can be parallelized perfectly. What is its time with 4, 16 and infinite processors? What is the maximum speedup?
+- **🔍 Estimate the parallel fraction.** If a program achieves a speedup of 3 with 4 processors, what fraction $f$ is parallel according to Amdahl's law? What speedup would you expect with 16 processors?
+- **⚖️ Algorithm or cores?** Compare the time of the naive Fibonacci with Fork/Join on all your cores for $n = 40$ with the iterative sequential version. Then compare the parallel sum of an array with `Arrays.stream(array).sum()` and with `Arrays.stream(array).parallel().sum()`.
+:::
