@@ -6,75 +6,175 @@ import Layout from '@theme/Layout';
 import styles from './index.module.css';
 import Icon from '@site/src/components/Icon';
 
-const card = (accentClass, icon, eyebrow, title, description, topics, cta, to) => ({
-  accentClass, icon: <Icon name={icon} size={30} />, eyebrow, title, description, topics, cta, to,
-});
-
-const PARTS = [
+const CHAPTERS = [
   {
-    title: 'Part I. Foundations',
-    chapters: [
-      card(styles.accentPurple, 'bulb', 'Chapter 1', 'Principles of Algorithmics',
-        'What an algorithm is, and how to measure and analyze its cost: empirical measurement, counting operations, asymptotic notation, growth rates and loops.',
-        ['Algorithmic thinking', 'Data structures', 'Measuring efficiency', 'Complexity analysis', 'Big O', 'Searching'],
-        '9 lessons + exercises', '/concepts/principles-of-algorithmics'),
+    accentClass: styles.accentPurple,
+    icon: <Icon name="bulb" size={30} />,
+    eyebrow: 'Part I · Chapter 1',
+    title: 'Principles of Algorithmics',
+    topics: [
+      { label: "Algorithmic thinking", to: '/concepts/principles-of-algorithmics/algorithmic-thinking' },
+      { label: "Pairwise product", to: '/concepts/principles-of-algorithmics/case-study-pairwise' },
+      { label: "Data structures", to: '/concepts/principles-of-algorithmics/data-structures' },
+      { label: "Measuring efficiency", to: '/concepts/principles-of-algorithmics/measuring-efficiency' },
+      { label: "Complexity analysis", to: '/concepts/principles-of-algorithmics/complexity-analysis' },
+      { label: "Big O", to: '/concepts/principles-of-algorithmics/asymptotic-notation' },
+      { label: "Growth rates", to: '/concepts/principles-of-algorithmics/growth-rates' },
+      { label: "Loops", to: '/concepts/principles-of-algorithmics/complexity-of-loops' },
+      { label: "Searching", to: '/concepts/principles-of-algorithmics/searching-case-studies' },
     ],
+    cta: '9 lessons',
+    to: '/concepts/principles-of-algorithmics',
   },
   {
-    title: 'Part II. Problem Domains',
-    chapters: [
-      card(styles.accentBlue, 'bars', 'Chapter 2', 'Sorting',
-        'One of the most studied problems in computing: the simple algorithms, Quicksort, the efficient alternatives and how to choose one in practice.',
-        ['Bubble', 'Insertion', 'Selection', 'Quicksort', 'Mergesort', 'Heapsort', 'Radix sort'],
-        '7 lessons + exercises', '/concepts/sorting'),
+    accentClass: styles.accentBlue,
+    icon: <Icon name="bars" size={30} />,
+    eyebrow: 'Part II · Chapter 2',
+    title: 'Sorting',
+    topics: [
+      { label: "The sorting problem", to: '/concepts/sorting/the-sorting-problem' },
+      { label: "Bubble", to: '/concepts/sorting/bubble-sort' },
+      { label: "Insertion", to: '/concepts/sorting/insertion-sort' },
+      { label: "Selection", to: '/concepts/sorting/selection-sort' },
+      { label: "Quicksort", to: '/concepts/sorting/quicksort' },
+      { label: "Shellsort", to: '/concepts/sorting/efficient-sorting#shellsort-insertion-over-long-distances' },
+      { label: "Heapsort", to: '/concepts/sorting/efficient-sorting#heapsort-selection-with-a-heap' },
+      { label: "Mergesort", to: '/concepts/sorting/efficient-sorting#mergesort-sorting-by-merging' },
+      { label: "Radix sort", to: '/concepts/sorting/efficient-sorting#sorting-without-comparisons' },
+      { label: "Choosing an algorithm", to: '/concepts/sorting/comparing-sorting-algorithms' },
     ],
+    cta: '7 lessons',
+    to: '/concepts/sorting',
   },
   {
-    title: 'Part III. Design Techniques',
-    chapters: [
-      card(styles.accentGreen, 'hammer', 'Chapter 3', 'Brute Force',
-        'Solving a problem in the most direct way, or by trying every candidate: its cost, when it is enough, and why it is the reference for every other technique.',
-        ['Exhaustive search', 'String matching', 'Subsets', 'Testing oracle'],
-        '1 lesson + exercises', '/concepts/brute-force'),
-      card(styles.accentGreen, 'split', 'Chapter 4', 'Divide and Conquer',
-        'Splitting a problem into smaller independent subproblems, analyzing the resulting recurrences, and many classic problems.',
-        ['Recurrences', 'Binary search', 'Mergesort', 'Karatsuba', 'Quickselect', 'Median'],
-        '5 lessons + exercises', '/concepts/divide-and-conquer'),
-      card(styles.accentGreen, 'coin', 'Chapter 5', 'Greedy Algorithms',
-        'One irrevocable choice per step: how to design the criterion, and how to prove that it is optimal or refute it with a counterexample.',
-        ['Change', 'Knapsack', 'Scheduling', 'Prim', 'Kruskal'],
-        '2 lessons + exercises', '/concepts/greedy-algorithms'),
-      card(styles.accentGreen, 'grid', 'Chapter 6', 'Dynamic Programming',
-        'Solving each subproblem only once and storing the result: the principle of optimality, recurrences and tables.',
-        ['Binomials', 'Knapsack', 'Change', 'River', 'LCS', 'Edit distance'],
-        '2 lessons + exercises', '/concepts/dynamic-programming'),
-      card(styles.accentOrange, 'tree', 'Chapter 7', 'Backtracking',
-        'Systematic search over a tree of states, abandoning partial solutions as soon as they cannot succeed.',
-        ['Pruning', 'N-queens', 'Subset sum', 'Coloring', 'Sudoku'],
-        '2 lessons + exercises', '/concepts/backtracking'),
-      card(styles.accentOrange, 'target', 'Chapter 8', 'Branch and Bound',
-        'Exploring the most promising states first, and discarding those that cannot beat the best solution found.',
-        ['Bounds', 'Heuristics', 'A*', 'Assignment', 'Puzzles', 'TSP'],
-        '2 lessons + exercises', '/concepts/branch-and-bound'),
+    accentClass: styles.accentGreen,
+    icon: <Icon name="hammer" size={30} />,
+    eyebrow: 'Part III · Chapter 3',
+    title: 'Brute Force',
+    topics: [
+      { label: "Brute force", to: '/concepts/brute-force/brute-force-and-exhaustive-search' },
+      { label: "String matching", to: '/concepts/brute-force/brute-force-and-exhaustive-search#example-naive-string-matching' },
+      { label: "Subsets", to: '/concepts/brute-force/brute-force-and-exhaustive-search#example-exhaustive-search-over-subsets' },
+      { label: "When to use it", to: '/concepts/brute-force/brute-force-and-exhaustive-search#when-brute-force-is-the-right-choice' },
     ],
+    cta: '1 lesson',
+    to: '/concepts/brute-force',
   },
   {
-    title: 'Part IV. Execution Models',
-    chapters: [
-      card(styles.accentTeal, 'cpu', 'Chapter 9', 'Parallel Algorithms',
-        'Using several processors at once: concurrency and parallelism, the Java Fork/Join framework, and how to measure and predict parallel performance.',
-        ['Threads', 'Fork/Join', 'Thresholds', 'Speedup', "Amdahl's law"],
-        '3 lessons + exercises', '/concepts/parallel-algorithms'),
+    accentClass: styles.accentGreen,
+    icon: <Icon name="split" size={30} />,
+    eyebrow: 'Part III · Chapter 4',
+    title: 'Divide and Conquer',
+    topics: [
+      { label: "The scheme", to: '/concepts/divide-and-conquer/divide-and-conquer-scheme' },
+      { label: "Recurrences", to: '/concepts/divide-and-conquer/analysis' },
+      { label: "Binary search", to: '/concepts/divide-and-conquer/numbers-and-searches#sequential-and-binary-search' },
+      { label: "Fibonacci", to: '/concepts/divide-and-conquer/numbers-and-searches#the-fibonacci-numbers' },
+      { label: "Mergesort", to: '/concepts/divide-and-conquer/classic-problems#mergesort' },
+      { label: "Hanoi", to: '/concepts/divide-and-conquer/classic-problems#the-towers-of-hanoi' },
+      { label: "Karatsuba", to: '/concepts/divide-and-conquer/classic-problems#multiplication-of-large-integers' },
+      { label: "Trominoes", to: '/concepts/divide-and-conquer/classic-problems#the-tromino-puzzle' },
+      { label: "Median", to: '/concepts/divide-and-conquer/majority-mode-and-median#the-median' },
     ],
+    cta: '5 lessons',
+    to: '/concepts/divide-and-conquer',
   },
   {
-    title: 'Appendices',
-    chapters: [
-      card(styles.accentRose, 'sigma', 'Appendix A', 'Mathematical Background',
-        'The mathematics behind the analysis of algorithms, explained rather than just stated: sums, logarithms, factorials, induction, loop invariants and recurrences.',
-        ['Sums', 'Logarithms', 'Stirling', 'Induction', 'Invariants', 'Recurrences'],
-        '2 lessons + exercises', '/concepts/mathematical-background'),
+    accentClass: styles.accentGreen,
+    icon: <Icon name="coin" size={30} />,
+    eyebrow: 'Part III · Chapter 5',
+    title: 'Greedy Algorithms',
+    topics: [
+      { label: "The greedy method", to: '/concepts/greedy-algorithms/greedy-method' },
+      { label: "Change", to: '/concepts/greedy-algorithms/greedy-method#the-problem-of-the-change' },
+      { label: "Knapsack", to: '/concepts/greedy-algorithms/classic-problems#the-knapsack-problem' },
+      { label: "Plumber", to: '/concepts/greedy-algorithms/classic-problems#the-diligent-plumber' },
+      { label: "Coloring", to: '/concepts/greedy-algorithms/classic-problems#graph-coloring' },
+      { label: "Prim and Kruskal", to: '/concepts/greedy-algorithms/classic-problems#minimum-spanning-trees-prim-and-kruskal' },
     ],
+    cta: '2 lessons',
+    to: '/concepts/greedy-algorithms',
+  },
+  {
+    accentClass: styles.accentGreen,
+    icon: <Icon name="grid" size={30} />,
+    eyebrow: 'Part III · Chapter 6',
+    title: 'Dynamic Programming',
+    topics: [
+      { label: "The method", to: '/concepts/dynamic-programming/dynamic-programming-method' },
+      { label: "Binomials", to: '/concepts/dynamic-programming/classic-problems#combinations' },
+      { label: "Knapsack", to: '/concepts/dynamic-programming/classic-problems#the-01-knapsack-problem' },
+      { label: "Change", to: '/concepts/dynamic-programming/classic-problems#the-problem-of-the-change' },
+      { label: "River", to: '/concepts/dynamic-programming/classic-problems#cheaper-travel-on-the-river' },
+      { label: "LCS and edit distance", to: '/concepts/dynamic-programming/classic-problems#beyond-the-course-dynamic-programming-on-strings' },
+    ],
+    cta: '2 lessons',
+    to: '/concepts/dynamic-programming',
+  },
+  {
+    accentClass: styles.accentOrange,
+    icon: <Icon name="tree" size={30} />,
+    eyebrow: 'Part III · Chapter 7',
+    title: 'Backtracking',
+    topics: [
+      { label: "The scheme", to: '/concepts/backtracking/backtracking-scheme' },
+      { label: "Pruning", to: '/concepts/backtracking/backtracking-scheme#pruning-the-key-to-efficiency' },
+      { label: "Permutations", to: '/concepts/backtracking/classic-problems#permutations' },
+      { label: "Subset sum", to: '/concepts/backtracking/classic-problems#subset-sum' },
+      { label: "N-queens", to: '/concepts/backtracking/classic-problems#n-queens' },
+      { label: "Coloring", to: '/concepts/backtracking/classic-problems#graph-coloring' },
+      { label: "Sudoku", to: '/concepts/backtracking/classic-problems#sudoku' },
+    ],
+    cta: '2 lessons',
+    to: '/concepts/backtracking',
+  },
+  {
+    accentClass: styles.accentOrange,
+    icon: <Icon name="target" size={30} />,
+    eyebrow: 'Part III · Chapter 8',
+    title: 'Branch and Bound',
+    topics: [
+      { label: "The scheme", to: '/concepts/branch-and-bound/branch-and-bound-scheme' },
+      { label: "Bounds", to: '/concepts/branch-and-bound/branch-and-bound-scheme#bounding-the-pruning-function' },
+      { label: "A*", to: '/concepts/branch-and-bound/branch-and-bound-scheme#branch-and-bound-and-a' },
+      { label: "Assignment", to: '/concepts/branch-and-bound/classic-problems#task-assignment' },
+      { label: "Knapsack", to: '/concepts/branch-and-bound/classic-problems#01-knapsack' },
+      { label: "Puzzles", to: '/concepts/branch-and-bound/classic-problems#sliding-puzzles' },
+      { label: "TSP", to: '/concepts/branch-and-bound/classic-problems#the-traveling-salesman' },
+    ],
+    cta: '2 lessons',
+    to: '/concepts/branch-and-bound',
+  },
+  {
+    accentClass: styles.accentTeal,
+    icon: <Icon name="cpu" size={30} />,
+    eyebrow: 'Part IV · Chapter 9',
+    title: 'Parallel Algorithms',
+    topics: [
+      { label: "Concurrency and parallelism", to: '/concepts/parallel-algorithms/parallel-algorithms' },
+      { label: "Fork/Join", to: '/concepts/parallel-algorithms/fork-join-framework' },
+      { label: "Thresholds", to: '/concepts/parallel-algorithms/fork-join-framework#choosing-the-threshold' },
+      { label: "Speedup", to: '/concepts/parallel-algorithms/parallel-performance#speedup-and-efficiency' },
+      { label: "Amdahl's law", to: '/concepts/parallel-algorithms/parallel-performance#amdahls-law' },
+    ],
+    cta: '3 lessons',
+    to: '/concepts/parallel-algorithms',
+  },
+  {
+    accentClass: styles.accentRose,
+    icon: <Icon name="sigma" size={30} />,
+    eyebrow: 'Appendix A',
+    title: 'Mathematical Background',
+    topics: [
+      { label: "Sums", to: '/concepts/mathematical-background/sums-and-logarithms#arithmetic-series' },
+      { label: "Logarithms", to: '/concepts/mathematical-background/sums-and-logarithms#logarithms' },
+      { label: "Stirling", to: '/concepts/mathematical-background/sums-and-logarithms#factorials-and-stirlings-formula' },
+      { label: "Induction", to: '/concepts/mathematical-background/induction-and-recurrences#mathematical-induction' },
+      { label: "Invariants", to: '/concepts/mathematical-background/induction-and-recurrences#loop-invariants' },
+      { label: "Recurrences", to: '/concepts/mathematical-background/induction-and-recurrences#recurrences' },
+    ],
+    cta: '2 lessons',
+    to: '/concepts/mathematical-background',
   },
 ];
 
@@ -117,13 +217,24 @@ function SectionCard({ accentClass, icon, eyebrow, title, description, topics, c
     <article className={clsx(styles.card, accentClass)}>
       {icon && <div className={styles.cardIcon}>{icon}</div>}
       <p className={styles.cardEyebrow}>{eyebrow}</p>
-      <h2 className={styles.cardTitle}>{title}</h2>
-      <p className={styles.cardDescription}>{description}</p>
+      <h2 className={styles.cardTitle}>
+        {to ? <Link className={styles.cardTitleLink} to={to}>{title}</Link> : title}
+      </h2>
+      {description && <p className={styles.cardDescription}>{description}</p>}
       {topics && (
         <ul className={styles.cardTopics}>
-          {topics.map((t) => (
-            <li key={t} className={styles.cardTopic}>{t}</li>
-          ))}
+          {topics.map((t) => {
+            const label = typeof t === 'string' ? t : t.label;
+            return (
+              <li key={label} className={styles.cardTopicItem}>
+                {typeof t === 'string' ? (
+                  <span className={styles.cardTopic}>{label}</span>
+                ) : (
+                  <Link className={clsx(styles.cardTopic, styles.cardTopicLink)} to={t.to}>{label}</Link>
+                )}
+              </li>
+            );
+          })}
         </ul>
       )}
       <div className={styles.cardFooter}>
@@ -146,16 +257,11 @@ export default function Home() {
     <Layout title="Home" description={siteConfig.tagline}>
       <main className={styles.main}>
         <Intro />
-        {PARTS.map((p) => (
-          <section key={p.title} className={styles.part}>
-            <h2 className={styles.partTitle}>{p.title}</h2>
-            <div className={styles.grid}>
-              {p.chapters.map((s) => (
-                <SectionCard key={s.title} {...s} />
-              ))}
-            </div>
-          </section>
-        ))}
+        <div className={styles.grid}>
+          {CHAPTERS.map((s) => (
+            <SectionCard key={s.title} {...s} />
+          ))}
+        </div>
         {showAlgorithms && (
           <section className={styles.part}>
             <h2 className={styles.partTitle}>Algorithm Collection</h2>
