@@ -80,6 +80,8 @@ The size of the primitive types is part of the language specification (unlike in
 | `int` | 32 bits | about $\pm 2.1 \times 10^{9}$ |
 | `long` | 64 bits | about $\pm 9.2 \times 10^{18}$ |
 
+<RepoCode files={['foundation/maxpairwise/MaxPairWiseProduct.java']} />
+
 ---
 
 ## Step 2: Moving to `long`, and a Second Trap
@@ -112,6 +114,8 @@ When you cannot bound the values like this, use `Math.multiplyExact(a, b)`, whic
 :::
 
 **Lesson 1:** always respect the physical limits of your data types, and remember that in most languages overflow is silent.
+
+<RepoCode files={['foundation/maxpairwise/MaxPairWiseProduct2.java']} />
 
 ---
 
@@ -156,6 +160,8 @@ public MaxPairWiseProduct3() {
   **Answer:** Almost certainly $99 \cdot 99 = 9801$. With 100,000 values uniformly distributed between 0 and 99, the value 99 is expected to appear about 1,000 times, so it is practically certain that it appears at least twice, at two different positions. Predicting the result is a cheap and useful sanity check for any program.
 
 </details>
+
+<RepoCode files={['foundation/maxpairwise/MaxPairWiseProductRandomNumbers.java']} />
 
 ---
 
@@ -224,6 +230,8 @@ A quadratic algorithm cannot be rescued by buying a faster processor. A machine 
 
 **Lesson 2:** a correct algorithm can still be useless if its cost grows too fast. We need a better strategy, not a faster machine.
 
+<RepoCode files={['foundation/maxpairwise/MaxPairWiseProduct3.java']} />
+
 ---
 
 ## Step 5: Improving Time by Sorting
@@ -256,6 +264,8 @@ Good sorting algorithms need a number of operations proportional to $n \log_2 n$
 This version **modifies the caller's data**: after calling `compute()`, the list is sorted. If other parts of the program relied on the original order, we have introduced a bug that has nothing to do with the maximum product. When an algorithm needs to reorder its input, it should either document it clearly or work on a copy (which costs extra memory).
 :::
 
+<RepoCode files={['foundation/maxpairwise/MaxPairWiseProduct4.java']} />
+
 ---
 
 ## Step 6: Removing Unnecessary Work
@@ -278,6 +288,8 @@ Asymptotically, nothing has changed: the cost is still dominated by the sort, pr
 
 - improvements that change the **growth rate** of the cost (from $n^2$ to $n \log n$), which are decisive for large inputs, and
 - improvements that only change the **constant factors** (doing the same kind of work, but less of it), which are useful but secondary.
+
+<RepoCode files={['foundation/maxpairwise/MaxPairWiseProduct5.java']} />
 
 ---
 
@@ -322,6 +334,8 @@ This algorithm:
 - does **not modify** the input.
 
 In our measurements, it processes the 100,000 numbers in about a **tenth of a millisecond**, roughly 30 times faster than sorting and tens of thousands of times faster than brute force. And it is optimal in an important sense: *any* correct algorithm must read every element at least once (an unread element could be the largest), so no algorithm can grow more slowly than linearly.
+
+<RepoCode files={['foundation/maxpairwise/MaxPairWiseProduct6.java']} />
 
 ---
 

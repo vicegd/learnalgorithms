@@ -147,6 +147,8 @@ On average, the search costs about $2.25n$ operations: less than the worst case 
 
 </details>
 
+<RepoCode files={['foundation/search/Search.java']} />
+
 ---
 
 ## Sequential Search with a Sentinel
@@ -220,6 +222,8 @@ Measurements confirm it, with an important nuance. Searching for a missing value
 - **It needs a free position.** With a plain array, there must be space for one more element. With an `ArrayList`, adding at the end is cheap (amortised constant time), but with other implementations it may not be.
 - **Beware of `get(i)` on linked lists.** If the list were a `LinkedList`, each `get(i)` would traverse the list from the beginning, making the search quadratic! The analysis assumes constant-time access by position.
 :::
+
+<RepoCode files={['foundation/search/Search.java']} />
 
 ---
 
@@ -319,6 +323,8 @@ Two more details of the correct version deserve attention:
 
 - **The central position** is computed as `left + (right - left) / 2` instead of `(left + right) / 2`. Both are mathematically equivalent, but with very large arrays the sum `left + right` can exceed the maximum `int` value and **overflow**, producing a negative index. This bug was present for years in the binary search of widely used libraries, including Java's own.
 - **The loop invariant.** At the start of every iteration, *if the value is in the array, it is between positions `left` and `right`*. Checking that each branch preserves this invariant, and that the interval shrinks in every iteration, is the way to convince yourself that the algorithm is correct and terminates.
+
+<RepoCode files={['foundation/search/Search.java']} />
 
 ---
 

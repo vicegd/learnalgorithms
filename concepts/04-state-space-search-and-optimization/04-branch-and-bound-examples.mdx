@@ -76,6 +76,8 @@ On random $n \times n$ matrices with costs between 1 and 99, we compared this B&
 
 Both return the same optimum. The difference comes from the **estimate of the future cost**: backtracking only knows what has already been spent, while the B&B bound also accounts for what must still be spent, so it detects hopeless branches much earlier. For a walkthrough of the same technique, see [Assignment Problem using Branch and Bound](https://www.youtube.com/watch?v=BV2MIZna6PI).
 
+<RepoCode files={['branchandbound/agents/AgentsTasks.java']} />
+
 ***
 
 ## 0/1 knapsack
@@ -219,6 +221,8 @@ For example, with $p_1 = 1 \times 2$, $p_2 = 2 \times 2$ and $p_3 = 1 \times 3$,
 - **Bound**: the area of the enclosing box of the pieces placed so far can only grow when more pieces are added, so it is a valid lower bound. A node is pruned when that area already reaches the area of the best solution found.
 
 A stronger bound uses the fact that the final box must also contain the area of the pieces not yet placed: $\max(\text{current box area}, \text{total area of all pieces})$.
+
+<RepoCode files={['branchandbound/rectangles/RectanglesPlacement.java', 'branchandbound/rectangles/Game.java', 'branchandbound/rectangles/Piece.java', 'branchandbound/rectangles/PieceOrientation.java']} />
 
 ***
 

@@ -98,6 +98,8 @@ The first rows of the table (Pascal's triangle):
 
 **Complexity.** There are $O(n \cdot k)$ cells, each computed with one addition: $O(n \cdot k)$ time and memory (or $O(k)$ memory keeping only the previous row). Compare with the exponential growth of the recursive version.
 
+<RepoCode files={['dynamic/combinations/Combinations.java']} />
+
 ---
 
 ## The 0/1 Knapsack Problem
@@ -185,6 +187,8 @@ int knapsack01(int maxWeight, int[] weights, int[] values) {
 The table has $(n + 1) \times (W + 1)$ cells, each computed in constant time: **$O(n \cdot W)$** in time and memory (memory can be reduced to $O(W)$ by keeping a single row, at the cost of not being able to reconstruct the objects).
 
 This looks polynomial, but it depends on the **value** of $W$, not on its size. $W$ is written with about $\log_2 W$ bits, so $O(n \cdot W)$ is exponential in the size of the input, just like the naive greatest common divisor of the divide and conquer chapter. Such algorithms are called **pseudo-polynomial**: excellent when $W$ is moderate (a few thousand), impractical when $W$ is huge (for example, weights in grams of a cargo ship). No algorithm that is polynomial in the size of the input is known for the 0/1 knapsack problem.
+
+<RepoCode files={['dynamic/knapsack/Knapsack01.java']} />
 
 ---
 

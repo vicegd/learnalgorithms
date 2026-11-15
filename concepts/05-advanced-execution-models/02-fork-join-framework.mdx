@@ -178,6 +178,8 @@ pool.invoke(new RecursiveActionSquare(data, 0, data.length));
 
 Notice that the tasks share the array, but each one writes **only its own range** of positions, so no synchronisation is needed.
 
+<RepoCode files={['parallel/square/RecursiveActionSquare.java']} />
+
 ---
 
 ## Example 2: Summing the Elements of an Array
@@ -271,6 +273,8 @@ double right = rightTask.compute();       // ...and only then starts the right o
 Calling `join` immediately after `fork` makes the current thread wait for the left half **before** starting the right half: the two halves are computed one after the other, and the parallelism is lost. Always start (or compute) the other subtask **before** joining.
 :::
 
+<RepoCode files={['parallel/sum/RecursiveTaskSum.java']} />
+
 ---
 
 ## Example 3: Processing Files in Parallel
@@ -298,6 +302,8 @@ The same scheme applies to processing the lines of a large log, the images of a 
 :::caution Input/output and parallelism
 When the bottleneck is reading from a disk or a network, adding threads may not help much: they will simply wait for the same device. Parallelism pays off most when each piece of work requires significant **computation** (parsing, compressing, analyzing...) once the data has been read.
 :::
+
+<RepoCode files={['parallel/fileprocessing/FileProcessingTask.java']} />
 
 ---
 

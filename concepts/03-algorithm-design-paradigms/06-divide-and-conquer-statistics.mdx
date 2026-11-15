@@ -109,6 +109,8 @@ A divide and conquer solution can be designed with the ideas of Quicksort. Hints
 - The mode is either the pivot, or it is inside one of the other two groups. Which groups is it worth exploring? Can a group be **discarded** if it has fewer elements than the best frequency found so far?
 - How does the cost depend on the number of different values in the vector?
 
+<RepoCode files={['divideconquer/mode/Mode.java']} />
+
 ---
 
 ## The Median
@@ -186,6 +188,8 @@ There is a famous algorithm, the **median of medians** (Blum, Floyd, Pratt, Rive
   **Answer:** No. With Quickselect you can find the element that would be in position $n - 10$ in linear average time; after that partition, the 10 largest elements are exactly those to its right (in any order), and sorting just those 10 is trivial. Another good option is a min-heap of size 10, traversing the list once: $O(n \log 10) = O(n)$. Sorting the whole list, $O(n \log n)$, does far more work than needed.
 
 </details>
+
+<RepoCode files={['divideconquer/median/Median.java', 'divideconquer/median/Util.java']} />
 
 ---
 

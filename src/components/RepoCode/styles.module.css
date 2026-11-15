@@ -1,0 +1,99 @@
+.box {
+  margin: 1.75rem 0 1.5rem;
+  padding: 1rem 1.25rem 1.1rem;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--ifm-color-primary) 35%, transparent);
+  background:
+    linear-gradient(135deg,
+      color-mix(in srgb, var(--ifm-color-primary) 10%, transparent),
+      color-mix(in srgb, var(--ifm-color-primary) 3%, transparent));
+  box-shadow: 0 1px 3px rgb(0 0 0 / 6%);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 0.8rem;
+}
+
+.mark {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 50%;
+  color: #fff;
+  background: var(--ifm-color-primary);
+}
+
+.title {
+  margin: 0;
+  font-weight: 700;
+  font-size: 0.98rem;
+  color: var(--ifm-color-emphasis-900);
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 0.78rem;
+  font-family: var(--ifm-font-family-monospace);
+  color: var(--ifm-color-emphasis-600);
+}
+
+.files {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.files li {
+  margin: 0;
+}
+
+.file {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.75rem 0.35rem 0.4rem;
+  border-radius: 999px;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  background: var(--ifm-background-surface-color);
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.82rem;
+  color: var(--ifm-color-emphasis-800);
+  transition: border-color var(--ifm-transition-fast), transform var(--ifm-transition-fast),
+    box-shadow var(--ifm-transition-fast);
+}
+
+.file:hover {
+  text-decoration: none;
+  color: var(--ifm-color-primary-darker);
+  border-color: var(--ifm-color-primary);
+  box-shadow: 0 3px 10px rgb(0 0 0 / 10%);
+  transform: translateY(-1px);
+}
+
+.java {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.35rem;
+  height: 1.35rem;
+  border-radius: 50%;
+  background: #e76f00;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  font-family: var(--ifm-font-family-base);
+}
+
+.arrow {
+  font-size: 0.8rem;
+  opacity: 0.6;
+}

@@ -49,6 +49,8 @@ public long factorialIterative(int n) {
 
 Both are $O(n)$ in time, but the iterative version needs $O(1)$ extra memory instead of $O(n)$ stack frames. (And remember from the first chapter: with `long`, the result overflows for $n \gt 20$.)
 
+<RepoCode files={['divideconquer/factorial/Factorial.java']} />
+
 ---
 
 ## Sequential and Binary Search
@@ -67,6 +69,8 @@ private int searchBySubtraction(int i, int[] v, int x) {
 
 $a = 1$, $b = 1$, $k = 0$: $O(n)$ in the worst case, like the iterative version, but with a recursion depth of up to $n$.
 
+<RepoCode files={['divideconquer/search/SequentialSearch.java']} />
+
 ### Binary search by division
 
 If the vector is **sorted**, compare `x` with the central element, and search only in the half where it can be:
@@ -82,6 +86,8 @@ private int searchByDivision(int left, int right, int[] v, int x) {
 ```
 
 Although the code contains **two** recursive calls, only **one** of them is executed in each invocation: $a = 1$, $b = 2$, $k = 0$. Since $a = b^k$ ($1 = 2^0$): $O(n^0 \log n) = O(\log n)$, the result we obtained by counting iterations in the first chapter.
+
+<RepoCode files={['divideconquer/search/BinarySearch.java']} />
 
 ---
 
@@ -250,6 +256,8 @@ public long fibonacciLogarithmic(int n) {
 | Tail recursive | $O(n)$ | $O(n)$ stack in Java |
 | Logarithmic (fast exponentiation) | $O(\log n)$ | $O(1)$ |
 
+<RepoCode files={['divideconquer/fibonacci/Fibonacci.java']} />
+
 ---
 
 ## The Greatest Common Divisor
@@ -293,6 +301,8 @@ For example: $\gcd(300, 120) = \gcd(120, 60) = \gcd(60, 0) = 60$. Two divisions,
 :::tip Know your problem
 Euclid's algorithm illustrates an important lesson: **finding the best algorithm often requires knowing something interesting about the problem**. The naive approach only uses the definition of the GCD; Euclid's uses a mathematical property, and the gain is enormous.
 :::
+
+<RepoCode files={['divideconquer/gcd/GCD.java']} />
 
 ---
 
