@@ -100,6 +100,8 @@ The first rows of the table (Pascal's triangle):
 
 <RepoCode files={['dynamic/combinations/Combinations.java']} />
 
+<ProofLink to="/concepts/algorithm-design-paradigms/proofs#pascals-rule" title="Pascal's rule" />
+
 ---
 
 ## The 0/1 Knapsack Problem
@@ -128,6 +130,8 @@ V(i, j) = \begin{cases} -\infty & \text{if } j \lt 0 \\ 0 & \text{if } i = 0 \te
 $$
 
 The value $-\infty$ for a negative capacity simply means that an object that does not fit can never be taken.
+
+<ProofLink to="/concepts/algorithm-design-paradigms/proofs#the-01-knapsack-recurrence-is-correct" title="The 0/1 knapsack recurrence is correct" />
 
 ### Filling the table
 
@@ -228,6 +232,8 @@ L(i, j) = \begin{cases} 0 & \text{if } i = 0 \text{ or } j = 0 \\ L(i-1, j-1) + 
 $$
 
 If the last characters match, they are part of the LCS; otherwise, one of them is not, and we keep the best of discarding either one. The table has $(|a| + 1) \times (|b| + 1)$ cells: $O(|a| \cdot |b|)$. The `diff` tool that compares versions of a file is based on this idea, applied to lines instead of characters.
+
+<ProofLink to="/concepts/algorithm-design-paradigms/proofs#the-lcs-recurrence-is-correct" title="The LCS recurrence is correct" />
 
 ### Edit distance
 

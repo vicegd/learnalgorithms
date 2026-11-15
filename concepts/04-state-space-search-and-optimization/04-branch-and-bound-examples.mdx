@@ -78,6 +78,8 @@ Both return the same optimum. The difference comes from the **estimate of the fu
 
 <RepoCode files={['branchandbound/agents/AgentsTasks.java']} />
 
+<ProofLink to="/concepts/state-space-search-and-optimization/proofs#the-bounds-used-in-the-examples-are-valid" title="The bounds used in the examples are valid" />
+
 ***
 
 ## 0/1 knapsack
@@ -116,6 +118,8 @@ On 30 random objects (weights between 10 and 99, capacity half of the total weig
 | Best-first B&B + fractional bound | 122 nodes expanded | 1.6 ms |
 
 All three return the same value. The bound is responsible for almost all of the improvement; the best-first order then halves the number of nodes, at the price of creating node objects and managing a priority queue. On instances with 40 and 50 objects, the bounded versions still need only a few hundred nodes.
+
+<ProofLink to="/concepts/state-space-search-and-optimization/proofs#the-bounds-used-in-the-examples-are-valid" title="The bounds used in the examples are valid" />
 
 ***
 
@@ -175,6 +179,8 @@ $\text{smaller}(13) = \text{smaller}(14) = \text{smaller}(15) = 1$ and $\text{sm
 
 For the 8-puzzle (odd board width), the rule is simpler: the goal is reachable if and only if the number of inversions among the 8 tiles, ignoring the empty cell, is even.
 
+<ProofLink to="/concepts/state-space-search-and-optimization/proofs#the-parity-condition-of-the-15-puzzle" title="The parity condition of the 15-puzzle" />
+
 ### Heuristics
 
 Two classic estimates of how far a board is from the goal:
@@ -183,6 +189,8 @@ Two classic estimates of how far a board is from the goal:
 - **Manhattan distance**: the sum, over all tiles, of the number of rows plus columns that separate each tile from its final cell.
 
 Both are **admissible**: each misplaced tile needs at least one move, and each move changes the Manhattan distance of only one tile by one. The empty cell must **not** be counted, or the estimate may exceed the true number of moves. Manhattan distance is always at least as large as the number of misplaced tiles, so it is the tighter (better) of the two.
+
+<ProofLink to="/concepts/state-space-search-and-optimization/proofs#the-puzzle-heuristics-are-admissible" title="The puzzle heuristics are admissible" />
 
 ### Ordering the live nodes: $g + h$
 

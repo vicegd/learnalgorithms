@@ -149,6 +149,8 @@ On average, the search costs about $2.25n$ operations: less than the worst case 
 
 <RepoCode files={['foundation/search/Search.java']} />
 
+<ProofLink to="/concepts/foundations-of-algorithms/proofs#the-average-case-of-sequential-search" title="The average case of sequential search" />
+
 ---
 
 ## Sequential Search with a Sentinel
@@ -294,6 +296,8 @@ A detailed analysis, assuming that the value is present and equally likely to be
 For an array of **one billion** elements, sequential search may need a billion comparisons. Binary search needs **at most 30** iterations ($2^{30} \approx 1.07 \times 10^9$). Doubling the size of the array adds just **one** more iteration.
 :::
 
+<ProofLink to="/concepts/foundations-of-algorithms/proofs#binary-search-needs-a-logarithmic-number-of-iterations" title="Binary search needs a logarithmic number of iterations" />
+
 ### Binary search is easy to get wrong
 
 Binary search is famous for being simple to describe and surprisingly hard to implement correctly. Small changes in the conditions break it. Consider this variant, which looks reasonable:
@@ -325,6 +329,8 @@ Two more details of the correct version deserve attention:
 - **The loop invariant.** At the start of every iteration, *if the value is in the array, it is between positions `left` and `right`*. Checking that each branch preserves this invariant, and that the interval shrinks in every iteration, is the way to convince yourself that the algorithm is correct and terminates.
 
 <RepoCode files={['foundation/search/Search.java']} />
+
+<ProofLink to="/concepts/foundations-of-algorithms/proofs#binary-search-is-correct" title="Binary search is correct" />
 
 ---
 

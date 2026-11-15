@@ -48,6 +48,8 @@ public int maximizeFileCount(int[] files, int diskCapacity) {
 
 This heuristic is **optimal**. Exchange argument: take any optimal selection of $k$ files. If it contains a file that is larger than some file left out, exchanging them keeps $k$ files and does not increase the space used. Repeating the exchange, we reach the $k$ smallest files, which therefore also fit. So the greedy algorithm, which takes as many of the smallest files as fit, stores at least $k$ files.
 
+<ProofLink to="/concepts/algorithm-design-paradigms/proofs#files-on-a-disk-smallest-files-first" title="Files on a disk: smallest files first" />
+
 ### Minimize the free space
 
 Now the disk has **1200 MB**, and we want to **fill it as much as possible** (minimize the free space) with the same files.
@@ -147,6 +149,8 @@ public float[] fillKnapsack(int maxWeight, int[] weights, int[] values) {
 
 The cost is dominated by sorting: $O(n \log n)$.
 
+<ProofLink to="/concepts/algorithm-design-paradigms/proofs#the-fractional-knapsack-highest-value-per-weight-first" title="The fractional knapsack: highest value per weight first" />
+
 ### Without breaking objects: the 0/1 knapsack
 
 If objects **cannot** be broken ($x_i \in \{0, 1\}$), the greedy algorithm is no longer optimal, even with the best heuristic. Counterexample with $W = 6$:
@@ -201,6 +205,8 @@ W(n) = n \cdot t_1 + (n-1) \cdot t_2 + \cdots + 1 \cdot t_n
 $$
 
 The first task is counted $n$ times, the last one only once. Now take any order in which a **longer** task $a$ is done immediately **before** a shorter task $b$ ($a \gt b$). Exchanging them changes only their two waiting times: before, the task in the earlier of the two positions was the long one, and it delayed the other; after the exchange, the short one goes first. The total waiting time decreases by exactly $a - b \gt 0$. So any order that is not sorted can be improved, and the sorted order is optimal. The cost is that of sorting: $O(n \log n)$.
+
+<ProofLink to="/concepts/algorithm-design-paradigms/proofs#the-plumber-shortest-tasks-first" title="The plumber: shortest tasks first" />
 
 ### Several plumbers
 

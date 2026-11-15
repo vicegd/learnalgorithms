@@ -54,6 +54,8 @@ With the initial vector **4 5 6 1 3 2 7 8**, the state after each pass is:
 
 Look at the first pass in detail. Starting from the right: 7 and 8 are in order; 2 and 7 too; 3 and 2 are not, so they are exchanged; then 1 and 2 are in order, but the 1 keeps advancing because 6, 5 and 4 are all greater than it. Notice how one element can travel a long way to the **left** in a single pass, while an element that must move to the **right** (like the 6) advances only one position per pass. We will come back to this asymmetry.
 
+<ProofLink to="/concepts/fundamental-problem-domains/proofs#bubble-sort-is-correct" title="Bubble sort is correct" />
+
 ---
 
 ## Analysis
@@ -115,6 +117,8 @@ To sort faster, an algorithm must move elements over **long distances** in a sin
 </details>
 
 <RepoCode files={['sorting/bubble/Bubble.java']} />
+
+<ProofLink to="/concepts/fundamental-problem-domains/proofs#adjacent-swaps-need-quadratic-time" title="Adjacent swaps need quadratic time" />
 
 ---
 

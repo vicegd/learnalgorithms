@@ -127,6 +127,8 @@ Heapsort is **$O(n \log n)$ in all cases** (best, worst and average), **in place
 
 <RepoCode files={['sorting/heapsort/Heapsort.java']} />
 
+<ProofLink to="/concepts/fundamental-problem-domains/proofs#building-a-heap-takes-linear-time" title="Building a heap takes linear time" />
+
 ---
 
 ## Mergesort: Sorting by Merging
@@ -154,6 +156,8 @@ Mergesort is a classic example of **divide and conquer**, and you will study it 
 
 <RepoCode files={['sorting/mergesort/Mergesort.java']} />
 
+<ProofLink to="/concepts/fundamental-problem-domains/proofs#mergesort-is-correct-and-costs-n-log-n" title="Mergesort is correct and costs n log n" />
+
 ---
 
 ## The Limit of Comparison-Based Sorting
@@ -169,6 +173,8 @@ Any comparison-based algorithm can be represented as a **decision tree**: each i
 > Every comparison-based sorting algorithm needs $\Omega(n \log n)$ comparisons in the worst case.
 
 This is a statement about the **problem**, not about a particular algorithm: no one will ever find a comparison-based algorithm that does better. Heapsort and Mergesort, which are $O(n \log n)$ in the worst case, are therefore **asymptotically optimal**.
+
+<ProofLink to="/concepts/fundamental-problem-domains/proofs#no-comparison-sort-can-beat-n-log-n" title="No comparison sort can beat n log n" />
 
 ---
 
@@ -198,6 +204,8 @@ The simple radix sort above assumes **non-negative** integers. In Java, `-1 % 10
 :::
 
 <RepoCode files={['sorting/radix/Radix.java']} />
+
+<ProofLink to="/concepts/fundamental-problem-domains/proofs#radix-sort-is-correct" title="Radix sort is correct" />
 
 ---
 

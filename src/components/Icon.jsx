@@ -215,6 +215,7 @@ const RULES = [
   ['exercises', 'pencil'],
   ['glossary', 'glossary'],
   ['references', 'book'],
+  ['proofs', 'stairs'],
   ['algorithmic-thinking', 'bulb'],
   ['case-study-pairwise', 'puzzle'],
   ['data-structures', 'layers'],
