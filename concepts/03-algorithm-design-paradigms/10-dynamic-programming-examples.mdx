@@ -9,7 +9,7 @@ import TabItem from '@theme/TabItem';
 
 # Dynamic Programming in Action
 
-This lesson applies the design steps of dynamic programming to several classic problems: counting combinations, the 0/1 knapsack problem, and two problems on strings, the longest common subsequence and the edit distance. It also proposes two problems from the course to solve yourself: the change and the cheapest travel on a river. The implementations of the course examples are in the [course repository](https://github.com/vicegd/algorithms/tree/master/src/topics/dynamic).
+This lesson applies the design steps of dynamic programming to several classic problems: counting combinations, the 0/1 knapsack problem, the change with any coin system, the cheapest travel on a river, and two problems on strings, the longest common subsequence and the edit distance. The implementations of the course examples are in the [course repository](https://github.com/vicegd/algorithms/tree/master/src/topics/dynamic).
 
 :::note What you will learn in this lesson
 - How to turn a recursive formula with overlapping subproblems into a table: **Pascal's triangle**.
@@ -196,26 +196,115 @@ This looks polynomial, but it depends on the **value** of $W$, not on its size. 
 
 ---
 
-## Try It Yourself: The Change and the River
+## The Problem of the Change
 
-The course proposes two more problems to solve with dynamic programming. Try them before looking for any solution.
+In the [greedy chapter](./07-greedy-algorithms.mdx#the-problem-of-the-change) we saw that always taking the largest coin that fits gives the fewest coins for the euro, but fails for other coin systems. Dynamic programming solves the problem for **any** coin system.
 
-### The problem of the change
+**Problem.** Pay an amount $A$ with the **fewest possible coins**, choosing from $n$ coin values $c_1 \lt c_2 \lt \dots \lt c_n$, with an unlimited supply of each. We assume $c_1 = 1$, so that every amount can be paid.
 
-We want to pay an amount with the **fewest possible coins**, for **any** coin system (we saw in the greedy chapter that the greedy heuristic fails for some systems). Hints:
+### The subproblems and the recurrence
 
-- The method could be `int change(int amount, int[] coins)`, with the coins sorted from the smallest to the largest, and the first one with a value of 1 (so that every amount can be paid).
-- The structure is very similar to the knapsack: a table with a row for each coin type and a column for each amount from 0 to the total. But now we look for the **lowest** value instead of the greatest, and each coin can be used **many times**.
-- With coins of 1, 4, 5, 12, 20, 50, 100 and 200, paying 15 requires **3** coins (5 + 5 + 5). Check that your algorithm finds it, and that the greedy one does not (it would take 12 + 1 + 1 + 1).
-- What is the complexity of your algorithm?
+**Subproblems:** let $C(i, j)$ be the minimum number of coins needed to pay the amount $j$ using **only the first $i$ coin values**. The answer is $C(n, A)$.
 
-### Cheaper travel on the river
+**Recurrence:** for coin value $c_i$ there are two options. Either we do not use it, and the best is $C(i-1, j)$; or we use **at least one** coin of value $c_i$, and then we still have to pay $j - c_i$, possibly with more coins of the same value, so the best is $1 + C(i, j - c_i)$. The difference with the knapsack is in that last term: it stays in **the same row $i$**, because a coin can be used many times.
 
-A river has $n$ docks. At each one you can rent a boat to go to any other dock **downstream** (it is impossible to go upstream). A fee table indicates the cost of traveling from dock $i$ to dock $j$ ($i \lt j$). A trip from $i$ to $j$ may be more expensive than a succession of shorter trips: then it is better to go from $i$ to some dock $k$ and take a second boat from $k$ to $j$. Design an efficient algorithm that determines the **minimum cost for every pair** of docks $i \lt j$, and indicate its time as a function of $n$.
+$$
+C(i, j) = \begin{cases} j & \text{if } i = 1 \text{ (only coins of value 1)} \\ C(i-1, j) & \text{if } i \gt 1 \text{ and } j \lt c_i \\ \min\big(C(i-1, j),\; 1 + C(i, j - c_i)\big) & \text{otherwise} \end{cases}
+$$
 
-Hint: think about how a trip from $i$ to $j$ can be split into smaller trips, which subproblems that defines, and in which order the table must be filled so that the values you need are already known.
+### Filling the table
 
----
+With coins of 1, 4, 5 and 12 and $A = 15$, the table has one row per coin value and one column per amount from 0 to 15. Each row is filled from left to right, because each cell may use the cell $c_i$ positions to its left in the same row:
+
+| Coins \ Amount | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| up to 1 | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 |
+| up to 4 | 0 | 1 | 2 | 3 | 1 | 2 | 3 | 4 | 2 | 3 | 4 | 5 | 3 | 4 | 5 | 6 |
+| up to 5 | 0 | 1 | 2 | 3 | 1 | 1 | 2 | 3 | 2 | 2 | 2 | 3 | 3 | 3 | 3 | **3** |
+| up to 12 | 0 | 1 | 2 | 3 | 1 | 1 | 2 | 3 | 2 | 2 | 2 | 3 | 1 | 2 | 3 | **3** |
+
+The answer is **3 coins**. To know which ones, walk back from the last cell: if a cell equals the one above it, the coin of its row was not needed, so move up; otherwise one coin of its row was used, so subtract its value and move left. From $C(4, 15) = C(3, 15) = 3$ we move up, and in row "up to 5" we take three coins of 5: **5 + 5 + 5**. The greedy algorithm would take 12 + 1 + 1 + 1, four coins.
+
+```java
+public int change(int amount, int[] coins) {        // coins sorted, coins[0] == 1
+    int n = coins.length;
+    int[][] c = new int[n][amount + 1];
+    for (int j = 0; j <= amount; j++)
+        c[0][j] = j;                                 // only coins of value 1
+    for (int i = 1; i < n; i++)
+        for (int j = 0; j <= amount; j++) {
+            c[i][j] = c[i - 1][j];                   // do not use coins[i]
+            if (j >= coins[i])
+                c[i][j] = Math.min(c[i][j], 1 + c[i][j - coins[i]]);   // use it once more
+        }
+    return c[n - 1][amount];
+}
+```
+
+**Complexity.** The table has $n \times (A + 1)$ cells, each filled in $O(1)$: $O(n \cdot A)$ time and memory. As in the knapsack, it is **pseudo-polynomial**: it depends on the value of $A$. Only the previous row is needed, so the memory can be reduced to a single array of $A + 1$ positions.
+
+With the table it is easy to check where the greedy algorithm fails: for the coins 1, 4, 5, 12, 20 and 50, it gives more coins than necessary for 10 of the amounts from 1 to 100, the first ones being 8 (greedy 5 + 1 + 1 + 1, optimal 4 + 4) and 15.
+
+<RepoCode files={['dynamic/change/Change.java']} />
+
+***
+
+## Cheaper Travel on the River
+
+A river has $n$ docks, numbered from 0 (upstream) to $n - 1$ (downstream). At each one you can rent a boat to go to any other dock **downstream**; going upstream is impossible. A table of fees $T(i, j)$ gives the price of a trip from dock $i$ to dock $j$, for $i \lt j$. A direct trip may cost more than a combination of shorter trips, changing boats at an intermediate dock. We want the **minimum cost $C(i, j)$ for every pair** of docks $i \lt j$.
+
+### The subproblems and the recurrence
+
+The cheapest way from $i$ to $j$ either goes directly, or stops for the **first time** at some dock $k$ between them; then it must continue from $k$ to $j$ in the cheapest way, and also reach $k$ from $i$ in the cheapest way (the principle of optimality):
+
+$$
+C(i, j) = \min\Big( T(i, j),\; \min_{i \lt k \lt j} \big( C(i, k) + C(k, j) \big) \Big), \qquad C(i, i) = 0
+$$
+
+Each $C(i, j)$ depends on pairs that are **closer** together, so the table can be filled by increasing distance $j - i$, or, as in the code below, with $i$ going from the last dock upwards and $j$ from $i + 1$ downstream.
+
+### An example
+
+With five docks and these fees (only the upper triangle makes sense):
+
+| From \ To | 1 | 2 | 3 | 4 |
+|---|---:|---:|---:|---:|
+| 0 | 3 | 8 | 12 | 20 |
+| 1 | | 4 | 7 | 15 |
+| 2 | | | 2 | 9 |
+| 3 | | | | 4 |
+
+the table of minimum costs is:
+
+| From \ To | 1 | 2 | 3 | 4 |
+|---|---:|---:|---:|---:|
+| 0 | 3 | 7 | 9 | **13** |
+| 1 | | 4 | 6 | 10 |
+| 2 | | | 2 | 6 |
+| 3 | | | | 4 |
+
+For example, $C(2, 4) = \min(9, C(2, 3) + C(3, 4)) = \min(9, 2 + 4) = 6$, and the cheapest trip from the first to the last dock costs **13** instead of the direct fee of 20, stopping at every dock: $3 + 4 + 2 + 4$. Storing, for each pair, the dock $k$ that gave the minimum allows recovering the route.
+
+```java
+public int[][] minimumCosts(int[][] fee) {
+    int n = fee.length;
+    int[][] cost = new int[n][n];
+    for (int i = n - 2; i >= 0; i--)
+        for (int j = i + 1; j < n; j++) {
+            int best = fee[i][j];                       // direct trip
+            for (int k = i + 1; k < j; k++)             // first stop at k
+                best = Math.min(best, cost[i][k] + cost[k][j]);
+            cost[i][j] = best;
+        }
+    return cost;
+}
+```
+
+**Complexity.** There are about $n^2 / 2$ pairs, and each one tries up to $n$ intermediate docks: $O(n^3)$ time and $O(n^2)$ memory. It is the same idea as Floyd's algorithm for shortest paths between all pairs of nodes of a graph, simplified by the fact that the boats only go downstream.
+
+<RepoCode files={['dynamic/river/RiverTravel.java']} />
+
+***
 
 ## Beyond the Course: Dynamic Programming on Strings
 
@@ -266,6 +355,8 @@ Spelling correctors use it to suggest the closest dictionary words, and bioinfor
 | Fibonacci | $F(i)$, $0 \le i \le n$ | $F(i) = F(i-1) + F(i-2)$ | $O(n)$ |
 | Combinations | $C(i, j)$ | $C(i, j) = C(i-1, j-1) + C(i-1, j)$ | $O(n \cdot k)$ |
 | 0/1 knapsack | $V(i, j)$: first $i$ objects, capacity $j$ | leave or take object $i$ | $O(n \cdot W)$, pseudo-polynomial |
+| Change | $C(i, j)$: first $i$ coin values, amount $j$ | skip coin $i$, or use one more (same row) | $O(n \cdot A)$, pseudo-polynomial |
+| River | $C(i, j)$: from dock $i$ to dock $j$ | direct trip, or first stop at $k$ | $O(n^3)$ |
 | LCS | $L(i, j)$: prefixes of both strings | match, or discard one character | $O(\lvert a \rvert \cdot \lvert b \rvert)$ |
 | Edit distance | $D(i, j)$: prefixes of both strings | delete, insert or substitute | $O(\lvert a \rvert \cdot \lvert b \rvert)$ |
 
@@ -277,7 +368,7 @@ Spelling correctors use it to suggest the closest dictionary words, and bioinfor
 - **🔺 Pascal.** Run `combinationsDP` and `combinationsRecursive` from the [course repository](https://github.com/vicegd/algorithms/tree/master/src/topics/dynamic/combinations) for increasing $n$ with $k = n/2$, and check the number of calls $2\,C(n, k) - 1$.
 - **🎒 Knapsack by hand.** Fill the knapsack table for the data of the checkpoint ($W = 6$), and recover the objects chosen by tracing back from $V(4, 6)$. Which of the two optimal combinations do you obtain?
 - **💾 One row.** Rewrite the knapsack algorithm using a single array of $W + 1$ positions. In which direction must the inner loop run so that each object is used at most once?
-- **💰 The change.** Solve the problem of the change with dynamic programming (try it yourself), and use it to find the amounts up to 100 for which the greedy algorithm fails with the coins 1, 4, 5, 12, 20, 50.
-- **🚣 The river.** Solve the problem of the cheapest travel on the river, and analyze its complexity.
+- **💰 The change with one array.** Rewrite the change algorithm with a single array of $A + 1$ positions. Why can the inner loop go from left to right here, while in the knapsack it had to go the other way?
+- **🚣 The route on the river.** Extend the river algorithm to store the intermediate dock of each minimum, and write a method that prints the cheapest route between two docks.
 - **🔤 LCS.** Implement the LCS algorithm, including the reconstruction of the subsequence, and test it with two versions of a short text.
 :::

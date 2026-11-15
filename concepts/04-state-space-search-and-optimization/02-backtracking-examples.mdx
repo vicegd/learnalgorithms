@@ -19,6 +19,8 @@ This lesson applies the [general schemes of backtracking](./01-backtracking.mdx)
 | Knight's tour | First solution | Huge trees; the effect of ordering the candidates |
 | Graph coloring | All solutions | Constraint satisfaction |
 | Task assignment | Best solution | Optimization with bound pruning |
+| Magic squares | All solutions | Pruning as soon as a constraint is complete |
+| Sudoku | First solution | Constraint satisfaction; choosing the most constrained cell |
 
 The full code of most of these examples, with tests and time measurements, is in the course repository [vicegd/algorithms](https://github.com/vicegd/algorithms), in the package `topics.backtracking`.
 
@@ -229,6 +231,29 @@ There are no solutions for $n = 2$ and $n = 3$. The classic eight queens puzzle 
 
 **Complexity.** Without the diagonal checks, the tree would contain every permutation of the rows: $O(n!)$. The diagonal checks prune most of it (for $n = 8$, the algorithm generates 2,057 nodes to find all 92 solutions, out of the 40,320 permutations), but the growth remains exponential. The [previous lesson](./01-backtracking.mdx#complexity-analysis) has the measured counts up to $n = 14$. A full video walkthrough is available in [N Queen Problem Using Backtracking Algorithm](https://www.youtube.com/watch?v=xouin83ebxE).
 
+### Exploiting symmetry
+
+The board has symmetries: reflecting a solution vertically (row $i$ becomes row $n - 1 - i$) gives another solution. Every solution with the first queen in the **upper half** of the first column has a mirror image with the first queen in the lower half. For even $n$, it is therefore enough to try only the first $n/2$ rows for the first queen and count each solution twice:
+
+```java
+void backtracking(int j) {
+    ...
+    int limit = (j == 0) ? n / 2 : n;     // first column: only the upper half
+    for (int i = 0; i < limit; i++)
+        ...
+}
+```
+
+The number of solutions is `2 * count`. (For odd $n$, the middle row of the first column is its own mirror image and must be explored separately, without doubling.) We measured it:
+
+| $n$ | Nodes, whole board | Nodes, upper half | Solutions (2 × half) |
+|---:|---:|---:|---:|
+| 8 | 2,057 | 1,029 | 92 |
+| 12 | 856,189 | 428,095 | 14,200 |
+| 14 | 27,358,553 | 13,679,277 | 365,596 |
+
+The work is exactly halved. Using also the rotations and the other reflections of the board (8 symmetries in total), the essentially different solutions can be found with about an eighth of the work, but the bookkeeping is more delicate.
+
 <RepoCode files={['backtracking/nqueens/ChessQueensOne.java', 'backtracking/nqueens/ChessQueensAll.java']} />
 
 ***
@@ -392,22 +417,98 @@ Both versions return the same optimum. The pruning works better when good soluti
 
 ***
 
-## Try it yourself
+## Magic squares
 
-These exercises are left without solution. Use the schemes of the [previous lesson](./01-backtracking.mdx) and the design questions listed there.
+**Problem.** Find all the $3 \times 3$ magic squares: the numbers 1 to 9 placed in the 9 cells so that every row, column and diagonal adds up to 15. This is the example that opened the [previous lesson](./01-backtracking.mdx#the-magic-square).
 
-1. **Magic square.** Write a backtracking algorithm that finds all $3 \times 3$ magic squares (there are 8). *Hint:* fill the cells row by row and check each row, column and diagonal as soon as it is complete. Then add a look-ahead test: when two cells of a line are filled, the third one is determined.
-2. **Sudoku.** Solve a Sudoku with backtracking. *Hint:* use three arrays of booleans (rows, columns and boxes) as in the N-queens problem, and try filling first the empty cell with fewest candidates.
-3. **Paths in a graph.** Given a directed graph with positive weights, a source node and a target node, find:
-   - all simple paths (no repeated nodes) from the source to the target;
-   - the cheapest simple path;
-   - the cheapest simple path, pruning any branch whose cost already reaches the best cost found so far.
+**Design.**
 
-   Compare the running times of the last two versions for growing random graphs.
-4. **Hamiltonian cycles and the traveling salesman.** Find all the cycles that start at a given node, visit every other node exactly once and return to the start. Then find the cheapest one, first by exhaustive search and then with pruning, and compare their times.
-5. **Symmetry.** Modify the N-queens algorithm so that it only places the first queen in the upper half of the first column and obtains the remaining solutions by reflection. How much faster is it?
+- **Solution vector**: `cell[0..8]`, the cells read row by row. Level $k$ decides the number in cell $k$.
+- **Candidates**: the numbers not used yet, marked in a boolean array, as for permutations.
+- **Feasibility**: after placing a number, every line (row, column or diagonal) whose three cells are already filled must add up to 15. A line is complete when its last cell (in the reading order) has been filled.
+
+```java
+static final int[][] LINES = {{0,1,2}, {3,4,5}, {6,7,8},     // rows
+                              {0,3,6}, {1,4,7}, {2,5,8},     // columns
+                              {0,4,8}, {2,4,6}};             // diagonals
+int[] cell = new int[9];
+boolean[] used = new boolean[10];
+
+boolean linesOk(int filled) {                    // cells 0..filled-1 are filled
+    for (int[] l : LINES) {
+        int last = Math.max(l[0], Math.max(l[1], l[2]));
+        if (last < filled && cell[l[0]] + cell[l[1]] + cell[l[2]] != 15)
+            return false;                        // a complete line that does not add up
+    }
+    return true;
+}
+
+void magic(int k) {
+    if (k == 9) {
+        printSquare();
+        return;
+    }
+    for (int v = 1; v <= 9; v++)
+        if (!used[v]) {
+            used[v] = true;
+            cell[k] = v;
+            if (linesOk(k + 1))                  // prune as soon as a line fails
+                magic(k + 1);
+            used[v] = false;
+            cell[k] = 0;
+        }
+}
+```
+
+It finds the **8** magic squares (the rotations and reflections of `2 7 6 / 9 5 1 / 4 3 8`) after generating **2,378** nodes, while filling all 9 cells before checking would generate 986,410.
+
+**A look-ahead improvement.** When two cells of a line are filled, the third one is determined: it must be $15$ minus their sum. If that number is outside 1 to 9 or already used, the branch can be pruned before filling the third cell. Even better, the candidates of a cell that completes a line can be reduced to that single value.
 
 ***
+
+## Sudoku
+
+**Problem.** Complete a $9 \times 9$ grid, partially filled, so that every row, every column and every $3 \times 3$ box contains the digits 1 to 9 exactly once.
+
+**Design.** Sudoku is the N-queens idea applied three times:
+
+- **State**: the grid, with 0 in the empty cells.
+- **Constant-time checks**: three boolean tables, `row[r][v]`, `col[c][v]` and `box[b][v]`, say whether the digit $v$ is already in row $r$, column $c$ or box $b = 3 \lfloor r/3 \rfloor + \lfloor c/3 \rfloor$.
+- **Level**: one empty cell. Each level tries the digits that are not in its row, column or box.
+- **Scheme**: first solution (a well-posed Sudoku has exactly one).
+
+```java
+int[][] grid = new int[9][9];                    // 0 = empty
+boolean[][] row = new boolean[9][10], col = new boolean[9][10], box = new boolean[9][10];
+
+boolean solve() {
+    int r = -1, c = -1;
+    for (int i = 0; i < 81 && r < 0; i++)         // first empty cell
+        if (grid[i / 9][i % 9] == 0) { r = i / 9; c = i % 9; }
+    if (r < 0) return true;                       // no empty cell: solved
+    int b = (r / 3) * 3 + c / 3;
+    for (int v = 1; v <= 9; v++)
+        if (!row[r][v] && !col[c][v] && !box[b][v]) {
+            grid[r][c] = v;
+            row[r][v] = col[c][v] = box[b][v] = true;
+            if (solve()) return true;             // first solution: stop
+            grid[r][c] = 0;
+            row[r][v] = col[c][v] = box[b][v] = false;
+        }
+    return false;                                 // no digit fits: go back
+}
+```
+
+Before calling `solve()`, the given digits are written in the grid and marked in the three tables. Here the grid itself is the solution vector, and the undo step (writing 0 again) is skipped once the solution is found, because `solve()` returns as soon as it succeeds.
+
+**Choosing the cell.** The code takes the first empty cell. A classic improvement is to take the empty cell with the **fewest candidates** (the *minimum remaining values* heuristic): a cell with a single possible digit is filled without branching, and a cell with none reveals a dead end immediately. We tried both versions on a puzzle published in 2012 by Arto Inkala as one of the hardest Sudokus:
+
+| Choice of cell | Nodes generated | Time in our run |
+|---|---:|---:|
+| First empty cell | 49,559 | 7 ms |
+| Fewest candidates | 10,102 | 36 ms |
+
+The heuristic generates **five times fewer nodes**, but each node is more expensive, because it counts the candidates of every empty cell. For a single Sudoku both are instantaneous; the lesson is the trade-off between the size of the tree and the cost of each node, which appears in every backtracking algorithm. (Keeping the candidate counts updated incrementally, instead of recounting them, gets the best of both.)
 
 ## Summary
 
@@ -419,3 +520,5 @@ These exercises are left without solution. Use the schemes of the [previous less
 | Knight's tour | Degree 8, height $n^2$ | $O(8^{n^2})$ | Board limits and visited squares; Warnsdorff ordering |
 | Graph coloring | Degree $m$, height $n$ | $O(n \cdot m^n)$ | Adjacent vertex with the same color |
 | Task assignment | Degree $n, n-1, \dots, 1$ | $O(n!)$ | Cost so far reaches the best cost |
+| Magic squares | Degree $9, 8, \dots, 1$, height 9 | $O(9!)$ | Each line must add up to 15 when complete |
+| Sudoku | Degree at most 9, one level per empty cell | $O(9^e)$ for $e$ empty cells | Row, column and box checks; fewest candidates first |

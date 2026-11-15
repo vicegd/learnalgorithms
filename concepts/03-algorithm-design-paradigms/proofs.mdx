@@ -162,6 +162,20 @@ The coefficients $n, n-1, \dots, 1$ decrease. Suppose that in some order a longe
 
 ***
 
+## Prim and Kruskal are optimal
+
+Both algorithms for [minimum spanning trees](./08-greedy-examples.mdx#minimum-spanning-trees-prim-and-kruskal) rely on one property. A **cut** of a graph is a division of its nodes into two non-empty groups $S$ and $V \setminus S$; an edge **crosses** the cut if it has one end in each group.
+
+**Cut property.** Let $F$ be a set of edges contained in some minimum spanning tree, and let $(S, V \setminus S)$ be a cut that no edge of $F$ crosses. If $e$ is a cheapest edge crossing the cut, then $F \cup \{e\}$ is also contained in some minimum spanning tree.
+
+*Proof.* Let $T$ be a minimum spanning tree that contains $F$. If $e \in T$, we are done. Otherwise, adding $e = (u, v)$ to $T$ creates a cycle, because $T$ already connects $u$ and $v$. The path of $T$ from $u$ (in $S$) to $v$ (outside $S$) must cross the cut at some edge $e'$. Replace $e'$ by $e$: the result $T' = T - e' + e$ is still connected (any path that used $e'$ can go around the cycle through $e$) and has $n - 1$ edges, so it is a spanning tree. Its weight is $w(T) - w(e') + w(e) \le w(T)$, because $e$ is a cheapest crossing edge. So $T'$ is also a minimum spanning tree, and it contains $F \cup \{e\}$ ($e'$ is not in $F$, because no edge of $F$ crosses the cut). $\blacksquare$
+
+**Prim.** At each step, let $S$ be the set of nodes of the current tree. No edge of the tree crosses the cut $(S, V \setminus S)$, and Prim adds a cheapest crossing edge. By induction on the steps, using the cut property, the tree is always contained in a minimum spanning tree; when it has $n - 1$ edges, it is one.
+
+**Kruskal.** When Kruskal accepts the edge $e = (u, v)$, let $S$ be the set of nodes of the current tree that contains $u$. No accepted edge crosses the cut $(S, V \setminus S)$, and every lighter edge that crosses it was considered earlier and rejected, which only happens if both its ends were already connected, contradicting that it crosses the cut. So $e$ is a cheapest crossing edge, and the cut property applies again. $\blacksquare$
+
+***
+
 ## The 0/1 knapsack recurrence is correct
 
 **Claim.** The value $V(i, j)$ defined by the [recurrence of the lesson](./10-dynamic-programming-examples.mdx#the-subproblems-and-the-recurrence) is the maximum value obtainable with the first $i$ objects and capacity $j$.
