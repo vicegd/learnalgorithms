@@ -7,6 +7,11 @@ tags: [Greedy, Knapsack, Scheduling, Knight's Tour, Graph Coloring]
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import FigKnapsackHeuristics from './img/knapsack-heuristics.svg';
+import FigPlumber from './img/plumber.svg';
+import FigCrownColoring from './img/crown-coloring.svg';
+import FigMstGraph from './img/mst-graph.svg';
+import FigMst from './img/mst.svg';
 
 # Greedy Algorithms: Classic Problems
 
@@ -127,6 +132,10 @@ $x = (1, 1, 1, 0, 0.8)$: total value **164**.
 </TabItem>
 </Tabs>
 
+<Figure caption="The three heuristics on the same data. Each block is an object, as wide as the weight carried; all three fill the capacity of 100, but only the best value per weight reaches the optimum, 164.">
+  <FigKnapsackHeuristics />
+</Figure>
+
 The data is a counterexample showing that the first two heuristics are **not** optimal. The third one, the best **value per weight unit**, is **optimal** for the fractional knapsack. Intuition (exchange argument): if an optimal solution carried some weight of an object with a lower ratio while leaving out part of an object with a higher ratio, replacing that weight with the better object would increase the value. So the best solution uses the highest ratios first, as the greedy algorithm does.
 
 ```java
@@ -194,6 +203,10 @@ The problem is to find the **order** (permutation) of the tasks that minimizes $
   **Question:** The tasks take 7, 5, 4, 3, 6, 8 and 2 minutes. What is the minimum total waiting time?
 
   **Answer:** Sorted: 2, 3, 4, 5, 6, 7, 8. The waiting times are the cumulative sums: 2, 5, 9, 14, 20, 27, 35, whose total is **112** minutes. For comparison, doing the tasks in the given order (7, 5, 4, 3, 6, 8, 2) gives 147, and the worst order (longest first) gives 168.
+
+  <Figure caption="The tasks of the checkpoint in the given order and sorted. The total time is 35 in both cases, but each customer waits until his task ends: shortest first, the waits add up to 112 instead of 147.">
+    <FigPlumber />
+  </Figure>
 
 </details>
 
@@ -313,6 +326,10 @@ For each of the remaining n - 1 nodes:
 
 It is fast: $O(n^2)$ with an adjacency matrix. But the number of colors depends heavily on the **order** in which the nodes are visited. We tested it on a "crown" graph with 8 nodes ($u_0, \dots, u_3$ and $v_0, \dots, v_3$, where each $u_i$ is connected to every $v_j$ with $j \ne i$). This graph can be colored with just **2** colors (all the $u$ nodes with one color and all the $v$ nodes with another), and the greedy algorithm finds that coloring if it visits the nodes in the order $u_0, u_1, u_2, u_3, v_0, \dots$ But in the order $u_0, v_0, u_1, v_1, \dots$ it uses **4** colors. For larger crown graphs, the gap grows without limit.
 
+<Figure caption="The greedy coloring of the crown graph in two orders. Visiting all the u nodes first gives the optimal 2 colors; alternating u and v nodes forces 4.">
+  <FigCrownColoring />
+</Figure>
+
 So the greedy algorithm does not always find the chromatic number. In fact, computing the chromatic number of a general graph is a computationally hard problem. Better orders (for example, visiting first the nodes with more neighbours) usually help, but guarantee nothing.
 
 ### Applications
@@ -336,12 +353,11 @@ Any map drawn on a plane can be colored with at most **four** colors so that nei
 
 Two classic greedy algorithms solve it, and both are **always optimal**.
 
-We use this graph of six nodes, given as a list of edges with their weights:
+We use this graph of six nodes, with the weight of each edge on it:
 
-```text
-1-2: 6    1-3: 1    1-4: 5    2-3: 5    2-5: 3
-3-4: 5    3-5: 6    3-6: 4    4-6: 2    5-6: 6
-```
+<Figure caption="The example graph: six nodes and ten weighted edges.">
+  <FigMstGraph />
+</Figure>
 
 ### Prim's algorithm
 
@@ -400,6 +416,10 @@ Kruskal's algorithm looks at the **edges** in increasing order of weight, and ac
 | 2-3 (5) | accept: joins the tree of 2-5 with the rest. Five edges: stop |
 
 The result is a different tree (1-3, 4-6, 2-5, 3-6, 2-3) with the **same total weight, 15**: when several edges have the same weight, there may be several minimum spanning trees. To check quickly whether an edge forms a cycle, Kruskal's algorithm uses a **union-find** (disjoint sets) structure, which keeps the current trees as sets: an edge is rejected if both ends are in the same set. Sorting the edges dominates the cost: $O(m \log m)$.
+
+<Figure caption="The trees found by Prim (left, starting at node 1) and Kruskal (right). The numbers #1 to #5 give the order in which each edge is added. The trees differ in one edge but both weigh 15; Kruskal rejects 1-4 because nodes 1 and 4 are already connected.">
+  <FigMst />
+</Figure>
 
 **Why are they optimal?** Both rely on the same property: for any division of the nodes into two groups, the cheapest edge that crosses between the groups belongs to some minimum spanning tree. Prim applies it to the division "tree / rest"; Kruskal, to the two trees that the accepted edge joins.
 

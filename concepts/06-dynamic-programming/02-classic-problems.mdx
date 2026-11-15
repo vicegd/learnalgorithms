@@ -7,6 +7,12 @@ tags: [Dynamic Programming, Combinations, Knapsack, LCS, Edit Distance]
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import FigPascal from './img/pascal.svg';
+import FigKnapsackTable from './img/knapsack-table.svg';
+import FigChangeTable from './img/change-table.svg';
+import FigRiver from './img/river.svg';
+import FigLcs from './img/lcs.svg';
+import FigEditDistance from './img/edit-distance.svg';
 
 # Dynamic Programming: Classic Problems
 
@@ -97,6 +103,10 @@ The first rows of the table (Pascal's triangle):
 | 5 | 1 | 5 | 10 | 10 | 5 | 1 |
 | 6 | 1 | 6 | 15 | 20 | 15 | 6 |
 
+<Figure caption="Each cell of the table is the sum of two cells of the previous row, already computed: for example, C(6, 3) = 10 + 10 = 20.">
+  <FigPascal />
+</Figure>
+
 **Complexity.** There are $O(n \cdot k)$ cells, each computed with one addition: $O(n \cdot k)$ time and memory (or $O(k)$ memory keeping only the previous row). Compare with the exponential growth of the recursive version.
 
 <RepoCode files={['dynamic/combinations/Combinations.java']} />
@@ -164,6 +174,10 @@ The table gives the optimal **value**. To know **which objects** to take, trace 
 
 Solution: objects **2 and 3**, with total weight 10 and value 10.
 
+<Figure caption="The table of the example. V(3, 10) chooses between leaving object 3 (the cell above, 8) and taking it (V(2, 5) + 5 = 10). The orange path is the traceback that recovers the objects.">
+  <FigKnapsackTable />
+</Figure>
+
 ```java
 int knapsack01(int maxWeight, int[] weights, int[] values) {
     int n = weights.length;
@@ -226,6 +240,10 @@ With coins of 1, 4, 5 and 12 and $A = 15$, the table has one row per coin value 
 
 The answer is **3 coins**. To know which ones, walk back from the last cell: if a cell equals the one above it, the coin of its row was not needed, so move up; otherwise one coin of its row was used, so subtract its value and move left. From $C(4, 15) = C(3, 15) = 3$ we move up, and in row "up to 5" we take three coins of 5: **5 + 5 + 5**. The greedy algorithm would take 12 + 1 + 1 + 1, four coins.
 
+<Figure caption="The traceback in the change table. C(4, 15) equals the cell above, so the 12 is not used; in the row of the 5, each step to the left by 5 columns is one coin: 5 + 5 + 5.">
+  <FigChangeTable />
+</Figure>
+
 ```java
 public int change(int amount, int[] coins) {        // coins sorted, coins[0] == 1
     int n = coins.length;
@@ -284,6 +302,10 @@ the table of minimum costs is:
 | 2 | | | 2 | 6 |
 | 3 | | | | 4 |
 
+<Figure caption="The five docks of the example and the fee of every trip downstream. The cheapest way from dock 0 to dock 4 changes boat at every dock and costs 13, instead of the direct fee of 20.">
+  <FigRiver />
+</Figure>
+
 For example, $C(2, 4) = \min(9, C(2, 3) + C(3, 4)) = \min(9, 2 + 4) = 6$, and the cheapest trip from the first to the last dock costs **13** instead of the direct fee of 20, stopping at every dock: $3 + 4 + 2 + 4$. Storing, for each pair, the dock $k$ that gave the minimum allows recovering the route.
 
 ```java
@@ -315,6 +337,10 @@ Two classic problems show how dynamic programming handles **sequences**.
 
 A **subsequence** of a string is obtained by deleting some characters without changing the order of the rest. The **longest common subsequence** of two strings is the longest string that is a subsequence of both. For example, for `ALGORITHM` and `ALTRUISM`, an LCS is `ALRIM`, of length 5.
 
+<Figure caption="A longest common subsequence of ALGORITHM and ALTRUISM: the five matched letters keep their order in both strings, and the lines never cross.">
+  <FigLcs />
+</Figure>
+
 **Subproblems:** $L(i, j)$ = length of the LCS of the first $i$ characters of $a$ and the first $j$ characters of $b$.
 
 $$
@@ -328,6 +354,10 @@ If the last characters match, they are part of the LCS; otherwise, one of them i
 ### Edit distance
 
 The **edit distance** (or Levenshtein distance) between two strings is the minimum number of single-character **insertions**, **deletions** and **substitutions** needed to transform one into the other. For example, `KITTEN` → `SITTING` needs 3 operations: substitute K by S, substitute E by I, insert G.
+
+<Figure caption="An optimal alignment of KITTEN and SITTING: two substitutions and one insertion, edit distance 3.">
+  <FigEditDistance />
+</Figure>
 
 $$
 D(i, j) = \min \begin{cases} D(i-1, j) + 1 & \text{(delete } a_i\text{)} \\ D(i, j-1) + 1 & \text{(insert } b_j\text{)} \\ D(i-1, j-1) + (a_i \ne b_j\ ?\ 1 : 0) & \text{(substitute, or keep if equal)} \end{cases}

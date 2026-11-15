@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 560 150" width="560" height="150" role="img">
+  <title>Paying 60 cents with coins of 50, 20 and 2: greedy uses 6 coins, the optimum 3</title>
+  <text class="t-s t-b t-bad" x="20.0" y="40.0" text-anchor="start" dominant-baseline="central">greedy</text>
+  <circle class="box-bad" cx="120.0" cy="40.0" r="20.0"/>
+  <text class="t-xs t-b" x="120.0" y="40.0" text-anchor="middle" dominant-baseline="central">50</text>
+  <circle class="box-bad" cx="164.0" cy="40.0" r="13.0"/>
+  <text class="t-xs t-b" x="164.0" y="40.0" text-anchor="middle" dominant-baseline="central">2</text>
+  <circle class="box-bad" cx="208.0" cy="40.0" r="13.0"/>
+  <text class="t-xs t-b" x="208.0" y="40.0" text-anchor="middle" dominant-baseline="central">2</text>
+  <circle class="box-bad" cx="252.0" cy="40.0" r="13.0"/>
+  <text class="t-xs t-b" x="252.0" y="40.0" text-anchor="middle" dominant-baseline="central">2</text>
+  <circle class="box-bad" cx="296.0" cy="40.0" r="13.0"/>
+  <text class="t-xs t-b" x="296.0" y="40.0" text-anchor="middle" dominant-baseline="central">2</text>
+  <circle class="box-bad" cx="340.0" cy="40.0" r="13.0"/>
+  <text class="t-xs t-b" x="340.0" y="40.0" text-anchor="middle" dominant-baseline="central">2</text>
+  <text class="t-s t-bad" x="390.0" y="40.0" text-anchor="start" dominant-baseline="central">6 coins</text>
+  <text class="t-s t-b t-hl" x="20.0" y="105.0" text-anchor="start" dominant-baseline="central">optimal</text>
+  <circle class="box-hl" cx="120.0" cy="105.0" r="17.0"/>
+  <text class="t-xs t-b" x="120.0" y="105.0" text-anchor="middle" dominant-baseline="central">20</text>
+  <circle class="box-hl" cx="164.0" cy="105.0" r="17.0"/>
+  <text class="t-xs t-b" x="164.0" y="105.0" text-anchor="middle" dominant-baseline="central">20</text>
+  <circle class="box-hl" cx="208.0" cy="105.0" r="17.0"/>
+  <text class="t-xs t-b" x="208.0" y="105.0" text-anchor="middle" dominant-baseline="central">20</text>
+  <text class="t-s t-hl" x="390.0" y="105.0" text-anchor="start" dominant-baseline="central">3 coins</text>
+  <text class="t-xs t-mut" x="470.0" y="72.0" text-anchor="middle" dominant-baseline="central">amount: 60 cents</text>
+</svg>

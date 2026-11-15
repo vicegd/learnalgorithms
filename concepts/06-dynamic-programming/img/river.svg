@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 700 250" width="700" height="250" role="img">
+  <title>Five docks on a river with the fee of each trip downstream; the cheapest trip from 0 to 4 costs 13</title>
+  <line class="ln-hl" x1="88.0" y1="190.0" x2="192.0" y2="190.0"/>
+  <text class="t-s t-hl t-b" x="140.0" y="206.0" text-anchor="middle" dominant-baseline="central">3</text>
+  <path class="ln-mut" d="M70,172 Q210.0,62 350,172"/>
+  <rect class="box" x="199.0" y="98.0" width="22.0" height="18.0" rx="9"/>
+  <text class="t-xs t-mut" x="210.0" y="107.0" text-anchor="middle" dominant-baseline="central">8</text>
+  <path class="ln-mut" d="M70,172 Q280.0,6 490,172"/>
+  <rect class="box" x="269.0" y="70.0" width="22.0" height="18.0" rx="9"/>
+  <text class="t-xs t-mut" x="280.0" y="79.0" text-anchor="middle" dominant-baseline="central">12</text>
+  <path class="ln-bad" d="M70,172 Q350.0,-50 630,172"/>
+  <rect class="box" x="339.0" y="42.0" width="22.0" height="18.0" rx="9"/>
+  <text class="t-xs t-bad t-b" x="350.0" y="51.0" text-anchor="middle" dominant-baseline="central">20</text>
+  <line class="ln-hl" x1="228.0" y1="190.0" x2="332.0" y2="190.0"/>
+  <text class="t-s t-hl t-b" x="280.0" y="206.0" text-anchor="middle" dominant-baseline="central">4</text>
+  <path class="ln-mut" d="M210,172 Q350.0,62 490,172"/>
+  <rect class="box" x="339.0" y="98.0" width="22.0" height="18.0" rx="9"/>
+  <text class="t-xs t-mut" x="350.0" y="107.0" text-anchor="middle" dominant-baseline="central">7</text>
+  <path class="ln-mut" d="M210,172 Q420.0,6 630,172"/>
+  <rect class="box" x="409.0" y="70.0" width="22.0" height="18.0" rx="9"/>
+  <text class="t-xs t-mut" x="420.0" y="79.0" text-anchor="middle" dominant-baseline="central">15</text>
+  <line class="ln-hl" x1="368.0" y1="190.0" x2="472.0" y2="190.0"/>
+  <text class="t-s t-hl t-b" x="420.0" y="206.0" text-anchor="middle" dominant-baseline="central">2</text>
+  <path class="ln-mut" d="M350,172 Q490.0,62 630,172"/>
+  <rect class="box" x="479.0" y="98.0" width="22.0" height="18.0" rx="9"/>
+  <text class="t-xs t-mut" x="490.0" y="107.0" text-anchor="middle" dominant-baseline="central">9</text>
+  <line class="ln-hl" x1="508.0" y1="190.0" x2="612.0" y2="190.0"/>
+  <text class="t-s t-hl t-b" x="560.0" y="206.0" text-anchor="middle" dominant-baseline="central">4</text>
+  <circle class="box-blue" cx="70.0" cy="190.0" r="18.0"/>
+  <text class="t-b" x="70.0" y="190.0" text-anchor="middle" dominant-baseline="central">0</text>
+  <circle class="box-blue" cx="210.0" cy="190.0" r="18.0"/>
+  <text class="t-b" x="210.0" y="190.0" text-anchor="middle" dominant-baseline="central">1</text>
+  <circle class="box-blue" cx="350.0" cy="190.0" r="18.0"/>
+  <text class="t-b" x="350.0" y="190.0" text-anchor="middle" dominant-baseline="central">2</text>
+  <circle class="box-blue" cx="490.0" cy="190.0" r="18.0"/>
+  <text class="t-b" x="490.0" y="190.0" text-anchor="middle" dominant-baseline="central">3</text>
+  <circle class="box-blue" cx="630.0" cy="190.0" r="18.0"/>
+  <text class="t-b" x="630.0" y="190.0" text-anchor="middle" dominant-baseline="central">4</text>
+  <text class="t-xs t-mut" x="70.0" y="228.0" text-anchor="middle" dominant-baseline="central">upstream</text>
+  <text class="t-xs t-mut" x="630.0" y="228.0" text-anchor="middle" dominant-baseline="central">downstream</text>
+  <text class="t-xs t-mut" x="350.0" y="228.0" text-anchor="middle" dominant-baseline="central">green: 3 + 4 + 2 + 4 = 13 · red: direct trip, 20</text>
+</svg>
