@@ -309,6 +309,94 @@ When the bottleneck is reading from a disk or a network, adding threads may not 
 
 ---
 
+## Example 4: Parallel Fibonacci
+
+The naive recursive Fibonacci makes two recursive calls, $F(n-1)$ and $F(n-2)$, which are independent: a perfect shape for Fork/Join. Each task forks one call, computes the other, and joins; below a threshold it uses the sequential recursive version.
+
+```java
+public class FibonacciTask extends RecursiveTask<Long> {
+    private static final int THRESHOLD = 30;
+    private final int n;
+
+    public FibonacciTask(int n) {
+        this.n = n;
+    }
+
+    @Override
+    protected Long compute() {
+        if (n < THRESHOLD)
+            return fibonacci(n);                         // sequential naive recursion
+        FibonacciTask f1 = new FibonacciTask(n - 1);
+        FibonacciTask f2 = new FibonacciTask(n - 2);
+        f1.fork();                                       // F(n-1) in another worker
+        long b = f2.compute();                           // F(n-2) in this thread
+        long a = f1.join();
+        return a + b;
+    }
+
+    private static long fibonacci(int n) {
+        return n < 2 ? n : fibonacci(n - 1) + fibonacci(n - 2);
+    }
+}
+```
+
+We computed $F(40) = 102{,}334{,}155$ in several ways on a computer with 2 cores:
+
+| Version | Time |
+| :--- | ---: |
+| Sequential naive recursion | 402 ms |
+| Fork/Join, threshold 30 | 349 ms |
+| Fork/Join, threshold 15 | 435 ms |
+| Fork/Join, threshold 2 | 5,070 ms |
+| Iterative loop (or dynamic programming) | 0.02 ms |
+
+Three lessons come out of this table:
+
+- With a sensible threshold, the parallel version is somewhat faster, and on a machine with more cores the gain would be larger.
+- With a tiny threshold, the program creates hundreds of millions of tasks and is **more than 12 times slower** than the sequential version: the overhead of the tasks dwarfs the additions they perform.
+- Above all, **parallelism does not fix a bad algorithm**. The naive recursion is exponential, and no number of processors can compete with the linear iterative version, which is about 15,000 times faster than the best parallel time. The right fix is [dynamic programming](../03-algorithm-design-paradigms/09-dynamic-programming.mdx), not more cores.
+
+<RepoCode files={['parallel/fibonacci/FibonacciTask.java', 'parallel/fibonacci/FibonacciAlgorithm.java']} />
+
+***
+
+## Example 5: Parallel Quicksort
+
+After partitioning, Quicksort has two independent subproblems: the parts to the left and to the right of the pivot. Sorting them in parallel only requires turning the recursive calls into tasks. Since the parts are sorted in place and nothing is returned, the task is a `RecursiveAction`:
+
+```java
+public class ParallelQuicksort extends RecursiveAction {
+    private static final int THRESHOLD = 10_000;
+    private final int[] a;
+    private final int left, right;
+
+    public ParallelQuicksort(int[] a, int left, int right) {
+        this.a = a;
+        this.left = left;
+        this.right = right;
+    }
+
+    @Override
+    protected void compute() {
+        if (right - left < THRESHOLD) {
+            Arrays.sort(a, left, right + 1);             // small part: sequential
+            return;
+        }
+        int p = partition(a, left, right);               // sequential partition
+        invokeAll(new ParallelQuicksort(a, left, p - 1), // both parts in parallel
+                  new ParallelQuicksort(a, p + 1, right));
+    }
+}
+```
+
+`partition` is any of the partitions of the [Quicksort lesson](../02-fundamental-problem-domains/05-quicksort.mdx). The two tasks work on **disjoint** parts of the array, so they never interfere, and no synchronization is needed.
+
+Two limits are worth noting. First, the partition of the whole array is **sequential**: the first level alone costs $O(n)$, so the span of the algorithm is at least linear, and the speedup is limited to $O(\log n)$ however many cores there are (see the [proofs of the chapter](./proofs.mdx#work-span-and-the-time-with-p-processors)). Second, the parts can be very unbalanced, which leaves some workers idle; work stealing mitigates this.
+
+Sorting 20 million random integers on our 2-core computer took 1.68 s with the sequential Quicksort and 1.59 s with the parallel one; `Arrays.parallelSort`, which uses a parallel Mergesort with a parallel merge, took 1.56 s. On a computer with 8 or more cores, the parallel versions pull clearly ahead. In practice, `Arrays.parallelSort` is the version to use: it is tuned, and it avoids the sequential partition at the top.
+
+***
+
 ## Choosing the Threshold
 
 The essential design decision in a Fork/Join algorithm is the **sequential threshold**: the size below which a task stops dividing and does its work directly.
@@ -363,6 +451,6 @@ As with sequential algorithms, prefer the library when it solves your problem, a
 - **💻 Run the examples.** The [course repository](https://github.com/vicegd/algorithms/tree/master/src/topics/parallel) contains the square, sum, cube root and file processing examples. Run them and find the processors and parallelism of your computer.
 - **📏 Find the best threshold.** Measure the parallel sum of 50 million `double` values with thresholds from 10 to 10,000,000. Plot the time against the threshold (with a logarithmic scale). Where is the minimum on your computer?
 - **🐞 Break it.** Change the sum so that it calls `leftTask.fork()` and `leftTask.join()` before computing the right task. How do the times change?
-- **🔢 Parallel Fibonacci (try it yourself).** Write a `RecursiveTask<Long>` that computes the naive recursive Fibonacci number with Fork/Join, using a threshold below which the sequential version is used. Compare its time with the sequential naive version and with the iterative one. What do you conclude?
-- **⚡ Parallel Quicksort (try it yourself).** Implement Quicksort with the Fork/Join framework: after each partition, sort both parts in parallel as two `RecursiveAction` tasks, and use the sequential algorithm below a threshold. Compare it with the sequential Quicksort and with `Arrays.parallelSort`.
+- **🔢 Your own Fibonacci measurements.** Run the parallel Fibonacci of Example 4 on your computer with thresholds from 5 to 35. Where is the best threshold, and how does it relate to the number of cores?
+- **⚡ Parallel Mergesort.** Following Example 5, write a parallel Mergesort: the two halves are sorted as two tasks, and the merge is done when both have finished. Why is its span still linear?
 :::

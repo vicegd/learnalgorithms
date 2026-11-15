@@ -329,6 +329,83 @@ Any map drawn on a plane can be colored with at most **four** colors so that nei
 
 ---
 
+## Minimum Spanning Trees: Prim and Kruskal
+
+**Problem.** A company wants to connect $n$ offices with a network. The cost of a direct cable between each pair of offices is known. Which cables should be installed so that all the offices are connected, directly or indirectly, at the **minimum total cost**? In graph terms: given a connected undirected graph with weights on its edges, find a **minimum spanning tree**, a set of edges that connects all the nodes, has no cycles (a cycle would contain a useless cable), and has the minimum total weight. A spanning tree of $n$ nodes always has exactly $n - 1$ edges.
+
+Two classic greedy algorithms solve it, and both are **always optimal**.
+
+We use this graph of six nodes, given as a list of edges with their weights:
+
+```text
+1-2: 6    1-3: 1    1-4: 5    2-3: 5    2-5: 3
+3-4: 5    3-5: 6    3-6: 4    4-6: 2    5-6: 6
+```
+
+### Prim's algorithm
+
+Prim's algorithm grows **a single tree** from a starting node. At each step it adds the **cheapest edge that connects the tree with a node outside it**. Starting from node 1:
+
+| Step | Nodes in the tree | Cheapest edge leaving the tree | Total |
+|---:|---|---|---:|
+| 1 | 1 | 1-3 (1) | 1 |
+| 2 | 1, 3 | 3-6 (4) | 5 |
+| 3 | 1, 3, 6 | 6-4 (2) | 7 |
+| 4 | 1, 3, 4, 6 | 3-2 (5) | 12 |
+| 5 | 1, 2, 3, 4, 6 | 2-5 (3) | 15 |
+
+The tree has the edges 1-3, 3-6, 6-4, 3-2 and 2-5, with total weight **15**. In step 4 there are three candidates of weight 5 (1-4, 3-2 and 3-4); 1-4 and 3-4 would join two nodes already in the tree (forming a cycle), so they are not candidates at all, and 3-2 is the only edge of weight 5 that reaches a new node.
+
+An implementation with an adjacency matrix keeps, for every node outside the tree, the weight `dist[v]` of its cheapest edge to the tree:
+
+```java
+static final int INF = Integer.MAX_VALUE;
+
+int prim(int[][] w) {                       // w[u][v] = 0 if there is no edge
+    int n = w.length;
+    boolean[] inTree = new boolean[n];
+    int[] dist = new int[n];                // cheapest edge from v to the tree
+    Arrays.fill(dist, INF);
+    dist[0] = 0;                            // start at node 0
+    int total = 0;
+    for (int step = 0; step < n; step++) {
+        int u = -1;                         // greedy choice: the closest node outside the tree
+        for (int v = 0; v < n; v++)
+            if (!inTree[v] && dist[v] != INF && (u == -1 || dist[v] < dist[u]))
+                u = v;
+        inTree[u] = true;
+        total += dist[u];
+        for (int v = 0; v < n; v++)         // update the candidates
+            if (!inTree[v] && w[u][v] > 0 && w[u][v] < dist[v])
+                dist[v] = w[u][v];
+    }
+    return total;
+}
+```
+
+Each of the $n$ steps scans the $n$ nodes twice: $O(n^2)$, which is optimal for dense graphs given as a matrix. With adjacency lists and a priority queue, it costs $O(m \log n)$ for $m$ edges, better for sparse graphs.
+
+### Kruskal's algorithm
+
+Kruskal's algorithm looks at the **edges** in increasing order of weight, and accepts each one unless it would form a cycle with the edges already accepted. At the beginning every node is a separate tree; each accepted edge joins two trees into one.
+
+| Edge (weight) | Decision |
+|---|---|
+| 1-3 (1) | accept |
+| 4-6 (2) | accept |
+| 2-5 (3) | accept |
+| 3-6 (4) | accept: joins the trees of 1-3 and 4-6 |
+| 1-4 (5) | **reject**: 1 and 4 are already connected (1-3-6-4) |
+| 2-3 (5) | accept: joins the tree of 2-5 with the rest. Five edges: stop |
+
+The result is a different tree (1-3, 4-6, 2-5, 3-6, 2-3) with the **same total weight, 15**: when several edges have the same weight, there may be several minimum spanning trees. To check quickly whether an edge forms a cycle, Kruskal's algorithm uses a **union-find** (disjoint sets) structure, which keeps the current trees as sets: an edge is rejected if both ends are in the same set. Sorting the edges dominates the cost: $O(m \log m)$.
+
+**Why are they optimal?** Both rely on the same property: for any division of the nodes into two groups, the cheapest edge that crosses between the groups belongs to some minimum spanning tree. Prim applies it to the division "tree / rest"; Kruskal, to the two trees that the accepted edge joins.
+
+<ProofLink to="/concepts/algorithm-design-paradigms/proofs#prim-and-kruskal-are-optimal" title="Prim and Kruskal are optimal" />
+
+***
+
 ## Greedy Algorithms That Are Always Optimal
 
 For some important problems, a well-chosen greedy algorithm is provably optimal. You will meet several of them in your degree:
