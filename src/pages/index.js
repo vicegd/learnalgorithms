@@ -43,7 +43,7 @@ const CHAPTERS = [
     description:
       'Exact search over huge spaces of candidate solutions: exploring implicit trees of states, pruning hopeless branches and using bounds and heuristics.',
     topics: ['Backtracking', 'Pruning', 'N-queens', 'Branch and bound', 'A*'],
-    cta: '4 lessons',
+    cta: '4 lessons + exercises',
     to: '/concepts/category/4-state-space-search-and-optimization',
   },
   {
@@ -53,7 +53,7 @@ const CHAPTERS = [
     description:
       'Using several processors at once: concurrency and parallelism, the Java Fork/Join framework, and how to measure and predict parallel performance.',
     topics: ['Threads', 'Fork/Join', 'Thresholds', 'Speedup', "Amdahl's law"],
-    cta: '3 lessons',
+    cta: '3 lessons + exercises',
     to: '/concepts/category/5-advanced-execution-models',
   },
   {
@@ -63,7 +63,7 @@ const CHAPTERS = [
     description:
       'The mathematics behind the analysis of algorithms, explained rather than just stated: sums, logarithms, factorials, induction, loop invariants and recurrences.',
     topics: ['Sums', 'Logarithms', 'Stirling', 'Induction', 'Invariants', 'Recurrences'],
-    cta: '2 lessons',
+    cta: '2 lessons + exercises',
     to: '/concepts/category/6-mathematical-background',
   },
 ];
