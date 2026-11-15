@@ -5,6 +5,8 @@ sidebar_position: 3
 tags: [Exercises, Branch and Bound, Heuristics]
 ---
 
+import FigExerciseTree from './img/exercise-tree.svg';
+
 # Exercises: Branch and Bound
 
 These exercises review the two lessons on [branch and bound](./01-branch-and-bound-scheme.mdx). They are different from the seminar activities and from the lab problems, which are left for those sessions. Try each one before reading its solution: the solutions are grouped at the [end of the page](#solutions).
@@ -13,15 +15,9 @@ These exercises review the two lessons on [branch and bound](./01-branch-and-bou
 
 <span id="ex-8-1"></span>**8.1. Orders of exploration.** In this tree, the number in parentheses is the estimate of each node (lower is better):
 
-```text
-                A(8)
-         ┌───────┴───────┐
-       B(12)            C(9)
-     ┌───┴───┐       ┌───┴───┐
-   D(14)   E(12)   F(10)   G(11)
-                     │
-                   H(13)
-```
+<Figure caption="The tree of the exercise; the number in parentheses is the estimate of each node.">
+  <FigExerciseTree />
+</Figure>
 
 Give the order in which the nodes are expanded with (a) depth-first search, (b) breadth-first search and (c) best-first search. (d) In best-first search, suppose that G turns out to be a solution with cost 11, and that the estimates are valid lower bounds. Which nodes are never expanded?
 

@@ -4,6 +4,7 @@ sidebar_position: 1
 tags: [Paradigms, State Space Search, Branch and Bound, Optimization, BFS, Heuristics]
 ---
 
+import FigFourOrders from './img/four-orders.svg';
 
 # The Branch and Bound Scheme
 
@@ -20,13 +21,9 @@ The name describes the two ingredients: **branch** (generate the children of a n
 
 Consider this tree, where the number next to each node is an estimate of how good the solutions below it are (lower is better):
 
-```text
-                      A(10)
-          ┌─────────────┼─────────────┐
-        B(14)         C(11)         D(12)
-       ┌──┴──┐          │          ┌──┴──┐
-     E(15) F(16)      G(13)      H(11) I(12)
-```
+<Figure caption="The four strategies on the same tree; the small numbers give the order in which the nodes are expanded. Only best-first jumps between branches, guided by the estimates, and leaves branch B for last.">
+  <FigFourOrders />
+</Figure>
 
 The four classic strategies visit the nodes in different orders:
 

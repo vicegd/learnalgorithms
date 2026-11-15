@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 360 230" width="360" height="230" role="img">
+  <title>The tree of exercise 8.1, with the estimate of each node</title>
+  <line class="ln" x1="180.0" y1="36.0" x2="95.0" y2="72.0"/>
+  <line class="ln" x1="180.0" y1="36.0" x2="265.0" y2="72.0"/>
+  <line class="ln" x1="95.0" y1="96.0" x2="50.0" y2="132.0"/>
+  <line class="ln" x1="95.0" y1="96.0" x2="140.0" y2="132.0"/>
+  <line class="ln" x1="265.0" y1="96.0" x2="220.0" y2="132.0"/>
+  <line class="ln" x1="265.0" y1="96.0" x2="310.0" y2="132.0"/>
+  <line class="ln" x1="220.0" y1="156.0" x2="220.0" y2="192.0"/>
+  <rect class="box" x="157.0" y="12.0" width="46.0" height="24.0" rx="6"/>
+  <text class="t-xs t-m" x="180.0" y="24.5" text-anchor="middle" dominant-baseline="central">A(8)</text>
+  <rect class="box" x="72.0" y="72.0" width="46.0" height="24.0" rx="6"/>
+  <text class="t-xs t-m" x="95.0" y="84.5" text-anchor="middle" dominant-baseline="central">B(12)</text>
+  <rect class="box" x="242.0" y="72.0" width="46.0" height="24.0" rx="6"/>
+  <text class="t-xs t-m" x="265.0" y="84.5" text-anchor="middle" dominant-baseline="central">C(9)</text>
+  <rect class="box" x="27.0" y="132.0" width="46.0" height="24.0" rx="6"/>
+  <text class="t-xs t-m" x="50.0" y="144.5" text-anchor="middle" dominant-baseline="central">D(14)</text>
+  <rect class="box" x="117.0" y="132.0" width="46.0" height="24.0" rx="6"/>
+  <text class="t-xs t-m" x="140.0" y="144.5" text-anchor="middle" dominant-baseline="central">E(12)</text>
+  <rect class="box" x="197.0" y="132.0" width="46.0" height="24.0" rx="6"/>
+  <text class="t-xs t-m" x="220.0" y="144.5" text-anchor="middle" dominant-baseline="central">F(10)</text>
+  <rect class="box" x="287.0" y="132.0" width="46.0" height="24.0" rx="6"/>
+  <text class="t-xs t-m" x="310.0" y="144.5" text-anchor="middle" dominant-baseline="central">G(11)</text>
+  <rect class="box" x="197.0" y="192.0" width="46.0" height="24.0" rx="6"/>
+  <text class="t-xs t-m" x="220.0" y="204.5" text-anchor="middle" dominant-baseline="central">H(13)</text>
+</svg>

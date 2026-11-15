@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 600 190" width="600" height="190" role="img">
+  <title>Two admissible heuristics for an 8-puzzle board: misplaced tiles and Manhattan distance</title>
+  <rect class="f-blue" x="20.0" y="34.0" width="40.0" height="40.0" rx="0"/>
+  <text class="t-s t-m" x="40.0" y="54.0" text-anchor="middle" dominant-baseline="central">2</text>
+  <rect class="f-blue" x="60.0" y="34.0" width="40.0" height="40.0" rx="0"/>
+  <text class="t-s t-m" x="80.0" y="54.0" text-anchor="middle" dominant-baseline="central">8</text>
+  <rect class="f-hl" x="100.0" y="34.0" width="40.0" height="40.0" rx="0"/>
+  <text class="t-s t-m" x="120.0" y="54.0" text-anchor="middle" dominant-baseline="central">3</text>
+  <rect class="f-blue" x="20.0" y="74.0" width="40.0" height="40.0" rx="0"/>
+  <text class="t-s t-m" x="40.0" y="94.0" text-anchor="middle" dominant-baseline="central">1</text>
+  <rect class="f-blue" x="60.0" y="74.0" width="40.0" height="40.0" rx="0"/>
+  <text class="t-s t-m" x="80.0" y="94.0" text-anchor="middle" dominant-baseline="central">6</text>
+  <rect class="f-blue" x="100.0" y="74.0" width="40.0" height="40.0" rx="0"/>
+  <text class="t-s t-m" x="120.0" y="94.0" text-anchor="middle" dominant-baseline="central">4</text>
+  <rect class="f-hl" x="20.0" y="114.0" width="40.0" height="40.0" rx="0"/>
+  <text class="t-s t-m" x="40.0" y="134.0" text-anchor="middle" dominant-baseline="central">7</text>
+  <rect class="f-soft" x="60.0" y="114.0" width="40.0" height="40.0" rx="0"/>
+  <rect class="f-blue" x="100.0" y="114.0" width="40.0" height="40.0" rx="0"/>
+  <text class="t-s t-m" x="120.0" y="134.0" text-anchor="middle" dominant-baseline="central">5</text>
+  <line class="ln" x1="20.0" y1="34.0" x2="20.0" y2="154.0"/>
+  <line class="ln" x1="20.0" y1="34.0" x2="140.0" y2="34.0"/>
+  <line class="ln" x1="60.0" y1="34.0" x2="60.0" y2="154.0"/>
+  <line class="ln" x1="20.0" y1="74.0" x2="140.0" y2="74.0"/>
+  <line class="ln" x1="100.0" y1="34.0" x2="100.0" y2="154.0"/>
+  <line class="ln" x1="20.0" y1="114.0" x2="140.0" y2="114.0"/>
+  <line class="ln" x1="140.0" y1="34.0" x2="140.0" y2="154.0"/>
+  <line class="ln" x1="20.0" y1="154.0" x2="140.0" y2="154.0"/>
+  <text class="t-xs t-b" x="80.0" y="22.0" text-anchor="middle" dominant-baseline="central">board</text>
+  <rect class="f-hl" x="190.0" y="34.0" width="40.0" height="40.0" rx="0"/>
+  <text class="t-s t-m" x="210.0" y="54.0" text-anchor="middle" dominant-baseline="central">1</text>
+  <rect class="f-hl" x="230.0" y="34.0" width="40.0" height="40.0" rx="0"/>
+  <text class="t-s t-m" x="250.0" y="54.0" text-anchor="middle" dominant-baseline="central">2</text>
+  <rect class="f-hl" x="270.0" y="34.0" width="40.0" height="40.0" rx="0"/>
+  <text class="t-s t-m" x="290.0" y="54.0" text-anchor="middle" dominant-baseline="central">3</text>
+  <rect class="f-hl" x="190.0" y="74.0" width="40.0" height="40.0" rx="0"/>
+  <text class="t-s t-m" x="210.0" y="94.0" text-anchor="middle" dominant-baseline="central">4</text>
+  <rect class="f-hl" x="230.0" y="74.0" width="40.0" height="40.0" rx="0"/>
+  <text class="t-s t-m" x="250.0" y="94.0" text-anchor="middle" dominant-baseline="central">5</text>
+  <rect class="f-hl" x="270.0" y="74.0" width="40.0" height="40.0" rx="0"/>
+  <text class="t-s t-m" x="290.0" y="94.0" text-anchor="middle" dominant-baseline="central">6</text>
+  <rect class="f-hl" x="190.0" y="114.0" width="40.0" height="40.0" rx="0"/>
+  <text class="t-s t-m" x="210.0" y="134.0" text-anchor="middle" dominant-baseline="central">7</text>
+  <rect class="f-hl" x="230.0" y="114.0" width="40.0" height="40.0" rx="0"/>
+  <text class="t-s t-m" x="250.0" y="134.0" text-anchor="middle" dominant-baseline="central">8</text>
+  <rect class="f-soft" x="270.0" y="114.0" width="40.0" height="40.0" rx="0"/>
+  <line class="ln" x1="190.0" y1="34.0" x2="190.0" y2="154.0"/>
+  <line class="ln" x1="190.0" y1="34.0" x2="310.0" y2="34.0"/>
+  <line class="ln" x1="230.0" y1="34.0" x2="230.0" y2="154.0"/>
+  <line class="ln" x1="190.0" y1="74.0" x2="310.0" y2="74.0"/>
+  <line class="ln" x1="270.0" y1="34.0" x2="270.0" y2="154.0"/>
+  <line class="ln" x1="190.0" y1="114.0" x2="310.0" y2="114.0"/>
+  <line class="ln" x1="310.0" y1="34.0" x2="310.0" y2="154.0"/>
+  <line class="ln" x1="190.0" y1="154.0" x2="310.0" y2="154.0"/>
+  <text class="t-xs t-b" x="250.0" y="22.0" text-anchor="middle" dominant-baseline="central">goal</text>
+  <text class="t-xs t-ac t-b" x="54.0" y="43.0" text-anchor="middle" dominant-baseline="central">1</text>
+  <text class="t-xs t-ac t-b" x="94.0" y="43.0" text-anchor="middle" dominant-baseline="central">2</text>
+  <text class="t-xs t-ac t-b" x="54.0" y="83.0" text-anchor="middle" dominant-baseline="central">1</text>
+  <text class="t-xs t-ac t-b" x="94.0" y="83.0" text-anchor="middle" dominant-baseline="central">1</text>
+  <text class="t-xs t-ac t-b" x="134.0" y="83.0" text-anchor="middle" dominant-baseline="central">2</text>
+  <text class="t-xs t-ac t-b" x="134.0" y="123.0" text-anchor="middle" dominant-baseline="central">2</text>
+  <text class="t-s t-b" x="350.0" y="60.0" text-anchor="start" dominant-baseline="central">misplaced tiles: 6</text>
+  <text class="t-xs t-mut" x="350.0" y="78.0" text-anchor="start" dominant-baseline="central">(blue tiles: 1, 2, 4, 5, 6, 8)</text>
+  <text class="t-s t-b" x="350.0" y="115.0" text-anchor="start" dominant-baseline="central">Manhattan distance: 9</text>
+  <text class="t-xs t-mut" x="350.0" y="133.0" text-anchor="start" dominant-baseline="central">(orange: rows + columns to its cell)</text>
+  <text class="t-xs t-hl" x="350.0" y="165.0" text-anchor="start" dominant-baseline="central">both ≤ the true number of moves</text>
+</svg>
