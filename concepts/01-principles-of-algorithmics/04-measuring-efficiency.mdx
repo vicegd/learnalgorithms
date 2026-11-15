@@ -272,10 +272,12 @@ This value includes everything in the heap (not only our data structures) and de
 
 ## Practice
 
-:::tip Technical lab
+<div className="practice-box">
+
 - **⏱️ See the resolution problem.** Measure the sum of a vector of 10,000 elements once with `currentTimeMillis` and once with `nanoTime`, ten times each. How stable are the results?
 - **🔁 Use repetitions.** Find the number of repetitions (a power of 10) needed to measure the sum of a vector of 10,000 elements above 50 ms on your computer, and compute the time of one execution in microseconds.
 - **📈 Run a doubling test.** Measure, with `-Xint`, the times of an algorithm with two nested loops and of one with three nested loops for increasing sizes. Compute the ratios between consecutive times and check them against the table of this lesson.
 - **⚖️ Compare with ratios.** Measure the brute-force and the sorting versions of the maximum pairwise product for several sizes and compute the ratio of their times. Does it tend to 0, to infinity or to a constant? Is that what you expected?
 - **🧪 Optimized or not?** Repeat one of the previous experiments without `-Xint`. In which cases do the measurements still follow the theoretical growth, and in which do they become erratic?
-:::
+
+</div>

@@ -266,11 +266,13 @@ Time and space are often exchanged: we can sometimes save a lot of time by stori
 
 ## Practice
 
-:::tip Analytical challenge
+<div className="practice-box">
+
 - **🧮 Count it.** Obtain $T(n)$, counting each instruction as one unit, for a method that returns the **maximum** of a non-empty vector of $n$ integers. Does the result depend on the content of the vector? (Hint: the assignment inside the `if` may or may not execute.)
 - **📐 Use summations.** How many times does the innermost instruction run in this fragment? `for (i = 0; i < n; i++) for (j = 0; j < i; j++) for (k = 0; k < j; k++) x++;` Give the exact formula and its leading term.
 - **🔢 Logarithmic loops.** How many iterations does `for (i = n; i >= 1; i /= 3)` perform? Check your formula for $n = 1$, $n = 9$ and $n = 10$.
 - **⚖️ Cases.** For a method that checks whether a vector is sorted in ascending order (returning `false` as soon as it finds two consecutive elements out of order), describe the best and worst cases and their cost.
 - **💾 Space.** Compare the additional space needed by the three versions of the maximum pairwise product (brute force, sorting a copy, linear scan).
 - **💻 Verify experimentally.** Add a counter to the sum of a vector that increments once per elementary operation, run it for several values of $n$ and check that the result is $3n + 4$.
-:::
+
+</div>

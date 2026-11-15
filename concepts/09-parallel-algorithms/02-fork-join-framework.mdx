@@ -452,10 +452,12 @@ As with sequential algorithms, prefer the library when it solves your problem, a
 
 ## Practice
 
-:::tip Exercises
+<div className="practice-box">
+
 - **💻 Run the examples.** The [course repository](https://github.com/vicegd/algorithms/tree/master/src/topics/parallel) contains the square, sum, cube root and file processing examples. Run them and find the processors and parallelism of your computer.
 - **📏 Find the best threshold.** Measure the parallel sum of 50 million `double` values with thresholds from 10 to 10,000,000. Plot the time against the threshold (with a logarithmic scale). Where is the minimum on your computer?
 - **🐞 Break it.** Change the sum so that it calls `leftTask.fork()` and `leftTask.join()` before computing the right task. How do the times change?
 - **🔢 Your own Fibonacci measurements.** Run the parallel Fibonacci of Example 4 on your computer with thresholds from 5 to 35. Where is the best threshold, and how does it relate to the number of cores?
 - **⚡ Parallel Mergesort.** Following Example 5, write a parallel Mergesort: the two halves are sorted as two tasks, and the merge is done when both have finished. Why is its span still linear?
-:::
+
+</div>

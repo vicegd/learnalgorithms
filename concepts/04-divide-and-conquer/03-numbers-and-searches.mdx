@@ -313,10 +313,12 @@ Euclid's algorithm illustrates an important lesson: **finding the best algorithm
 
 ## Practice
 
-:::tip Exercises
+<div className="practice-box">
+
 - **🐇 Count the calls.** Instrument the naive Fibonacci to count its calls, and check the formula $2F(n+1) - 1$ for $n = 10, 20, 30$.
 - **⏱️ Measure.** Measure the naive, iterative and logarithmic versions of Fibonacci for increasing $n$ (lab session 3). For which $n$ does the naive version exceed one minute on your computer?
 - **🔢 BigInteger.** Rewrite the iterative and logarithmic versions with `BigInteger` and compute $F(100{,}000)$ with both. Which one is faster, and why is the difference smaller than $O(n)$ versus $O(\log n)$ suggests? (Hint: what is the cost of multiplying two numbers with thousands of digits?)
 - **➗ Euclid by hand.** Compute $\gcd(1071, 462)$ with Euclid's algorithm, writing each step. How many divisions are needed?
 - **⚡ Fast power.** Write a divide and conquer method that computes $x^n$ for an integer $n \ge 0$ with $O(\log n)$ multiplications, and identify $a$, $b$ and $k$.
-:::
+
+</div>

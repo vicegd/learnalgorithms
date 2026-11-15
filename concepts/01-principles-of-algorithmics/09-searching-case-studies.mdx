@@ -388,10 +388,12 @@ Binary search showed us how much sorted data is worth. The next chapter focuses 
 
 ## Practice
 
-:::tip Technical lab
+<div className="practice-box">
+
 - **💻 Run the course code.** The [course repository](https://github.com/vicegd/algorithms) contains the three search algorithms in [`src/topics/foundation/search`](https://github.com/vicegd/algorithms/tree/master/src/topics/foundation/search), with their tests. Note how the sentinel version removes the sentinel before returning.
 - **⏱️ Measure.** Measure the worst case of sequential search, with and without sentinel, for sizes from 1 to 64 million elements (doubling each time), with and without `-Xint`. Do the times double? Is the ratio between the two versions close to $2/3$?
 - **📈 Logarithms in practice.** Instrument binary search to count iterations and run it for $n = 2^{10}, 2^{11}, \dots, 2^{25}$ searching for a value smaller than all the elements. Plot the number of iterations against $n$.
 - **🐞 Stress test.** Write a stress test that compares your binary search with sequential search on thousands of small random sorted arrays, searching for values that are present and values that are not. Introduce the bug described in this lesson and check that your test detects it.
 - **🔍 First occurrence.** Modify binary search so that, if the value appears several times, it returns the position of its **first** occurrence (or $-1$ if it does not appear), still in $O(\log n)$ time.
-:::
+
+</div>

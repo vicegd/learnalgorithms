@@ -106,9 +106,11 @@ Writing correct programs with raw threads and locks is difficult. Fortunately, f
 
 ## Practice
 
-:::tip Exercises
+<div className="practice-box">
+
 - **🖥️ Know your machine.** Find out how many cores your computer has, and check it from Java with `Runtime.getRuntime().availableProcessors()`.
 - **🏁 A race condition.** Write a program in which two threads increment the same `int` counter 1,000,000 times each, without synchronisation. Run it several times. Is the final value always 2,000,000? Then use `AtomicInteger` instead and repeat.
 - **🎬 See it animated.** The *Java Concurrent Animated* application (available in the course materials and on [SourceForge](https://sourceforge.net/projects/javaconcurrenta/)) shows, with animations, how the main concurrency mechanisms of Java work.
 - **🤔 Classify.** For each situation, say whether it involves concurrency, parallelism or both: a browser downloading several images while you scroll; a video encoder using 8 cores; a single-core microcontroller reading sensors and updating a display.
-:::
+
+</div>

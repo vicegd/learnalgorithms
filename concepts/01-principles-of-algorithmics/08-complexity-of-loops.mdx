@@ -301,10 +301,12 @@ The patterns of this lesson are easy to verify experimentally with the technique
 
 ## Practice
 
-:::tip Analytical challenge
+<div className="practice-box">
+
 - **🔍 Classify.** Give the complexity of `for (i = n; i > 1; i = i / 3) for (j = 0; j < i * i; j++) { O(1) }`. Is it $O(n^2 \log n)$? (Hint: sum the iterations of the inner loop, as in the last checkpoint.)
 - **📏 Count exactly.** How many times does the body of `for (i = 1; i <= n; i++) for (j = 1; j <= i * i; j++) { O(1) }` run? Give the exact formula and its order.
 - **🧩 Find the trap.** `String s = ""; for (i = 0; i < n; i++) s += "x";` Strings in Java are immutable: each concatenation creates a new string, copying the previous one. What is the complexity of the loop? How does `StringBuilder` change it?
 - **🛠️ Design.** Write a loop whose complexity is $O(\sqrt{n} \log n)$, and another one whose complexity is $O(n \sqrt{n})$.
 - **💻 Verify.** Implement two of the patterns of this lesson, measure them with the doubling test (without optimization) and check that the ratios match the theoretical complexity.
-:::
+
+</div>
