@@ -1,0 +1,73 @@
+---
+title: "Exercises: Brute Force"
+sidebar_label: Exercises
+sidebar_position: 2
+tags: [Exercises, Brute Force, Exhaustive Search]
+---
+
+# Exercises: Brute Force
+
+These exercises review the lesson on [brute force and exhaustive search](./01-brute-force-and-exhaustive-search.mdx). Most of them ask the same two questions: how many candidates does brute force examine, and is that feasible? Try each one before reading its solution: the solutions are grouped at the [end of the page](#solutions).
+
+***
+
+<span id="ex-3-1"></span>**3.1. Pairs that cancel.** Given an array of $n$ distinct integers, count the pairs of positions $i \lt j$ such that $a[i] + a[j] = 0$. Write the brute-force algorithm and give its complexity. Then describe two faster algorithms, one using sorting and one using a hash set.
+
+<ToSolution n="3.1" />
+
+<span id="ex-3-2"></span>**3.2. Subset sum.** Is there a subset of `3 34 4 12 5 2` whose elements add up to 9? Solve it by exhaustive search: how many subsets are examined, and which ones are solutions? If a computer examines $10^8$ subsets per second, how long would the same search take with 40 numbers?
+
+<ToSolution n="3.2" />
+
+<span id="ex-3-3"></span>**3.3. Guessing a password.** An attacker tries every password of 8 characters at a rate of $10^9$ attempts per second. How long does the exhaustive search take in the worst case if the password uses (a) only lowercase letters (26 symbols), and (b) lowercase letters, uppercase letters and digits (62 symbols)? How much does each extra character multiply the time in case (b)?
+
+<ToSolution n="3.3" />
+
+<span id="ex-3-4"></span>**3.4. The closest pair of points.** The brute-force algorithm for the closest pair of $n$ points in the plane computes the distance between every pair and keeps the smallest. How many distances does it compute? If a computer computes $10^8$ distances per second, what is the largest $n$ it can handle in one second?
+
+<ToSolution n="3.4" />
+
+<span id="ex-3-5"></span>**3.5. Magic squares by brute force.** A $3 \times 3$ magic square contains the numbers 1 to 9, and every row, column and diagonal adds up to the same value. How many ways are there to fill the table with the nine numbers? Only 8 of them are magic: what fraction of the candidates does brute force examine in vain? What is the magic sum, and why?
+
+<ToSolution n="3.5" />
+
+***
+
+## Solutions
+
+<span id="sol-3-1"></span>**3.1.** Brute force tries every pair:
+
+```java
+int count = 0;
+for (int i = 0; i < n; i++)
+    for (int j = i + 1; j < n; j++)
+        if (a[i] + a[j] == 0) count++;
+```
+
+It performs $\frac{n(n-1)}{2}$ checks: $O(n^2)$. Two faster options:
+- **Sorting**, $O(n \log n)$: sort the array and move two indices from both ends towards the center. If the sum is positive, move the right index left; if negative, move the left index right; if zero, count it and move both.
+- **Hash set**, $O(n)$ on average: for each element $x$, check whether $-x$ is already in the set, then add $x$.
+
+Brute force remains the best tool to **test** the two faster versions on small random arrays.
+
+<ToStatement n="3.1" />
+
+<span id="sol-3-2"></span>**3.2.** Each of the 6 numbers is in the subset or not, so exhaustive search examines $2^6 = 64$ subsets. Two of them add up to 9: $\{4, 5\}$ and $\{3, 4, 2\}$. With 40 numbers there are $2^{40} \approx 1.1 \times 10^{12}$ subsets: at $10^8$ per second, about $11{,}000$ seconds, roughly **3 hours**. Each extra number doubles the time.
+
+<ToStatement n="3.2" />
+
+<span id="sol-3-3"></span>**3.3.**
+- (a) $26^8 \approx 2.09 \times 10^{11}$ passwords: about **209 seconds**, three and a half minutes.
+- (b) $62^8 \approx 2.18 \times 10^{14}$ passwords: about $2.2 \times 10^5$ seconds, **two and a half days**.
+
+Each extra character multiplies the time by 62: with 10 characters, case (b) would take about 26 years. That is why long passwords matter much more than complicated ones, and why exhaustive search is easy to parallelize: the candidates can be split among many processors.
+
+<ToStatement n="3.3" />
+
+<span id="sol-3-4"></span>**3.4.** One distance per pair: $\binom{n}{2} = \frac{n(n-1)}{2}$, so $O(n^2)$. Setting $\frac{n(n-1)}{2} \le 10^8$ gives $n \approx 14{,}000$ (exactly, $n = 14{,}142$ computes $99{,}991{,}011$ distances). A divide and conquer algorithm solves the same problem in $O(n \log n)$ and handles millions of points in that time.
+
+<ToStatement n="3.4" />
+
+<span id="sol-3-5"></span>**3.5.** There are 9 positions for the number 1, 8 for the 2, and so on: $9! = 362{,}880$ fillings. Only 8 are magic (they are rotations and reflections of a single square), so brute force examines $362{,}872$ candidates in vain: all but 1 in every $45{,}360$. The magic sum is **15**: the three rows contain all the numbers, which add up to $1 + 2 + \dots + 9 = 45$, so each row adds up to $45 / 3 = 15$. The [backtracking](../07-backtracking/02-classic-problems.mdx#magic-squares) version of this search prunes a partial filling as soon as a row cannot add up to 15, and examines far fewer nodes.
+
+<ToStatement n="3.5" />

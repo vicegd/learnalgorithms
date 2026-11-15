@@ -1,0 +1,36 @@
+---
+title: "Proofs: Backtracking"
+sidebar_label: Proofs
+sidebar_position: 98
+tags: [Proofs, Backtracking, Pruning]
+---
+
+# Proofs: Backtracking
+
+Backtracking is an **exact** method: it promises to find every solution, or the best one. That promise depends on the pruning being **safe**, that is, never discarding a branch that contains what we are looking for. This page proves when that is the case.
+
+***
+
+## Backtracking finds every solution
+
+**Claim.** The "all solutions" scheme of [backtracking](./01-backtracking-scheme.mdx#general-schemes) processes every solution of the tree of states, provided that the feasibility test only rejects partial solutions that cannot be completed into a solution.
+
+*Proof.* Without pruning, the recursion visits every node of the tree: by induction on the height of a subtree, a call on its root makes one recursive call per child, and each child call visits its whole subtree. With pruning, a child is skipped only if the test rejects it, and by hypothesis then no solution lies in its subtree. So every node that is an ancestor of a solution is visited, and in particular every solution is reached. $\blacksquare$
+
+The "first solution" scheme visits the same nodes in the same order until the first solution, and stops there. If the tree has no solution, it explores everything that is not pruned, so it correctly reports that there is none.
+
+**Termination.** If every branch of the tree is finite (every path from the root has a bounded length, for example $n$ decisions), the search terminates. This is not automatic in problems where states can repeat, such as sliding puzzles: there, repeated states must be detected, or the depth limited.
+
+***
+
+## Bound pruning never loses the optimum
+
+**Claim.** In a minimization problem, if $\hat{c}(x)$ is a **lower bound** (no solution in the subtree of $x$ costs less than $\hat{c}(x)$), and $U$ is the cost of a solution already found, then discarding $x$ when $\hat{c}(x) \ge U$ never removes a solution cheaper than $U$.
+
+*Proof.* Every solution $s$ in the subtree of $x$ satisfies $\mathrm{cost}(s) \ge \hat{c}(x) \ge U$. So none of them is better than the solution we already have. $\blacksquare$
+
+Two consequences:
+- The bound must be a true lower bound. If it can exceed the real cost of the best solution below $x$, the argument breaks, and the optimum can be pruned.
+- The simplest bound is the **cost accumulated so far** when costs are non-negative, as in the [task assignment by backtracking](./02-classic-problems.mdx#task-assignment): adding more decisions can only increase the cost. Better bounds also estimate the cost still to come.
+
+For **maximization** everything is mirrored: an upper bound $\hat{v}(x)$, and $x$ is discarded when $\hat{v}(x) \le$ the best value found.

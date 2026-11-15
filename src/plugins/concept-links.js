@@ -15,7 +15,7 @@
 const CONCEPT_LINKS = {
 };
 
-  //'brute force':  '/concepts/algorithm-design-paradigms/brute-force',
-  //'brute-force':  '/concepts/algorithm-design-paradigms/brute-force',
+  //'brute force':  '/concepts/brute-force/brute-force-and-exhaustive-search',
+  //'brute-force':  '/concepts/brute-force/brute-force-and-exhaustive-search',
 
 export default CONCEPT_LINKS;

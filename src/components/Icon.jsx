@@ -244,11 +244,8 @@ const RULES = [
   ['sums-and-logarithms', 'sigma'],
   ['induction', 'stairs'],
   // chapters
-  ['foundations-of-algorithms', 'bulb'],
-  ['fundamental-problem-domains', 'bars'],
-  ['algorithm-design-paradigms', 'puzzle'],
-  ['state-space-search', 'tree'],
-  ['advanced-execution-models', 'cpu'],
+  ['principles-of-algorithmics', 'bulb'],
+  ['sorting', 'bars'],
   ['mathematical-background', 'sigma'],
 ];
 
@@ -260,13 +257,17 @@ export function iconForUrl(url = '', fallback = 'book') {
   return fallback;
 }
 
-/* One accent color per chapter, matching the home page cards. */
+/* One accent color per group of chapters, matching the home page cards. */
 const ACCENTS = [
-  ['foundations-of-algorithms', '#8b5cf6'],
-  ['fundamental-problem-domains', '#3b82f6'],
-  ['algorithm-design-paradigms', '#2e8555'],
-  ['state-space-search', '#ea580c'],
-  ['advanced-execution-models', '#0d9488'],
+  ['principles-of-algorithmics', '#8b5cf6'],
+  ['/sorting', '#3b82f6'],
+  ['brute-force', '#2e8555'],
+  ['divide-and-conquer', '#2e8555'],
+  ['greedy-algorithms', '#2e8555'],
+  ['dynamic-programming', '#2e8555'],
+  ['backtracking', '#ea580c'],
+  ['branch-and-bound', '#ea580c'],
+  ['parallel-algorithms', '#0d9488'],
   ['mathematical-background', '#db2777'],
 ];
 

@@ -7,104 +7,104 @@ title: Glossary
 
 The main terms of the course, in alphabetical order. Each entry gives a short definition and links to the lesson where the term is explained in detail.
 
-**A\*.** Best-first search that orders states by $f = g + h$: the cost already paid plus an optimistic estimate of the cost still to pay. With an admissible $h$ it finds an optimal solution. See [Branch and Bound](./04-state-space-search-and-optimization/03-branch-and-bound.mdx).
+**A\*.** Best-first search that orders states by $f = g + h$: the cost already paid plus an optimistic estimate of the cost still to pay. With an admissible $h$ it finds an optimal solution. See [Branch and Bound](./08-branch-and-bound/01-branch-and-bound-scheme.mdx).
 
-**Adaptive sorting algorithm.** A sorting algorithm that runs faster when the input is already partly sorted, such as insertion sort. See [Insertion Sort](./02-fundamental-problem-domains/03-insertion-sort.mdx).
+**Adaptive sorting algorithm.** A sorting algorithm that runs faster when the input is already partly sorted, such as insertion sort. See [Insertion Sort](./02-sorting/03-insertion-sort.mdx).
 
-**Admissible heuristic.** An estimate of the remaining cost that never exceeds the true remaining cost. See [Branch and Bound: Classic Problems](./04-state-space-search-and-optimization/04-branch-and-bound-examples.mdx).
+**Admissible heuristic.** An estimate of the remaining cost that never exceeds the true remaining cost. See [Branch and Bound: Classic Problems](./08-branch-and-bound/02-classic-problems.mdx).
 
-**Algorithm.** A finite sequence of precise, unambiguous instructions that solves a problem for every valid input in a finite time. See [Algorithmic Thinking](./01-foundations-of-algorithms/01-algorithmic-thinking.mdx).
+**Algorithm.** A finite sequence of precise, unambiguous instructions that solves a problem for every valid input in a finite time. See [Algorithmic Thinking](./01-principles-of-algorithmics/01-algorithmic-thinking.mdx).
 
-**Amdahl's law.** The maximum speedup of a program with a sequential fraction $s$ is $1 / s$, however many processors are used. See [Performance of Parallel Algorithms](./05-advanced-execution-models/03-parallel-performance.mdx).
+**Amdahl's law.** The maximum speedup of a program with a sequential fraction $s$ is $1 / s$, however many processors are used. See [Performance of Parallel Algorithms](./09-parallel-algorithms/03-parallel-performance.mdx).
 
-**Asymptotic notation.** The notations $O$, $\Omega$ and $\Theta$, which describe how a function grows for large inputs, ignoring constant factors. See [Asymptotic Notation](./01-foundations-of-algorithms/06-asymptotic-notation.mdx).
+**Asymptotic notation.** The notations $O$, $\Omega$ and $\Theta$, which describe how a function grows for large inputs, ignoring constant factors. See [Asymptotic Notation](./01-principles-of-algorithmics/06-asymptotic-notation.mdx).
 
-**Average case.** The expected cost of an algorithm over all inputs of a given size, under some probability distribution. See [Complexity Analysis](./01-foundations-of-algorithms/05-complexity-analysis.mdx).
+**Average case.** The expected cost of an algorithm over all inputs of a given size, under some probability distribution. See [Complexity Analysis](./01-principles-of-algorithmics/05-complexity-analysis.mdx).
 
-**Backtracking.** A depth-first search over an implicit tree of partial solutions that abandons a partial solution as soon as it cannot be completed. See [Backtracking](./04-state-space-search-and-optimization/01-backtracking.mdx).
+**Backtracking.** A depth-first search over an implicit tree of partial solutions that abandons a partial solution as soon as it cannot be completed. See [Backtracking](./07-backtracking/01-backtracking-scheme.mdx).
 
-**Best case.** The input of a given size for which an algorithm does the least work. See [Complexity Analysis](./01-foundations-of-algorithms/05-complexity-analysis.mdx).
+**Best case.** The input of a given size for which an algorithm does the least work. See [Complexity Analysis](./01-principles-of-algorithmics/05-complexity-analysis.mdx).
 
-**Big O.** $f(n) \in O(g(n))$ means that, from some size on, $f$ grows no faster than a constant multiple of $g$: an upper bound. See [Asymptotic Notation](./01-foundations-of-algorithms/06-asymptotic-notation.mdx).
+**Big O.** $f(n) \in O(g(n))$ means that, from some size on, $f$ grows no faster than a constant multiple of $g$: an upper bound. See [Asymptotic Notation](./01-principles-of-algorithmics/06-asymptotic-notation.mdx).
 
-**Binary search.** Search in a sorted array that compares with the middle element and discards half of the array at each step, in $O(\log n)$. See [Searching Case Studies](./01-foundations-of-algorithms/09-searching-case-studies.mdx).
+**Binary search.** Search in a sorted array that compares with the middle element and discards half of the array at each step, in $O(\log n)$. See [Searching Case Studies](./01-principles-of-algorithmics/09-searching-case-studies.mdx).
 
-**Bound.** In branch and bound, an optimistic estimate of the best solution reachable from a node, used to prune nodes that cannot beat the best solution known. See [Branch and Bound](./04-state-space-search-and-optimization/03-branch-and-bound.mdx).
+**Bound.** In branch and bound, an optimistic estimate of the best solution reachable from a node, used to prune nodes that cannot beat the best solution known. See [Branch and Bound](./08-branch-and-bound/01-branch-and-bound-scheme.mdx).
 
-**Branch and bound.** A search over an implicit tree that keeps the live nodes in a (usually priority) queue, expands the most promising one, and prunes with bounds. See [Branch and Bound](./04-state-space-search-and-optimization/03-branch-and-bound.mdx).
+**Branch and bound.** A search over an implicit tree that keeps the live nodes in a (usually priority) queue, expands the most promising one, and prunes with bounds. See [Branch and Bound](./08-branch-and-bound/01-branch-and-bound-scheme.mdx).
 
-**Branching factor.** The number of children of a node in a tree of states (also called its degree). See [Backtracking](./04-state-space-search-and-optimization/01-backtracking.mdx).
+**Branching factor.** The number of children of a node in a tree of states (also called its degree). See [Backtracking](./07-backtracking/01-backtracking-scheme.mdx).
 
-**Brute force.** Solving a problem in the most direct way, following its statement, without exploiting its structure. See [Brute Force and Exhaustive Search](./03-algorithm-design-paradigms/01-brute-force.mdx).
+**Brute force.** Solving a problem in the most direct way, following its statement, without exploiting its structure. See [Brute Force and Exhaustive Search](./03-brute-force/01-brute-force-and-exhaustive-search.mdx).
 
-**Combinatorial explosion.** The very fast (exponential or factorial) growth of the number of candidate solutions as the input grows. See [Backtracking](./04-state-space-search-and-optimization/01-backtracking.mdx).
+**Combinatorial explosion.** The very fast (exponential or factorial) growth of the number of candidate solutions as the input grows. See [Backtracking](./07-backtracking/01-backtracking-scheme.mdx).
 
-**Complexity (time and space).** The amount of time, or memory, an algorithm needs as a function of the size of its input. See [Complexity Analysis](./01-foundations-of-algorithms/05-complexity-analysis.mdx).
+**Complexity (time and space).** The amount of time, or memory, an algorithm needs as a function of the size of its input. See [Complexity Analysis](./01-principles-of-algorithmics/05-complexity-analysis.mdx).
 
-**Concurrency.** Several tasks making progress in overlapping periods of time, not necessarily at the same instant. See [Concurrency and Parallelism](./05-advanced-execution-models/01-parallel-algorithms.mdx).
+**Concurrency.** Several tasks making progress in overlapping periods of time, not necessarily at the same instant. See [Concurrency and Parallelism](./09-parallel-algorithms/01-parallel-algorithms.mdx).
 
-**Divide and conquer.** Solving a problem by splitting it into smaller subproblems of the same kind, solving them (usually recursively) and combining their solutions. See [Divide and Conquer](./03-algorithm-design-paradigms/02-divide-and-conquer.mdx).
+**Divide and conquer.** Solving a problem by splitting it into smaller subproblems of the same kind, solving them (usually recursively) and combining their solutions. See [Divide and Conquer](./04-divide-and-conquer/01-divide-and-conquer-scheme.mdx).
 
-**Division (recurrence by).** A recursive scheme in which each call works on a fraction $n / b$ of the input; its cost is $O(n^k)$, $O(n^k \log n)$ or $O(n^{\log_b a})$ depending on $a$, $b$ and $k$. See [Analyzing Divide and Conquer](./03-algorithm-design-paradigms/03-divide-and-conquer-analysis.mdx).
+**Division (recurrence by).** A recursive scheme in which each call works on a fraction $n / b$ of the input; its cost is $O(n^k)$, $O(n^k \log n)$ or $O(n^{\log_b a})$ depending on $a$, $b$ and $k$. See [Analyzing Divide and Conquer](./04-divide-and-conquer/02-analysis.mdx).
 
-**Dynamic programming.** Solving a problem by solving each distinct subproblem only once and storing its result in a table, when subproblems overlap and the principle of optimality holds. See [Dynamic Programming](./03-algorithm-design-paradigms/09-dynamic-programming.mdx).
+**Dynamic programming.** Solving a problem by solving each distinct subproblem only once and storing its result in a table, when subproblems overlap and the principle of optimality holds. See [Dynamic Programming](./06-dynamic-programming/01-dynamic-programming-method.mdx).
 
-**Efficiency.** In parallel computing, the speedup divided by the number of processors: how well the processors are used. See [Performance of Parallel Algorithms](./05-advanced-execution-models/03-parallel-performance.mdx).
+**Efficiency.** In parallel computing, the speedup divided by the number of processors: how well the processors are used. See [Performance of Parallel Algorithms](./09-parallel-algorithms/03-parallel-performance.mdx).
 
-**Exhaustive search.** Generating every candidate in the space of possible solutions and testing each one. See [Brute Force and Exhaustive Search](./03-algorithm-design-paradigms/01-brute-force.mdx).
+**Exhaustive search.** Generating every candidate in the space of possible solutions and testing each one. See [Brute Force and Exhaustive Search](./03-brute-force/01-brute-force-and-exhaustive-search.mdx).
 
-**Fork/Join.** The Java framework for parallel divide and conquer: a task splits (forks) into subtasks, which run in parallel, and waits for (joins) their results. See [The Fork/Join Framework](./05-advanced-execution-models/02-fork-join-framework.mdx).
+**Fork/Join.** The Java framework for parallel divide and conquer: a task splits (forks) into subtasks, which run in parallel, and waits for (joins) their results. See [The Fork/Join Framework](./09-parallel-algorithms/02-fork-join-framework.mdx).
 
-**Geometric series.** A sum $1 + r + r^2 + \dots + r^k$; it is dominated by its last term if $r \gt 1$ and by its first if $r \lt 1$, the key to analyzing divide and conquer. See [Sums, Logarithms and Factorials](./06-mathematical-background/01-sums-and-logarithms.mdx).
+**Geometric series.** A sum $1 + r + r^2 + \dots + r^k$; it is dominated by its last term if $r \gt 1$ and by its first if $r \lt 1$, the key to analyzing divide and conquer. See [Sums, Logarithms and Factorials](./10-mathematical-background/01-sums-and-logarithms.mdx).
 
-**Greedy algorithm.** An algorithm that builds a solution step by step, always taking the choice that looks best at the moment and never reconsidering it. See [Greedy Algorithms](./03-algorithm-design-paradigms/07-greedy-algorithms.mdx).
+**Greedy algorithm.** An algorithm that builds a solution step by step, always taking the choice that looks best at the moment and never reconsidering it. See [Greedy Algorithms](./05-greedy-algorithms/01-greedy-method.mdx).
 
-**Harmonic number.** $H_n = 1 + 1/2 + \dots + 1/n \approx \ln n + 0.577$. It appears in the average case of randomized algorithms such as Quicksort. See [Sums, Logarithms and Factorials](./06-mathematical-background/01-sums-and-logarithms.mdx).
+**Harmonic number.** $H_n = 1 + 1/2 + \dots + 1/n \approx \ln n + 0.577$. It appears in the average case of randomized algorithms such as Quicksort. See [Sums, Logarithms and Factorials](./10-mathematical-background/01-sums-and-logarithms.mdx).
 
-**Heuristic.** A rule of thumb that usually leads to good decisions but does not guarantee them. In search, an estimate of how promising a state is. See [Greedy Algorithms](./03-algorithm-design-paradigms/07-greedy-algorithms.mdx) and [Branch and Bound](./04-state-space-search-and-optimization/03-branch-and-bound.mdx).
+**Heuristic.** A rule of thumb that usually leads to good decisions but does not guarantee them. In search, an estimate of how promising a state is. See [Greedy Algorithms](./05-greedy-algorithms/01-greedy-method.mdx) and [Branch and Bound](./08-branch-and-bound/01-branch-and-bound-scheme.mdx).
 
-**Implicit graph.** A graph of states that is never stored: its nodes are generated only when the search reaches them. See [Backtracking](./04-state-space-search-and-optimization/01-backtracking.mdx).
+**Implicit graph.** A graph of states that is never stored: its nodes are generated only when the search reaches them. See [Backtracking](./07-backtracking/01-backtracking-scheme.mdx).
 
-**Induction.** A proof technique: prove a property for a base case, and prove that if it holds for smaller values it holds for the next one. It is how recursive algorithms are proved correct. See [Induction, Correctness and Recurrences](./06-mathematical-background/02-induction-and-recurrences.mdx).
+**Induction.** A proof technique: prove a property for a base case, and prove that if it holds for smaller values it holds for the next one. It is how recursive algorithms are proved correct. See [Induction, Correctness and Recurrences](./10-mathematical-background/02-induction-and-recurrences.mdx).
 
-**In-place algorithm.** An algorithm that needs only a constant (or very small) amount of memory besides its input. See [The Sorting Problem](./02-fundamental-problem-domains/01-the-sorting-problem.mdx).
+**In-place algorithm.** An algorithm that needs only a constant (or very small) amount of memory besides its input. See [The Sorting Problem](./02-sorting/01-the-sorting-problem.mdx).
 
-**Live node.** In branch and bound, a node that has been generated but not yet expanded. See [Branch and Bound](./04-state-space-search-and-optimization/03-branch-and-bound.mdx).
+**Live node.** In branch and bound, a node that has been generated but not yet expanded. See [Branch and Bound](./08-branch-and-bound/01-branch-and-bound-scheme.mdx).
 
-**Loop invariant.** A property that holds before a loop and after every iteration, used to prove the loop correct. See [Induction, Correctness and Recurrences](./06-mathematical-background/02-induction-and-recurrences.mdx).
+**Loop invariant.** A property that holds before a loop and after every iteration, used to prove the loop correct. See [Induction, Correctness and Recurrences](./10-mathematical-background/02-induction-and-recurrences.mdx).
 
-**Memoization.** The top-down form of dynamic programming: a recursive algorithm that stores each result the first time it is computed and reuses it afterwards. See [Dynamic Programming](./03-algorithm-design-paradigms/09-dynamic-programming.mdx).
+**Memoization.** The top-down form of dynamic programming: a recursive algorithm that stores each result the first time it is computed and reuses it afterwards. See [Dynamic Programming](./06-dynamic-programming/01-dynamic-programming-method.mdx).
 
-**Omega and Theta.** $\Omega(g(n))$ is a lower bound on growth; $\Theta(g(n))$ means both $O(g(n))$ and $\Omega(g(n))$, an exact order of growth. See [Asymptotic Notation](./01-foundations-of-algorithms/06-asymptotic-notation.mdx).
+**Omega and Theta.** $\Omega(g(n))$ is a lower bound on growth; $\Theta(g(n))$ means both $O(g(n))$ and $\Omega(g(n))$, an exact order of growth. See [Asymptotic Notation](./01-principles-of-algorithmics/06-asymptotic-notation.mdx).
 
-**Parallelism.** Several computations executing at the same instant on different processors or cores. See [Concurrency and Parallelism](./05-advanced-execution-models/01-parallel-algorithms.mdx).
+**Parallelism.** Several computations executing at the same instant on different processors or cores. See [Concurrency and Parallelism](./09-parallel-algorithms/01-parallel-algorithms.mdx).
 
-**Partition.** In Quicksort, rearranging an array so that the elements smaller than a pivot come before it and the larger ones after it. See [Quicksort](./02-fundamental-problem-domains/05-quicksort.mdx).
+**Partition.** In Quicksort, rearranging an array so that the elements smaller than a pivot come before it and the larger ones after it. See [Quicksort](./02-sorting/05-quicksort.mdx).
 
-**Pivot.** The element around which Quicksort partitions the array. See [Quicksort](./02-fundamental-problem-domains/05-quicksort.mdx).
+**Pivot.** The element around which Quicksort partitions the array. See [Quicksort](./02-sorting/05-quicksort.mdx).
 
-**Principle of optimality.** The property that an optimal solution is made of optimal solutions to its subproblems; it is required to apply dynamic programming to an optimization problem. See [Dynamic Programming](./03-algorithm-design-paradigms/09-dynamic-programming.mdx).
+**Principle of optimality.** The property that an optimal solution is made of optimal solutions to its subproblems; it is required to apply dynamic programming to an optimization problem. See [Dynamic Programming](./06-dynamic-programming/01-dynamic-programming-method.mdx).
 
-**Pruning.** Discarding a branch of a search tree without exploring it, because it is proven not to contain a valid or better solution. See [Backtracking](./04-state-space-search-and-optimization/01-backtracking.mdx).
+**Pruning.** Discarding a branch of a search tree without exploring it, because it is proven not to contain a valid or better solution. See [Backtracking](./07-backtracking/01-backtracking-scheme.mdx).
 
-**Pseudo-polynomial time.** A running time that is polynomial in the numeric value of the input (such as the capacity $W$ in the 0/1 knapsack, $O(nW)$) but exponential in the number of bits needed to write it. See [Dynamic Programming: Classic Problems](./03-algorithm-design-paradigms/10-dynamic-programming-examples.mdx).
+**Pseudo-polynomial time.** A running time that is polynomial in the numeric value of the input (such as the capacity $W$ in the 0/1 knapsack, $O(nW)$) but exponential in the number of bits needed to write it. See [Dynamic Programming: Classic Problems](./06-dynamic-programming/02-classic-problems.mdx).
 
-**Recurrence.** An equation that defines the cost of a recursive algorithm in terms of its cost on smaller inputs. See [Analyzing Divide and Conquer](./03-algorithm-design-paradigms/03-divide-and-conquer-analysis.mdx).
+**Recurrence.** An equation that defines the cost of a recursive algorithm in terms of its cost on smaller inputs. See [Analyzing Divide and Conquer](./04-divide-and-conquer/02-analysis.mdx).
 
-**Sentinel.** A special value placed at the end of an array so that a loop does not need to check the bounds. See [Searching Case Studies](./01-foundations-of-algorithms/09-searching-case-studies.mdx).
+**Sentinel.** A special value placed at the end of an array so that a loop does not need to check the bounds. See [Searching Case Studies](./01-principles-of-algorithmics/09-searching-case-studies.mdx).
 
-**Sequential threshold.** In parallel divide and conquer, the problem size below which a task is solved sequentially instead of being split further. See [The Fork/Join Framework](./05-advanced-execution-models/02-fork-join-framework.mdx).
+**Sequential threshold.** In parallel divide and conquer, the problem size below which a task is solved sequentially instead of being split further. See [The Fork/Join Framework](./09-parallel-algorithms/02-fork-join-framework.mdx).
 
-**Speedup.** The time of the sequential version divided by the time of the parallel version. See [Performance of Parallel Algorithms](./05-advanced-execution-models/03-parallel-performance.mdx).
+**Speedup.** The time of the sequential version divided by the time of the parallel version. See [Performance of Parallel Algorithms](./09-parallel-algorithms/03-parallel-performance.mdx).
 
-**Stable sorting algorithm.** A sorting algorithm that keeps the relative order of elements with equal keys. See [The Sorting Problem](./02-fundamental-problem-domains/01-the-sorting-problem.mdx).
+**Stable sorting algorithm.** A sorting algorithm that keeps the relative order of elements with equal keys. See [The Sorting Problem](./02-sorting/01-the-sorting-problem.mdx).
 
-**Stirling's formula.** The approximation $n! \approx \sqrt{2\pi n}(n/e)^n$, which shows that $n!$ grows faster than any exponential and that $\log (n!) \in \Theta(n \log n)$. See [Sums, Logarithms and Factorials](./06-mathematical-background/01-sums-and-logarithms.mdx).
+**Stirling's formula.** The approximation $n! \approx \sqrt{2\pi n}(n/e)^n$, which shows that $n!$ grows faster than any exponential and that $\log (n!) \in \Theta(n \log n)$. See [Sums, Logarithms and Factorials](./10-mathematical-background/01-sums-and-logarithms.mdx).
 
-**Stress testing.** Comparing a fast algorithm with a simple, trusted one (often brute force) on many random small inputs to find bugs. See [Brute Force and Exhaustive Search](./03-algorithm-design-paradigms/01-brute-force.mdx).
+**Stress testing.** Comparing a fast algorithm with a simple, trusted one (often brute force) on many random small inputs to find bugs. See [Brute Force and Exhaustive Search](./03-brute-force/01-brute-force-and-exhaustive-search.mdx).
 
-**Subtraction (recurrence by).** A recursive scheme in which each call works on an input of size $n - b$; with one call the cost is polynomial, with several calls it is exponential. See [Analyzing Divide and Conquer](./03-algorithm-design-paradigms/03-divide-and-conquer-analysis.mdx).
+**Subtraction (recurrence by).** A recursive scheme in which each call works on an input of size $n - b$; with one call the cost is polynomial, with several calls it is exponential. See [Analyzing Divide and Conquer](./04-divide-and-conquer/02-analysis.mdx).
 
-**Tree of states.** The conceptual tree explored by backtracking and branch and bound: the root is the initial state, each level is a decision, and the leaves are solutions or dead ends. See [Backtracking](./04-state-space-search-and-optimization/01-backtracking.mdx).
+**Tree of states.** The conceptual tree explored by backtracking and branch and bound: the root is the initial state, each level is a decision, and the leaves are solutions or dead ends. See [Backtracking](./07-backtracking/01-backtracking-scheme.mdx).
 
-**Worst case.** The input of a given size for which an algorithm does the most work. See [Complexity Analysis](./01-foundations-of-algorithms/05-complexity-analysis.mdx).
+**Worst case.** The input of a given size for which an algorithm does the most work. See [Complexity Analysis](./01-principles-of-algorithmics/05-complexity-analysis.mdx).

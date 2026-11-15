@@ -1,7 +1,0 @@
-{
-  "label": "2. Fundamental Problem Domains",
-  "link": {
-    "type": "generated-index",
-    "description": "Sorting, one of the most studied problems in computing: the criteria to compare sorting algorithms, the simple algorithms (bubble, insertion, selection), Quicksort, the efficient alternatives (Shellsort, Heapsort, Mergesort, Radix sort), the theoretical limit of comparison-based sorting, and how to choose an algorithm in practice."
-  }
-}

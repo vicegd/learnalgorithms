@@ -5,7 +5,7 @@ import styles from './styles.module.css';
 /**
  * A highlighted link from the explanation of an algorithm to its proof.
  *
- *   <ProofLink to="/concepts/fundamental-problem-domains/proofs#insertion-sort-is-correct"
+ *   <ProofLink to="/concepts/sorting/proofs#insertion-sort-is-correct"
  *              title="Insertion sort is correct" />
  */
 export default function ProofLink({ to, title, children }) {

@@ -15,87 +15,104 @@ The code of the examples, with tests and time measurements, is in the course rep
 - Every claim about running times has been **measured**, and every example has been **executed**. Where a lesson gives a number of operations or a time, it is a real measurement, not an estimate.
 - Most lessons end with **self-check questions** (open them to see the answer), a list of **key ideas**, and **practice** suggestions. Exercises from the seminars and lab sessions are not solved on this site.
 - Chapters end with an **exercises** page whose solutions are grouped at the end.
-- Chapters 1 to 5 have a **proofs** page with the correctness and cost proofs of their algorithms; each algorithm links to its proof, so the lessons stay light.
+- Most chapters have a **proofs** page with the correctness and cost proofs of their algorithms; each algorithm links to its proof, so the lessons stay light.
 - Each chapter closes with a **references** page: the course readings, textbooks (with the chapters that match), the original articles where each algorithm was published, and online resources.
-- Mathematical notation is kept to what is needed: sums, logarithms and the asymptotic notation introduced in chapter 1.
+- Mathematical notation is kept to what is needed: sums, logarithms and the asymptotic notation introduced in chapter 1. The mathematics behind it is explained in [Appendix A](./10-mathematical-background/01-sums-and-logarithms.mdx).
+- The course is organized in **parts**: foundations, problem domains, design techniques and execution models. Every chapter follows the same structure (lessons, exercises, proofs and references), so new chapters can be added to any part.
 
-## Contents
+## Part I. Foundations
 
-### 1. Foundations of Algorithms
+### 1. Principles of Algorithmics
 
 What an algorithm is, and the tools to measure and analyze its cost.
 
-1. [Algorithmic Thinking](./01-foundations-of-algorithms/01-algorithmic-thinking.mdx): what an algorithm is, where the word comes from, and why we study algorithm design.
-2. [Case Study: Pairwise Product](./01-foundations-of-algorithms/02-case-study-pairwise.mdx): one problem solved in several ways, from quadratic to linear.
-3. [Data Structures](./01-foundations-of-algorithms/03-data-structures.mdx): arrays, the Java collections, graphs and trees.
-4. [Measuring Efficiency](./01-foundations-of-algorithms/04-measuring-efficiency.mdx): how to take reliable time measurements, and their limits.
-5. [Complexity Analysis](./01-foundations-of-algorithms/05-complexity-analysis.mdx): counting operations; best, worst and average case.
-6. [Asymptotic Notation](./01-foundations-of-algorithms/06-asymptotic-notation.mdx): big O, Omega and Theta.
-7. [Growth Rates and Predictions](./01-foundations-of-algorithms/07-growth-rates.mdx): complexity classes and predicting times.
-8. [Complexity of Loops](./01-foundations-of-algorithms/08-complexity-of-loops.mdx): analyzing iterative code.
-9. [Searching Case Studies](./01-foundations-of-algorithms/09-searching-case-studies.mdx): sequential search, the sentinel, and binary search.
-10. [Exercises: Foundations](./01-foundations-of-algorithms/10-exercises.mdx): 16 exercises on the whole chapter, with solutions.
+1. [Algorithmic Thinking](./01-principles-of-algorithmics/01-algorithmic-thinking.mdx): what an algorithm is, where the word comes from, and why we study algorithm design.
+2. [Case Study: Maximum Pairwise Product](./01-principles-of-algorithmics/02-case-study-pairwise.mdx): one problem solved in several ways, from quadratic to linear.
+3. [Data Structures](./01-principles-of-algorithmics/03-data-structures.mdx): arrays, the Java collections, graphs and trees.
+4. [Measuring Efficiency](./01-principles-of-algorithmics/04-measuring-efficiency.mdx): how to take reliable time measurements, and their limits.
+5. [Complexity Analysis](./01-principles-of-algorithmics/05-complexity-analysis.mdx): counting operations; best, worst and average case.
+6. [Asymptotic Notation](./01-principles-of-algorithmics/06-asymptotic-notation.mdx): big O, Omega and Theta.
+7. [Growth Rates and Predictions](./01-principles-of-algorithmics/07-growth-rates.mdx): complexity classes and predicting times.
+8. [Complexity of Loops](./01-principles-of-algorithmics/08-complexity-of-loops.mdx): analyzing iterative code.
+9. [Case Studies: Searching](./01-principles-of-algorithmics/09-searching-case-studies.mdx): sequential search, the sentinel, and binary search.
+10. [Exercises](./01-principles-of-algorithmics/10-exercises.mdx): 16 exercises, with solutions.
 
-### 2. Fundamental Problem Domains
+## Part II. Problem Domains
 
-Sorting, one of the most studied problems in computing.
+### 2. Sorting
 
-1. [The Sorting Problem](./02-fundamental-problem-domains/01-the-sorting-problem.mdx)
-2. [Bubble Sort](./02-fundamental-problem-domains/02-bubble-sort.mdx)
-3. [Insertion Sort](./02-fundamental-problem-domains/03-insertion-sort.mdx)
-4. [Selection Sort](./02-fundamental-problem-domains/04-selection-sort.mdx)
-5. [Quicksort](./02-fundamental-problem-domains/05-quicksort.mdx)
-6. [Beyond Quadratic Sorting](./02-fundamental-problem-domains/06-efficient-sorting.mdx): Shellsort, Heapsort, Mergesort, Radix sort and the $n \log n$ limit.
-7. [Comparing Sorting Algorithms](./02-fundamental-problem-domains/07-comparing-sorting-algorithms.mdx): choosing an algorithm in practice.
-8. [Exercises: Sorting](./02-fundamental-problem-domains/08-exercises.mdx): 16 exercises on the whole chapter, with solutions.
+One of the most studied problems in computing.
 
-### 3. Algorithm Design Paradigms
+1. [The Sorting Problem](./02-sorting/01-the-sorting-problem.mdx)
+2. [Bubble Sort](./02-sorting/02-bubble-sort.mdx)
+3. [Insertion Sort](./02-sorting/03-insertion-sort.mdx)
+4. [Selection Sort](./02-sorting/04-selection-sort.mdx)
+5. [Quicksort](./02-sorting/05-quicksort.mdx)
+6. [Beyond Quadratic Sorting](./02-sorting/06-efficient-sorting.mdx): Shellsort, Heapsort, Mergesort, Radix sort and the $n \log n$ limit.
+7. [Comparing Sorting Algorithms](./02-sorting/07-comparing-sorting-algorithms.mdx): choosing an algorithm in practice.
+8. [Exercises](./02-sorting/08-exercises.mdx): 16 exercises, with solutions.
 
-General strategies for designing algorithms.
+## Part III. Design Techniques
 
-1. [Brute Force and Exhaustive Search](./03-algorithm-design-paradigms/01-brute-force.mdx)
-2. [Divide and Conquer](./03-algorithm-design-paradigms/02-divide-and-conquer.mdx)
-3. [Analyzing Divide and Conquer](./03-algorithm-design-paradigms/03-divide-and-conquer-analysis.mdx): recurrences by subtraction and by division.
-4. [Divide and Conquer: Numbers and Searches](./03-algorithm-design-paradigms/04-divide-and-conquer-examples-1.mdx)
-5. [Divide and Conquer: Classic Problems](./03-algorithm-design-paradigms/05-divide-and-conquer-examples-2.mdx)
-6. [Divide and Conquer: Majority, Mode and Median](./03-algorithm-design-paradigms/06-divide-and-conquer-statistics.mdx)
-    - [Exercises: Brute Force and Divide and Conquer](./03-algorithm-design-paradigms/exercises-divide-and-conquer.mdx)
-7. [Greedy Algorithms](./03-algorithm-design-paradigms/07-greedy-algorithms.mdx)
-8. [Greedy Algorithms: Classic Problems](./03-algorithm-design-paradigms/08-greedy-examples.mdx)
-    - [Exercises: Greedy Algorithms](./03-algorithm-design-paradigms/exercises-greedy.mdx)
-9. [Dynamic Programming](./03-algorithm-design-paradigms/09-dynamic-programming.mdx)
-10. [Dynamic Programming: Classic Problems](./03-algorithm-design-paradigms/10-dynamic-programming-examples.mdx)
-    - [Exercises: Dynamic Programming](./03-algorithm-design-paradigms/exercises-dynamic-programming.mdx)
+### 3. Brute Force
 
-### 4. State Space Search and Optimization
+1. [Brute Force and Exhaustive Search](./03-brute-force/01-brute-force-and-exhaustive-search.mdx): the most direct way to solve a problem, and the reference for every other technique.
+2. [Exercises](./03-brute-force/02-exercises.mdx): 5 exercises, with solutions.
 
-Exact search over huge spaces of candidate solutions.
+### 4. Divide and Conquer
 
-1. [Backtracking](./04-state-space-search-and-optimization/01-backtracking.mdx)
-2. [Backtracking: Classic Problems](./04-state-space-search-and-optimization/02-backtracking-examples.mdx)
-3. [Branch and Bound](./04-state-space-search-and-optimization/03-branch-and-bound.mdx)
-4. [Branch and Bound: Classic Problems](./04-state-space-search-and-optimization/04-branch-and-bound-examples.mdx)
-5. [Exercises: Backtracking and Branch and Bound](./04-state-space-search-and-optimization/05-exercises.mdx)
+1. [The Divide and Conquer Scheme](./04-divide-and-conquer/01-divide-and-conquer-scheme.mdx)
+2. [Analyzing Divide and Conquer](./04-divide-and-conquer/02-analysis.mdx): recurrences by subtraction and by division.
+3. [Numbers and Searches](./04-divide-and-conquer/03-numbers-and-searches.mdx): factorial, searches, Fibonacci and the greatest common divisor.
+4. [Classic Problems](./04-divide-and-conquer/04-classic-problems.mdx): Mergesort, Quicksort, the towers of Hanoi, large integers, tournaments and trominoes.
+5. [Majority, Mode and Median](./04-divide-and-conquer/05-majority-mode-and-median.mdx)
+6. [Exercises](./04-divide-and-conquer/06-exercises.mdx): 8 exercises, with solutions.
 
-### 5. Advanced Execution Models
+### 5. Greedy Algorithms
 
-Using several processors at once.
+1. [The Greedy Method](./05-greedy-algorithms/01-greedy-method.mdx)
+2. [Classic Problems](./05-greedy-algorithms/02-classic-problems.mdx): files on a disk, the knapsack, the plumber, the knight's tour, assignment, coloring, and the minimum spanning trees of Prim and Kruskal.
+3. [Exercises](./05-greedy-algorithms/03-exercises.mdx): 9 exercises, with solutions.
 
-1. [Concurrency and Parallelism](./05-advanced-execution-models/01-parallel-algorithms.mdx)
-2. [The Fork/Join Framework](./05-advanced-execution-models/02-fork-join-framework.mdx)
-3. [Performance of Parallel Algorithms](./05-advanced-execution-models/03-parallel-performance.mdx): speedup, efficiency and Amdahl's law.
-4. [Exercises: Parallel Algorithms](./05-advanced-execution-models/04-exercises.mdx)
+### 6. Dynamic Programming
 
-### 6. Mathematical Background
+1. [The Dynamic Programming Method](./06-dynamic-programming/01-dynamic-programming-method.mdx)
+2. [Classic Problems](./06-dynamic-programming/02-classic-problems.mdx): binomial coefficients, knapsack, change, the river, LCS and edit distance.
+3. [Exercises](./06-dynamic-programming/03-exercises.mdx): 10 exercises, with solutions.
 
-A reference for the mathematics used in the other chapters, with the reasons behind each fact.
+### 7. Backtracking
 
-1. [Sums, Logarithms and Factorials](./06-mathematical-background/01-sums-and-logarithms.mdx): arithmetic, geometric and harmonic series, logarithm rules, Stirling's formula.
-2. [Induction, Correctness and Recurrences](./06-mathematical-background/02-induction-and-recurrences.mdx): induction, loop invariants, and four ways to solve recurrences.
-3. [Exercises: Mathematical Background](./06-mathematical-background/03-exercises.mdx)
+1. [The Backtracking Scheme](./07-backtracking/01-backtracking-scheme.mdx)
+2. [Classic Problems](./07-backtracking/02-classic-problems.mdx): permutations, subset sum, N-queens, the knight's tour, coloring, assignment, magic squares and Sudoku.
+3. [Exercises](./07-backtracking/03-exercises.mdx): 5 exercises, with solutions.
+
+### 8. Branch and Bound
+
+1. [The Branch and Bound Scheme](./08-branch-and-bound/01-branch-and-bound-scheme.mdx)
+2. [Classic Problems](./08-branch-and-bound/02-classic-problems.mdx): assignment, knapsack, sliding puzzles, rectangle placement, N-queens and the traveling salesman.
+3. [Exercises](./08-branch-and-bound/03-exercises.mdx): 6 exercises, with solutions.
+
+## Part IV. Execution Models
+
+### 9. Parallel Algorithms
+
+1. [Concurrency and Parallelism](./09-parallel-algorithms/01-parallel-algorithms.mdx)
+2. [The Fork/Join Framework](./09-parallel-algorithms/02-fork-join-framework.mdx)
+3. [Performance of Parallel Algorithms](./09-parallel-algorithms/03-parallel-performance.mdx): speedup, efficiency and Amdahl's law.
+4. [Exercises](./09-parallel-algorithms/04-exercises.mdx): 9 exercises, with solutions.
+
+## Appendices
+
+### A. Mathematical Background
+
+A reference for the mathematics used in the chapters, with the reasons behind each fact.
+
+1. [Sums, Logarithms and Factorials](./10-mathematical-background/01-sums-and-logarithms.mdx): arithmetic, geometric and harmonic series, logarithm rules, Stirling's formula.
+2. [Induction, Correctness and Recurrences](./10-mathematical-background/02-induction-and-recurrences.mdx): induction, loop invariants, and four ways to solve recurrences.
+3. [Exercises](./10-mathematical-background/03-exercises.mdx): 12 exercises, with solutions.
 
 The [Glossary](./glossary.mdx) collects the main terms of the course, each with a short definition and a link to the lesson where it is explained.
 
 ## Suggested order
 
-Chapters 1 and 2 are the base for everything else: read them first and in order. In chapter 3, divide and conquer, greedy algorithms and dynamic programming can be read in that order (each one compares itself with the previous ones). Chapter 4 builds on brute force and dynamic programming. Chapter 5 (parallelism) only needs divide and conquer, so it can be read right after the first lessons of chapter 3. Chapter 6 is a reference: consult it whenever a lesson relies on a sum, a logarithm or a recurrence, or read it alongside chapter 1.
+Chapters 1 and 2 are the base for everything else: read them first and in order. The design techniques of Part III can then be read in order, since each one compares itself with the previous ones: brute force is the reference, and backtracking and branch and bound refine it. Parallel algorithms (chapter 9) only need divide and conquer, so they can be read right after chapter 4. Appendix A is a reference: consult it whenever a lesson relies on a sum, a logarithm or a recurrence, or read it alongside chapter 1.
