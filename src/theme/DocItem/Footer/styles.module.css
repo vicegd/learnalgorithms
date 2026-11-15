@@ -1,0 +1,15 @@
+.feedback {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1.25rem;
+  margin-top: 2.5rem;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid var(--ifm-color-emphasis-300);
+  font-size: 0.9rem;
+}
+
+.label {
+  color: var(--ifm-color-emphasis-700);
+  font-weight: 600;
+}

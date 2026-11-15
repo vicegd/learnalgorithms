@@ -1,0 +1,38 @@
+name: 🐞 Report an error
+description: Something on the site is wrong (a typo, an explanation, a formula, code, a diagram, a link…).
+title: "[Error] "
+labels: ["bug"]
+body:
+  - type: input
+    id: page
+    attributes:
+      label: Page
+      description: The page where you found the error (filled in automatically if you came from the site).
+      placeholder: https://learnalgorithms.dev/concepts/...
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What kind of error is it?
+      options:
+        - Typo or wording
+        - Incorrect content (explanation, formula, complexity…)
+        - Code error
+        - Diagram or figure
+        - Broken link or display problem
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: where
+    attributes:
+      label: Where exactly?
+      description: Section name, figure caption, line of code…
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What is wrong and, if you know it, what it should be.
+    validations:
+      required: true
