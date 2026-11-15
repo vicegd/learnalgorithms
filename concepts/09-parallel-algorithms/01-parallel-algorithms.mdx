@@ -4,6 +4,9 @@ sidebar_position: 1
 tags: [Parallelism, Concurrency, Threads, Multi-core]
 ---
 
+import FigConcurrencyVsParallelism from './img/concurrency-vs-parallelism.svg';
+import FigProcessesThreadsTasks from './img/processes-threads-tasks.svg';
+
 # Concurrency and Parallelism
 
 Until now, every algorithm in this course has been **sequential**: one instruction after another, on a single processor. But the computers we use, from phones to servers, have several processor **cores**, and a sequential program uses only one of them. **Parallel algorithms** divide the work so that several cores can do it at the same time.
@@ -55,6 +58,10 @@ Concurrent tasks do **not** necessarily run at the same physical instant. With a
 | Main goal | Structure and responsiveness (do not block while waiting) | Speed (finish the work sooner) |
 | Example | A text editor that checks spelling while you type | Sorting a huge array using all the cores |
 
+<Figure caption="Two tasks, A and B. With one core they are concurrent: the operating system alternates them, and they finish at the end. With two cores they are also parallel: each one runs on its own core, and both finish in half the time.">
+  <FigConcurrencyVsParallelism />
+</Figure>
+
 Parallelism can greatly speed up many operations, such as sorting, searching or transforming data. It is especially well suited to any task that can be broken down into **smaller, independent components**, which is exactly what **divide and conquer** does.
 
 :::tip Concurrency is not parallelism
@@ -71,16 +78,9 @@ Concurrency is built on three nested mechanisms:
 - A **thread** belongs to exactly one process and is a sequence of instructions that is executed independently of the others. The threads of a process **share its resources**, in particular its memory, which makes communication between them easy (and dangerous).
 - A **task** is a small unit of work: a component of the solution that some thread has to execute.
 
-```
-System
- ├── Process
- │    ├── Thread ── Task, Task, ...
- │    └── Thread ── Task, ...
- ├── Process
- │    ├── Thread ── Task, ...
- │    └── ...
- └── ...
-```
+<Figure caption="Processes have separate memory; the threads of a process share its memory, and each thread executes tasks.">
+  <FigProcessesThreadsTasks />
+</Figure>
 
 The **operating system** decides which threads run on which processors, and when: concurrently (alternating on the same core) or in parallel (on different cores).
 

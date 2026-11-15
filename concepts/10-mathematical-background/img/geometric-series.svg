@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 640 150" width="640" height="150" role="img">
+  <title>The geometric series 1 + 1/2 + 1/4 + ... never reaches 2: each term fills half of the remaining gap</title>
+  <rect class="box-blue" x="30.0" y="40.0" width="280.0" height="40.0" rx="0"/>
+  <text class="t-xs t-b" x="170.0" y="60.0" text-anchor="middle" dominant-baseline="central">1</text>
+  <rect class="box-hl" x="310.0" y="40.0" width="140.0" height="40.0" rx="0"/>
+  <text class="t-xs t-b" x="380.0" y="60.0" text-anchor="middle" dominant-baseline="central">1/2</text>
+  <rect class="box-ac" x="450.0" y="40.0" width="70.0" height="40.0" rx="0"/>
+  <text class="t-xs t-b" x="485.0" y="60.0" text-anchor="middle" dominant-baseline="central">1/4</text>
+  <rect class="box-pur" x="520.0" y="40.0" width="35.0" height="40.0" rx="0"/>
+  <text class="t-xs t-b" x="537.5" y="60.0" text-anchor="middle" dominant-baseline="central">1/8</text>
+  <rect class="box-blue" x="555.0" y="40.0" width="17.5" height="40.0" rx="0"/>
+  <text class="t-xs t-b" x="563.8" y="60.0" text-anchor="middle" dominant-baseline="central">1/16</text>
+  <rect class="box-hl" x="572.5" y="40.0" width="8.8" height="40.0" rx="0"/>
+  <rect class="box-ac" x="581.2" y="40.0" width="4.4" height="40.0" rx="0"/>
+  <rect class="ln" x="30.0" y="40.0" width="560.0" height="40.0" rx="0"/>
+  <line class="ln-bad" x1="590.0" y1="30.0" x2="590.0" y2="92.0"/>
+  <text class="t-s t-bad t-b" x="590.0" y="104.0" text-anchor="middle" dominant-baseline="central">2</text>
+  <text class="t-xs t-mut" x="30.0" y="104.0" text-anchor="middle" dominant-baseline="central">0</text>
+  <text class="t-xs t-mut" x="310.0" y="125.0" text-anchor="middle" dominant-baseline="central">r &lt; 1: the first term dominates, and the sum stays below 1/(1 − r) = 2</text>
+</svg>

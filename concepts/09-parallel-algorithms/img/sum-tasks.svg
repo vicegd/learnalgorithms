@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 700 205" width="700" height="205" role="img">
+  <title>The recursive sum task on 10 numbers with a threshold of 3: parts of 3 or fewer elements are summed sequentially</title>
+  <line class="ln" x1="278.0" y1="38.0" x2="146.0" y2="78.0"/>
+  <line class="ln" x1="146.0" y1="102.0" x2="80.0" y2="142.0"/>
+  <line class="ln" x1="146.0" y1="102.0" x2="212.0" y2="142.0"/>
+  <line class="ln" x1="278.0" y1="38.0" x2="410.0" y2="78.0"/>
+  <line class="ln" x1="410.0" y1="102.0" x2="344.0" y2="142.0"/>
+  <line class="ln" x1="410.0" y1="102.0" x2="476.0" y2="142.0"/>
+  <rect class="box-blue" x="224.2" y="14.0" width="107.6" height="24.0" rx="6"/>
+  <text class="t-xs t-m" x="278.0" y="26.5" text-anchor="middle" dominant-baseline="central">[0, 10) → 647</text>
+  <rect class="box-blue" x="95.8" y="78.0" width="100.4" height="24.0" rx="6"/>
+  <text class="t-xs t-m" x="146.0" y="90.5" text-anchor="middle" dominant-baseline="central">[0, 5) → 324</text>
+  <rect class="box-hl" x="37.0" y="142.0" width="86.0" height="24.0" rx="6"/>
+  <text class="t-xs t-m" x="80.0" y="154.5" text-anchor="middle" dominant-baseline="central">76 13 → 89</text>
+  <rect class="box-hl" x="154.6" y="142.0" width="114.8" height="24.0" rx="6"/>
+  <text class="t-xs t-m" x="212.0" y="154.5" text-anchor="middle" dominant-baseline="central">97 90 48 → 235</text>
+  <rect class="box-blue" x="356.2" y="78.0" width="107.6" height="24.0" rx="6"/>
+  <text class="t-xs t-m" x="410.0" y="90.5" text-anchor="middle" dominant-baseline="central">[5, 10) → 323</text>
+  <rect class="box-hl" x="297.4" y="142.0" width="93.2" height="24.0" rx="6"/>
+  <text class="t-xs t-m" x="344.0" y="154.5" text-anchor="middle" dominant-baseline="central">76 94 → 170</text>
+  <rect class="box-hl" x="418.6" y="142.0" width="114.8" height="24.0" rx="6"/>
+  <text class="t-xs t-m" x="476.0" y="154.5" text-anchor="middle" dominant-baseline="central">59 42 52 → 153</text>
+  <text class="t-xs t-mut" x="350.0" y="192.0" text-anchor="middle" dominant-baseline="central">blue: tasks that split in two (fork, then join and add) · green: below the threshold, a sequential loop</text>
+</svg>
