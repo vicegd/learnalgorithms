@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 700 260" width="700" height="260" role="img">
+  <title>Balanced partitions give log n levels; a pivot at one end every time gives n levels</title>
+  <text class="t-s t-b t-hl" x="170.0" y="16.0" text-anchor="middle" dominant-baseline="central">pivot in the middle: log₂ n levels</text>
+  <rect class="box-hl" x="20.0" y="40.0" width="294.0" height="22.0" rx="3"/>
+  <text class="t-xs t-m" x="167.0" y="51.0" text-anchor="middle" dominant-baseline="central">n</text>
+  <text class="t-xs t-mut" x="330.0" y="51.0" text-anchor="start" dominant-baseline="central">n per level</text>
+  <rect class="box-hl" x="20.0" y="90.0" width="144.0" height="22.0" rx="3"/>
+  <text class="t-xs t-m" x="92.0" y="101.0" text-anchor="middle" dominant-baseline="central">n/2</text>
+  <rect class="box-hl" x="170.0" y="90.0" width="144.0" height="22.0" rx="3"/>
+  <text class="t-xs t-m" x="242.0" y="101.0" text-anchor="middle" dominant-baseline="central">n/2</text>
+  <text class="t-xs t-mut" x="330.0" y="101.0" text-anchor="start" dominant-baseline="central">n per level</text>
+  <rect class="box-hl" x="20.0" y="140.0" width="69.0" height="22.0" rx="3"/>
+  <text class="t-xs t-m" x="54.5" y="151.0" text-anchor="middle" dominant-baseline="central">n/4</text>
+  <rect class="box-hl" x="95.0" y="140.0" width="69.0" height="22.0" rx="3"/>
+  <text class="t-xs t-m" x="129.5" y="151.0" text-anchor="middle" dominant-baseline="central">n/4</text>
+  <rect class="box-hl" x="170.0" y="140.0" width="69.0" height="22.0" rx="3"/>
+  <text class="t-xs t-m" x="204.5" y="151.0" text-anchor="middle" dominant-baseline="central">n/4</text>
+  <rect class="box-hl" x="245.0" y="140.0" width="69.0" height="22.0" rx="3"/>
+  <text class="t-xs t-m" x="279.5" y="151.0" text-anchor="middle" dominant-baseline="central">n/4</text>
+  <text class="t-xs t-mut" x="330.0" y="151.0" text-anchor="start" dominant-baseline="central">n per level</text>
+  <rect class="box-hl" x="20.0" y="190.0" width="31.5" height="22.0" rx="3"/>
+  <text class="t-xs t-m" x="35.8" y="201.0" text-anchor="middle" dominant-baseline="central">n/8</text>
+  <rect class="box-hl" x="57.5" y="190.0" width="31.5" height="22.0" rx="3"/>
+  <text class="t-xs t-m" x="73.2" y="201.0" text-anchor="middle" dominant-baseline="central">n/8</text>
+  <rect class="box-hl" x="95.0" y="190.0" width="31.5" height="22.0" rx="3"/>
+  <text class="t-xs t-m" x="110.8" y="201.0" text-anchor="middle" dominant-baseline="central">n/8</text>
+  <rect class="box-hl" x="132.5" y="190.0" width="31.5" height="22.0" rx="3"/>
+  <text class="t-xs t-m" x="148.2" y="201.0" text-anchor="middle" dominant-baseline="central">n/8</text>
+  <rect class="box-hl" x="170.0" y="190.0" width="31.5" height="22.0" rx="3"/>
+  <text class="t-xs t-m" x="185.8" y="201.0" text-anchor="middle" dominant-baseline="central">n/8</text>
+  <rect class="box-hl" x="207.5" y="190.0" width="31.5" height="22.0" rx="3"/>
+  <text class="t-xs t-m" x="223.2" y="201.0" text-anchor="middle" dominant-baseline="central">n/8</text>
+  <rect class="box-hl" x="245.0" y="190.0" width="31.5" height="22.0" rx="3"/>
+  <text class="t-xs t-m" x="260.8" y="201.0" text-anchor="middle" dominant-baseline="central">n/8</text>
+  <rect class="box-hl" x="282.5" y="190.0" width="31.5" height="22.0" rx="3"/>
+  <text class="t-xs t-m" x="298.2" y="201.0" text-anchor="middle" dominant-baseline="central">n/8</text>
+  <text class="t-xs t-mut" x="330.0" y="201.0" text-anchor="start" dominant-baseline="central">n per level</text>
+  <text class="t-s t-hl t-b" x="170.0" y="240.0" text-anchor="middle" dominant-baseline="central">total ≈ n log₂ n</text>
+  <text class="t-s t-b t-bad" x="530.0" y="16.0" text-anchor="middle" dominant-baseline="central">pivot always at one end: n levels</text>
+  <rect class="box-bad" x="410.0" y="40.0" width="260.0" height="22.0" rx="3"/>
+  <text class="t-xs t-m" x="540.0" y="51.0" text-anchor="middle" dominant-baseline="central">n</text>
+  <rect class="box-mut" x="674.0" y="40.0" width="10.0" height="22.0" rx="2"/>
+  <rect class="box-bad" x="410.0" y="80.0" width="226.0" height="22.0" rx="3"/>
+  <text class="t-xs t-m" x="523.0" y="91.0" text-anchor="middle" dominant-baseline="central">n − 1</text>
+  <rect class="box-mut" x="640.0" y="80.0" width="10.0" height="22.0" rx="2"/>
+  <rect class="box-bad" x="410.0" y="120.0" width="192.0" height="22.0" rx="3"/>
+  <text class="t-xs t-m" x="506.0" y="131.0" text-anchor="middle" dominant-baseline="central">n − 2</text>
+  <rect class="box-mut" x="606.0" y="120.0" width="10.0" height="22.0" rx="2"/>
+  <rect class="box-bad" x="410.0" y="160.0" width="158.0" height="22.0" rx="3"/>
+  <text class="t-xs t-m" x="489.0" y="171.0" text-anchor="middle" dominant-baseline="central">n − 3</text>
+  <rect class="box-mut" x="572.0" y="160.0" width="10.0" height="22.0" rx="2"/>
+  <text class="t-mut" x="530.0" y="206.0" text-anchor="middle" dominant-baseline="central">⋮</text>
+  <text class="t-s t-bad t-b" x="530.0" y="240.0" text-anchor="middle" dominant-baseline="central">total ≈ n + (n − 1) + … + 1 ≈ n²/2</text>
+</svg>
