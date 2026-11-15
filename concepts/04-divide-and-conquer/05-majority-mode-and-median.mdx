@@ -174,6 +174,8 @@ The repository version of `partition` takes the central element as pivot, moves 
 
 Two partitions were enough, and the elements 5, 6 and 7 were never ordered among themselves.
 
+<Origin who="C. A. R. Hoare" year="1961" title="Algorithm 65: Find" venue="Communications of the ACM 4(7):321–322" url="https://doi.org/10.1145/366622.366647" />
+
 ### Analysis
 
 Each call partitions its part in linear time and continues with **one** subproblem.
@@ -184,7 +186,7 @@ Each call partitions its part in linear time and continues with **one** subprobl
 In practice, Quickselect is much faster than sorting. We measured both with 2 million random integers: Quickselect found the median in about **37 ms**, while `Arrays.sort` needed about **330 ms** to sort the copy.
 
 :::info A linear worst case
-There is a famous algorithm, the **median of medians** (Blum, Floyd, Pratt, Rivest and Tarjan, 1973), that chooses a pivot guaranteed to be "good enough" (it divides the vector into groups of 5, takes the median of each group, and recursively the median of those medians). It makes the selection $O(n)$ even in the **worst case**. Its constants are high, so in practice randomised Quickselect is usually preferred, but it proved that selection is fundamentally easier than sorting.
+There is a famous algorithm, the **median of medians** ([Blum, Floyd, Pratt, Rivest and Tarjan, 1973](https://doi.org/10.1016/S0022-0000(73)80033-9)), that chooses a pivot guaranteed to be "good enough" (it divides the vector into groups of 5, takes the median of each group, and recursively the median of those medians). It makes the selection $O(n)$ even in the **worst case**. Its constants are high, so in practice randomised Quickselect is usually preferred, but it proved that selection is fundamentally easier than sorting.
 :::
 
 <details>

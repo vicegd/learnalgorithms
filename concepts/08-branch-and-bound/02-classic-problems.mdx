@@ -99,6 +99,8 @@ Both return the same optimum. The difference comes from the **estimate of the fu
 
 **Problem.** We have $n$ objects with weights $w_i$ and values $v_i$, and a knapsack with capacity $W$. Choose objects (each one entirely or not at all) to **maximize** the total value without exceeding the capacity. We solved it with [dynamic programming](../06-dynamic-programming/02-classic-problems.mdx) in pseudo-polynomial time; branch and bound solves it without depending on the size of $W$.
 
+<Origin who="Peter J. Kolesar" year="1967" title="A branch and bound algorithm for the knapsack problem" venue="Management Science 13(9):723–735" url="https://doi.org/10.1287/mnsc.13.9.723" />
+
 ### Design
 
 - **State**: decisions taken for the first $k$ objects (take it or leave it), with the weight and value accumulated. Each node has at most two children.
@@ -147,6 +149,10 @@ All three return the same value. The bound is responsible for almost all of the 
 <Figure caption="An initial state of the 15-puzzle and the goal state. A move slides a tile into the empty cell.">
   <FigPuzzleGoal />
 </Figure>
+
+<Origin who="W. W. Johnson and W. E. Story" year="1879" title="Notes on the “15” puzzle" venue="American Journal of Mathematics 2(4):397–404">
+  They proved that exactly half of the configurations can be reached, which is the reachability test below.
+</Origin>
 
 ### The state space
 
@@ -291,6 +297,8 @@ The heuristic guides the search towards a solution far more directly. It is not 
 ## The traveling salesman
 
 **Problem.** A salesman must visit $n$ cities, each exactly once, and return to the city where he started. The distance $d(i, j)$ between every pair of cities is known. Find the **shortest tour**. It is the most famous NP-hard problem, and branch and bound is the basis of the exact methods used to solve it.
+
+<Origin who="John D. C. Little, Katta G. Murty, Dura W. Sweeney and Caroline Karel" year="1963" title="An algorithm for the traveling salesman problem" venue="Operations Research 11(6):972–989" url="https://doi.org/10.1287/opre.11.6.972" />
 
 ### Design
 

@@ -142,6 +142,10 @@ void subsets(int level, int sum) {
 
 The difficulties are two: finding a good **representation** of the board, and knowing **quickly** whether a square is attacked.
 
+<Origin who="Max Bezzel" year="1848" venue="Proposed for 8 queens in the Berliner Schachzeitung">
+  Gauss studied it in 1850, and Franz Nauck gave the first complete set of 92 solutions that same year.
+</Origin>
+
 ### Representation
 
 An $n \times n$ matrix would work, but it wastes space and makes the checks slow. Since there must be exactly one queen per column, it is enough to store, for each column, the row of its queen:
@@ -324,6 +328,8 @@ Applied as the **order** in which backtracking tries the 8 moves (the algorithm 
 This is the general lesson: **the order in which candidates are tried can matter more than any pruning**.
 
 <RepoCode files={['backtracking/knighttour/ChessHorseOne.java', 'backtracking/knighttour/ChessHorseAll.java']} />
+
+<Origin who="H. C. von Warnsdorf" year="1823" title="Des Rösselsprunges einfachste und allgemeinste Lösung" venue="Schmalkalden" />
 
 ***
 

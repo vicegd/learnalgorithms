@@ -129,7 +129,7 @@ const config = {
       },
       footer: {
         style: 'dark',
-        copyright: `Copyright © ${new Date().getFullYear()} learnalgorithms.dev`,
+        copyright: `Copyright © ${new Date().getFullYear()} learnalgorithms.dev · Created by <a href="https://www.vicentegarciadiaz.com" target="_blank" rel="noopener noreferrer">Vicente García Díaz</a>`,
       },
       prism: {
         theme: prismThemes.oneLight,

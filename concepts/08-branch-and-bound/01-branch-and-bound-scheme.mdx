@@ -6,6 +6,10 @@ tags: [Paradigms, State Space Search, Branch and Bound, Optimization, BFS, Heuri
 
 import FigFourOrders from './img/four-orders.svg';
 
+<Origin who="Ailsa H. Land and Alison G. Doig" year="1960" title="An automatic method of solving discrete programming problems" venue="Econometrica 28(3):497–520" url="https://www.jstor.org/stable/1910129">
+  The name “branch and bound” was introduced by Little, Murty, Sweeney and Karel in 1963.
+</Origin>
+
 # The Branch and Bound Scheme
 
 Branch and bound (B&B) is the last design technique of the course. Like [backtracking](../07-backtracking/01-backtracking-scheme.mdx), it searches an **implicit tree of states**: nodes represent states of the problem, edges represent valid changes, and solving the problem means finding a node (or a path) in that tree. The difference is **the order in which the tree is explored**, and that single change makes it suitable for different problems.
@@ -194,6 +198,8 @@ best-first branch and bound becomes the famous **A\*** search algorithm (Hart, N
 A common mistake is to order the nodes **only** by the estimate of the remaining cost, $h(x)$, forgetting the cost already paid. The search becomes a greedy best-first search: it reaches *a* solution very quickly, but not necessarily the best one. In the 8-puzzle we measured this effect: ordering by $h$ alone found solutions with about 65 moves on average, while ordering by $g + h$ found the optimal ones, with about 22 moves (see the [next lesson](./02-classic-problems.mdx#sliding-puzzles)).
 
 <ProofLink to="/concepts/branch-and-bound/proofs#a-with-an-admissible-heuristic-finds-an-optimal-path" title="A* with an admissible heuristic finds an optimal path" />
+
+<Origin who="Peter E. Hart, Nils J. Nilsson and Bertram Raphael" year="1968" title="A formal basis for the heuristic determination of minimum cost paths" venue="IEEE Transactions on Systems Science and Cybernetics 4(2):100–107" url="https://doi.org/10.1109/TSSC.1968.300136" />
 
 ***
 

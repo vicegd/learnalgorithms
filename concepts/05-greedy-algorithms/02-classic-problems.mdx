@@ -86,6 +86,10 @@ $$
 
 With the greedy elements: the **candidates** are the $n$ objects; the **state** is the solution vector $X = (x_1, x_2, \dots, x_n)$; the **feasibility** condition is $\sum x_i w_i \le W$; and the **selection function** is the heuristic.
 
+<Origin who="George B. Dantzig" year="1957" title="Discrete-variable extremum problems" venue="Operations Research 5(2):266–288" url="https://doi.org/10.1287/opre.5.2.266">
+  Includes the greedy rule by value/weight ratio, which is optimal when objects can be broken.
+</Origin>
+
 ### Data
 
 Five objects and a weight limit $W = 100$:
@@ -210,6 +214,10 @@ The problem is to find the **order** (permutation) of the tasks that minimizes $
 
 </details>
 
+<Origin who="Wayne E. Smith" year="1956" title="Various optimizers for single-stage production" venue="Naval Research Logistics Quarterly 3(1–2):59–66" url="https://doi.org/10.1002/nav.3800030106">
+  The “shortest task first” rule and its exchange argument are known as Smith’s rule.
+</Origin>
+
 ### Why is it optimal? An exchange argument
 
 Each task delays every task done after it. If the tasks are done in the order $t_1, t_2, \dots, t_n$:
@@ -280,6 +288,10 @@ We ran both heuristics of the course repository on an $8 \times 8$ board, starti
 The simple heuristic always gets stuck before visiting every square. Warnsdorff's rule succeeds almost always, with an $O(n^2)$ algorithm for an $n \times n$ board. But not always: from one of the starting squares, with the order in which the course implementation breaks ties, it also gets stuck, although a tour exists from every square. A greedy algorithm cannot guarantee a solution here; **backtracking**, which can undo bad decisions, can (at a much higher cost).
 
 <RepoCode files={['greedy/knighttour/ChessHorse.java', 'greedy/knighttour/ChessHorseSimpleHeuristic.java']} />
+
+<Origin who="H. C. von Warnsdorf" year="1823" title="Des Rösselsprunges einfachste und allgemeinste Lösung" venue="Schmalkalden">
+  The heuristic “move to the square with the fewest onward moves” is known as Warnsdorff’s rule.
+</Origin>
 
 ---
 
@@ -402,6 +414,10 @@ int prim(int[][] w) {                       // w[u][v] = 0 if there is no edge
 
 Each of the $n$ steps scans the $n$ nodes twice: $O(n^2)$, which is optimal for dense graphs given as a matrix. With adjacency lists and a priority queue, it costs $O(m \log n)$ for $m$ edges, better for sparse graphs.
 
+<Origin who="Robert C. Prim" year="1957" title="Shortest connection networks and some generalizations" venue="Bell System Technical Journal 36(6):1389–1401" url="https://doi.org/10.1002/j.1538-7305.1957.tb01515.x">
+  The same algorithm had been published by Vojtěch Jarník in 1930, and it is also called Jarník’s algorithm.
+</Origin>
+
 ### Kruskal's algorithm
 
 Kruskal's algorithm looks at the **edges** in increasing order of weight, and accepts each one unless it would form a cycle with the edges already accepted. At the beginning every node is a separate tree; each accepted edge joins two trees into one.
@@ -425,15 +441,17 @@ The result is a different tree (1-3, 4-6, 2-5, 3-6, 2-3) with the **same total w
 
 <ProofLink to="/concepts/greedy-algorithms/proofs#prim-and-kruskal-are-optimal" title="Prim and Kruskal are optimal" />
 
+<Origin who="Joseph B. Kruskal" year="1956" title="On the shortest spanning subtree of a graph and the traveling salesman problem" venue="Proceedings of the AMS 7(1):48–50" url="https://doi.org/10.1090/S0002-9939-1956-0078686-7" />
+
 ***
 
 ## Greedy Algorithms That Are Always Optimal
 
 For some important problems, a well-chosen greedy algorithm is provably optimal. You will meet several of them in your degree:
 
-- **Dijkstra's algorithm** finds the shortest paths from one node to all the others in a graph with non-negative weights, by repeatedly fixing the closest node not yet fixed.
+- **Dijkstra's algorithm** ([Dijkstra, 1959](https://doi.org/10.1007/BF01386390)) finds the shortest paths from one node to all the others in a graph with non-negative weights, by repeatedly fixing the closest node not yet fixed.
 - **Prim's algorithm** and **Kruskal's algorithm** find a **minimum spanning tree**, as seen in the [previous section](#minimum-spanning-trees-prim-and-kruskal).
-- **Huffman coding** builds an optimal prefix code for data compression, by repeatedly merging the two least frequent symbols.
+- **Huffman coding** ([Huffman, 1952](https://doi.org/10.1109/JRPROC.1952.273898)) builds an optimal prefix code for data compression, by repeatedly merging the two least frequent symbols.
 - **Interval scheduling**: to attend the maximum number of non-overlapping activities, repeatedly choose the one that **finishes first**.
 
 ---

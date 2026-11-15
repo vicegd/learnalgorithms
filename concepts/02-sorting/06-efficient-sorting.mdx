@@ -76,11 +76,17 @@ The analysis of Shellsort is notoriously difficult and depends on the gap sequen
 
 <RepoCode files={['sorting/shellsort/Shellsort.java']} />
 
+<Origin who="Donald L. Shell" year="1959" title="A high-speed sorting procedure" venue="Communications of the ACM 2(7):30–32" url="https://doi.org/10.1145/368370.368387" />
+
 ---
 
 ## Heapsort: Selection with a Heap
 
 Selection sort spends linear time finding each maximum (or minimum). **Heapsort** keeps the unsorted part organized as a **heap**, which provides the maximum immediately and can be repaired in logarithmic time.
+
+<Origin who="J. W. J. Williams" year="1964" title="Algorithm 232: Heapsort" venue="Communications of the ACM 7(6):347–348" url="https://doi.org/10.1145/512274.512284">
+  The linear-time construction of the heap is due to Robert W. Floyd (“Algorithm 245: Treesort 3”, CACM 7(12), 1964).
+</Origin>
 
 ### Binary heaps
 
@@ -175,6 +181,10 @@ Mergesort is a classic example of **divide and conquer**, and you will study it 
 
 <ProofLink to="/concepts/sorting/proofs#mergesort-is-correct-and-costs-n-log-n" title="Mergesort is correct and costs n log n" />
 
+<Origin who="John von Neumann" year="1945" venue="Unpublished manuscript on sorting programs for the EDVAC">
+  There is no published paper: the attribution comes from Knuth, The Art of Computer Programming, vol. 3, §5.2.4.
+</Origin>
+
 ---
 
 ## The Limit of Comparison-Based Sorting
@@ -231,6 +241,10 @@ The simple radix sort above assumes **non-negative** integers. In Java, `-1 % 10
 <RepoCode files={['sorting/radix/Radix.java']} />
 
 <ProofLink to="/concepts/sorting/proofs#radix-sort-is-correct" title="Radix sort is correct" />
+
+<Origin who="Herman Hollerith" year="1880s" venue="Punched-card tabulating and sorting machines">
+  The first computer versions of radix sort and counting sort are described by Harold H. Seward in his MIT master’s thesis (1954).
+</Origin>
 
 ---
 
