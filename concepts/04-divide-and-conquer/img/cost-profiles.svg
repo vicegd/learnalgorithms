@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 660 200" width="660" height="200" role="img">
+  <title>Where the work concentrates: at the root, evenly, or at the leaves</title>
+  <text class="t-s t-b" x="115.0" y="16.0" text-anchor="middle" dominant-baseline="central">a &lt; bᵏ: O(nᵏ)</text>
+  <rect class="box-blue" x="30.0" y="34.0" width="170.0" height="20.0" rx="3"/>
+  <rect class="box-blue" x="64.0" y="60.0" width="102.0" height="20.0" rx="3"/>
+  <rect class="box-blue" x="84.4" y="86.0" width="61.2" height="20.0" rx="3"/>
+  <rect class="box-blue" x="96.3" y="112.0" width="37.4" height="20.0" rx="3"/>
+  <rect class="box-blue" x="104.0" y="138.0" width="22.1" height="20.0" rx="3"/>
+  <text class="t-xs t-mut" x="115.0" y="178.0" text-anchor="middle" dominant-baseline="central">work shrinks level by level</text>
+  <text class="t-s t-b" x="330.0" y="16.0" text-anchor="middle" dominant-baseline="central">a = bᵏ: O(nᵏ log n)</text>
+  <rect class="box-pur" x="245.0" y="34.0" width="170.0" height="20.0" rx="3"/>
+  <rect class="box-pur" x="245.0" y="60.0" width="170.0" height="20.0" rx="3"/>
+  <rect class="box-pur" x="245.0" y="86.0" width="170.0" height="20.0" rx="3"/>
+  <rect class="box-pur" x="245.0" y="112.0" width="170.0" height="20.0" rx="3"/>
+  <rect class="box-pur" x="245.0" y="138.0" width="170.0" height="20.0" rx="3"/>
+  <text class="t-xs t-mut" x="330.0" y="178.0" text-anchor="middle" dominant-baseline="central">same work at every level</text>
+  <text class="t-s t-b" x="545.0" y="16.0" text-anchor="middle" dominant-baseline="central">a &gt; bᵏ: O(n^(log_b a))</text>
+  <rect class="box-ac" x="534.0" y="34.0" width="22.1" height="20.0" rx="3"/>
+  <rect class="box-ac" x="526.3" y="60.0" width="37.4" height="20.0" rx="3"/>
+  <rect class="box-ac" x="514.4" y="86.0" width="61.2" height="20.0" rx="3"/>
+  <rect class="box-ac" x="494.0" y="112.0" width="102.0" height="20.0" rx="3"/>
+  <rect class="box-ac" x="460.0" y="138.0" width="170.0" height="20.0" rx="3"/>
+  <text class="t-xs t-mut" x="545.0" y="178.0" text-anchor="middle" dominant-baseline="central">work grows towards the leaves</text>
+  <text class="t-xs t-mut" x="8.0" y="44.0" text-anchor="start" dominant-baseline="central">root</text>
+  <text class="t-xs t-mut" x="8.0" y="148.0" text-anchor="start" dominant-baseline="central">leaves</text>
+</svg>

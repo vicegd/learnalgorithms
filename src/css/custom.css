@@ -147,3 +147,9 @@ svg.dg .ln-axis { stroke: var(--dg-muted); stroke-width: 1.3; fill: none; }
 svg.dg .ln-grid { stroke: var(--dg-grid); stroke-width: 1; fill: none; }
 svg.dg .ah { fill: var(--dg-line); } svg.dg .ah-hl { fill: var(--dg-hl); } svg.dg .ah-ac { fill: var(--dg-ac); }
 svg.dg .ah-bad { fill: var(--dg-bad); } svg.dg .ah-blue { fill: var(--dg-blue); } svg.dg .ah-pur { fill: var(--dg-pur); }
+svg.dg .f-blue { fill: var(--dg-blue-bg); } svg.dg .f-pur { fill: var(--dg-pur-bg); } svg.dg .f-hl { fill: var(--dg-hl-bg); }
+svg.dg .f-soft { fill: var(--dg-soft); } svg.dg .f-ac { fill: var(--dg-ac-bg); } svg.dg .f-bad { fill: var(--dg-bad-bg); }
+svg.dg .f-yel { fill: var(--dg-yel-bg); }
+svg.dg .ln-strong { stroke: var(--dg-fg); stroke-width: 2.2; fill: none; }
+:root { --dg-yel-bg: #fef3c7; }
+[data-theme='dark'] { --dg-yel-bg: #3a3214; }

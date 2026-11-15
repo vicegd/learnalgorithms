@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 600 330" width="600" height="330" role="img">
+  <title>The divide and conquer scheme: divide, solve the subproblems recursively, combine</title>
+  <rect class="box-blue" x="205.0" y="14.0" width="190.0" height="32.0" rx="7"/>
+  <text class="t-s" x="300.0" y="30.0" text-anchor="middle" dominant-baseline="central">problem of size n</text>
+  <rect class="box" x="65.0" y="104.0" width="190.0" height="32.0" rx="7"/>
+  <text class="t-s" x="160.0" y="120.0" text-anchor="middle" dominant-baseline="central">subproblem of size n/2</text>
+  <rect class="box" x="345.0" y="104.0" width="190.0" height="32.0" rx="7"/>
+  <text class="t-s" x="440.0" y="120.0" text-anchor="middle" dominant-baseline="central">subproblem of size n/2</text>
+  <rect class="box" x="85.0" y="194.0" width="150.0" height="32.0" rx="7"/>
+  <text class="t-s" x="160.0" y="210.0" text-anchor="middle" dominant-baseline="central">subsolution</text>
+  <rect class="box" x="365.0" y="194.0" width="150.0" height="32.0" rx="7"/>
+  <text class="t-s" x="440.0" y="210.0" text-anchor="middle" dominant-baseline="central">subsolution</text>
+  <rect class="box-hl" x="225.0" y="284.0" width="150.0" height="32.0" rx="7"/>
+  <text class="t-s" x="300.0" y="300.0" text-anchor="middle" dominant-baseline="central">solution</text>
+  <line class="ln-blue" x1="270.0" y1="46.0" x2="186.7" y2="99.7"/>
+  <polygon class="ah-blue" points="180.0,104.0 184.6,96.3 188.9,103.0"/>
+  <line class="ln-blue" x1="330.0" y1="46.0" x2="413.3" y2="99.7"/>
+  <polygon class="ah-blue" points="420.0,104.0 411.1,103.0 415.4,96.3"/>
+  <text class="t-s t-blue t-b" x="300.0" y="78.0" text-anchor="middle" dominant-baseline="central">1. divide</text>
+  <line class="ln-ac" x1="160.0" y1="136.0" x2="160.0" y2="186.0"/>
+  <polygon class="ah-ac" points="160.0,194.0 156.0,186.0 164.0,186.0"/>
+  <line class="ln-ac" x1="440.0" y1="136.0" x2="440.0" y2="186.0"/>
+  <polygon class="ah-ac" points="440.0,194.0 436.0,186.0 444.0,186.0"/>
+  <text class="t-s t-ac t-b" x="300.0" y="165.0" text-anchor="middle" dominant-baseline="central">2. solve each one recursively</text>
+  <text class="t-xs t-mut" x="300.0" y="183.0" text-anchor="middle" dominant-baseline="central">(directly in the base case)</text>
+  <line class="ln-hl" x1="180.0" y1="226.0" x2="263.3" y2="279.7"/>
+  <polygon class="ah-hl" points="270.0,284.0 261.1,283.0 265.4,276.3"/>
+  <line class="ln-hl" x1="420.0" y1="226.0" x2="336.7" y2="279.7"/>
+  <polygon class="ah-hl" points="330.0,284.0 334.6,276.3 338.9,283.0"/>
+  <text class="t-s t-hl t-b" x="300.0" y="255.0" text-anchor="middle" dominant-baseline="central">3. combine</text>
+</svg>

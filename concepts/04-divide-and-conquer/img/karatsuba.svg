@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 680 210" width="680" height="210" role="img">
+  <title>Multiplying two numbers split into halves: four products of half size, or three with Karatsuba</title>
+  <text class="t-s t-b" x="20.0" y="22.0" text-anchor="start" dominant-baseline="central">U =</text>
+  <rect class="box-blue" x="56.0" y="8.0" width="70.0" height="28.0" rx="3"/>
+  <text class="t-m" x="91.0" y="22.5" text-anchor="middle" dominant-baseline="central">w</text>
+  <rect class="box-pur" x="126.0" y="8.0" width="70.0" height="28.0" rx="3"/>
+  <text class="t-m" x="161.0" y="22.5" text-anchor="middle" dominant-baseline="central">x</text>
+  <text class="t-s t-b" x="20.0" y="62.0" text-anchor="start" dominant-baseline="central">V =</text>
+  <rect class="box-blue" x="56.0" y="48.0" width="70.0" height="28.0" rx="3"/>
+  <text class="t-m" x="91.0" y="62.5" text-anchor="middle" dominant-baseline="central">y</text>
+  <rect class="box-pur" x="126.0" y="48.0" width="70.0" height="28.0" rx="3"/>
+  <text class="t-m" x="161.0" y="62.5" text-anchor="middle" dominant-baseline="central">z</text>
+  <text class="t-xs t-mut" x="126.0" y="92.0" text-anchor="middle" dominant-baseline="central">n/2 digits each half</text>
+  <text class="t-s t-b" x="410.0" y="22.0" text-anchor="middle" dominant-baseline="central">direct split: 4 products</text>
+  <rect class="box" x="258.0" y="45.0" width="64.0" height="26.0" rx="6"/>
+  <text class="t-s t-m" x="290.0" y="58.5" text-anchor="middle" dominant-baseline="central">w·y</text>
+  <rect class="box" x="338.0" y="45.0" width="64.0" height="26.0" rx="6"/>
+  <text class="t-s t-m" x="370.0" y="58.5" text-anchor="middle" dominant-baseline="central">w·z</text>
+  <rect class="box" x="418.0" y="45.0" width="64.0" height="26.0" rx="6"/>
+  <text class="t-s t-m" x="450.0" y="58.5" text-anchor="middle" dominant-baseline="central">x·y</text>
+  <rect class="box" x="498.0" y="45.0" width="64.0" height="26.0" rx="6"/>
+  <text class="t-s t-m" x="530.0" y="58.5" text-anchor="middle" dominant-baseline="central">x·z</text>
+  <text class="t-xs t-bad" x="410.0" y="90.0" text-anchor="middle" dominant-baseline="central">T(n) = 4T(n/2) + O(n)  →  O(n²): no gain</text>
+  <text class="t-s t-b" x="410.0" y="122.0" text-anchor="middle" dominant-baseline="central">Karatsuba: 3 products</text>
+  <rect class="box-hl" x="268.0" y="145.0" width="64.0" height="26.0" rx="6"/>
+  <text class="t-s t-m" x="300.0" y="158.5" text-anchor="middle" dominant-baseline="central">w·y</text>
+  <rect class="box-hl" x="378.0" y="145.0" width="64.0" height="26.0" rx="6"/>
+  <text class="t-s t-m" x="410.0" y="158.5" text-anchor="middle" dominant-baseline="central">x·z</text>
+  <rect class="box-ac" x="472.0" y="145.0" width="96.0" height="26.0" rx="6"/>
+  <text class="t-s t-m" x="520.0" y="158.5" text-anchor="middle" dominant-baseline="central">(w+x)·(y+z)</text>
+  <text class="t-xs t-hl" x="410.0" y="194.0" text-anchor="middle" dominant-baseline="central">wz + xy = (w+x)(y+z) − wy − xz  →  T(n) = 3T(n/2) + O(n) = O(n^1.585)</text>
+</svg>

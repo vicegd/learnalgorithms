@@ -7,6 +7,10 @@ tags: [Divide and Conquer, Mergesort, Towers of Hanoi, Karatsuba, Tennis Tournam
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import FigMergesort from '../02-sorting/img/mergesort.svg';
+import FigHanoi from './img/hanoi.svg';
+import FigTromino from './img/tromino.svg';
+import FigKaratsuba from './img/karatsuba.svg';
 
 # Divide and Conquer: Classic Problems
 
@@ -55,14 +59,9 @@ void combine(int x1, int x2, int y1, int y2, int[] elements) {
 
 With **4 5 6 1 3 2 7 8**:
 
-```
-divide:        4 5 6 1 3 2 7 8
-            4 5 6 1        3 2 7 8
-          4 5    6 1     3 2    7 8
-merge:    4 5    1 6     2 3    7 8
-            1 4 5 6        2 3 7 8
-               1 2 3 4 5 6 7 8
-```
+<Figure caption="Mergesort on 4 5 6 1 3 2 7 8: the vector is halved until the parts have one element, and the sorted parts are merged back level by level.">
+  <FigMergesort />
+</Figure>
 
 **Analysis.** Divide and conquer by **division**: $a = 2$ subproblems, $b = 2$ (each of size $n/2$), $k = 1$ (merging costs $O(n)$). Since $a = b^k$ ($2 = 2^1$): $O(n^k \log n) = O(n \log n)$, **in all cases**, because the division is always into halves, whatever the data.
 
@@ -105,6 +104,10 @@ The problem seems complicated, but divide and conquer makes it simple. To move $
 3. Move the $n - 1$ discs from the work rod to the **target** (using the source as auxiliary).
 
 Steps 1 and 3 are the same problem with one disc fewer, so they are solved recursively. The base case is a single disc, which is moved directly.
+
+<Figure caption="The recursive strategy for three discs. Steps 1 and 3 move a tower of n − 1 discs, the same problem with one disc fewer, and step 2 moves only the largest disc.">
+  <FigHanoi />
+</Figure>
 
 ```java
 /** Moves nDiscs from the source rod to the target rod, with the aid of the work rod */
@@ -201,6 +204,10 @@ LargeInteger multiply(LargeInteger u, LargeInteger v) {      // n digits each
 }
 ```
 
+<Figure caption="Splitting both numbers into halves. The direct split needs four products of half size and gains nothing; Karatsuba's identity obtains the middle term with a single extra product, three in total.">
+  <FigKaratsuba />
+</Figure>
+
 **Analysis:** $a = 3$, $b = 2$, $k = 1$. Since $a \gt b^k$ ($3 \gt 2$): $O(n^{\log_2 3}) \approx O(n^{1.585})$. Saving a single multiplication in each call changes the exponent, which makes a huge difference for large numbers: for numbers of a million digits, $n^2 = 10^{12}$ while $n^{1.585} \approx 3 \times 10^9$. We implemented this algorithm on binary numbers and checked it against Java's `BigInteger` on 200 random pairs of 2,000-bit numbers.
 
 <ProofLink to="/concepts/divide-and-conquer/proofs#karatsubas-identity" title="Karatsuba's identity" />
@@ -266,6 +273,10 @@ A **tromino** is an L-shaped figure formed by three $1 \times 1$ squares. We hav
 
 - **Base case** ($n = 2$): a $2 \times 2$ board with one missing cell is exactly one tromino.
 - **Recursive case:** divide the board into four quadrants of $\frac{n}{2} \times \frac{n}{2}$. The missing cell is in one of them. Place **one tromino at the center of the board**, covering the corner cell of each of the **other three** quadrants that touches the center. Now each of the four quadrants has exactly one cell that is missing or covered, so each one is a smaller instance of the same problem, and can be tiled recursively.
+
+<Figure caption="An 8 × 8 board with one missing cell (red), tiled by divide and conquer. The first tromino (orange) is placed at the center so that each quadrant has exactly one missing or covered cell; each quadrant is then tiled in the same way.">
+  <FigTromino />
+</Figure>
 
 The number of cells to cover is $n^2 - 1$, which is always divisible by 3 when $n$ is a power of 2, and the algorithm uses exactly $\frac{n^2 - 1}{3}$ trominoes.
 
