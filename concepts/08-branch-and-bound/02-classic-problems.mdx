@@ -5,6 +5,13 @@ sidebar_position: 2
 tags: [Paradigms, State Space Search, Branch and Bound, Optimization, Heuristics, A*]
 ---
 
+import FigAssignmentTree from './img/assignment-tree.svg';
+import FigKnapsackTree from './img/knapsack-tree.svg';
+import FigPuzzleGoal from './img/puzzle-goal.svg';
+import FigPuzzleExample1 from './img/puzzle-example1.svg';
+import FigPuzzleExample2 from './img/puzzle-example2.svg';
+import FigPuzzleHeuristics from './img/puzzle-heuristics.svg';
+
 # Branch and Bound: Classic Problems
 
 This lesson applies the [general scheme of branch and bound](./01-branch-and-bound-scheme.mdx) to several problems. In each one, the work consists of answering the same three questions:
@@ -62,6 +69,10 @@ The live nodes are kept in a priority queue ordered by heuristic. The search pro
 | 5 | a1 b3 (61) | c2 d4: solution, cost 69; c4 d2: **solution, cost 61** | **61** |
 | 6 | | The best live node is a2 b4 (64) ≥ 61: **stop** | 61 |
 
+<Figure caption="The search tree of the trace. The orange numbers give the order of expansion; nodes whose bound reaches the limit are pruned (red) as soon as they are generated, and the search stops when no live node (gray) can beat the solution of cost 61.">
+  <FigAssignmentTree />
+</Figure>
+
 The optimal solution is **(a, 1), (b, 3), (c, 4), (d, 2)**, with cost $11 + 13 + 23 + 14 = 61$.
 
 Only **4 complete assignments** were generated (6 if we count the two diagonals used for the initial limit), instead of the $4! = 24$ that exhaustive backtracking examines. Nodes a3, a4, a2 b1, a1 b2 and a1 b4 were never expanded.
@@ -107,6 +118,10 @@ Use the instance from the dynamic programming lesson: $W = 10$, and three object
 - Expand "take 2" (10). "Take 3": value **10**, which becomes the best value. "Leave 3": bound 5, pruned.
 - No live node can beat 10: **stop**. The optimum is objects 2 and 3, value 10.
 
+<Figure caption="The search for the knapsack example. Each node shows the value carried so far (v) and its optimistic bound (b); the branch with the best bound, take 1, is explored first but only reaches 8, and the optimum, 10, is in the other branch.">
+  <FigKnapsackTree />
+</Figure>
+
 The example also shows that the first branch explored (the one with the most attractive bound) does not always contain the optimum: the fractional bound of "take 1" was 12, but its true best completion is only 8. The bound was optimistic, as required, and the search corrected itself.
 
 ### The power of a tight bound
@@ -129,13 +144,9 @@ All three return the same value. The bound is responsible for almost all of the 
 
 **Problem.** The **15-puzzle** is played on a $4 \times 4$ board with 15 numbered tiles and one empty cell. A move slides a tile adjacent to the empty cell into it (equivalently, the empty cell moves to one of its up to four neighbors). Pieces cannot be lifted. Starting from a scrambled board, reach the goal state with the tiles in order and the empty cell in the last position, using **as few moves as possible**. The **8-puzzle** is the same game on a $3 \times 3$ board.
 
-```text
-Initial state           Goal state
-14  2  3 12              1  2  3  4
- 9  .  4  8              5  6  7  8
-13 10 11  7              9 10 11 12
- 5  1 15  6             13 14 15  .
-```
+<Figure caption="An initial state of the 15-puzzle and the goal state. A move slides a tile into the empty cell.">
+  <FigPuzzleGoal />
+</Figure>
 
 ### The state space
 
@@ -159,23 +170,17 @@ The reason is a parity argument: every move changes the parity of the number of 
 
 **Example 1.** For the board
 
-```text
- 1  3  4 15
- 2  .  5 12
- 7  6 11 14
- 8  9 10 13
-```
+<Figure caption="Example 1. The purple cells are the shaded cells of the checkerboard pattern; the empty cell, 6, is not one of them.">
+  <FigPuzzleExample1 />
+</Figure>
 
 the values are $\text{smaller}(3) = \text{smaller}(4) = \text{smaller}(7) = 1$, $\text{smaller}(11) = 3$, $\text{smaller}(12) = 6$, $\text{smaller}(14) = 4$, $\text{smaller}(15) = 11$ and $\text{smaller}(16) = 10$, all the others 0. The sum is 37, and the empty cell is in cell 6, which is not shaded ($x = 0$). The total, 37, is odd: **the goal cannot be reached**, and the search should not even start.
 
 **Example 2.** For the board
 
-```text
- 1  2  3  4
- 5  6  7  8
- 9 10  . 11
-13 14 15 12
-```
+<Figure caption="Example 2. The empty cell, 11, is not shaded, and the sum is even.">
+  <FigPuzzleExample2 />
+</Figure>
 
 $\text{smaller}(13) = \text{smaller}(14) = \text{smaller}(15) = 1$ and $\text{smaller}(16) = 5$, so the sum is 8, with $x = 0$ (cell 11 is not shaded). The total is even: **the goal is reachable** (in fact, with 2 moves). The initial state shown at the beginning of this section is also reachable (sum 64, $x = 0$).
 
@@ -191,6 +196,10 @@ Two classic estimates of how far a board is from the goal:
 - **Manhattan distance**: the sum, over all tiles, of the number of rows plus columns that separate each tile from its final cell.
 
 Both are **admissible**: each misplaced tile needs at least one move, and each move changes the Manhattan distance of only one tile by one. The empty cell must **not** be counted, or the estimate may exceed the true number of moves. Manhattan distance is always at least as large as the number of misplaced tiles, so it is the tighter (better) of the two.
+
+<Figure caption="An 8-puzzle board and the goal. Six tiles are misplaced (blue); the orange numbers are the Manhattan distance of each tile to its cell, 9 in total. Both estimates are lower than or equal to the real number of moves.">
+  <FigPuzzleHeuristics />
+</Figure>
 
 <ProofLink to="/concepts/branch-and-bound/proofs#the-puzzle-heuristics-are-admissible" title="The puzzle heuristics are admissible" />
 

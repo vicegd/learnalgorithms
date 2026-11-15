@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 558 294" width="558" height="294" role="img">
+  <title>Backtracking tree for binary strings of length 3 without two consecutive 1s</title>
+  <line class="ln" x1="289.8" y1="34.0" x2="151.0" y2="76.0"/>
+  <line class="ln" x1="151.0" y1="100.0" x2="77.0" y2="142.0"/>
+  <line class="ln" x1="77.0" y1="166.0" x2="40.0" y2="208.0"/>
+  <line class="ln" x1="77.0" y1="166.0" x2="114.0" y2="208.0"/>
+  <line class="ln" x1="151.0" y1="100.0" x2="225.0" y2="142.0"/>
+  <line class="ln" x1="225.0" y1="166.0" x2="188.0" y2="208.0"/>
+  <line class="ln-bad" x1="225.0" y1="166.0" x2="262.0" y2="208.0"/>
+  <line class="ln" x1="289.8" y1="34.0" x2="428.5" y2="76.0"/>
+  <line class="ln" x1="428.5" y1="100.0" x2="373.0" y2="142.0"/>
+  <line class="ln" x1="373.0" y1="166.0" x2="336.0" y2="208.0"/>
+  <line class="ln" x1="373.0" y1="166.0" x2="410.0" y2="208.0"/>
+  <line class="ln-bad" x1="428.5" y1="100.0" x2="484.0" y2="142.0"/>
+  <rect class="box-blue" x="261.8" y="10.0" width="56.0" height="24.0" rx="6"/>
+  <text class="t-s t-m" x="289.8" y="22.5" text-anchor="middle" dominant-baseline="central">( )</text>
+  <text class="t-xs t-ac" x="289.8" y="44.0" text-anchor="middle" dominant-baseline="central">#1</text>
+  <rect class="box-blue" x="123.0" y="76.0" width="56.0" height="24.0" rx="6"/>
+  <text class="t-s t-m" x="151.0" y="88.5" text-anchor="middle" dominant-baseline="central">(0)</text>
+  <text class="t-xs t-ac" x="151.0" y="110.0" text-anchor="middle" dominant-baseline="central">#2</text>
+  <rect class="box-blue" x="49.0" y="142.0" width="56.0" height="24.0" rx="6"/>
+  <text class="t-s t-m" x="77.0" y="154.5" text-anchor="middle" dominant-baseline="central">(0,0)</text>
+  <text class="t-xs t-ac" x="77.0" y="176.0" text-anchor="middle" dominant-baseline="central">#3</text>
+  <rect class="box-hl" x="12.0" y="208.0" width="56.0" height="24.0" rx="6"/>
+  <text class="t-s t-m" x="40.0" y="220.5" text-anchor="middle" dominant-baseline="central">000</text>
+  <text class="t-xs t-ac" x="40.0" y="242.0" text-anchor="middle" dominant-baseline="central">#4</text>
+  <rect class="box-hl" x="86.0" y="208.0" width="56.0" height="24.0" rx="6"/>
+  <text class="t-s t-m" x="114.0" y="220.5" text-anchor="middle" dominant-baseline="central">001</text>
+  <text class="t-xs t-ac" x="114.0" y="242.0" text-anchor="middle" dominant-baseline="central">#5</text>
+  <rect class="box-blue" x="197.0" y="142.0" width="56.0" height="24.0" rx="6"/>
+  <text class="t-s t-m" x="225.0" y="154.5" text-anchor="middle" dominant-baseline="central">(0,1)</text>
+  <text class="t-xs t-ac" x="225.0" y="176.0" text-anchor="middle" dominant-baseline="central">#6</text>
+  <rect class="box-hl" x="160.0" y="208.0" width="56.0" height="24.0" rx="6"/>
+  <text class="t-s t-m" x="188.0" y="220.5" text-anchor="middle" dominant-baseline="central">010</text>
+  <text class="t-xs t-ac" x="188.0" y="242.0" text-anchor="middle" dominant-baseline="central">#7</text>
+  <rect class="box-bad" x="234.0" y="208.0" width="56.0" height="24.0" rx="6"/>
+  <text class="t-s t-m t-bad" x="262.0" y="220.5" text-anchor="middle" dominant-baseline="central">011</text>
+  <text class="t-xs t-bad" x="262.0" y="242.0" text-anchor="middle" dominant-baseline="central">pruned</text>
+  <rect class="box-blue" x="400.5" y="76.0" width="56.0" height="24.0" rx="6"/>
+  <text class="t-s t-m" x="428.5" y="88.5" text-anchor="middle" dominant-baseline="central">(1)</text>
+  <text class="t-xs t-ac" x="428.5" y="110.0" text-anchor="middle" dominant-baseline="central">#8</text>
+  <rect class="box-blue" x="345.0" y="142.0" width="56.0" height="24.0" rx="6"/>
+  <text class="t-s t-m" x="373.0" y="154.5" text-anchor="middle" dominant-baseline="central">(1,0)</text>
+  <text class="t-xs t-ac" x="373.0" y="176.0" text-anchor="middle" dominant-baseline="central">#9</text>
+  <rect class="box-hl" x="308.0" y="208.0" width="56.0" height="24.0" rx="6"/>
+  <text class="t-s t-m" x="336.0" y="220.5" text-anchor="middle" dominant-baseline="central">100</text>
+  <text class="t-xs t-ac" x="336.0" y="242.0" text-anchor="middle" dominant-baseline="central">#10</text>
+  <rect class="box-hl" x="382.0" y="208.0" width="56.0" height="24.0" rx="6"/>
+  <text class="t-s t-m" x="410.0" y="220.5" text-anchor="middle" dominant-baseline="central">101</text>
+  <text class="t-xs t-ac" x="410.0" y="242.0" text-anchor="middle" dominant-baseline="central">#11</text>
+  <rect class="box-bad" x="456.0" y="142.0" width="56.0" height="24.0" rx="6"/>
+  <text class="t-s t-m t-bad" x="484.0" y="154.5" text-anchor="middle" dominant-baseline="central">11</text>
+  <text class="t-xs t-bad" x="484.0" y="176.0" text-anchor="middle" dominant-baseline="central">pruned</text>
+  <text class="t-xs t-mut" x="279.0" y="286.0" text-anchor="middle" dominant-baseline="central">green: the 5 solutions · red: pruned · #k: order of the visits (depth first)</text>
+</svg>

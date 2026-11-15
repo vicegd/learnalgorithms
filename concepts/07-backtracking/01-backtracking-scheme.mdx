@@ -6,6 +6,8 @@ tags: [Paradigms, State Space Search, Backtracking, Graphs, DFS]
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import FigTictactoeTree from './img/tictactoe-tree.svg';
+import FigBinaryStringsTree from './img/binary-strings-tree.svg';
 
 # The Backtracking Scheme
 
@@ -89,14 +91,9 @@ The implicit graph explored by backtracking is usually drawn as a tree, the **tr
 
 A familiar example is tic-tac-toe ("three in a row"). The root is the empty board, its 9 children are the 9 possible first moves of X, each of those has 8 children for the replies of O, and so on. Game-playing programs for chess or Go explore trees like this one; techniques such as **minimax**, **alpha-beta pruning** and **Monte Carlo tree search** are all refinements of the same idea.
 
-```text
-                        [ empty board ]                level 0
-               ┌──────────────┼──────────────┐
-          [X in a1]       [X in a2]   ...  [X in c3]     level 1 (9 nodes)
-        ┌─────┼─────┐
-   [O in a2] ... [O in c3]                               level 2 (8 children each)
-        ...
-```
+<Figure caption="The first levels of the tree of states of tic-tac-toe. The root is the empty board, its children are the 9 first moves of X, and each of them has 8 children for the replies of O.">
+  <FigTictactoeTree />
+</Figure>
 
 ***
 
@@ -122,16 +119,9 @@ This is a **depth-first search** of the tree of states, with two additions: the 
 
 Let us generate all binary strings of length 3 with **no two consecutive 1s**. The solution is a vector $(x_1, x_2, x_3)$ with $x_i \in \{0, 1\}$. Before setting $x_i = 1$, we check that $x_{i-1} \ne 1$.
 
-```text
-                          ( )
-              ┌────────────┴────────────┐
-            (0)                         (1)
-        ┌────┴────┐                 ┌────┴────┐
-     (0,0)      (0,1)            (1,0)      (1,1) ✗ pruned
-    ┌──┴──┐     ┌──┴──┐         ┌──┴──┐
- (000)  (001) (010) (011)✗   (100) (101)
-   ✓      ✓     ✓               ✓     ✓
-```
+<Figure caption="The search for binary strings of length 3 without two consecutive 1s. The numbers give the order of the visits: the search goes down as far as it can and backs up at each leaf. The red nodes are rejected before being explored.">
+  <FigBinaryStringsTree />
+</Figure>
 
 The algorithm goes down the leftmost branch to $(0,0,0)$, records it, goes back one level, tries $(0,0,1)$, goes back two levels, tries $(0,1,0)$, rejects $(0,1,1)$ without generating it, and so on. It finds the 5 valid strings. The pruned node $(1,1)$ would have had two children; in longer strings, cutting a node near the root removes a whole subtree of size $2^{\text{remaining levels}}$.
 

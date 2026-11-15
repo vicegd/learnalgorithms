@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 240 180" width="240" height="180" role="img">
+  <title>sum 37 + x 0 = 37, odd</title>
+  <rect class="f-hl" x="56.0" y="26.0" width="32.0" height="32.0" rx="0"/>
+  <text class="t-s t-m" x="72.0" y="42.0" text-anchor="middle" dominant-baseline="central">1</text>
+  <rect class="f-pur" x="88.0" y="26.0" width="32.0" height="32.0" rx="0"/>
+  <text class="t-s t-m" x="104.0" y="42.0" text-anchor="middle" dominant-baseline="central">3</text>
+  <rect class="f-hl" x="120.0" y="26.0" width="32.0" height="32.0" rx="0"/>
+  <text class="t-s t-m" x="136.0" y="42.0" text-anchor="middle" dominant-baseline="central">4</text>
+  <rect class="f-pur" x="152.0" y="26.0" width="32.0" height="32.0" rx="0"/>
+  <text class="t-s t-m" x="168.0" y="42.0" text-anchor="middle" dominant-baseline="central">15</text>
+  <rect class="f-pur" x="56.0" y="58.0" width="32.0" height="32.0" rx="0"/>
+  <text class="t-s t-m" x="72.0" y="74.0" text-anchor="middle" dominant-baseline="central">2</text>
+  <rect class="f-soft" x="88.0" y="58.0" width="32.0" height="32.0" rx="0"/>
+  <rect class="f-pur" x="120.0" y="58.0" width="32.0" height="32.0" rx="0"/>
+  <text class="t-s t-m" x="136.0" y="74.0" text-anchor="middle" dominant-baseline="central">5</text>
+  <rect class="f-hl" x="152.0" y="58.0" width="32.0" height="32.0" rx="0"/>
+  <text class="t-s t-m" x="168.0" y="74.0" text-anchor="middle" dominant-baseline="central">12</text>
+  <rect class="f-hl" x="56.0" y="90.0" width="32.0" height="32.0" rx="0"/>
+  <text class="t-s t-m" x="72.0" y="106.0" text-anchor="middle" dominant-baseline="central">7</text>
+  <rect class="f-pur" x="88.0" y="90.0" width="32.0" height="32.0" rx="0"/>
+  <text class="t-s t-m" x="104.0" y="106.0" text-anchor="middle" dominant-baseline="central">6</text>
+  <rect class="f-hl" x="120.0" y="90.0" width="32.0" height="32.0" rx="0"/>
+  <text class="t-s t-m" x="136.0" y="106.0" text-anchor="middle" dominant-baseline="central">11</text>
+  <rect class="f-pur" x="152.0" y="90.0" width="32.0" height="32.0" rx="0"/>
+  <text class="t-s t-m" x="168.0" y="106.0" text-anchor="middle" dominant-baseline="central">14</text>
+  <rect class="f-pur" x="56.0" y="122.0" width="32.0" height="32.0" rx="0"/>
+  <text class="t-s t-m" x="72.0" y="138.0" text-anchor="middle" dominant-baseline="central">8</text>
+  <rect class="f-hl" x="88.0" y="122.0" width="32.0" height="32.0" rx="0"/>
+  <text class="t-s t-m" x="104.0" y="138.0" text-anchor="middle" dominant-baseline="central">9</text>
+  <rect class="f-pur" x="120.0" y="122.0" width="32.0" height="32.0" rx="0"/>
+  <text class="t-s t-m" x="136.0" y="138.0" text-anchor="middle" dominant-baseline="central">10</text>
+  <rect class="f-hl" x="152.0" y="122.0" width="32.0" height="32.0" rx="0"/>
+  <text class="t-s t-m" x="168.0" y="138.0" text-anchor="middle" dominant-baseline="central">13</text>
+  <line class="ln" x1="56.0" y1="26.0" x2="56.0" y2="154.0"/>
+  <line class="ln" x1="56.0" y1="26.0" x2="184.0" y2="26.0"/>
+  <line class="ln" x1="88.0" y1="26.0" x2="88.0" y2="154.0"/>
+  <line class="ln" x1="56.0" y1="58.0" x2="184.0" y2="58.0"/>
+  <line class="ln" x1="120.0" y1="26.0" x2="120.0" y2="154.0"/>
+  <line class="ln" x1="56.0" y1="90.0" x2="184.0" y2="90.0"/>
+  <line class="ln" x1="152.0" y1="26.0" x2="152.0" y2="154.0"/>
+  <line class="ln" x1="56.0" y1="122.0" x2="184.0" y2="122.0"/>
+  <line class="ln" x1="184.0" y1="26.0" x2="184.0" y2="154.0"/>
+  <line class="ln" x1="56.0" y1="154.0" x2="184.0" y2="154.0"/>
+  <text class="t-xs t-b" x="120.0" y="14.0" text-anchor="middle" dominant-baseline="central">sum 37 + x 0 = 37, odd</text>
+  <text class="t-s t-bad t-b" x="120.0" y="170.0" text-anchor="middle" dominant-baseline="central">unreachable</text>
+</svg>

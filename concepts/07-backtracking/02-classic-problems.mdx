@@ -7,6 +7,10 @@ tags: [Paradigms, State Space Search, Backtracking, N-Queens, Subset Sum, Permut
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import FigPermutationsTree from './img/permutations-tree.svg';
+import FigSubsetSumTree from './img/subset-sum-tree.svg';
+import FigQueens4 from './img/queens4.svg';
+import FigKnightMoves from './img/knight-moves.svg';
 
 # Backtracking: Classic Problems
 
@@ -41,6 +45,10 @@ The full code of most of these examples, with tests and time measurements, is in
 1 0 2 3
 ...
 ```
+
+<Figure caption="The tree of permutations of three elements. Each level fills one position with an element not used yet, so the levels have 3, 6 and 6 nodes, and the leaves are the 3! = 6 permutations.">
+  <FigPermutationsTree />
+</Figure>
 
 **Design.**
 
@@ -115,6 +123,10 @@ void subsets(int level, int sum) {
     }
 }
 ```
+
+<Figure caption="The pruned search tree for {1, 2, 3, 4, 5} and c = 10. Each node shows the current sum; solid edges take the next number and dashed edges leave it. The search reaches the 3 solutions with 25 calls instead of the 63 nodes of the full tree.">
+  <FigSubsetSumTree />
+</Figure>
 
 **Effect of pruning.** The full binary tree for $n = 5$ has $2^6 - 1 = 63$ nodes. With both prunings, the algorithm finds the 3 solutions in **25 calls**. On a larger instance (30 random numbers between 1 and 100, target 500, with more than 1.6 million solutions), feasibility pruning alone needed about 402 million calls, and adding the look-ahead test reduced them to about 98 million, roughly four times fewer.
 
@@ -213,12 +225,9 @@ With $n = 4$ the search goes like this (rows and columns numbered from 0):
 2. Column 1, row 3. Column 2: try row 1. Column 3: every row is attacked. **Back** to column 2: no more rows. **Back** to column 1: no more rows. **Back** to column 0.
 3. Column 0, row 1. Column 1: row 3. Column 2: row 0. Column 3: row 2. **Solution** $(1, 3, 0, 2)$.
 
-```text
-. . Q .
-Q . . .
-. . . Q
-. Q . .
-```
+<Figure caption="The trace for n = 4 as a tree. Each node lists the rows of the queens placed so far, column by column; the two dead ends force the search back to column 0, and the third branch reaches the solution.">
+  <FigQueens4 />
+</Figure>
 
 The first-solution version stops here after generating 9 nodes. The all-solutions version continues and finds the second (and last) solution, $(2, 0, 3, 1)$, which is the mirror image of the first.
 
@@ -263,13 +272,9 @@ The work is exactly halved. Using also the rotations and the other reflections o
 
 **Problem.** A knight must visit **every square** of an $n \times n$ board **exactly once**, using its usual L-shaped move (two squares in one direction and one in the perpendicular direction). From a square in the middle of the board, it has 8 possible moves:
 
-```text
-.  3  .  2  .
-4  .  .  .  1
-.  .  *  .  .
-5  .  .  .  8
-.  6  .  7  .
-```
+<Figure caption="The 8 moves of a knight from a central square, numbered in the order of the displacement arrays a and b.">
+  <FigKnightMoves />
+</Figure>
 
 **Design.**
 
