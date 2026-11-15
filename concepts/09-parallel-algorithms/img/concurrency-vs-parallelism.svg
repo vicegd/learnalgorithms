@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 680 210" width="680" height="210" role="img">
+  <title>Concurrency on one core alternates two tasks; parallelism on two cores runs them at the same time</title>
+  <text class="t-s t-b" x="20.0" y="20.0" text-anchor="start" dominant-baseline="central">concurrency: 1 core</text>
+  <rect class="box-blue" x="120.0" y="34.0" width="40.0" height="28.0" rx="2"/>
+  <text class="t-s t-b" x="140.0" y="48.0" text-anchor="middle" dominant-baseline="central">A</text>
+  <rect class="box-ac" x="160.0" y="34.0" width="40.0" height="28.0" rx="2"/>
+  <text class="t-s t-b" x="180.0" y="48.0" text-anchor="middle" dominant-baseline="central">B</text>
+  <rect class="box-blue" x="200.0" y="34.0" width="40.0" height="28.0" rx="2"/>
+  <text class="t-s t-b" x="220.0" y="48.0" text-anchor="middle" dominant-baseline="central">A</text>
+  <rect class="box-ac" x="240.0" y="34.0" width="40.0" height="28.0" rx="2"/>
+  <text class="t-s t-b" x="260.0" y="48.0" text-anchor="middle" dominant-baseline="central">B</text>
+  <rect class="box-blue" x="280.0" y="34.0" width="40.0" height="28.0" rx="2"/>
+  <text class="t-s t-b" x="300.0" y="48.0" text-anchor="middle" dominant-baseline="central">A</text>
+  <rect class="box-blue" x="320.0" y="34.0" width="40.0" height="28.0" rx="2"/>
+  <text class="t-s t-b" x="340.0" y="48.0" text-anchor="middle" dominant-baseline="central">A</text>
+  <rect class="box-ac" x="360.0" y="34.0" width="40.0" height="28.0" rx="2"/>
+  <text class="t-s t-b" x="380.0" y="48.0" text-anchor="middle" dominant-baseline="central">B</text>
+  <rect class="box-ac" x="400.0" y="34.0" width="40.0" height="28.0" rx="2"/>
+  <text class="t-s t-b" x="420.0" y="48.0" text-anchor="middle" dominant-baseline="central">B</text>
+  <rect class="box-blue" x="440.0" y="34.0" width="40.0" height="28.0" rx="2"/>
+  <text class="t-s t-b" x="460.0" y="48.0" text-anchor="middle" dominant-baseline="central">A</text>
+  <rect class="box-ac" x="480.0" y="34.0" width="40.0" height="28.0" rx="2"/>
+  <text class="t-s t-b" x="500.0" y="48.0" text-anchor="middle" dominant-baseline="central">B</text>
+  <text class="t-xs t-mut" x="108.0" y="48.0" text-anchor="end" dominant-baseline="central">core 1</text>
+  <text class="t-s t-b" x="20.0" y="100.0" text-anchor="start" dominant-baseline="central">parallelism: 2 cores</text>
+  <rect class="box-blue" x="120.0" y="114.0" width="40.0" height="28.0" rx="2"/>
+  <text class="t-s t-b" x="140.0" y="128.0" text-anchor="middle" dominant-baseline="central">A</text>
+  <rect class="box-ac" x="120.0" y="146.0" width="40.0" height="28.0" rx="2"/>
+  <text class="t-s t-b" x="140.0" y="160.0" text-anchor="middle" dominant-baseline="central">B</text>
+  <rect class="box-blue" x="160.0" y="114.0" width="40.0" height="28.0" rx="2"/>
+  <text class="t-s t-b" x="180.0" y="128.0" text-anchor="middle" dominant-baseline="central">A</text>
+  <rect class="box-ac" x="160.0" y="146.0" width="40.0" height="28.0" rx="2"/>
+  <text class="t-s t-b" x="180.0" y="160.0" text-anchor="middle" dominant-baseline="central">B</text>
+  <rect class="box-blue" x="200.0" y="114.0" width="40.0" height="28.0" rx="2"/>
+  <text class="t-s t-b" x="220.0" y="128.0" text-anchor="middle" dominant-baseline="central">A</text>
+  <rect class="box-ac" x="200.0" y="146.0" width="40.0" height="28.0" rx="2"/>
+  <text class="t-s t-b" x="220.0" y="160.0" text-anchor="middle" dominant-baseline="central">B</text>
+  <rect class="box-blue" x="240.0" y="114.0" width="40.0" height="28.0" rx="2"/>
+  <text class="t-s t-b" x="260.0" y="128.0" text-anchor="middle" dominant-baseline="central">A</text>
+  <rect class="box-ac" x="240.0" y="146.0" width="40.0" height="28.0" rx="2"/>
+  <text class="t-s t-b" x="260.0" y="160.0" text-anchor="middle" dominant-baseline="central">B</text>
+  <rect class="box-blue" x="280.0" y="114.0" width="40.0" height="28.0" rx="2"/>
+  <text class="t-s t-b" x="300.0" y="128.0" text-anchor="middle" dominant-baseline="central">A</text>
+  <rect class="box-ac" x="280.0" y="146.0" width="40.0" height="28.0" rx="2"/>
+  <text class="t-s t-b" x="300.0" y="160.0" text-anchor="middle" dominant-baseline="central">B</text>
+  <text class="t-xs t-mut" x="108.0" y="128.0" text-anchor="end" dominant-baseline="central">core 1</text>
+  <text class="t-xs t-mut" x="108.0" y="160.0" text-anchor="end" dominant-baseline="central">core 2</text>
+  <line class="ln-axis" x1="120.0" y1="194.0" x2="534.0" y2="194.0"/>
+  <polygon class="ah" points="540.0,194.0 534.0,197.0 534.0,191.0"/>
+  <text class="t-xs t-mut" x="546.0" y="194.0" text-anchor="start" dominant-baseline="central">time</text>
+  <line class="ln-hl" x1="320.0" y1="108.0" x2="320.0" y2="182.0"/>
+  <text class="t-xs t-hl" x="326.0" y="108.0" text-anchor="start" dominant-baseline="central">both finished: half the time</text>
+</svg>

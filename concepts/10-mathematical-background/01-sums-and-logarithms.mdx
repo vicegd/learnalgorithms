@@ -4,6 +4,10 @@ sidebar_position: 1
 tags: [Mathematics, Summations, Logarithms, Factorials, Reference]
 ---
 
+import FigGaussSum from './img/gauss-sum.svg';
+import FigGeometricSeries from './img/geometric-series.svg';
+import FigHarmonic from './img/harmonic.svg';
+
 # Sums, Logarithms and Factorials
 
 Analyzing algorithms needs only a small amount of mathematics, but it needs it constantly. This lesson collects the facts used throughout the course, explains **where each one comes from**, and shows how to use them. It can be read on its own or consulted when a lesson refers to it.
@@ -44,6 +48,10 @@ $$
  2S = (n+1) + (n+1) + ... + (n+1) + (n+1)   = n (n+1)
 ```
 
+<Figure caption="The same trick in a picture: the staircase 1 + 2 + ... + n (blue) and a copy turned upside down (orange) fill a rectangle of n × (n + 1) squares, so each staircase has n(n + 1)/2.">
+  <FigGaussSum />
+</Figure>
+
 Each of the $n$ columns adds up to $n + 1$, so $2S = n(n+1)$. (The story goes that Gauss found this trick as a schoolboy.)
 
 **Where it appears.** In every **triangular loop**, where the inner loop runs $1, 2, \dots, n$ times (or $n - 1, n - 2, \dots, 1$): bubble sort, selection sort and insertion sort in its worst case all perform about $n^2/2$ comparisons. It is $\Theta(n^2)$: half of the square, but still quadratic.
@@ -82,6 +90,10 @@ The important part is what happens for large $k$, which depends only on the rati
 | $r = 1$ | All terms equal | $k + 1$ | |
 | $r \lt 1$ | The terms shrink; the **first** term dominates, and the sum never exceeds $\frac{1}{1-r}$ | $\Theta(1)$ | $1 + \frac{1}{2} + \frac{1}{4} + \dots \lt 2$ |
 
+<Figure caption="A geometric series with ratio 1/2. Each term covers half of the gap that remains up to 2, so the sum gets as close to 2 as we like but never reaches it.">
+  <FigGeometricSeries />
+</Figure>
+
 This table is the heart of the analysis of divide and conquer. In the [recursion tree](../04-divide-and-conquer/02-analysis.mdx) of a division scheme, the work per level forms a geometric series of ratio $a / b^k$, and the three cases of the formula are exactly the three rows above: the work is concentrated at the bottom, spread evenly, or concentrated at the top.
 
 It also explains a fact that surprises many students: a `for` loop that **doubles** its variable (`for (i = 1; i < n; i *= 2)`) with a body of cost $i$ costs only $1 + 2 + 4 + \dots + n/2 \lt n$, which is $O(n)$, not $O(n \log n)$. The same argument explains why adding $n$ elements to an `ArrayList` costs $O(n)$ in total: whenever the internal array is full, it is replaced by one larger by a constant factor (50% larger in Java) and the elements are copied, but the sizes of those copies form a geometric series, so all the copies together cost only a constant times the final size.
@@ -107,6 +119,10 @@ $$
 $$
 
 (with the inequalities reversed for decreasing $f$). For example, $\int_1^n \frac{dx}{x} = \ln n$, which is why $H_n \approx \ln n$. And $\sum_{i=1}^{n} i^k \approx \int_0^n x^k \, dx = \frac{n^{k+1}}{k+1}$, which agrees with $\Theta(n^{k+1})$.
+
+<Figure caption="The harmonic sum as an area. Each rectangle has width 1 and height 1/i, and together they cover the area under y = 1/x, which is a logarithm.">
+  <FigHarmonic />
+</Figure>
 
 ***
 

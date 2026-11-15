@@ -4,6 +4,9 @@ sidebar_position: 3
 tags: [Parallelism, Speedup, Amdahl's Law, Complexity]
 ---
 
+import FigWorkSpan from './img/work-span.svg';
+import FigAmdahl from './img/amdahl.svg';
+
 # Performance of Parallel Algorithms
 
 A parallel program is only worth its extra complexity if it is **faster**. But how much faster can it be? Does doubling the number of cores halve the time? This lesson presents the tools to answer these questions: how the complexity of an algorithm relates to its parallel execution time, how to measure the benefit of parallelism, and **Amdahl's law**, which sets a hard limit on it.
@@ -52,6 +55,10 @@ A more general way of analyzing a parallel algorithm uses two quantities:
 
 - the **work** $W$: the total number of operations, that is, the time with a single processor;
 - the **span** $S$ (or depth): the length of the longest chain of operations that must be executed one after another, that is, the time with an unlimited number of processors.
+
+<Figure caption="The sum of 8 numbers as a tree of additions. The work is the total number of additions, 7; the span is the longest chain of additions that must wait for each other, 3, because each level can be computed in parallel.">
+  <FigWorkSpan />
+</Figure>
 
 For the divide and conquer sum, $W \in O(n)$ and $S \in O(\log n)$ (the depth of the tree of additions). With $p$ processors, a good scheduler (such as Fork/Join's work stealing) achieves a time of about
 
@@ -125,6 +132,10 @@ $$
 | 90 % | 1.82 | 3.08 | 4.71 | 6.40 | 8.77 | 9.91 | 10 |
 | 95 % | 1.90 | 3.48 | 5.93 | 9.14 | 15.42 | 19.64 | 20 |
 | 99 % | 1.98 | 3.88 | 7.48 | 13.91 | 39.26 | 91.18 | 100 |
+
+<Figure caption="Amdahl's law. Each curve approaches its limit 1/(1 − f): with 10 % of sequential work, the speedup never exceeds 10, however many processors are added.">
+  <FigAmdahl />
+</Figure>
 
 The conclusion is striking: **if 10 % of an algorithm is intrinsically sequential, the program will never be more than 10 times faster, even with a million processors**. To benefit from many cores, the sequential part must be tiny.
 

@@ -4,6 +4,9 @@ sidebar_position: 2
 tags: [Mathematics, Induction, Correctness, Loop Invariants, Recurrences, Reference]
 ---
 
+import FigUnequalRecursionTree from './img/unequal-recursion-tree.svg';
+import FigLoopInvariants from './img/loop-invariants.svg';
+
 # Induction, Correctness and Recurrences
 
 Recursive algorithms raise two questions: **is the algorithm correct**, and **how long does it take**? The answer to both uses the same idea. A recursive algorithm solves a problem by trusting that the smaller calls work; **mathematical induction** is the tool that makes that trust rigorous, and a **recurrence** is the equation that describes its cost in terms of the cost of the smaller calls.
@@ -94,6 +97,10 @@ Iterative algorithms are proved correct with a **loop invariant**: a property th
 
 **Example: binary search.** Invariant: *if the target is in the array, it is in `a[left..right]`.* It holds initially (the whole array) and is maintained because each comparison discards only a half where the target cannot be, given that the array is sorted. When the range becomes empty, the invariant says the target is not in the array. Writing this invariant explicitly is the most reliable way to get the boundaries right, which is notoriously easy to get wrong: a version that uses `right = mid` instead of `right = mid - 1` in the wrong place can loop forever.
 
+<Figure caption="The two invariants in the middle of a run. In insertion sort, the prefix before position i is always sorted; in binary search, the interval from left to right always contains the target, if it is present.">
+  <FigLoopInvariants />
+</Figure>
+
 ***
 
 ## Recurrences
@@ -138,6 +145,10 @@ T(n) = T(n/3) + T(2n/3) + n
 $$
 
 The two children of a node together have the same size as the node, so every **complete** level of the tree costs $n$. The shortest branch (always taking the third) has $\log_3 n$ levels and the longest (always taking the two thirds) has $\log_{3/2} n$ levels. The total is therefore between $n \log_3 n$ and $n \log_{3/2} n$: $\Theta(n \log n)$. Computing the recurrence exactly, $T(n) / (n \log_2 n)$ is 1.15 for $n = 10^3$ and 1.12 for $n = 10^6$, consistent with $\Theta(n \log n)$. This is why Quicksort is still $O(n \log n)$ when every partition is uneven but **proportional**, such as 10% and 90%.
+
+<Figure caption="The recursion tree of an uneven division. Each complete level costs n, and the number of levels is between log₃ n and log₃/₂ n, so the total is Θ(n log n).">
+  <FigUnequalRecursionTree />
+</Figure>
 
 Another case outside the formulas is a non-recursive term that is not a power of $n$:
 

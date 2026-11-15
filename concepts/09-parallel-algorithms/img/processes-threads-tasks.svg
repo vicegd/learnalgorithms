@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 640 220" width="640" height="220" role="img">
+  <title>A system runs processes; each process has threads that share its memory; threads execute tasks</title>
+  <rect class="box-soft" x="10.0" y="10.0" width="620.0" height="200.0" rx="10"/>
+  <text class="t-s t-b" x="24.0" y="28.0" text-anchor="start" dominant-baseline="central">system</text>
+  <rect class="box" x="30.0" y="42.0" width="285.0" height="158.0" rx="8"/>
+  <text class="t-xs t-b" x="42.0" y="58.0" text-anchor="start" dominant-baseline="central">process 1: its own memory</text>
+  <rect class="box-pur" x="42.0" y="70.0" width="261.0" height="22.0" rx="4"/>
+  <text class="t-xs t-pur" x="172.0" y="81.0" text-anchor="middle" dominant-baseline="central">shared memory of the process</text>
+  <rect class="box-blue" x="42.0" y="104.0" width="261.0" height="38.0" rx="6"/>
+  <text class="t-xs t-b" x="52.0" y="123.0" text-anchor="start" dominant-baseline="central">thread 1</text>
+  <rect class="box-hl" x="120.0" y="112.0" width="50.0" height="22.0" rx="4"/>
+  <text class="t-xs" x="145.0" y="123.0" text-anchor="middle" dominant-baseline="central">task</text>
+  <rect class="box-hl" x="178.0" y="112.0" width="50.0" height="22.0" rx="4"/>
+  <text class="t-xs" x="203.0" y="123.0" text-anchor="middle" dominant-baseline="central">task</text>
+  <rect class="box-hl" x="236.0" y="112.0" width="50.0" height="22.0" rx="4"/>
+  <text class="t-xs" x="261.0" y="123.0" text-anchor="middle" dominant-baseline="central">task</text>
+  <rect class="box-blue" x="42.0" y="150.0" width="261.0" height="38.0" rx="6"/>
+  <text class="t-xs t-b" x="52.0" y="169.0" text-anchor="start" dominant-baseline="central">thread 2</text>
+  <rect class="box-hl" x="120.0" y="158.0" width="50.0" height="22.0" rx="4"/>
+  <text class="t-xs" x="145.0" y="169.0" text-anchor="middle" dominant-baseline="central">task</text>
+  <rect class="box-hl" x="178.0" y="158.0" width="50.0" height="22.0" rx="4"/>
+  <text class="t-xs" x="203.0" y="169.0" text-anchor="middle" dominant-baseline="central">task</text>
+  <rect class="box" x="335.0" y="42.0" width="285.0" height="158.0" rx="8"/>
+  <text class="t-xs t-b" x="347.0" y="58.0" text-anchor="start" dominant-baseline="central">process 2: its own memory</text>
+  <rect class="box-pur" x="347.0" y="70.0" width="261.0" height="22.0" rx="4"/>
+  <text class="t-xs t-pur" x="477.0" y="81.0" text-anchor="middle" dominant-baseline="central">shared memory of the process</text>
+  <rect class="box-blue" x="347.0" y="104.0" width="261.0" height="38.0" rx="6"/>
+  <text class="t-xs t-b" x="357.0" y="123.0" text-anchor="start" dominant-baseline="central">thread 1</text>
+  <rect class="box-hl" x="425.0" y="112.0" width="50.0" height="22.0" rx="4"/>
+  <text class="t-xs" x="450.0" y="123.0" text-anchor="middle" dominant-baseline="central">task</text>
+  <rect class="box-hl" x="483.0" y="112.0" width="50.0" height="22.0" rx="4"/>
+  <text class="t-xs" x="508.0" y="123.0" text-anchor="middle" dominant-baseline="central">task</text>
+  <rect class="box-hl" x="541.0" y="112.0" width="50.0" height="22.0" rx="4"/>
+  <text class="t-xs" x="566.0" y="123.0" text-anchor="middle" dominant-baseline="central">task</text>
+  <rect class="box-blue" x="347.0" y="150.0" width="261.0" height="38.0" rx="6"/>
+  <text class="t-xs t-b" x="357.0" y="169.0" text-anchor="start" dominant-baseline="central">thread 2</text>
+  <rect class="box-hl" x="425.0" y="158.0" width="50.0" height="22.0" rx="4"/>
+  <text class="t-xs" x="450.0" y="169.0" text-anchor="middle" dominant-baseline="central">task</text>
+  <rect class="box-hl" x="483.0" y="158.0" width="50.0" height="22.0" rx="4"/>
+  <text class="t-xs" x="508.0" y="169.0" text-anchor="middle" dominant-baseline="central">task</text>
+</svg>

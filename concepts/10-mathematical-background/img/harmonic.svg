@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 600 270" width="600" height="270" role="img">
+  <title>The harmonic sum as rectangles of height 1/i, compared with the area under 1/x</title>
+  <line class="ln-axis" x1="50.0" y1="230.0" x2="550.0" y2="230.0"/>
+  <line class="ln-axis" x1="50.0" y1="230.0" x2="50.0" y2="20.0"/>
+  <rect class="box-blue" x="95.5" y="30.0" width="45.5" height="200.0" rx="0"/>
+  <text class="t-xs t-mut" x="118.2" y="242.0" text-anchor="middle" dominant-baseline="central">1</text>
+  <rect class="box-blue" x="140.9" y="130.0" width="45.5" height="100.0" rx="0"/>
+  <text class="t-xs t-mut" x="163.6" y="242.0" text-anchor="middle" dominant-baseline="central">2</text>
+  <rect class="box-blue" x="186.4" y="163.3" width="45.5" height="66.7" rx="0"/>
+  <text class="t-xs t-mut" x="209.1" y="242.0" text-anchor="middle" dominant-baseline="central">3</text>
+  <rect class="box-blue" x="231.8" y="180.0" width="45.5" height="50.0" rx="0"/>
+  <text class="t-xs t-mut" x="254.5" y="242.0" text-anchor="middle" dominant-baseline="central">4</text>
+  <rect class="box-blue" x="277.3" y="190.0" width="45.5" height="40.0" rx="0"/>
+  <text class="t-xs t-mut" x="300.0" y="242.0" text-anchor="middle" dominant-baseline="central">5</text>
+  <rect class="box-blue" x="322.7" y="196.7" width="45.5" height="33.3" rx="0"/>
+  <text class="t-xs t-mut" x="345.5" y="242.0" text-anchor="middle" dominant-baseline="central">6</text>
+  <rect class="box-blue" x="368.2" y="201.4" width="45.5" height="28.6" rx="0"/>
+  <text class="t-xs t-mut" x="390.9" y="242.0" text-anchor="middle" dominant-baseline="central">7</text>
+  <rect class="box-blue" x="413.6" y="205.0" width="45.5" height="25.0" rx="0"/>
+  <text class="t-xs t-mut" x="436.4" y="242.0" text-anchor="middle" dominant-baseline="central">8</text>
+  <rect class="box-blue" x="459.1" y="207.8" width="45.5" height="22.2" rx="0"/>
+  <text class="t-xs t-mut" x="481.8" y="242.0" text-anchor="middle" dominant-baseline="central">9</text>
+  <rect class="box-blue" x="504.5" y="210.0" width="45.5" height="20.0" rx="0"/>
+  <text class="t-xs t-mut" x="527.3" y="242.0" text-anchor="middle" dominant-baseline="central">10</text>
+  <polyline class="ln-ac" points="91.8,12.6 94.1,23.8 96.4,33.9 98.6,43.1 100.9,51.4 103.2,59.1 105.5,66.1 107.7,72.5 110.0,78.5 112.3,84.0 114.5,89.2 116.8,93.9 119.1,98.4 121.4,102.6 123.6,106.5 125.9,110.2 128.2,113.7 130.5,117.0 132.7,120.1 135.0,123.0 137.3,125.8 139.5,128.5 141.8,131.0 144.1,133.4 146.4,135.7 148.6,137.8 150.9,139.9 153.2,141.9 155.5,143.8 157.7,145.6 160.0,147.4 162.3,149.0 164.5,150.6 166.8,152.2 169.1,153.7 171.4,155.1 173.6,156.5 175.9,157.8 178.2,159.1 180.5,160.3 182.7,161.5 185.0,162.7 187.3,163.8 189.5,164.9 191.8,165.9 194.1,166.9 196.4,167.9 198.6,168.8 200.9,169.8 203.2,170.7 205.5,171.5 207.7,172.4 210.0,173.2 212.3,174.0 214.5,174.8 216.8,175.5 219.1,176.2 221.4,176.9 223.6,177.6 225.9,178.3 228.2,179.0 230.5,179.6 232.7,180.2 235.0,180.9 237.3,181.5 239.5,182.0 241.8,182.6 244.1,183.2 246.4,183.7 248.6,184.2 250.9,184.8 253.2,185.3 255.5,185.8 257.7,186.2 260.0,186.7 262.3,187.2 264.5,187.6 266.8,188.1 269.1,188.5 271.4,188.9 273.6,189.3 275.9,189.8 278.2,190.2 280.5,190.6 282.7,190.9 285.0,191.3 287.3,191.7 289.5,192.0 291.8,192.4 294.1,192.8 296.4,193.1 298.6,193.4 300.9,193.8 303.2,194.1 305.5,194.4 307.7,194.7 310.0,195.0 312.3,195.3 314.5,195.6 316.8,195.9 319.1,196.2 321.4,196.5 323.6,196.8 325.9,197.1 328.2,197.3 330.5,197.6 332.7,197.8 335.0,198.1 337.3,198.4 339.5,198.6 341.8,198.8 344.1,199.1 346.4,199.3 348.6,199.6 350.9,199.8 353.2,200.0 355.5,200.2 357.7,200.5 360.0,200.7 362.3,200.9 364.5,201.1 366.8,201.3 369.1,201.5 371.4,201.7 373.6,201.9 375.9,202.1 378.2,202.3 380.5,202.5 382.7,202.7 385.0,202.9 387.3,203.0 389.5,203.2 391.8,203.4 394.1,203.6 396.4,203.8 398.6,203.9 400.9,204.1 403.2,204.3 405.5,204.4 407.7,204.6 410.0,204.7 412.3,204.9 414.5,205.1 416.8,205.2 419.1,205.4 421.4,205.5 423.6,205.7 425.9,205.8 428.2,206.0 430.5,206.1 432.7,206.2 435.0,206.4 437.3,206.5 439.5,206.7 441.8,206.8 444.1,206.9 446.4,207.1 448.6,207.2 450.9,207.3 453.2,207.5 455.5,207.6 457.7,207.7 460.0,207.8 462.3,207.9 464.5,208.1 466.8,208.2 469.1,208.3 471.4,208.4 473.6,208.5 475.9,208.7 478.2,208.8 480.5,208.9 482.7,209.0 485.0,209.1 487.3,209.2 489.5,209.3 491.8,209.4 494.1,209.5 496.4,209.6 498.6,209.7 500.9,209.8 503.2,209.9 505.5,210.0 507.7,210.1 510.0,210.2 512.3,210.3 514.5,210.4 516.8,210.5 519.1,210.6 521.4,210.7 523.6,210.8 525.9,210.9 528.2,211.0 530.5,211.1 532.7,211.2 535.0,211.3 537.3,211.3 539.5,211.4 541.8,211.5 544.1,211.6 546.4,211.7 548.6,211.8"/>
+  <text class="t-s t-ac t-b" x="168.2" y="106.0" text-anchor="start" dominant-baseline="central">y = 1/x</text>
+  <text class="t-xs" x="345.5" y="120.0" text-anchor="start" dominant-baseline="central">rectangle i has width 1 and height 1/i,</text>
+  <text class="t-xs" x="345.5" y="136.0" text-anchor="start" dominant-baseline="central">so the blue area is Hₙ</text>
+  <text class="t-xs t-mut" x="345.5" y="160.0" text-anchor="start" dominant-baseline="central">it lies above the curve from 1 to n + 1:</text>
+  <text class="t-xs t-mut" x="345.5" y="176.0" text-anchor="start" dominant-baseline="central">Hₙ ≥ ln(n + 1), and Hₙ ≈ ln n + 0.5772</text>
+  <text class="t-xs t-mut" x="42.0" y="30.0" text-anchor="end" dominant-baseline="central">1</text>
+</svg>
