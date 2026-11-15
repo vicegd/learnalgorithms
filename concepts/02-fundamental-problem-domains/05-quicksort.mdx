@@ -225,11 +225,11 @@ In practice, Quicksort is **very fast for $n \gt 20$**: its inner loops are very
 
 ## Practical Weaknesses and Improvements
 
-### 1. Recursion depth
+### Recursion depth
 
 In the worst case, the recursion reaches a depth of $n$, which can exhaust the call stack. The standard fix is to **recurse only on the smaller part** and handle the larger part with a loop. Since the smaller part has at most half the elements, the depth is then at most $\log_2 n$, whatever the pivots.
 
-### 2. Many repeated keys
+### Many repeated keys
 
 Look at the scanning loops: `i` advances while `elements[i] <= pivot`, and `j` retreats while `elements[j] >= pivot`. If **all the elements are equal**, `i` runs to the end of the part, the pivot is placed at the last position, and every partition is completely unbalanced: **quadratic** time. We measured it with the course implementation: sorting 20,000 equal elements took about 97 ms (and 25 ms for 10,000: the time quadruples when $n$ doubles), versus about 2 ms for 20,000 random elements. With 50,000 equal elements, the recursion is so deep that it ends with a `StackOverflowError`.
 
@@ -238,15 +238,15 @@ Arrays with many repeated keys are very common (sorting people by age, or orders
 - stop **both** scans at elements **equal** to the pivot (`<` and `>` instead of `<=` and `>=`) and exchange them; this splits runs of equal keys evenly between both sides;
 - use a **three-way partition** (the "Dutch national flag" problem, studied by Dijkstra), which divides the part into elements **smaller than**, **equal to** and **greater than** the pivot, and recurses only on the first and last groups. With many equal keys, it becomes much faster than standard Quicksort.
 
-### 3. Small parts
+### Small parts
 
 For parts of fewer than about 10 to 20 elements, the overhead of recursion outweighs its benefits. Many implementations stop the recursion at that size and finish with **insertion sort**, which is very fast on small and almost sorted arrays (the parts are already roughly in their final zones).
 
-### 4. Guaranteeing $O(n \log n)$
+### Guaranteeing $O(n \log n)$
 
 Even with a good pivot strategy, an adversary can construct inputs that make Quicksort quadratic. **Introsort** monitors the recursion depth and, if it exceeds a multiple of $\log n$, switches to Heapsort, which guarantees $O(n \log n)$. It is used in several standard libraries. Java's `Arrays.sort` for primitive types uses a highly tuned **dual-pivot Quicksort**, which partitions into three parts using two pivots.
 
-### 5. Parallelism
+### Parallelism
 
 After a partition, the two parts are completely **independent**, so they can be sorted **in parallel** by different threads. This makes Quicksort a natural candidate for the parallel algorithms chapter.
 

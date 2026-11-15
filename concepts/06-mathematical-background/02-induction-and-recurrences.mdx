@@ -111,7 +111,7 @@ A **recurrence** expresses the cost of a recursive algorithm for size $n$ in ter
 
 There are four main ways to solve them.
 
-### 1. Unrolling
+### Unrolling
 
 Substitute the recurrence into itself repeatedly until a pattern appears, then sum.
 
@@ -127,7 +127,7 @@ $$
 
 For 10 disks, $2^{10} - 1 = 1023$ moves, which is exactly what the recursive solution performs.
 
-### 2. The recursion tree
+### The recursion tree
 
 Draw the calls as a tree, write the non-recursive work at each node, add each level, and add the levels. This is how the formulas of the [division scheme](../03-algorithm-design-paradigms/03-divide-and-conquer-analysis.mdx) are derived: the levels form a geometric series, and the ratio decides which part of the tree dominates (see [geometric series](./01-sums-and-logarithms.mdx#geometric-series)).
 
@@ -147,7 +147,7 @@ $$
 
 Level $i$ has $2^i$ nodes of size $n / 2^i$, costing $n \log (n/2^i) = n (\log n - i)$ in total. Summing over the $\log n$ levels gives about $\frac{1}{2} n \log^2 n$: $\Theta(n \log^2 n)$, slightly more than Mergesort.
 
-### 3. Substitution: guess and verify
+### Substitution: guess and verify
 
 Guess the form of the solution, then prove it by induction. For Mergesort, guess $T(n) \le c \, n \log_2 n$ for some constant $c$ and $n \ge 2$. Assuming it holds for $n/2$:
 
@@ -159,7 +159,7 @@ $$
 "Prove" that Mergesort is $O(n)$: assume $T(n/2) \le c \cdot n/2$; then $T(n) \le 2 c \frac{n}{2} + n = c n + n = (c + 1) n = O(n)$. The error: induction must prove **exactly** the same statement, $T(n) \le c n$ with the **same** $c$, and $(c+1) n$ is not at most $c n$. The constant grows at each level of the recursion, $\log n$ times. Never use $O(\cdot)$ inside an inductive proof; work with explicit constants.
 :::
 
-### 4. Linear recurrences with several terms
+### Linear recurrences with several terms
 
 Recurrences such as Fibonacci's, $F_n = F_{n-1} + F_{n-2}$, have exact solutions of the form $r^n$. Substituting $F_n = r^n$ gives $r^2 = r + 1$, whose roots are $\varphi = \frac{1 + \sqrt{5}}{2} \approx 1.618$ (the golden ratio) and $\frac{1 - \sqrt{5}}{2} \approx -0.618$. The solution that fits the initial values is
 

@@ -75,3 +75,9 @@
 .theme-code-block pre {
   line-height: 1.6;
 }
+
+/* The course overview lists the chapters with their own numbers. */
+.docs-doc-id-index .theme-doc-markdown h2::before,
+.docs-doc-id-index .theme-doc-markdown h3::before {
+  content: none;
+}

@@ -214,6 +214,7 @@ export default function Icon({ name, size = 28, className, title }) {
 const RULES = [
   ['exercises', 'pencil'],
   ['glossary', 'glossary'],
+  ['references', 'book'],
   ['algorithmic-thinking', 'bulb'],
   ['case-study-pairwise', 'puzzle'],
   ['data-structures', 'layers'],
