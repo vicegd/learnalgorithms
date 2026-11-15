@@ -114,6 +114,8 @@ To sort faster, an algorithm must move elements over **long distances** in a sin
 
 </details>
 
+<RepoCode files={['sorting/bubble/Bubble.java']} />
+
 ---
 
 ## Bubble Sort with a Sentinel
@@ -165,6 +167,8 @@ The sentinel helps only if the vector becomes sorted early, and that depends on 
 
 For the second input, the sentinel saves nothing: the algorithm performs all $n - 1$ passes and $\frac{n(n-1)}{2}$ comparisons, the same as the basic version. So, for this input, the complexity is $O(n^2)$, even though the vector is almost sorted.
 
+<RepoCode files={['sorting/bubble/BubbleSentinel.java']} />
+
 ---
 
 ## Bidirectional Bubble Sort
@@ -204,6 +208,8 @@ However, it still only exchanges **adjacent** elements, so it performs exactly a
 :::tip Another simple improvement
 Instead of a boolean, the algorithm can remember the **position of the last exchange** in each pass. Everything beyond that position is already sorted, so the next pass can stop there. It is a further refinement of the same idea, with the same complexity.
 :::
+
+<RepoCode files={['sorting/bubble/BidirectionalBubble.java']} />
 
 ---
 

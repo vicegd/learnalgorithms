@@ -69,6 +69,8 @@ The call is `permutations(0)`. The order of the output follows the order of the 
 
 **Complexity.** The root has $n$ children, each of them $n - 1$, and so on: the tree has $1 + n + n(n-1) + \dots + n!$ nodes. For $n = 4$ that is $1 + 4 + 12 + 24 + 24 = 65$ calls, which we confirmed by counting. The time is $O(n!)$ (there are $n!$ solutions to print, so no algorithm can do better) and the extra space is $O(n)$.
 
+<RepoCode files={['backtracking/permutations/Permutations.java']} />
+
 ***
 
 ## Subset sum
@@ -114,6 +116,8 @@ void subsets(int level, int sum) {
 **Effect of pruning.** The full binary tree for $n = 5$ has $2^6 - 1 = 63$ nodes. With both prunings, the algorithm finds the 3 solutions in **25 calls**. On a larger instance (30 random numbers between 1 and 100, target 500, with more than 1.6 million solutions), feasibility pruning alone needed about 402 million calls, and adding the look-ahead test reduced them to about 98 million, roughly four times fewer.
 
 **Complexity.** In the worst case the binary tree is explored completely: $O(2^n)$ time and $O(n)$ space. This problem is NP-complete: no polynomial algorithm is known. (If $c$ is small, a dynamic programming table of size $n \times c$ decides whether a solution exists in pseudo-polynomial time, like the [0/1 knapsack](../03-algorithm-design-paradigms/10-dynamic-programming-examples.mdx).)
+
+<RepoCode files={['backtracking/subsetsum/SubsetsGivenSum.java']} />
 
 ***
 
@@ -225,6 +229,8 @@ There are no solutions for $n = 2$ and $n = 3$. The classic eight queens puzzle 
 
 **Complexity.** Without the diagonal checks, the tree would contain every permutation of the rows: $O(n!)$. The diagonal checks prune most of it (for $n = 8$, the algorithm generates 2,057 nodes to find all 92 solutions, out of the 40,320 permutations), but the growth remains exponential. The [previous lesson](./01-backtracking.mdx#complexity-analysis) has the measured counts up to $n = 14$. A full video walkthrough is available in [N Queen Problem Using Backtracking Algorithm](https://www.youtube.com/watch?v=xouin83ebxE).
 
+<RepoCode files={['backtracking/nqueens/ChessQueensOne.java', 'backtracking/nqueens/ChessQueensAll.java']} />
+
 ***
 
 ## Knight's tour
@@ -285,6 +291,8 @@ In 1823 H. C. von Warnsdorff proposed a simple heuristic: **always move to the s
 Applied as the **order** in which backtracking tries the 8 moves (the algorithm is still complete, because it can still go back), the effect is spectacular: on the $8 \times 8$ board the first tour is found with **64 calls**, one per square, without a single step back. The same happens on $20 \times 20$ (400 calls) and $50 \times 50$ (2,500 calls). The rule is not infallible (with unlucky tie-breaking it can reach a dead end), which is exactly why it is useful to embed it in a backtracking search rather than use it as a pure greedy algorithm.
 
 This is the general lesson: **the order in which candidates are tried can matter more than any pruning**.
+
+<RepoCode files={['backtracking/knighttour/ChessHorseOne.java', 'backtracking/knighttour/ChessHorseAll.java']} />
 
 ***
 
@@ -379,6 +387,8 @@ Without the condition `costSoFar + cost[agent][task] < bestCost`, this is plain 
 | 11 | 108,505,112 (1.2 s) | 35,103 (2 ms) |
 
 Both versions return the same optimum. The pruning works better when good solutions are found early, which is why the [branch and bound](./03-branch-and-bound.mdx) technique explores the most promising nodes first and uses an *estimate* of the remaining cost, not only the cost accumulated so far.
+
+<RepoCode files={['backtracking/agents/AgentsTasks.java']} />
 
 ***
 

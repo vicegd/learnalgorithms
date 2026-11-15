@@ -111,6 +111,8 @@ This property makes insertion sort very valuable in practice:
 
 </details>
 
+<RepoCode files={['sorting/insertion/DirectInsertion.java']} />
+
 ---
 
 ## Binary Insertion
@@ -140,6 +142,8 @@ public void sort(int[] elements) {
 The number of comparisons drops to about $\log_2 i$ per step, that is, about $n \log_2 n$ in total, whatever the input. But the number of **shifts** does not change: the element must still be moved to its place, and all the greater elements must still move one position. In the worst and average cases, the shifts are still $O(n^2)$, so binary insertion is still **quadratic**.
 
 It is advantageous when **comparisons are expensive** (long strings, complex objects) compared with moves. Notice also that it is **less adaptive**: on sorted data, it performs about $n \log_2 n$ comparisons instead of $n - 1$. The `else` branch, which moves `left` to the right when the keys are equal, keeps the algorithm **stable**.
+
+<RepoCode files={['sorting/insertion/BinaryInsertion.java']} />
 
 ---
 

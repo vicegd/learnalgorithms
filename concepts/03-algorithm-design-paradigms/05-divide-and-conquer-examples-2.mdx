@@ -67,6 +67,8 @@ merge:    4 5    1 6     2 3    7 8
 
 Taking `x[i]` when `x[i] <= y[j]` (that is, preferring the left half in case of a tie) makes Mergesort **stable**. Its weakness is the extra memory for the auxiliary arrays: $O(n)$.
 
+<RepoCode files={['sorting/mergesort/Mergesort.java']} />
+
 ---
 
 ## Quicksort, Revisited
@@ -77,6 +79,8 @@ Quicksort chooses a pivot, partitions the vector in $O(n)$ and sorts both parts 
 - **Completely unbalanced partitions** (the pivot is the smallest or largest element): one part is empty, so there is effectively one subproblem of size $n - 1$: subtraction scheme with $a = 1$, $b = 1$, $k = 1$. Since $a = 1$: $O(n^{k+1}) = O(n^2)$.
 
 The average case lies between both and, as we saw in the sorting chapter, is $O(n \log n)$. Unlike Mergesort, all the work of Quicksort is done when **dividing** (partitioning); combining requires nothing.
+
+<RepoCode files={['sorting/quicksort/Quicksort.java']} />
 
 ---
 

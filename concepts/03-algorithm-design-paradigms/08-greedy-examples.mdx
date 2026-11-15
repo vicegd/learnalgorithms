@@ -62,6 +62,8 @@ But $800 + 350 + 50 = 1200$: the disk can be filled **completely**. The heuristi
 Both problems use the same strategy (sort, then take while it fits), and the code is almost identical. But "smallest first" is provably optimal for counting files, while "largest first" is just a reasonable heuristic for filling space. Always ask whether the heuristic matches the **objective**.
 :::
 
+<RepoCode files={['greedy/disk/DiskPacking.java']} />
+
 ---
 
 ## The Knapsack Problem
@@ -159,6 +161,8 @@ The greedy algorithm takes object 1 (the best ratio, value 11), and then nothing
 
 To adapt the algorithm to indivisible objects, the selection function must skip the objects that no longer fit, and the loop must stop when no remaining object fits (for example, when the selection returns $-1$). But even then, the result is only an approximation. The 0/1 knapsack problem is solved optimally with **dynamic programming**, **backtracking** or **branch and bound**, which you will study in the following chapters.
 
+<RepoCode files={['greedy/knapsack/FractionalKnapsack.java', 'greedy/knapsack/Knapsack01.java']} />
+
 ---
 
 ## The Diligent Plumber
@@ -215,6 +219,8 @@ With 3 plumbers and the same tasks (7, 5, 4, 3, 6, 8, 2), sorted as 2, 3, 4, 5, 
 
 Total waiting time: $2 + 7 + 15 + 3 + 9 + 4 + 11 = $ **51** minutes. Since the tasks are sorted, assigning them to the least busy plumber is the same as distributing them in turns (task 1 to A, task 2 to B, task 3 to C, task 4 to A...), which is how the course implementation does it. This strategy is also optimal.
 
+<RepoCode files={['greedy/plumber/Plumber.java', 'greedy/plumber/MultiPlumber.java']} />
+
 ---
 
 ## The Knight's Tour
@@ -252,6 +258,8 @@ We ran both heuristics of the course repository on an $8 \times 8$ board, starti
 | Fewest onward jumps (Warnsdorff) | **63** of 64 |
 
 The simple heuristic always gets stuck before visiting every square. Warnsdorff's rule succeeds almost always, with an $O(n^2)$ algorithm for an $n \times n$ board. But not always: from one of the starting squares, with the order in which the course implementation breaks ties, it also gets stuck, although a tour exists from every square. A greedy algorithm cannot guarantee a solution here; **backtracking**, which can undo bad decisions, can (at a much higher cost).
+
+<RepoCode files={['greedy/knighttour/ChessHorse.java', 'greedy/knighttour/ChessHorseSimpleHeuristic.java']} />
 
 ---
 
