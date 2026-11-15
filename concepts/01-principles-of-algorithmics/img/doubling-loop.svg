@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 620 150" width="620" height="150" role="img">
+  <title>The loop i = 1, 2, 4, ..., 64 runs only 7 times for n = 100</title>
+  <line class="ln-axis" x1="30.0" y1="95.0" x2="590.0" y2="95.0"/>
+  <line class="ln-axis" x1="30.0" y1="95.0" x2="30.0" y2="100.0"/>
+  <text class="t-xs t-mut" x="30.0" y="111.0" text-anchor="middle" dominant-baseline="central">0</text>
+  <line class="ln-axis" x1="170.0" y1="95.0" x2="170.0" y2="100.0"/>
+  <text class="t-xs t-mut" x="170.0" y="111.0" text-anchor="middle" dominant-baseline="central">25</text>
+  <line class="ln-axis" x1="310.0" y1="95.0" x2="310.0" y2="100.0"/>
+  <text class="t-xs t-mut" x="310.0" y="111.0" text-anchor="middle" dominant-baseline="central">50</text>
+  <line class="ln-axis" x1="450.0" y1="95.0" x2="450.0" y2="100.0"/>
+  <text class="t-xs t-mut" x="450.0" y="111.0" text-anchor="middle" dominant-baseline="central">75</text>
+  <line class="ln-axis" x1="590.0" y1="95.0" x2="590.0" y2="100.0"/>
+  <text class="t-xs t-mut" x="590.0" y="111.0" text-anchor="middle" dominant-baseline="central">n = 100</text>
+  <circle class="box-hl" cx="35.6" cy="95.0" r="4.5"/>
+  <path class="ln-hl" d="M35.6,90.0 Q38.4,84.0 38.7,84.6"/>
+  <polygon class="ah-hl" points="41.2,90.0 35.9,85.8 41.4,83.3"/>
+  <circle class="box-hl" cx="41.2" cy="95.0" r="4.5"/>
+  <path class="ln-hl" d="M41.2,90.0 Q46.8,79.0 49.7,84.7"/>
+  <polygon class="ah-hl" points="52.4,90.0 47.0,86.0 52.4,83.3"/>
+  <circle class="box-hl" cx="52.4" cy="95.0" r="4.5"/>
+  <path class="ln-hl" d="M52.4,90.0 Q63.6,74.0 71.4,85.1"/>
+  <polygon class="ah-hl" points="74.8,90.0 68.9,86.8 73.8,83.4"/>
+  <circle class="box-hl" cx="74.8" cy="95.0" r="4.5"/>
+  <path class="ln-hl" d="M74.8,90.0 Q97.2,69.0 115.2,85.9"/>
+  <polygon class="ah-hl" points="119.6,90.0 113.2,88.1 117.3,83.7"/>
+  <circle class="box-hl" cx="119.6" cy="95.0" r="4.5"/>
+  <path class="ln-hl" d="M119.6,90.0 Q164.4,64.0 204.0,87.0"/>
+  <polygon class="ah-hl" points="209.2,90.0 202.5,89.6 205.5,84.4"/>
+  <circle class="box-hl" cx="209.2" cy="95.0" r="4.5"/>
+  <path class="ln-hl" d="M209.2,90.0 Q298.8,59.0 382.7,88.0"/>
+  <polygon class="ah-hl" points="388.4,90.0 381.7,90.9 383.7,85.2"/>
+  <circle class="box-hl" cx="388.4" cy="95.0" r="4.5"/>
+  <path class="ln-bad" d="M388.4,90.0 Q504.2,45.0 614.4,87.8"/>
+  <polygon class="ah-bad" points="620.0,90.0 613.3,90.6 615.5,85.0"/>
+  <text class="t-xs t-bad" x="594.0" y="22.0" text-anchor="end" dominant-baseline="central">128 &gt; n: stop</text>
+  <text class="t-s t-hl" x="388.4" y="129.0" text-anchor="middle" dominant-baseline="central">i = 1, 2, 4, 8, 16, 32, 64: ⌊log₂ 100⌋ + 1 = 7 iterations</text>
+</svg>

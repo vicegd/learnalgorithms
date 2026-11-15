@@ -100,7 +100,7 @@
   padding-left: 0;
 }
 
-/* ── Diagrams (SVGs in concepts/*/img, imported with svgr) ── */
+/* ── Diagrams (SVG files in the img folder of each chapter, imported with svgr) ── */
 :root {
   --dg-fg: #1f2937; --dg-muted: #6b7280; --dg-line: #9ca3af; --dg-faint: #d1d5db; --dg-grid: #e5e7eb;
   --dg-surface: #ffffff; --dg-soft: #f3f4f6;
