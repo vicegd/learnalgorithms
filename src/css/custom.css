@@ -153,3 +153,8 @@ svg.dg .f-yel { fill: var(--dg-yel-bg); }
 svg.dg .ln-strong { stroke: var(--dg-fg); stroke-width: 2.2; fill: none; }
 :root { --dg-yel-bg: #fef3c7; }
 [data-theme='dark'] { --dg-yel-bg: #3a3214; }
+/* On narrow screens, keep diagrams readable: scroll them sideways instead of shrinking the text. */
+@media (max-width: 600px) {
+  .dg-figure { overflow-x: auto; }
+  .dg-figure svg.dg { max-width: none; width: max(100%, 520px); }
+}
