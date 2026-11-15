@@ -1,0 +1,136 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 600 200" width="600" height="200" role="img">
+  <title>Radix sort on 170 45 75 90 802 24 2 66: one stable pass per digit, from the least significant</title>
+  <text class="t-xs t-mut" x="98.0" y="30.0" text-anchor="end" dominant-baseline="central">initial</text>
+  <rect class="box" x="110.0" y="16.0" width="52.0" height="28.0" rx="3"/>
+  <text class="t-s t-m" x="125.0" y="30.0" text-anchor="middle" dominant-baseline="central">1</text>
+  <text class="t-s t-m" x="136.0" y="30.0" text-anchor="middle" dominant-baseline="central">7</text>
+  <text class="t-s t-m" x="147.0" y="30.0" text-anchor="middle" dominant-baseline="central">0</text>
+  <rect class="box" x="166.0" y="16.0" width="52.0" height="28.0" rx="3"/>
+  <text class="t-s t-m t-mut" x="181.0" y="30.0" text-anchor="middle" dominant-baseline="central">0</text>
+  <text class="t-s t-m" x="192.0" y="30.0" text-anchor="middle" dominant-baseline="central">4</text>
+  <text class="t-s t-m" x="203.0" y="30.0" text-anchor="middle" dominant-baseline="central">5</text>
+  <rect class="box" x="222.0" y="16.0" width="52.0" height="28.0" rx="3"/>
+  <text class="t-s t-m t-mut" x="237.0" y="30.0" text-anchor="middle" dominant-baseline="central">0</text>
+  <text class="t-s t-m" x="248.0" y="30.0" text-anchor="middle" dominant-baseline="central">7</text>
+  <text class="t-s t-m" x="259.0" y="30.0" text-anchor="middle" dominant-baseline="central">5</text>
+  <rect class="box" x="278.0" y="16.0" width="52.0" height="28.0" rx="3"/>
+  <text class="t-s t-m t-mut" x="293.0" y="30.0" text-anchor="middle" dominant-baseline="central">0</text>
+  <text class="t-s t-m" x="304.0" y="30.0" text-anchor="middle" dominant-baseline="central">9</text>
+  <text class="t-s t-m" x="315.0" y="30.0" text-anchor="middle" dominant-baseline="central">0</text>
+  <rect class="box" x="334.0" y="16.0" width="52.0" height="28.0" rx="3"/>
+  <text class="t-s t-m" x="349.0" y="30.0" text-anchor="middle" dominant-baseline="central">8</text>
+  <text class="t-s t-m" x="360.0" y="30.0" text-anchor="middle" dominant-baseline="central">0</text>
+  <text class="t-s t-m" x="371.0" y="30.0" text-anchor="middle" dominant-baseline="central">2</text>
+  <rect class="box" x="390.0" y="16.0" width="52.0" height="28.0" rx="3"/>
+  <text class="t-s t-m t-mut" x="405.0" y="30.0" text-anchor="middle" dominant-baseline="central">0</text>
+  <text class="t-s t-m" x="416.0" y="30.0" text-anchor="middle" dominant-baseline="central">2</text>
+  <text class="t-s t-m" x="427.0" y="30.0" text-anchor="middle" dominant-baseline="central">4</text>
+  <rect class="box" x="446.0" y="16.0" width="52.0" height="28.0" rx="3"/>
+  <text class="t-s t-m t-mut" x="461.0" y="30.0" text-anchor="middle" dominant-baseline="central">0</text>
+  <text class="t-s t-m t-mut" x="472.0" y="30.0" text-anchor="middle" dominant-baseline="central">0</text>
+  <text class="t-s t-m" x="483.0" y="30.0" text-anchor="middle" dominant-baseline="central">2</text>
+  <rect class="box" x="502.0" y="16.0" width="52.0" height="28.0" rx="3"/>
+  <text class="t-s t-m t-mut" x="517.0" y="30.0" text-anchor="middle" dominant-baseline="central">0</text>
+  <text class="t-s t-m" x="528.0" y="30.0" text-anchor="middle" dominant-baseline="central">6</text>
+  <text class="t-s t-m" x="539.0" y="30.0" text-anchor="middle" dominant-baseline="central">6</text>
+  <text class="t-xs t-mut" x="98.0" y="74.0" text-anchor="end" dominant-baseline="central">by units</text>
+  <rect class="box" x="110.0" y="60.0" width="52.0" height="28.0" rx="3"/>
+  <text class="t-s t-m" x="125.0" y="74.0" text-anchor="middle" dominant-baseline="central">1</text>
+  <text class="t-s t-m" x="136.0" y="74.0" text-anchor="middle" dominant-baseline="central">7</text>
+  <text class="t-s t-m t-ac t-b" x="147.0" y="74.0" text-anchor="middle" dominant-baseline="central">0</text>
+  <rect class="box" x="166.0" y="60.0" width="52.0" height="28.0" rx="3"/>
+  <text class="t-s t-m t-mut" x="181.0" y="74.0" text-anchor="middle" dominant-baseline="central">0</text>
+  <text class="t-s t-m" x="192.0" y="74.0" text-anchor="middle" dominant-baseline="central">9</text>
+  <text class="t-s t-m t-ac t-b" x="203.0" y="74.0" text-anchor="middle" dominant-baseline="central">0</text>
+  <rect class="box" x="222.0" y="60.0" width="52.0" height="28.0" rx="3"/>
+  <text class="t-s t-m" x="237.0" y="74.0" text-anchor="middle" dominant-baseline="central">8</text>
+  <text class="t-s t-m" x="248.0" y="74.0" text-anchor="middle" dominant-baseline="central">0</text>
+  <text class="t-s t-m t-ac t-b" x="259.0" y="74.0" text-anchor="middle" dominant-baseline="central">2</text>
+  <rect class="box" x="278.0" y="60.0" width="52.0" height="28.0" rx="3"/>
+  <text class="t-s t-m t-mut" x="293.0" y="74.0" text-anchor="middle" dominant-baseline="central">0</text>
+  <text class="t-s t-m t-mut" x="304.0" y="74.0" text-anchor="middle" dominant-baseline="central">0</text>
+  <text class="t-s t-m t-ac t-b" x="315.0" y="74.0" text-anchor="middle" dominant-baseline="central">2</text>
+  <rect class="box" x="334.0" y="60.0" width="52.0" height="28.0" rx="3"/>
+  <text class="t-s t-m t-mut" x="349.0" y="74.0" text-anchor="middle" dominant-baseline="central">0</text>
+  <text class="t-s t-m" x="360.0" y="74.0" text-anchor="middle" dominant-baseline="central">2</text>
+  <text class="t-s t-m t-ac t-b" x="371.0" y="74.0" text-anchor="middle" dominant-baseline="central">4</text>
+  <rect class="box" x="390.0" y="60.0" width="52.0" height="28.0" rx="3"/>
+  <text class="t-s t-m t-mut" x="405.0" y="74.0" text-anchor="middle" dominant-baseline="central">0</text>
+  <text class="t-s t-m" x="416.0" y="74.0" text-anchor="middle" dominant-baseline="central">4</text>
+  <text class="t-s t-m t-ac t-b" x="427.0" y="74.0" text-anchor="middle" dominant-baseline="central">5</text>
+  <rect class="box" x="446.0" y="60.0" width="52.0" height="28.0" rx="3"/>
+  <text class="t-s t-m t-mut" x="461.0" y="74.0" text-anchor="middle" dominant-baseline="central">0</text>
+  <text class="t-s t-m" x="472.0" y="74.0" text-anchor="middle" dominant-baseline="central">7</text>
+  <text class="t-s t-m t-ac t-b" x="483.0" y="74.0" text-anchor="middle" dominant-baseline="central">5</text>
+  <rect class="box" x="502.0" y="60.0" width="52.0" height="28.0" rx="3"/>
+  <text class="t-s t-m t-mut" x="517.0" y="74.0" text-anchor="middle" dominant-baseline="central">0</text>
+  <text class="t-s t-m" x="528.0" y="74.0" text-anchor="middle" dominant-baseline="central">6</text>
+  <text class="t-s t-m t-ac t-b" x="539.0" y="74.0" text-anchor="middle" dominant-baseline="central">6</text>
+  <text class="t-xs t-mut" x="98.0" y="118.0" text-anchor="end" dominant-baseline="central">by tens</text>
+  <rect class="box" x="110.0" y="104.0" width="52.0" height="28.0" rx="3"/>
+  <text class="t-s t-m" x="125.0" y="118.0" text-anchor="middle" dominant-baseline="central">8</text>
+  <text class="t-s t-m t-ac t-b" x="136.0" y="118.0" text-anchor="middle" dominant-baseline="central">0</text>
+  <text class="t-s t-m" x="147.0" y="118.0" text-anchor="middle" dominant-baseline="central">2</text>
+  <rect class="box" x="166.0" y="104.0" width="52.0" height="28.0" rx="3"/>
+  <text class="t-s t-m t-mut" x="181.0" y="118.0" text-anchor="middle" dominant-baseline="central">0</text>
+  <text class="t-s t-m t-ac t-b" x="192.0" y="118.0" text-anchor="middle" dominant-baseline="central">0</text>
+  <text class="t-s t-m" x="203.0" y="118.0" text-anchor="middle" dominant-baseline="central">2</text>
+  <rect class="box" x="222.0" y="104.0" width="52.0" height="28.0" rx="3"/>
+  <text class="t-s t-m t-mut" x="237.0" y="118.0" text-anchor="middle" dominant-baseline="central">0</text>
+  <text class="t-s t-m t-ac t-b" x="248.0" y="118.0" text-anchor="middle" dominant-baseline="central">2</text>
+  <text class="t-s t-m" x="259.0" y="118.0" text-anchor="middle" dominant-baseline="central">4</text>
+  <rect class="box" x="278.0" y="104.0" width="52.0" height="28.0" rx="3"/>
+  <text class="t-s t-m t-mut" x="293.0" y="118.0" text-anchor="middle" dominant-baseline="central">0</text>
+  <text class="t-s t-m t-ac t-b" x="304.0" y="118.0" text-anchor="middle" dominant-baseline="central">4</text>
+  <text class="t-s t-m" x="315.0" y="118.0" text-anchor="middle" dominant-baseline="central">5</text>
+  <rect class="box" x="334.0" y="104.0" width="52.0" height="28.0" rx="3"/>
+  <text class="t-s t-m t-mut" x="349.0" y="118.0" text-anchor="middle" dominant-baseline="central">0</text>
+  <text class="t-s t-m t-ac t-b" x="360.0" y="118.0" text-anchor="middle" dominant-baseline="central">6</text>
+  <text class="t-s t-m" x="371.0" y="118.0" text-anchor="middle" dominant-baseline="central">6</text>
+  <rect class="box" x="390.0" y="104.0" width="52.0" height="28.0" rx="3"/>
+  <text class="t-s t-m" x="405.0" y="118.0" text-anchor="middle" dominant-baseline="central">1</text>
+  <text class="t-s t-m t-ac t-b" x="416.0" y="118.0" text-anchor="middle" dominant-baseline="central">7</text>
+  <text class="t-s t-m" x="427.0" y="118.0" text-anchor="middle" dominant-baseline="central">0</text>
+  <rect class="box" x="446.0" y="104.0" width="52.0" height="28.0" rx="3"/>
+  <text class="t-s t-m t-mut" x="461.0" y="118.0" text-anchor="middle" dominant-baseline="central">0</text>
+  <text class="t-s t-m t-ac t-b" x="472.0" y="118.0" text-anchor="middle" dominant-baseline="central">7</text>
+  <text class="t-s t-m" x="483.0" y="118.0" text-anchor="middle" dominant-baseline="central">5</text>
+  <rect class="box" x="502.0" y="104.0" width="52.0" height="28.0" rx="3"/>
+  <text class="t-s t-m t-mut" x="517.0" y="118.0" text-anchor="middle" dominant-baseline="central">0</text>
+  <text class="t-s t-m t-ac t-b" x="528.0" y="118.0" text-anchor="middle" dominant-baseline="central">9</text>
+  <text class="t-s t-m" x="539.0" y="118.0" text-anchor="middle" dominant-baseline="central">0</text>
+  <text class="t-xs t-mut" x="98.0" y="162.0" text-anchor="end" dominant-baseline="central">by hundreds</text>
+  <rect class="box" x="110.0" y="148.0" width="52.0" height="28.0" rx="3"/>
+  <text class="t-s t-m t-ac t-b" x="125.0" y="162.0" text-anchor="middle" dominant-baseline="central">0</text>
+  <text class="t-s t-m t-mut" x="136.0" y="162.0" text-anchor="middle" dominant-baseline="central">0</text>
+  <text class="t-s t-m" x="147.0" y="162.0" text-anchor="middle" dominant-baseline="central">2</text>
+  <rect class="box" x="166.0" y="148.0" width="52.0" height="28.0" rx="3"/>
+  <text class="t-s t-m t-ac t-b" x="181.0" y="162.0" text-anchor="middle" dominant-baseline="central">0</text>
+  <text class="t-s t-m" x="192.0" y="162.0" text-anchor="middle" dominant-baseline="central">2</text>
+  <text class="t-s t-m" x="203.0" y="162.0" text-anchor="middle" dominant-baseline="central">4</text>
+  <rect class="box" x="222.0" y="148.0" width="52.0" height="28.0" rx="3"/>
+  <text class="t-s t-m t-ac t-b" x="237.0" y="162.0" text-anchor="middle" dominant-baseline="central">0</text>
+  <text class="t-s t-m" x="248.0" y="162.0" text-anchor="middle" dominant-baseline="central">4</text>
+  <text class="t-s t-m" x="259.0" y="162.0" text-anchor="middle" dominant-baseline="central">5</text>
+  <rect class="box" x="278.0" y="148.0" width="52.0" height="28.0" rx="3"/>
+  <text class="t-s t-m t-ac t-b" x="293.0" y="162.0" text-anchor="middle" dominant-baseline="central">0</text>
+  <text class="t-s t-m" x="304.0" y="162.0" text-anchor="middle" dominant-baseline="central">6</text>
+  <text class="t-s t-m" x="315.0" y="162.0" text-anchor="middle" dominant-baseline="central">6</text>
+  <rect class="box" x="334.0" y="148.0" width="52.0" height="28.0" rx="3"/>
+  <text class="t-s t-m t-ac t-b" x="349.0" y="162.0" text-anchor="middle" dominant-baseline="central">0</text>
+  <text class="t-s t-m" x="360.0" y="162.0" text-anchor="middle" dominant-baseline="central">7</text>
+  <text class="t-s t-m" x="371.0" y="162.0" text-anchor="middle" dominant-baseline="central">5</text>
+  <rect class="box" x="390.0" y="148.0" width="52.0" height="28.0" rx="3"/>
+  <text class="t-s t-m t-ac t-b" x="405.0" y="162.0" text-anchor="middle" dominant-baseline="central">0</text>
+  <text class="t-s t-m" x="416.0" y="162.0" text-anchor="middle" dominant-baseline="central">9</text>
+  <text class="t-s t-m" x="427.0" y="162.0" text-anchor="middle" dominant-baseline="central">0</text>
+  <rect class="box" x="446.0" y="148.0" width="52.0" height="28.0" rx="3"/>
+  <text class="t-s t-m t-ac t-b" x="461.0" y="162.0" text-anchor="middle" dominant-baseline="central">1</text>
+  <text class="t-s t-m" x="472.0" y="162.0" text-anchor="middle" dominant-baseline="central">7</text>
+  <text class="t-s t-m" x="483.0" y="162.0" text-anchor="middle" dominant-baseline="central">0</text>
+  <rect class="box" x="502.0" y="148.0" width="52.0" height="28.0" rx="3"/>
+  <text class="t-s t-m t-ac t-b" x="517.0" y="162.0" text-anchor="middle" dominant-baseline="central">8</text>
+  <text class="t-s t-m" x="528.0" y="162.0" text-anchor="middle" dominant-baseline="central">0</text>
+  <text class="t-s t-m" x="539.0" y="162.0" text-anchor="middle" dominant-baseline="central">2</text>
+  <text class="t-xs t-mut" x="334.0" y="192.0" text-anchor="middle" dominant-baseline="central">orange: the digit that decides each pass · leading zeros in gray</text>
+</svg>

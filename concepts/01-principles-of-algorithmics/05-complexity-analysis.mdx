@@ -6,6 +6,7 @@ tags: [Analysis, Time Complexity, Space Complexity, Best Case, Worst Case, Avera
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import FigSearchCases from './img/search-cases.svg';
 
 # Complexity Analysis: Counting the Cost of an Algorithm
 
@@ -170,6 +171,10 @@ public static boolean contains(int[] list, int value) {
     return false;
 }
 ```
+
+<Figure caption="Three searches in the same array of size 8. The size is the same, but the work goes from 1 comparison (the value is first) to 8 (the value is not there).">
+  <FigSearchCases />
+</Figure>
 
 If the value is in the first position, the method returns after one iteration. If it is not in the vector, it must inspect all $n$ elements. To characterise algorithms like this one, we distinguish three cases:
 

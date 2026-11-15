@@ -9,6 +9,7 @@ import TabItem from '@theme/TabItem';
 import FigQuicksortIdea from './img/quicksort-idea.svg';
 import FigQuicksortPartition from './img/quicksort-partition.svg';
 import FigQuicksortCalls from './img/quicksort-calls.svg';
+import FigQuicksortBalance from './img/quicksort-balance.svg';
 
 # Quicksort
 
@@ -198,6 +199,10 @@ When the pivot is chosen at random (or the input is random), partitions are not 
 
 </TabItem>
 </Tabs>
+
+<Figure caption="The two extremes of the tree of partitions. With balanced pivots there are about log₂ n levels, each costing n; with a pivot at one end every time, there are n levels of decreasing size, and the cost is quadratic.">
+  <FigQuicksortBalance />
+</Figure>
 
 We checked the effect of the pivot by counting comparisons with $n = 1{,}000$ (the theoretical value of $n \log_2 n$ is about 9,966):
 
