@@ -12,7 +12,7 @@ These exercises review the whole chapter, from the definition of an algorithm to
 
 ## Algorithms and specifications
 
-**1.1. Is it an algorithm?** Consider this method:
+<span id="ex-1-1"></span>**1.1. Is it an algorithm?** Consider this method:
 
 ```java
 static int steps(int n) {          // n >= 1
@@ -27,11 +27,15 @@ static int steps(int n) {          // n >= 1
 
 For $n = 6$ the sequence is 6, 3, 10, 5, 16, 8, 4, 2, 1. Is this method an algorithm according to the definition of the [first lesson](./01-algorithmic-thinking.mdx)? (Ignore integer overflow.)
 
-**1.2. Specify.** Write a precondition and a postcondition for a method `int indexOfMin(int[] a)` that returns the position of the smallest element of an array. Your specification must say what happens when the array is empty and when the minimum appears more than once.
+<ToSolution n="1.1" />
+
+<span id="ex-1-2"></span>**1.2. Specify.** Write a precondition and a postcondition for a method `int indexOfMin(int[] a)` that returns the position of the smallest element of an array. Your specification must say what happens when the array is empty and when the minimum appears more than once.
+
+<ToSolution n="1.2" />
 
 ## Case study and stress testing
 
-**1.3. Find the counterexample.** This method tries to compute the maximum pairwise product of an array of non-negative integers (at least two elements) in linear time:
+<span id="ex-1-3"></span>**1.3. Find the counterexample.** This method tries to compute the maximum pairwise product of an array of non-negative integers (at least two elements) in linear time:
 
 ```java
 static long maxPairwise(int[] a) {
@@ -47,9 +51,11 @@ static long maxPairwise(int[] a) {
 
 It passes many tests. Find the **smallest** input on which it fails, explain the bug, and fix it.
 
+<ToSolution n="1.3" />
+
 ## Data structures
 
-**1.4. Choose the structure.** For each task, choose a Java collection and give the cost of its main operation:
+<span id="ex-1-4"></span>**1.4. Choose the structure.** For each task, choose a Java collection and give the cost of its main operation:
 
 - (a) The "undo" history of a text editor.
 - (b) A list of print jobs, served in order of arrival.
@@ -57,13 +63,19 @@ It passes many tests. Find the **smallest** input on which it fails, explain the
 - (d) Counting how many times each word appears in a text, and printing the words in alphabetical order.
 - (e) Always attending first the pending task with the highest priority.
 
-**1.5. Emptying a list.** An `ArrayList` contains $n$ elements. What is the cost of removing all of them with `n` calls to `remove(0)`? And with `n` calls to `remove(list.size() - 1)`? Why the difference?
+<ToSolution n="1.4" />
+
+<span id="ex-1-5"></span>**1.5. Emptying a list.** An `ArrayList` contains $n$ elements. What is the cost of removing all of them with `n` calls to `remove(0)`? And with `n` calls to `remove(list.size() - 1)`? Why the difference?
+
+<ToSolution n="1.5" />
 
 ## Measuring efficiency
 
-**1.6. How many repetitions?** One execution of a method takes about 2 µs, and you measure with `System.currentTimeMillis()`, whose resolution is about 1 ms. How many repetitions (a power of 10) do you need for the total time to exceed 50 ms? How do you obtain the time of one execution?
+<span id="ex-1-6"></span>**1.6. How many repetitions?** One execution of a method takes about 2 µs, and you measure with `System.currentTimeMillis()`, whose resolution is about 1 ms. How many repetitions (a power of 10) do you need for the total time to exceed 50 ms? How do you obtain the time of one execution?
 
-**1.7. Infer the complexity.** A program, run without optimization (`-Xint`), gives these times:
+<ToSolution n="1.6" />
+
+<span id="ex-1-7"></span>**1.7. Infer the complexity.** A program, run without optimization (`-Xint`), gives these times:
 
 | $n$ | 1,000 | 2,000 | 4,000 | 8,000 |
 |---|---:|---:|---:|---:|
@@ -71,9 +83,11 @@ It passes many tests. Find the **smallest** input on which it fails, explain the
 
 What complexity do the measurements suggest? Predict the time for $n = 32{,}000$.
 
+<ToSolution n="1.7" />
+
 ## Counting operations and cases
 
-**1.8. Equal neighbors.** This method checks whether an array has two equal consecutive elements:
+<span id="ex-1-8"></span>**1.8. Equal neighbors.** This method checks whether an array has two equal consecutive elements:
 
 ```java
 static boolean hasEqualNeighbors(int[] a) {
@@ -86,11 +100,15 @@ static boolean hasEqualNeighbors(int[] a) {
 
 Describe the best and the worst case, and give the number of comparisons `a[i] == a[i + 1]` in each.
 
-**1.9. Average case with failures.** A sequential search looks for a value in an array of $n$ elements. With probability $p$ the value is present, equally likely in any position; with probability $1 - p$ it is absent. How many elements does the search examine on average? Check your formula for $p = 1$ and $p = 0$.
+<ToSolution n="1.8" />
+
+<span id="ex-1-9"></span>**1.9. Average case with failures.** A sequential search looks for a value in an array of $n$ elements. With probability $p$ the value is present, equally likely in any position; with probability $1 - p$ it is absent. How many elements does the search examine on average? Check your formula for $p = 1$ and $p = 0$.
+
+<ToSolution n="1.9" />
 
 ## Asymptotic notation and growth
 
-**1.10. True or false?** Justify each answer.
+<span id="ex-1-10"></span>**1.10. True or false?** Justify each answer.
 
 - (a) $2^{n+1} \in O(2^n)$
 - (b) $2^{2n} \in O(2^n)$
@@ -98,11 +116,15 @@ Describe the best and the worst case, and give the number of comparisons `a[i] =
 - (d) $n^{1.01} \in O(n \log^2 n)$
 - (e) $\max(f(n), g(n)) \in \Theta(f(n) + g(n))$, for positive functions $f$ and $g$
 
-**1.11. Order by growth.** Order from slowest to fastest growth (logarithms in base 2): $n$, $\sqrt{n}$, $n^{\log_2 3}$, $\log^2 n$, $2^n$, $n \log n$, $n / \log n$, $1.1^n$, $n^{1/3}$, $n^2$.
+<ToSolution n="1.10" />
+
+<span id="ex-1-11"></span>**1.11. Order by growth.** Order from slowest to fastest growth (logarithms in base 2): $n$, $\sqrt{n}$, $n^{\log_2 3}$, $\log^2 n$, $2^n$, $n \log n$, $n / \log n$, $1.1^n$, $n^{1/3}$, $n^2$.
+
+<ToSolution n="1.11" />
 
 ## Complexity of loops
 
-**1.12. A growing step.**
+<span id="ex-1-12"></span>**1.12. A growing step.**
 
 ```java
 int i = 1, s = 0;
@@ -114,7 +136,9 @@ while (s < n) {
 
 How many iterations does the loop perform, as a function of $n$? What is its complexity?
 
-**1.13. Doubling bounds.** What is the complexity of this fragment? Be careful: it is not $O(n \log n)$.
+<ToSolution n="1.12" />
+
+<span id="ex-1-13"></span>**1.13. Doubling bounds.** What is the complexity of this fragment? Be careful: it is not $O(n \log n)$.
 
 ```java
 for (int i = 1; i < n; i *= 2)
@@ -122,7 +146,9 @@ for (int i = 1; i < n; i *= 2)
         operation();              // O(1)
 ```
 
-**1.14. Early exit.** What are the best-case and worst-case complexities of this fragment, which processes each suffix of the array until it finds a negative number?
+<ToSolution n="1.13" />
+
+<span id="ex-1-14"></span>**1.14. Early exit.** What are the best-case and worst-case complexities of this fragment, which processes each suffix of the array until it finds a negative number?
 
 ```java
 for (int i = 0; i < n; i++)
@@ -132,46 +158,68 @@ for (int i = 0; i < n; i++)
     }
 ```
 
+<ToSolution n="1.14" />
+
 ## Searching
 
-**1.15. Ternary search.** Instead of splitting the array in two, ternary search compares the target with the elements at one third and two thirds of the range, and keeps one of the three parts. It needs fewer iterations than binary search ($\log_3 n$ instead of $\log_2 n$). Is it faster? Count comparisons, not iterations.
+<span id="ex-1-15"></span>**1.15. Ternary search.** Instead of splitting the array in two, ternary search compares the target with the elements at one third and two thirds of the range, and keeps one of the three parts. It needs fewer iterations than binary search ($\log_3 n$ instead of $\log_2 n$). Is it faster? Count comparisons, not iterations.
 
-**1.16. Searching without knowing the size.** A sorted sequence is so large that its length is unknown (for example, it is generated on demand), but any position $i$ can be read. Design an algorithm that finds a value $x$ located at position $p$ in $O(\log p)$ time.
+<ToSolution n="1.15" />
+
+<span id="ex-1-16"></span>**1.16. Searching without knowing the size.** A sorted sequence is so large that its length is unknown (for example, it is generated on demand), but any position $i$ can be read. Design an algorithm that finds a value $x$ located at position $p$ in $O(\log p)$ time.
+
+<ToSolution n="1.16" />
 
 ***
 
 ## Solutions
 
-**1.1.** We **do not know**. The instructions are precise and each step is finite, but an algorithm must end for **every** valid input, and nobody has proved that this loop reaches 1 for every $n \ge 1$. This is the famous **Collatz conjecture**, open since 1937: it has been verified by computer for every $n$ up to $2^{71} \approx 2.4 \times 10^{21}$ (D. Barina, 2025), but not proved. So the method is a correct algorithm only if the conjecture is true.
+<span id="sol-1-1"></span>**1.1.** We **do not know**. The instructions are precise and each step is finite, but an algorithm must end for **every** valid input, and nobody has proved that this loop reaches 1 for every $n \ge 1$. This is the famous **Collatz conjecture**, open since 1937: it has been verified by computer for every $n$ up to $2^{71} \approx 2.4 \times 10^{21}$ (D. Barina, 2025), but not proved. So the method is a correct algorithm only if the conjecture is true.
 
-**1.2.** One possible specification:
+<ToStatement n="1.1" />
+
+<span id="sol-1-2"></span>**1.2.** One possible specification:
 
 - *Precondition:* `a` is not `null` and `a.length >= 1`. (Alternative: allow the empty array and return $-1$ for it. Either is acceptable, but the specification must say which.)
 - *Postcondition:* returns an index $k$ with $0 \le k \lt$ `a.length` such that `a[k] <= a[i]` for every $i$, and `a[k] < a[i]` for every $i \lt k$; that is, the **first** position of the minimum. The array is not modified.
 
 Without the last condition, two correct implementations could return different positions for the same input, and a test could not decide which is right.
 
-**1.3.** The smallest failing input is `{9, 4}` (any array of size 2 whose largest element is at position 0 and is strictly larger than the other): it returns $9 \cdot 9 = 81$ instead of $36$. The second loop starts with `i2 = 0`, which is the position of the maximum itself. Since no element is larger than the maximum, `i2` never changes, and the method multiplies the maximum by itself. Fix: start `i2` at a position different from `i1`, for example `int i2 = (i1 == 0) ? 1 : 0;`. A stress test with random arrays of size 2 to 5 and values 0 to 9 finds this bug immediately; a test suite of "typical" arrays may never find it.
+<ToStatement n="1.2" />
 
-**1.4.**
+<span id="sol-1-3"></span>**1.3.** The smallest failing input is `{9, 4}` (any array of size 2 whose largest element is at position 0 and is strictly larger than the other): it returns $9 \cdot 9 = 81$ instead of $36$. The second loop starts with `i2 = 0`, which is the position of the maximum itself. Since no element is larger than the maximum, `i2` never changes, and the method multiplies the maximum by itself. Fix: start `i2` at a position different from `i1`, for example `int i2 = (i1 == 0) ? 1 : 0;`. A stress test with random arrays of size 2 to 5 and values 0 to 9 finds this bug immediately; a test suite of "typical" arrays may never find it.
+
+<ToStatement n="1.3" />
+
+<span id="sol-1-4"></span>**1.4.**
 - (a) A stack (`ArrayDeque` used with `push`/`pop`): $O(1)$ per operation.
 - (b) A queue (`ArrayDeque` used with `offer`/`poll`): $O(1)$.
 - (c) A `HashSet`: `add` and `contains` in $O(1)$ on average. A list would need $O(n)$ per check.
 - (d) A `TreeMap<String, Integer>`: each update is $O(\log n)$, and iterating over it gives the words in alphabetical order. (A `HashMap` followed by sorting the keys at the end is also valid.)
 - (e) A `PriorityQueue`: insertion and extraction of the maximum (with a suitable comparator) in $O(\log n)$.
 
-**1.5.** With `remove(0)`, each call shifts all the remaining elements one position to the left: $(n-1) + (n-2) + \dots + 0 = \frac{n(n-1)}{2}$ moves, $O(n^2)$. With `remove(size() - 1)` nothing is shifted: $O(1)$ per call, $O(n)$ in total. An `ArrayList` is an array; only its end is cheap to modify. (An `ArrayDeque` would allow removing from either end in $O(1)$.)
+<ToStatement n="1.4" />
 
-**1.6.** For 50 ms you need $50{,}000 / 2 = 25{,}000$ executions, so $10^5$ repetitions (about 200 ms). The time of one execution is the total divided by $10^5$, expressed in microseconds. With fewer repetitions the measurement is dominated by the 1 ms resolution of the clock.
+<span id="sol-1-5"></span>**1.5.** With `remove(0)`, each call shifts all the remaining elements one position to the left: $(n-1) + (n-2) + \dots + 0 = \frac{n(n-1)}{2}$ moves, $O(n^2)$. With `remove(size() - 1)` nothing is shifted: $O(1)$ per call, $O(n)$ in total. An `ArrayList` is an array; only its end is cheap to modify. (An `ArrayDeque` would allow removing from either end in $O(1)$.)
 
-**1.7.** Each time $n$ doubles, the time multiplies by about 4 ($480/120 = 4.0$; $1910/480 \approx 3.98$; $7700/1910 \approx 4.03$): the algorithm is $O(n^2)$. From $n = 8{,}000$ to $32{,}000$ the size multiplies by 4, so the time multiplies by about $4^2 = 16$: $7.7 \cdot 16 \approx 123$ seconds, about 2 minutes.
+<ToStatement n="1.5" />
 
-**1.8.** The size of the input is $n$ = `a.length`.
+<span id="sol-1-6"></span>**1.6.** For 50 ms you need $50{,}000 / 2 = 25{,}000$ executions, so $10^5$ repetitions (about 200 ms). The time of one execution is the total divided by $10^5$, expressed in microseconds. With fewer repetitions the measurement is dominated by the 1 ms resolution of the clock.
+
+<ToStatement n="1.6" />
+
+<span id="sol-1-7"></span>**1.7.** Each time $n$ doubles, the time multiplies by about 4 ($480/120 = 4.0$; $1910/480 \approx 3.98$; $7700/1910 \approx 4.03$): the algorithm is $O(n^2)$. From $n = 8{,}000$ to $32{,}000$ the size multiplies by 4, so the time multiplies by about $4^2 = 16$: $7.7 \cdot 16 \approx 123$ seconds, about 2 minutes.
+
+<ToStatement n="1.7" />
+
+<span id="sol-1-8"></span>**1.8.** The size of the input is $n$ = `a.length`.
 - *Best case*: the first two elements are equal. One comparison: $O(1)$.
 - *Worst case*: no two consecutive elements are equal (or only the last two are). The loop makes $n - 1$ comparisons: $O(n)$.
 For an empty or one-element array, the loop does not run: zero comparisons.
 
-**1.9.** If the value is present at position $i$ (counting from 1), the search examines $i$ elements; averaged over the $n$ positions, $\frac{n+1}{2}$. If it is absent, it examines all $n$. So the average is
+<ToStatement n="1.8" />
+
+<span id="sol-1-9"></span>**1.9.** If the value is present at position $i$ (counting from 1), the search examines $i$ elements; averaged over the $n$ positions, $\frac{n+1}{2}$. If it is absent, it examines all $n$. So the average is
 
 $$
 p \cdot \frac{n+1}{2} + (1 - p) \cdot n
@@ -179,21 +227,37 @@ $$
 
 For $p = 1$ it gives $\frac{n+1}{2}$ (the classic average); for $p = 0$, $n$ (always the worst case). For $n = 100$ and $p = 0.6$ it gives 70.3, and a simulation with 200,000 random searches gave 70.31.
 
-**1.10.**
+<ToStatement n="1.9" />
+
+<span id="sol-1-10"></span>**1.10.**
 - (a) **True**: $2^{n+1} = 2 \cdot 2^n$, a constant times $2^n$.
 - (b) **False**: $2^{2n} = 4^n$, and $4^n / 2^n = 2^n$ is not bounded by any constant.
 - (c) **True**: $\log_2 (n!) = \log_2 1 + \dots + \log_2 n \le n \log_2 n$, and the largest $n/2$ terms are each at least $\log_2 (n/2)$, so it is also at least $\frac{n}{2} \log_2 \frac{n}{2}$. See [Sums, Logarithms and Factorials](../06-mathematical-background/01-sums-and-logarithms.mdx#factorials-and-stirlings-formula).
 - (d) **False**: dividing both by $n$, it would require $n^{0.01} \in O(\log^2 n)$, but every positive power of $n$ eventually exceeds every power of $\log n$. (For this pair, "eventually" means astronomically large $n$, which shows that asymptotic statements can be true but irrelevant in practice.)
 - (e) **True**: $\max(f, g) \le f + g \le 2 \max(f, g)$.
 
-**1.11.** $\log^2 n$, $n^{1/3}$, $\sqrt{n}$, $n / \log n$, $n$, $n \log n$, $n^{\log_2 3} \approx n^{1.585}$, $n^2$, $1.1^n$, $2^n$. Every exponential, even with base 1.1, eventually exceeds every polynomial.
+<ToStatement n="1.10" />
 
-**1.12.** After $k$ iterations, $s = 2 + 3 + \dots + (k+1) = \frac{(k+1)(k+2)}{2} - 1 \approx \frac{k^2}{2}$. The loop stops when $s \ge n$, that is, when $k \approx \sqrt{2n}$. Its complexity is $O(\sqrt{n})$. Counting the iterations: 13 for $n = 100$, 140 for $n = 10^4$ and 1,413 for $n = 10^6$, against $\sqrt{2n} = 14.1$, 141.4 and 1414.2.
+<span id="sol-1-11"></span>**1.11.** $\log^2 n$, $n^{1/3}$, $\sqrt{n}$, $n / \log n$, $n$, $n \log n$, $n^{\log_2 3} \approx n^{1.585}$, $n^2$, $1.1^n$, $2^n$. Every exponential, even with base 1.1, eventually exceeds every polynomial.
 
-**1.13.** The inner loop runs $i$ times, and $i$ takes the values $1, 2, 4, \dots$ up to less than $n$. The total is a geometric series dominated by its last term: $1 + 2 + 4 + \dots + 2^k \lt 2 \cdot 2^k \lt 2n$. The fragment is $O(n)$. Multiplying "the outer loop runs $\log n$ times" by "the inner loop runs at most $n$ times" gives a correct but loose upper bound, $O(n \log n)$.
+<ToStatement n="1.11" />
 
-**1.14.** The outer loop always runs $n$ times, and for each $i$ the inner loop stops at the first negative element from position $i$ on. *Best case*: every element is negative, so each inner loop stops at its first step: $O(n)$. *Worst case*: no element is negative, so the inner loop runs $n - i$ times for each $i$, in total $\frac{n(n+1)}{2}$: $O(n^2)$. (A single negative element at position 0 is **not** the best case: it only stops the first inner loop.)
+<span id="sol-1-12"></span>**1.12.** After $k$ iterations, $s = 2 + 3 + \dots + (k+1) = \frac{(k+1)(k+2)}{2} - 1 \approx \frac{k^2}{2}$. The loop stops when $s \ge n$, that is, when $k \approx \sqrt{2n}$. Its complexity is $O(\sqrt{n})$. Counting the iterations: 13 for $n = 100$, 140 for $n = 10^4$ and 1,413 for $n = 10^6$, against $\sqrt{2n} = 14.1$, 141.4 and 1414.2.
 
-**1.15.** No. Each iteration of ternary search needs up to **4** comparisons (equal to each of the two pivots, then which of the three parts), against **2** for binary search (equal to the middle, then which half). In the worst case that is about $4 \log_3 n \approx 2.52 \log_2 n$ comparisons against $2 \log_2 n$. For an array of $10^6$ elements, searching for a value larger than all of them, we counted 40 comparisons for binary search and 52 for ternary search. Both are $O(\log n)$, but splitting in two is better. (With a single "less than" comparison per probe, the same argument holds: $2 \log_3 n \approx 1.26 \log_2 n$ against $\log_2 n$.)
+<ToStatement n="1.12" />
 
-**1.16.** **Exponential (or galloping) search.** First read positions $1, 2, 4, 8, \dots$ until finding a position $2^k$ whose element is greater than or equal to $x$ (or that does not exist). This takes about $\log_2 p + 1$ reads, since $2^{k-1} \lt p \le 2^k$. Then run binary search between positions $2^{k-1}$ and $2^k$, a range of fewer than $p$ elements: another $O(\log p)$ steps. In total, $O(\log p)$, which is much better than $O(\log N)$ when the target is near the beginning of a huge sequence. Java's `TimSort` (used by `Arrays.sort` for objects) uses this technique to merge runs efficiently.
+<span id="sol-1-13"></span>**1.13.** The inner loop runs $i$ times, and $i$ takes the values $1, 2, 4, \dots$ up to less than $n$. The total is a geometric series dominated by its last term: $1 + 2 + 4 + \dots + 2^k \lt 2 \cdot 2^k \lt 2n$. The fragment is $O(n)$. Multiplying "the outer loop runs $\log n$ times" by "the inner loop runs at most $n$ times" gives a correct but loose upper bound, $O(n \log n)$.
+
+<ToStatement n="1.13" />
+
+<span id="sol-1-14"></span>**1.14.** The outer loop always runs $n$ times, and for each $i$ the inner loop stops at the first negative element from position $i$ on. *Best case*: every element is negative, so each inner loop stops at its first step: $O(n)$. *Worst case*: no element is negative, so the inner loop runs $n - i$ times for each $i$, in total $\frac{n(n+1)}{2}$: $O(n^2)$. (A single negative element at position 0 is **not** the best case: it only stops the first inner loop.)
+
+<ToStatement n="1.14" />
+
+<span id="sol-1-15"></span>**1.15.** No. Each iteration of ternary search needs up to **4** comparisons (equal to each of the two pivots, then which of the three parts), against **2** for binary search (equal to the middle, then which half). In the worst case that is about $4 \log_3 n \approx 2.52 \log_2 n$ comparisons against $2 \log_2 n$. For an array of $10^6$ elements, searching for a value larger than all of them, we counted 40 comparisons for binary search and 52 for ternary search. Both are $O(\log n)$, but splitting in two is better. (With a single "less than" comparison per probe, the same argument holds: $2 \log_3 n \approx 1.26 \log_2 n$ against $\log_2 n$.)
+
+<ToStatement n="1.15" />
+
+<span id="sol-1-16"></span>**1.16.** **Exponential (or galloping) search.** First read positions $1, 2, 4, 8, \dots$ until finding a position $2^k$ whose element is greater than or equal to $x$ (or that does not exist). This takes about $\log_2 p + 1$ reads, since $2^{k-1} \lt p \le 2^k$. Then run binary search between positions $2^{k-1}$ and $2^k$, a range of fewer than $p$ elements: another $O(\log p)$ steps. In total, $O(\log p)$, which is much better than $O(\log N)$ when the target is near the beginning of a huge sequence. Java's `TimSort` (used by `Arrays.sort` for objects) uses this technique to merge runs efficiently.
+
+<ToStatement n="1.16" />
