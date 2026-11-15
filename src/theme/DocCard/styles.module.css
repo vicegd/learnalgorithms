@@ -1,0 +1,57 @@
+.cardContainer {
+  --ifm-link-color: var(--ifm-color-emphasis-800);
+  --ifm-link-hover-color: var(--ifm-color-emphasis-700);
+  --ifm-link-hover-decoration: none;
+  height: 100%;
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-left: 4px solid var(--card-accent, var(--ifm-color-primary));
+  box-shadow: 0 1.5px 3px 0 rgb(0 0 0 / 8%);
+  transition: border-color var(--ifm-transition-fast) ease,
+    box-shadow var(--ifm-transition-fast) ease,
+    transform var(--ifm-transition-fast) ease;
+}
+
+.cardContainer:hover {
+  border-color: var(--card-accent, var(--ifm-color-primary));
+  box-shadow: 0 6px 16px 0 rgb(0 0 0 / 12%);
+  transform: translateY(-2px);
+}
+
+.cardRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.cardText {
+  min-width: 0;
+  flex: 1;
+}
+
+.iconBadge {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.75rem;
+  color: var(--card-accent, var(--ifm-color-primary));
+  background: color-mix(in srgb, var(--card-accent, var(--ifm-color-primary)) 12%, transparent);
+}
+
+.cardTitle {
+  font-size: 1.15rem;
+  margin-bottom: 0.25rem;
+}
+
+/* The doc pages number their h2 headings; card titles must not be numbered. */
+.cardTitle::before {
+  content: none !important;
+}
+
+.cardDescription {
+  font-size: 0.82rem;
+  margin: 0;
+  color: var(--ifm-color-emphasis-700);
+}

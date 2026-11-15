@@ -4,10 +4,12 @@ import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
 import styles from './index.module.css';
+import Icon from '@site/src/components/Icon';
 
 const CHAPTERS = [
   {
     accentClass: styles.accentPurple,
+    icon: <Icon name="bulb" size={30} />,
     eyebrow: 'Chapter 1',
     title: 'Foundations of Algorithms',
     description:
@@ -18,6 +20,7 @@ const CHAPTERS = [
   },
   {
     accentClass: styles.accentBlue,
+    icon: <Icon name="bars" size={30} />,
     eyebrow: 'Chapter 2',
     title: 'Fundamental Problem Domains',
     description:
@@ -28,6 +31,7 @@ const CHAPTERS = [
   },
   {
     accentClass: styles.accentGreen,
+    icon: <Icon name="puzzle" size={30} />,
     eyebrow: 'Chapter 3',
     title: 'Algorithm Design Paradigms',
     description:
@@ -38,6 +42,7 @@ const CHAPTERS = [
   },
   {
     accentClass: styles.accentOrange,
+    icon: <Icon name="tree" size={30} />,
     eyebrow: 'Chapter 4',
     title: 'State Space Search and Optimization',
     description:
@@ -48,6 +53,7 @@ const CHAPTERS = [
   },
   {
     accentClass: styles.accentTeal,
+    icon: <Icon name="cpu" size={30} />,
     eyebrow: 'Chapter 5',
     title: 'Advanced Execution Models',
     description:
@@ -57,7 +63,8 @@ const CHAPTERS = [
     to: '/concepts/category/5-advanced-execution-models',
   },
   {
-    accentClass: styles.accentPurple,
+    accentClass: styles.accentRose,
+    icon: <Icon name="sigma" size={30} />,
     eyebrow: 'Chapter 6',
     title: 'Mathematical Background',
     description:
@@ -70,7 +77,8 @@ const CHAPTERS = [
 
 const ALGORITHMS_SECTION = {
   accentClass: styles.accentGreen,
-  eyebrow: 'Algorithm Collection',
+  icon: <Icon name="book" size={30} />,
+    eyebrow: 'Algorithm Collection',
   title: 'Algorithm Sheets',
   description:
     'Rigorous, interactive breakdowns of each algorithm: from the naive approach and why it fails, through the full derivation, to annotated multi-language code and step-by-step table visualizations.',

@@ -49,3 +49,29 @@
 .theme-doc-markdown h3::before {
   content: counter(h2counter) "." counter(h3counter) " ";
 }
+
+/* ── Code blocks ─────────────────────────────────────────── */
+:root {
+  --ifm-font-family-monospace: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', ui-monospace,
+    SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
+  --ifm-code-font-size: 88%;
+  --docusaurus-highlighted-code-line-bg: rgba(60, 173, 110, 0.14);
+}
+
+[data-theme='dark'] {
+  --docusaurus-highlighted-code-line-bg: rgba(60, 173, 110, 0.22);
+}
+
+.theme-code-block {
+  border-radius: 10px;
+  border: 1px solid var(--ifm-color-emphasis-200);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 5%);
+}
+
+[data-theme='dark'] .theme-code-block {
+  border-color: var(--ifm-color-emphasis-300);
+}
+
+.theme-code-block pre {
+  line-height: 1.6;
+}

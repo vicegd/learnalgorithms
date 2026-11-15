@@ -9,6 +9,7 @@ import rehypeKatex from 'rehype-katex';
 import {themes as prismThemes} from 'prism-react-renderer';
 import remarkAutolinkConcepts from './src/plugins/remark-autolink-concepts.js';
 import pluginSiteData from './src/plugins/docusaurus-plugin-site-data.js';
+import remarkCodeLineNumbers from './src/plugins/remark-code-line-numbers.js';
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
@@ -57,7 +58,7 @@ const config = {
           path: './concepts',
           routeBasePath: 'concepts',
           sidebarPath: './sidebars.js',
-          remarkPlugins: [remarkMath, remarkAutolinkConcepts],
+          remarkPlugins: [remarkMath, remarkAutolinkConcepts, remarkCodeLineNumbers],
           rehypePlugins: [rehypeKatex],
         },
         blog: false, // hidden — content preserved in blog/ folder
@@ -118,8 +119,16 @@ const config = {
         copyright: `Copyright © ${new Date().getFullYear()} learnalgorithms.dev`,
       },
       prism: {
-        theme: prismThemes.github,
-        darkTheme: prismThemes.dracula,
+        theme: prismThemes.oneLight,
+        darkTheme: prismThemes.oneDark,
+        additionalLanguages: ['java', 'bash', 'latex'],
+        magicComments: [
+          {
+            className: 'theme-code-block-highlighted-line',
+            line: 'highlight-next-line',
+            block: {start: 'highlight-start', end: 'highlight-end'},
+          },
+        ],
       },
     }),
 
@@ -154,7 +163,7 @@ const config = {
               path: './algorithms',
               routeBasePath: 'algorithms',
               sidebarPath: './sidebarsAlgorithms.js',
-              remarkPlugins: [remarkMath, remarkAutolinkConcepts],
+              remarkPlugins: [remarkMath, remarkAutolinkConcepts, remarkCodeLineNumbers],
               rehypePlugins: [rehypeKatex],
             },
           ],
