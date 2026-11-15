@@ -6,6 +6,9 @@ tags: [Divide and Conquer, Recurrences, Master Theorem, Complexity]
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import FigRecursionTree from './img/recursion-tree.svg';
+import FigCostProfiles from './img/cost-profiles.svg';
+import FigSubtractionTrees from './img/subtraction-trees.svg';
 
 # Analyzing Divide and Conquer Algorithms
 
@@ -52,6 +55,10 @@ This result is a particular case of the so-called **master theorem**.
 
 Draw the tree of recursive calls. The root is the original problem, of size $n$. It has $a$ children of size $n/b$, each of which has $a$ children of size $n/b^2$, and so on, until the base case. The tree has about $\log_b n$ levels.
 
+<Figure caption="The recursion tree of the division scheme. Level i has aⁱ subproblems of size n/bⁱ; multiplying the number of subproblems by the work of each one gives the work of the level.">
+  <FigRecursionTree />
+</Figure>
+
 | Level | Number of subproblems | Size of each one | Non-recursive work at the level |
 | :---: | :---: | :---: | :--- |
 | 0 | $1$ | $n$ | $c \cdot n^k$ |
@@ -65,6 +72,10 @@ The total time is the sum of all levels: $c \cdot n^k$ multiplied by a **geometr
 - **$a \lt b^k$ ($r \lt 1$):** the work **decreases** from each level to the next. The sum is dominated by the first term: the work at the root, $O(n^k)$. The subproblems shrink faster than they multiply.
 - **$a = b^k$ ($r = 1$):** every level does the **same** work, $c \cdot n^k$, and there are $\log_b n$ levels: $O(n^k \log n)$.
 - **$a \gt b^k$ ($r \gt 1$):** the work **increases** from each level to the next. The sum is dominated by the last level, the leaves, whose number is $a^{\log_b n}$. By the logarithm rule $x^{\log_b y} = y^{\log_b x}$ from the asymptotic notation lesson, $a^{\log_b n} = n^{\log_b a}$: $O(n^{\log_b a})$.
+
+<Figure caption="The work of each level of the tree in the three cases. The ratio a/bᵏ decides whether the root, all the levels equally, or the leaves dominate the total.">
+  <FigCostProfiles />
+</Figure>
 
 So the three cases correspond to three situations: the cost is concentrated at the **top** of the tree, **evenly spread** over all levels, or concentrated at the **bottom**.
 
@@ -90,6 +101,10 @@ The intuition is again in the recursion tree, which now has about $n / b$ levels
 
 - **$a = 1$:** a single chain of $n/b$ calls, with sizes $n, n - b, n - 2b, \dots$. The work at each one is at most $c \cdot n^k$, and there are $n/b$ of them: $O(n^{k+1})$. A loop of $n$ iterations whose body costs $O(n^k)$, written recursively.
 - **$a \gt 1$:** the number of calls **multiplies by $a$ at each level**, through $n/b$ levels: $a^{n/b}$ calls. The algorithm is **exponential**, and the non-recursive work does not even matter.
+
+<Figure caption="The recursion trees of the subtraction scheme. With one recursive call the calls form a chain of n/b links; with two, the number of calls doubles at every level.">
+  <FigSubtractionTrees />
+</Figure>
 
 :::danger Avoid subtraction with several subproblems
 An algorithm with $a \gt 1$ in a subtraction scheme is exponential, and therefore unusable except for very small inputs. If you find yourself writing two or more recursive calls on $n - 1$ (or $n - 2$...), stop and think: most likely the same subproblems are being solved many times, and a different technique (an iterative version, or dynamic programming) is needed.

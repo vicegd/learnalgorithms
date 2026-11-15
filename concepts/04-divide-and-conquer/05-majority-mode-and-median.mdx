@@ -5,6 +5,8 @@ sidebar_position: 5
 tags: [Divide and Conquer, Majority Element, Mode, Median, Quickselect]
 ---
 
+import FigQuickselect from './img/quickselect.svg';
+
 # Majority, Mode and Median
 
 The last group of problems of this chapter comes from statistics: finding the **majority element**, the **mode** and the **median** of a set of numbers. For each of them, there is an obvious quadratic solution, a better one based on sorting, and room for something smarter. They are excellent exercises to practise designing divide and conquer algorithms: this lesson develops the median completely, and leaves the divide and conquer versions of the majority element and the mode as challenges, with hints.
@@ -165,6 +167,10 @@ The repository version of `partition` takes the central element as pivot, moves 
 | :--- | :---: | :--- | :---: | :--- |
 | positions 0 to 6 | 1 | **1** 5 6 4 3 2 7 | 0 | $0 \lt 3$: search the right part |
 | positions 1 to 6 | 4 | 1 2 3 **4** 6 5 7 | 3 | $3 = 3$: the median is **4** |
+
+<Figure caption="Quickselect for the median of 4 5 6 1 3 2 7. After each partition only the part that contains position k = 3 is searched; the other part is discarded without being sorted.">
+  <FigQuickselect />
+</Figure>
 
 Two partitions were enough, and the elements 5, 6 and 7 were never ordered among themselves.
 

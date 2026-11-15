@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 660 300" width="660" height="300" role="img">
+  <title>An array stores its elements in consecutive positions; a linked list connects separate nodes with references</title>
+  <text class="t-s t-b" x="20.0" y="22.0" text-anchor="start" dominant-baseline="central">Array: consecutive memory</text>
+  <rect class="box" x="30.0" y="40.0" width="52.0" height="34.0" rx="3"/>
+  <text class="t-m" x="56.0" y="57.5" text-anchor="middle" dominant-baseline="central">12</text>
+  <rect class="box" x="82.0" y="40.0" width="52.0" height="34.0" rx="3"/>
+  <text class="t-m" x="108.0" y="57.5" text-anchor="middle" dominant-baseline="central">7</text>
+  <rect class="box-hl" x="134.0" y="40.0" width="52.0" height="34.0" rx="3"/>
+  <text class="t-m" x="160.0" y="57.5" text-anchor="middle" dominant-baseline="central">31</text>
+  <rect class="box" x="186.0" y="40.0" width="52.0" height="34.0" rx="3"/>
+  <text class="t-m" x="212.0" y="57.5" text-anchor="middle" dominant-baseline="central">5</text>
+  <rect class="box" x="238.0" y="40.0" width="52.0" height="34.0" rx="3"/>
+  <text class="t-m" x="264.0" y="57.5" text-anchor="middle" dominant-baseline="central">18</text>
+  <text class="t-xs t-mut t-m" x="56.0" y="88.0" text-anchor="middle" dominant-baseline="central">1000</text>
+  <text class="t-xs t-mut t-m" x="108.0" y="88.0" text-anchor="middle" dominant-baseline="central">1004</text>
+  <text class="t-xs t-mut t-m" x="160.0" y="88.0" text-anchor="middle" dominant-baseline="central">1008</text>
+  <text class="t-xs t-mut t-m" x="212.0" y="88.0" text-anchor="middle" dominant-baseline="central">1012</text>
+  <text class="t-xs t-mut t-m" x="264.0" y="88.0" text-anchor="middle" dominant-baseline="central">1016</text>
+  <text class="t-xs" x="26.0" y="88.0" text-anchor="middle" dominant-baseline="central"></text>
+  <text class="t-s t-m" x="306.0" y="50.0" text-anchor="start" dominant-baseline="central">address of element i = start + 4 · i</text>
+  <text class="t-xs t-hl" x="306.0" y="70.0" text-anchor="start" dominant-baseline="central">element 2 → 1000 + 8 = 1008: one step, O(1)</text>
+  <text class="t-s t-b" x="20.0" y="140.0" text-anchor="start" dominant-baseline="central">Linked list: nodes scattered in memory, joined by references</text>
+  <rect class="box" x="30.0" y="170.0" width="44.0" height="34.0" rx="4"/>
+  <text class="t-m" x="52.0" y="187.0" text-anchor="middle" dominant-baseline="central">12</text>
+  <rect class="box-soft" x="74.0" y="170.0" width="26.0" height="34.0" rx="4"/>
+  <circle class="ah" cx="87.0" cy="187.0" r="3.0"/>
+  <line class="ln" x1="87.0" y1="187.0" x2="151.0" y2="187.0"/>
+  <polygon class="ah" points="158.0,187.0 151.0,190.5 151.0,183.5"/>
+  <rect class="box" x="158.0" y="170.0" width="44.0" height="34.0" rx="4"/>
+  <text class="t-m" x="180.0" y="187.0" text-anchor="middle" dominant-baseline="central">7</text>
+  <rect class="box-soft" x="202.0" y="170.0" width="26.0" height="34.0" rx="4"/>
+  <circle class="ah" cx="215.0" cy="187.0" r="3.0"/>
+  <line class="ln" x1="215.0" y1="187.0" x2="279.0" y2="187.0"/>
+  <polygon class="ah" points="286.0,187.0 279.0,190.5 279.0,183.5"/>
+  <rect class="box-hl" x="286.0" y="170.0" width="44.0" height="34.0" rx="4"/>
+  <text class="t-m" x="308.0" y="187.0" text-anchor="middle" dominant-baseline="central">31</text>
+  <rect class="box-soft" x="330.0" y="170.0" width="26.0" height="34.0" rx="4"/>
+  <circle class="ah" cx="343.0" cy="187.0" r="3.0"/>
+  <line class="ln" x1="343.0" y1="187.0" x2="407.0" y2="187.0"/>
+  <polygon class="ah" points="414.0,187.0 407.0,190.5 407.0,183.5"/>
+  <rect class="box" x="414.0" y="170.0" width="44.0" height="34.0" rx="4"/>
+  <text class="t-m" x="436.0" y="187.0" text-anchor="middle" dominant-baseline="central">5</text>
+  <rect class="box-soft" x="458.0" y="170.0" width="26.0" height="34.0" rx="4"/>
+  <circle class="ah" cx="471.0" cy="187.0" r="3.0"/>
+  <line class="ln" x1="471.0" y1="187.0" x2="535.0" y2="187.0"/>
+  <polygon class="ah" points="542.0,187.0 535.0,190.5 535.0,183.5"/>
+  <rect class="box" x="542.0" y="170.0" width="44.0" height="34.0" rx="4"/>
+  <text class="t-m" x="564.0" y="187.0" text-anchor="middle" dominant-baseline="central">18</text>
+  <rect class="box-soft" x="586.0" y="170.0" width="26.0" height="34.0" rx="4"/>
+  <text class="t-s t-mut" x="599.0" y="187.0" text-anchor="middle" dominant-baseline="central">∅</text>
+  <text class="t-xs t-mut" x="30.0" y="158.0" text-anchor="start" dominant-baseline="central">head</text>
+  <text class="t-xs t-ac" x="308.0" y="222.0" text-anchor="middle" dominant-baseline="central">to reach element 2, follow 2 references: O(i)</text>
+  <text class="t-xs t-mut" x="330.0" y="270.0" text-anchor="middle" dominant-baseline="central">array: direct access, costly insertions · list: sequential access, cheap insertions once there</text>
+</svg>

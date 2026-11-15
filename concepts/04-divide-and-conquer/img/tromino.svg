@@ -1,0 +1,168 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 600 300" width="600" height="300" role="img">
+  <title>An 8 by 8 board with one missing cell tiled with 21 trominoes by divide and conquer</title>
+  <rect class="f-pur" x="20.0" y="20.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-pur" x="50.0" y="20.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-hl" x="80.0" y="20.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-hl" x="110.0" y="20.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-blue" x="140.0" y="20.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-blue" x="170.0" y="20.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-pur" x="200.0" y="20.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-pur" x="230.0" y="20.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-pur" x="20.0" y="50.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-blue" x="50.0" y="50.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-blue" x="80.0" y="50.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-hl" x="110.0" y="50.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-blue" x="140.0" y="50.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-bad" x="170.0" y="50.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-blue" x="200.0" y="50.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-pur" x="230.0" y="50.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-hl" x="20.0" y="80.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-blue" x="50.0" y="80.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-pur" x="80.0" y="80.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-pur" x="110.0" y="80.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-hl" x="140.0" y="80.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-blue" x="170.0" y="80.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-blue" x="200.0" y="80.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-yel" x="230.0" y="80.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-hl" x="20.0" y="110.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-hl" x="50.0" y="110.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-pur" x="80.0" y="110.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-ac" x="110.0" y="110.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-hl" x="140.0" y="110.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-hl" x="170.0" y="110.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-yel" x="200.0" y="110.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-yel" x="230.0" y="110.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-pur" x="20.0" y="140.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-pur" x="50.0" y="140.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-hl" x="80.0" y="140.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-ac" x="110.0" y="140.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-ac" x="140.0" y="140.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-pur" x="170.0" y="140.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-hl" x="200.0" y="140.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-hl" x="230.0" y="140.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-pur" x="20.0" y="170.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-blue" x="50.0" y="170.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-hl" x="80.0" y="170.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-hl" x="110.0" y="170.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-pur" x="140.0" y="170.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-pur" x="170.0" y="170.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-blue" x="200.0" y="170.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-hl" x="230.0" y="170.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-hl" x="20.0" y="200.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-blue" x="50.0" y="200.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-blue" x="80.0" y="200.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-pur" x="110.0" y="200.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-hl" x="140.0" y="200.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-blue" x="170.0" y="200.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-blue" x="200.0" y="200.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-pur" x="230.0" y="200.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-hl" x="20.0" y="230.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-hl" x="50.0" y="230.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-pur" x="80.0" y="230.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-pur" x="110.0" y="230.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-hl" x="140.0" y="230.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-hl" x="170.0" y="230.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-pur" x="200.0" y="230.0" width="30.0" height="30.0" rx="0"/>
+  <rect class="f-pur" x="230.0" y="230.0" width="30.0" height="30.0" rx="0"/>
+  <line class="ln-grid" x1="20.0" y1="20.0" x2="20.0" y2="260.0"/>
+  <line class="ln-grid" x1="20.0" y1="20.0" x2="260.0" y2="20.0"/>
+  <line class="ln-grid" x1="50.0" y1="20.0" x2="50.0" y2="260.0"/>
+  <line class="ln-grid" x1="20.0" y1="50.0" x2="260.0" y2="50.0"/>
+  <line class="ln-grid" x1="80.0" y1="20.0" x2="80.0" y2="260.0"/>
+  <line class="ln-grid" x1="20.0" y1="80.0" x2="260.0" y2="80.0"/>
+  <line class="ln-grid" x1="110.0" y1="20.0" x2="110.0" y2="260.0"/>
+  <line class="ln-grid" x1="20.0" y1="110.0" x2="260.0" y2="110.0"/>
+  <line class="ln-grid" x1="140.0" y1="20.0" x2="140.0" y2="260.0"/>
+  <line class="ln-grid" x1="20.0" y1="140.0" x2="260.0" y2="140.0"/>
+  <line class="ln-grid" x1="170.0" y1="20.0" x2="170.0" y2="260.0"/>
+  <line class="ln-grid" x1="20.0" y1="170.0" x2="260.0" y2="170.0"/>
+  <line class="ln-grid" x1="200.0" y1="20.0" x2="200.0" y2="260.0"/>
+  <line class="ln-grid" x1="20.0" y1="200.0" x2="260.0" y2="200.0"/>
+  <line class="ln-grid" x1="230.0" y1="20.0" x2="230.0" y2="260.0"/>
+  <line class="ln-grid" x1="20.0" y1="230.0" x2="260.0" y2="230.0"/>
+  <line class="ln-grid" x1="260.0" y1="20.0" x2="260.0" y2="260.0"/>
+  <line class="ln-grid" x1="20.0" y1="260.0" x2="260.0" y2="260.0"/>
+  <line class="ln-strong" x1="80.0" y1="20.0" x2="80.0" y2="50.0"/>
+  <line class="ln-strong" x1="50.0" y1="50.0" x2="80.0" y2="50.0"/>
+  <line class="ln-strong" x1="80.0" y1="50.0" x2="110.0" y2="50.0"/>
+  <line class="ln-strong" x1="140.0" y1="20.0" x2="140.0" y2="50.0"/>
+  <line class="ln-strong" x1="200.0" y1="20.0" x2="200.0" y2="50.0"/>
+  <line class="ln-strong" x1="170.0" y1="50.0" x2="200.0" y2="50.0"/>
+  <line class="ln-strong" x1="200.0" y1="50.0" x2="230.0" y2="50.0"/>
+  <line class="ln-strong" x1="50.0" y1="50.0" x2="50.0" y2="80.0"/>
+  <line class="ln-strong" x1="20.0" y1="80.0" x2="50.0" y2="80.0"/>
+  <line class="ln-strong" x1="110.0" y1="50.0" x2="110.0" y2="80.0"/>
+  <line class="ln-strong" x1="80.0" y1="80.0" x2="110.0" y2="80.0"/>
+  <line class="ln-strong" x1="140.0" y1="50.0" x2="140.0" y2="80.0"/>
+  <line class="ln-strong" x1="110.0" y1="80.0" x2="140.0" y2="80.0"/>
+  <line class="ln-strong" x1="170.0" y1="50.0" x2="170.0" y2="80.0"/>
+  <line class="ln-strong" x1="140.0" y1="80.0" x2="170.0" y2="80.0"/>
+  <line class="ln-strong" x1="200.0" y1="50.0" x2="200.0" y2="80.0"/>
+  <line class="ln-strong" x1="170.0" y1="80.0" x2="200.0" y2="80.0"/>
+  <line class="ln-strong" x1="230.0" y1="50.0" x2="230.0" y2="80.0"/>
+  <line class="ln-strong" x1="230.0" y1="80.0" x2="260.0" y2="80.0"/>
+  <line class="ln-strong" x1="50.0" y1="80.0" x2="50.0" y2="110.0"/>
+  <line class="ln-strong" x1="80.0" y1="80.0" x2="80.0" y2="110.0"/>
+  <line class="ln-strong" x1="50.0" y1="110.0" x2="80.0" y2="110.0"/>
+  <line class="ln-strong" x1="140.0" y1="80.0" x2="140.0" y2="110.0"/>
+  <line class="ln-strong" x1="110.0" y1="110.0" x2="140.0" y2="110.0"/>
+  <line class="ln-strong" x1="170.0" y1="80.0" x2="170.0" y2="110.0"/>
+  <line class="ln-strong" x1="170.0" y1="110.0" x2="200.0" y2="110.0"/>
+  <line class="ln-strong" x1="230.0" y1="80.0" x2="230.0" y2="110.0"/>
+  <line class="ln-strong" x1="200.0" y1="110.0" x2="230.0" y2="110.0"/>
+  <line class="ln-strong" x1="20.0" y1="140.0" x2="50.0" y2="140.0"/>
+  <line class="ln-strong" x1="80.0" y1="110.0" x2="80.0" y2="140.0"/>
+  <line class="ln-strong" x1="50.0" y1="140.0" x2="80.0" y2="140.0"/>
+  <line class="ln-strong" x1="110.0" y1="110.0" x2="110.0" y2="140.0"/>
+  <line class="ln-strong" x1="80.0" y1="140.0" x2="110.0" y2="140.0"/>
+  <line class="ln-strong" x1="140.0" y1="110.0" x2="140.0" y2="140.0"/>
+  <line class="ln-strong" x1="140.0" y1="140.0" x2="170.0" y2="140.0"/>
+  <line class="ln-strong" x1="200.0" y1="110.0" x2="200.0" y2="140.0"/>
+  <line class="ln-strong" x1="170.0" y1="140.0" x2="200.0" y2="140.0"/>
+  <line class="ln-strong" x1="200.0" y1="140.0" x2="230.0" y2="140.0"/>
+  <line class="ln-strong" x1="230.0" y1="140.0" x2="260.0" y2="140.0"/>
+  <line class="ln-strong" x1="80.0" y1="140.0" x2="80.0" y2="170.0"/>
+  <line class="ln-strong" x1="50.0" y1="170.0" x2="80.0" y2="170.0"/>
+  <line class="ln-strong" x1="110.0" y1="140.0" x2="110.0" y2="170.0"/>
+  <line class="ln-strong" x1="110.0" y1="170.0" x2="140.0" y2="170.0"/>
+  <line class="ln-strong" x1="170.0" y1="140.0" x2="170.0" y2="170.0"/>
+  <line class="ln-strong" x1="140.0" y1="170.0" x2="170.0" y2="170.0"/>
+  <line class="ln-strong" x1="200.0" y1="140.0" x2="200.0" y2="170.0"/>
+  <line class="ln-strong" x1="200.0" y1="170.0" x2="230.0" y2="170.0"/>
+  <line class="ln-strong" x1="50.0" y1="170.0" x2="50.0" y2="200.0"/>
+  <line class="ln-strong" x1="20.0" y1="200.0" x2="50.0" y2="200.0"/>
+  <line class="ln-strong" x1="80.0" y1="170.0" x2="80.0" y2="200.0"/>
+  <line class="ln-strong" x1="80.0" y1="200.0" x2="110.0" y2="200.0"/>
+  <line class="ln-strong" x1="140.0" y1="170.0" x2="140.0" y2="200.0"/>
+  <line class="ln-strong" x1="110.0" y1="200.0" x2="140.0" y2="200.0"/>
+  <line class="ln-strong" x1="140.0" y1="200.0" x2="170.0" y2="200.0"/>
+  <line class="ln-strong" x1="200.0" y1="170.0" x2="200.0" y2="200.0"/>
+  <line class="ln-strong" x1="170.0" y1="200.0" x2="200.0" y2="200.0"/>
+  <line class="ln-strong" x1="230.0" y1="170.0" x2="230.0" y2="200.0"/>
+  <line class="ln-strong" x1="230.0" y1="200.0" x2="260.0" y2="200.0"/>
+  <line class="ln-strong" x1="50.0" y1="200.0" x2="50.0" y2="230.0"/>
+  <line class="ln-strong" x1="50.0" y1="230.0" x2="80.0" y2="230.0"/>
+  <line class="ln-strong" x1="110.0" y1="200.0" x2="110.0" y2="230.0"/>
+  <line class="ln-strong" x1="80.0" y1="230.0" x2="110.0" y2="230.0"/>
+  <line class="ln-strong" x1="140.0" y1="200.0" x2="140.0" y2="230.0"/>
+  <line class="ln-strong" x1="170.0" y1="200.0" x2="170.0" y2="230.0"/>
+  <line class="ln-strong" x1="170.0" y1="230.0" x2="200.0" y2="230.0"/>
+  <line class="ln-strong" x1="230.0" y1="200.0" x2="230.0" y2="230.0"/>
+  <line class="ln-strong" x1="200.0" y1="230.0" x2="230.0" y2="230.0"/>
+  <line class="ln-strong" x1="80.0" y1="230.0" x2="80.0" y2="260.0"/>
+  <line class="ln-strong" x1="140.0" y1="230.0" x2="140.0" y2="260.0"/>
+  <line class="ln-strong" x1="200.0" y1="230.0" x2="200.0" y2="260.0"/>
+  <rect class="ln-strong" x="20.0" y="20.0" width="240.0" height="240.0" rx="0"/>
+  <line class="ln-ac" x1="140.0" y1="14.0" x2="140.0" y2="266.0"/>
+  <line class="ln-ac" x1="14.0" y1="140.0" x2="266.0" y2="140.0"/>
+  <text class="t-bad t-b" x="185.0" y="65.0" text-anchor="middle" dominant-baseline="central">✕</text>
+  <text class="t-s t-bad" x="290.0" y="32.0" text-anchor="start" dominant-baseline="central">red: the missing cell</text>
+  <text class="t-s t-ac" x="290.0" y="52.0" text-anchor="start" dominant-baseline="central">orange: the first tromino, placed at</text>
+  <text class="t-s t-ac" x="290.0" y="72.0" text-anchor="start" dominant-baseline="central">the center so that it covers one</text>
+  <text class="t-s t-ac" x="290.0" y="92.0" text-anchor="start" dominant-baseline="central">cell of each quadrant without a</text>
+  <text class="t-s t-ac" x="290.0" y="112.0" text-anchor="start" dominant-baseline="central">missing cell</text>
+  <text class="t-s" x="290.0" y="152.0" text-anchor="start" dominant-baseline="central">now each quadrant is a 4 × 4 board</text>
+  <text class="t-s" x="290.0" y="172.0" text-anchor="start" dominant-baseline="central">with exactly one covered cell:</text>
+  <text class="t-s" x="290.0" y="192.0" text-anchor="start" dominant-baseline="central">the same problem, half the size</text>
+  <text class="t-s t-b" x="290.0" y="232.0" text-anchor="start" dominant-baseline="central">21 trominoes = (8² − 1) / 3</text>
+</svg>

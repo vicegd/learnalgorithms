@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 720 200" width="720" height="200" role="img">
+  <title>Towers of Hanoi with three discs: the three steps of the recursive strategy</title>
+  <text class="t-xs t-b" x="94.0" y="18.0" text-anchor="middle" dominant-baseline="central">start</text>
+  <rect class="box-soft" x="14.0" y="150.0" width="160.0" height="6.0" rx="2"/>
+  <rect class="box-soft" x="38.0" y="60.0" width="4.0" height="90.0" rx="1"/>
+  <text class="t-xs t-mut" x="40.0" y="170.0" text-anchor="middle" dominant-baseline="central">A</text>
+  <rect class="box-ac" x="15.0" y="134.0" width="50.0" height="14.0" rx="4"/>
+  <rect class="box-blue" x="21.0" y="118.0" width="38.0" height="14.0" rx="4"/>
+  <rect class="box-blue" x="27.0" y="102.0" width="26.0" height="14.0" rx="4"/>
+  <rect class="box-soft" x="92.0" y="60.0" width="4.0" height="90.0" rx="1"/>
+  <text class="t-xs t-mut" x="94.0" y="170.0" text-anchor="middle" dominant-baseline="central">B</text>
+  <rect class="box-soft" x="146.0" y="60.0" width="4.0" height="90.0" rx="1"/>
+  <text class="t-xs t-mut" x="148.0" y="170.0" text-anchor="middle" dominant-baseline="central">C</text>
+  <text class="t-xs t-b" x="272.0" y="18.0" text-anchor="middle" dominant-baseline="central">1. move n − 1 discs to B</text>
+  <rect class="box-soft" x="192.0" y="150.0" width="160.0" height="6.0" rx="2"/>
+  <rect class="box-soft" x="216.0" y="60.0" width="4.0" height="90.0" rx="1"/>
+  <text class="t-xs t-mut" x="218.0" y="170.0" text-anchor="middle" dominant-baseline="central">A</text>
+  <rect class="box-ac" x="193.0" y="134.0" width="50.0" height="14.0" rx="4"/>
+  <rect class="box-soft" x="270.0" y="60.0" width="4.0" height="90.0" rx="1"/>
+  <text class="t-xs t-mut" x="272.0" y="170.0" text-anchor="middle" dominant-baseline="central">B</text>
+  <rect class="box-blue" x="253.0" y="134.0" width="38.0" height="14.0" rx="4"/>
+  <rect class="box-blue" x="259.0" y="118.0" width="26.0" height="14.0" rx="4"/>
+  <rect class="box-soft" x="324.0" y="60.0" width="4.0" height="90.0" rx="1"/>
+  <text class="t-xs t-mut" x="326.0" y="170.0" text-anchor="middle" dominant-baseline="central">C</text>
+  <line class="ln" x1="176.0" y1="100.0" x2="184.0" y2="100.0"/>
+  <polygon class="ah" points="190.0,100.0 184.0,103.0 184.0,97.0"/>
+  <text class="t-xs t-b" x="450.0" y="18.0" text-anchor="middle" dominant-baseline="central">2. move the largest disc to C</text>
+  <rect class="box-soft" x="370.0" y="150.0" width="160.0" height="6.0" rx="2"/>
+  <rect class="box-soft" x="394.0" y="60.0" width="4.0" height="90.0" rx="1"/>
+  <text class="t-xs t-mut" x="396.0" y="170.0" text-anchor="middle" dominant-baseline="central">A</text>
+  <rect class="box-soft" x="448.0" y="60.0" width="4.0" height="90.0" rx="1"/>
+  <text class="t-xs t-mut" x="450.0" y="170.0" text-anchor="middle" dominant-baseline="central">B</text>
+  <rect class="box-blue" x="431.0" y="134.0" width="38.0" height="14.0" rx="4"/>
+  <rect class="box-blue" x="437.0" y="118.0" width="26.0" height="14.0" rx="4"/>
+  <rect class="box-soft" x="502.0" y="60.0" width="4.0" height="90.0" rx="1"/>
+  <text class="t-xs t-mut" x="504.0" y="170.0" text-anchor="middle" dominant-baseline="central">C</text>
+  <rect class="box-ac" x="479.0" y="134.0" width="50.0" height="14.0" rx="4"/>
+  <line class="ln" x1="354.0" y1="100.0" x2="362.0" y2="100.0"/>
+  <polygon class="ah" points="368.0,100.0 362.0,103.0 362.0,97.0"/>
+  <text class="t-xs t-b" x="628.0" y="18.0" text-anchor="middle" dominant-baseline="central">3. move n − 1 discs onto it</text>
+  <rect class="box-soft" x="548.0" y="150.0" width="160.0" height="6.0" rx="2"/>
+  <rect class="box-soft" x="572.0" y="60.0" width="4.0" height="90.0" rx="1"/>
+  <text class="t-xs t-mut" x="574.0" y="170.0" text-anchor="middle" dominant-baseline="central">A</text>
+  <rect class="box-soft" x="626.0" y="60.0" width="4.0" height="90.0" rx="1"/>
+  <text class="t-xs t-mut" x="628.0" y="170.0" text-anchor="middle" dominant-baseline="central">B</text>
+  <rect class="box-soft" x="680.0" y="60.0" width="4.0" height="90.0" rx="1"/>
+  <text class="t-xs t-mut" x="682.0" y="170.0" text-anchor="middle" dominant-baseline="central">C</text>
+  <rect class="box-ac" x="657.0" y="134.0" width="50.0" height="14.0" rx="4"/>
+  <rect class="box-blue" x="663.0" y="118.0" width="38.0" height="14.0" rx="4"/>
+  <rect class="box-blue" x="669.0" y="102.0" width="26.0" height="14.0" rx="4"/>
+  <line class="ln" x1="532.0" y1="100.0" x2="540.0" y2="100.0"/>
+  <polygon class="ah" points="546.0,100.0 540.0,103.0 540.0,97.0"/>
+  <text class="t-xs t-mut" x="360.0" y="192.0" text-anchor="middle" dominant-baseline="central">steps 1 and 3 are the same problem with one disc fewer: M(n) = 2M(n − 1) + 1 = 2ⁿ − 1 moves</text>
+</svg>

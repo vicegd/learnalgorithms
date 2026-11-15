@@ -6,6 +6,10 @@ tags: [Foundations, Data Structures, Java Collections, Graphs, Trees]
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import FigArrayVsList from './img/array-vs-list.svg';
+import FigGraphRepresentations from './img/graph-representations.svg';
+import FigTreeVocabulary from './img/tree-vocabulary.svg';
+import FigBstBalance from './img/bst-balance.svg';
 
 # Data Structures: The Other Half of Every Program
 
@@ -77,6 +81,10 @@ Two practical consequences, both relevant for algorithms:
 The **array** is the most fundamental data structure: a fixed number of elements of the same type stored in **consecutive memory positions**. It exists in virtually every programming language.
 
 Because elements are contiguous and all have the same size, the address of element $i$ can be computed directly as *start address + i × element size*. That is why accessing any position takes the **same time** regardless of the size of the array, a property called **random access** (or constant-time access).
+
+<Figure caption="An array and a linked list with the same elements. The array computes the address of any element directly; the list must follow the references one by one, but inserting a node only requires changing two references.">
+  <FigArrayVsList />
+</Figure>
 
 Arrays also have important limitations:
 
@@ -418,6 +426,10 @@ The two classical representations have different costs, which is another example
 - **Adjacency matrix:** an $|N| \times |N|$ matrix where cell $(u, v)$ indicates whether there is an edge (or its weight). Checking whether two nodes are connected is immediate, but the memory grows with $|N|^2$, even if the graph has few edges.
 - **Adjacency lists:** for each node, a list of its neighbours. The memory grows with $|N| + |A|$, which is much better for **sparse** graphs (few edges), and traversing the neighbours of a node is efficient. Checking whether a specific edge exists, however, requires searching a list.
 
+<Figure caption="The same undirected graph stored as an adjacency matrix (every pair of nodes has a cell) and as adjacency lists (each node keeps only its neighbors).">
+  <FigGraphRepresentations />
+</Figure>
+
 ### Some algorithms on graphs
 
 Some of the classic graph algorithms that you may meet in this course and in your degree are:
@@ -438,6 +450,10 @@ A **tree** consists of a set of nodes and a set of edges connecting pairs of nod
 
 Some additional vocabulary: nodes without children are **leaves**; the **depth** of a node is the length of the path from the root to it; and the **height** of the tree is the maximum depth of its nodes. A tree is a special case of a graph: a connected graph without cycles.
 
+<Figure caption="Tree vocabulary. Node 1 is the root, nodes 4, 6 and 7 are leaves, and the height of the tree is 3, the depth of its deepest node.">
+  <FigTreeVocabulary />
+</Figure>
+
 ### Some types of trees
 
 - **Binary trees**, where each node has at most two children:
@@ -446,6 +462,10 @@ Some additional vocabulary: nodes without children are **leaves**; the **depth**
   - **Expression trees**, which represent arithmetic expressions: operators in internal nodes, operands in the leaves.
   - **Binary heaps**, where every node is smaller than (or equal to) its children, so the minimum is always at the root. They are the structure behind `PriorityQueue`.
 - **Multiway trees**, where nodes can have many children, such as **B-trees**, widely used in databases and file systems because they minimize disk accesses.
+
+<Figure caption="The same seven keys in two binary search trees. Inserted in a good order they form a balanced tree of height 2; inserted in sorted order they form a chain of height 6, no better than a list.">
+  <FigBstBalance />
+</Figure>
 
 :::info Why balance matters
 In a search tree, the cost of an operation depends on the **height** of the tree. A balanced tree with $n$ nodes has a height of about $\log_2 n$: about 20 levels for a million elements. A degenerate tree (for example, one built by inserting already sorted keys into a plain binary search tree) can have height $n$, and then it is no better than a linked list. Keeping the tree balanced is what makes `TreeSet` and `TreeMap` efficient.

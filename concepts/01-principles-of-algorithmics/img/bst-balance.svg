@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 640 250" width="640" height="250" role="img">
+  <title>The same seven keys in a balanced search tree (height 2) and in a degenerate one (height 6)</title>
+  <line class="ln" x1="150.0" y1="40.0" x2="85.0" y2="100.0"/>
+  <line class="ln" x1="150.0" y1="40.0" x2="215.0" y2="100.0"/>
+  <line class="ln" x1="85.0" y1="100.0" x2="50.0" y2="160.0"/>
+  <line class="ln" x1="85.0" y1="100.0" x2="120.0" y2="160.0"/>
+  <line class="ln" x1="215.0" y1="100.0" x2="180.0" y2="160.0"/>
+  <line class="ln" x1="215.0" y1="100.0" x2="250.0" y2="160.0"/>
+  <circle class="box-hl" cx="150.0" cy="40.0" r="16.0"/>
+  <text class="t-m t-s" x="150.0" y="40.0" text-anchor="middle" dominant-baseline="central">40</text>
+  <circle class="box-hl" cx="85.0" cy="100.0" r="16.0"/>
+  <text class="t-m t-s" x="85.0" y="100.0" text-anchor="middle" dominant-baseline="central">20</text>
+  <circle class="box-hl" cx="215.0" cy="100.0" r="16.0"/>
+  <text class="t-m t-s" x="215.0" y="100.0" text-anchor="middle" dominant-baseline="central">60</text>
+  <circle class="box-hl" cx="50.0" cy="160.0" r="16.0"/>
+  <text class="t-m t-s" x="50.0" y="160.0" text-anchor="middle" dominant-baseline="central">10</text>
+  <circle class="box-hl" cx="120.0" cy="160.0" r="16.0"/>
+  <text class="t-m t-s" x="120.0" y="160.0" text-anchor="middle" dominant-baseline="central">30</text>
+  <circle class="box-hl" cx="180.0" cy="160.0" r="16.0"/>
+  <text class="t-m t-s" x="180.0" y="160.0" text-anchor="middle" dominant-baseline="central">50</text>
+  <circle class="box-hl" cx="250.0" cy="160.0" r="16.0"/>
+  <text class="t-m t-s" x="250.0" y="160.0" text-anchor="middle" dominant-baseline="central">70</text>
+  <text class="t-s t-hl" x="150.0" y="215.0" text-anchor="middle" dominant-baseline="central">balanced: height ≈ log₂ n</text>
+  <circle class="box-bad" cx="360.0" cy="22.0" r="13.0"/>
+  <text class="t-m t-xs" x="360.0" y="22.0" text-anchor="middle" dominant-baseline="central">10</text>
+  <line class="ln" x1="360.0" y1="22.0" x2="398.0" y2="52.0"/>
+  <circle class="box-bad" cx="398.0" cy="52.0" r="13.0"/>
+  <text class="t-m t-xs" x="398.0" y="52.0" text-anchor="middle" dominant-baseline="central">20</text>
+  <line class="ln" x1="398.0" y1="52.0" x2="436.0" y2="82.0"/>
+  <circle class="box-bad" cx="436.0" cy="82.0" r="13.0"/>
+  <text class="t-m t-xs" x="436.0" y="82.0" text-anchor="middle" dominant-baseline="central">30</text>
+  <line class="ln" x1="436.0" y1="82.0" x2="474.0" y2="112.0"/>
+  <circle class="box-bad" cx="474.0" cy="112.0" r="13.0"/>
+  <text class="t-m t-xs" x="474.0" y="112.0" text-anchor="middle" dominant-baseline="central">40</text>
+  <line class="ln" x1="474.0" y1="112.0" x2="512.0" y2="142.0"/>
+  <circle class="box-bad" cx="512.0" cy="142.0" r="13.0"/>
+  <text class="t-m t-xs" x="512.0" y="142.0" text-anchor="middle" dominant-baseline="central">50</text>
+  <line class="ln" x1="512.0" y1="142.0" x2="550.0" y2="172.0"/>
+  <circle class="box-bad" cx="550.0" cy="172.0" r="13.0"/>
+  <text class="t-m t-xs" x="550.0" y="172.0" text-anchor="middle" dominant-baseline="central">60</text>
+  <line class="ln" x1="550.0" y1="172.0" x2="588.0" y2="202.0"/>
+  <circle class="box-bad" cx="588.0" cy="202.0" r="13.0"/>
+  <text class="t-m t-xs" x="588.0" y="202.0" text-anchor="middle" dominant-baseline="central">70</text>
+  <text class="t-s t-bad" x="470.0" y="240.0" text-anchor="middle" dominant-baseline="central">keys inserted in order: height n − 1</text>
+</svg>
