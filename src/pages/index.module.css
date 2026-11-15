@@ -326,3 +326,24 @@
   border-color: rgba(13, 148, 136, 0.28);
   color: #0f766e;
 }
+
+.accentRose { border-top-color: #db2777; }
+.accentRose .cardLink { color: #db2777; }
+.accentRose .cardTopic {
+  background: rgba(219, 39, 119, 0.07);
+  border-color: rgba(219, 39, 119, 0.28);
+  color: #be185d;
+}
+.accentOrange .cardIcon { color: #ea580c; }
+.accentTeal   .cardIcon { color: #0d9488; }
+.accentRose   .cardIcon { color: #db2777; }
+
+.cardIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 0.9rem;
+  background: color-mix(in srgb, currentColor 11%, transparent);
+}
