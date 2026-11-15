@@ -99,3 +99,51 @@
 .sidebar-part > .menu__list {
   padding-left: 0;
 }
+
+/* ── Diagrams (SVGs in concepts/*/img, imported with svgr) ── */
+:root {
+  --dg-fg: #1f2937; --dg-muted: #6b7280; --dg-line: #9ca3af; --dg-faint: #d1d5db; --dg-grid: #e5e7eb;
+  --dg-surface: #ffffff; --dg-soft: #f3f4f6;
+  --dg-hl: #2e8555; --dg-hl-bg: #e3f4ea;
+  --dg-ac: #ea580c; --dg-ac-t: #c2410c; --dg-ac-bg: #fdebdc;
+  --dg-bad: #dc2626; --dg-bad-bg: #fde2e2;
+  --dg-blue: #3b82f6; --dg-blue-t: #2563eb; --dg-blue-bg: #dbeafe;
+  --dg-pur: #8b5cf6; --dg-pur-t: #7c3aed; --dg-pur-bg: #ede9fe;
+}
+[data-theme='dark'] {
+  --dg-fg: #e5e7eb; --dg-muted: #9ca3af; --dg-line: #6b7280; --dg-faint: #4b5563; --dg-grid: #374151;
+  --dg-surface: #1b1b1d; --dg-soft: #2a2b2e;
+  --dg-hl: #4cc38a; --dg-hl-bg: #173a2a;
+  --dg-ac: #fb923c; --dg-ac-t: #fdba74; --dg-ac-bg: #3d2414;
+  --dg-bad: #f87171; --dg-bad-bg: #3b1a1a;
+  --dg-blue: #60a5fa; --dg-blue-t: #93c5fd; --dg-blue-bg: #172a46;
+  --dg-pur: #a78bfa; --dg-pur-t: #c4b5fd; --dg-pur-bg: #2a2346;
+}
+.dg-figure { margin: 1.5rem 0 1.75rem; text-align: center; }
+.dg-figure svg.dg { max-width: 100%; height: auto; }
+.dg-figure figcaption { margin-top: 0.5rem; font-size: 0.875rem; color: var(--dg-muted); line-height: 1.45; max-width: 46rem; margin-left: auto; margin-right: auto; }
+svg.dg text { font-family: var(--ifm-font-family-base); font-size: 14px; fill: var(--dg-fg); }
+svg.dg .t-s { font-size: 12px; } svg.dg .t-xs { font-size: 10.5px; } svg.dg .t-b { font-weight: 700; }
+svg.dg .t-m { font-family: var(--ifm-font-family-monospace); }
+svg.dg .t-mut { fill: var(--dg-muted); } svg.dg .t-hl { fill: var(--dg-hl); } svg.dg .t-ac { fill: var(--dg-ac-t); }
+svg.dg .t-bad { fill: var(--dg-bad); } svg.dg .t-blue { fill: var(--dg-blue-t); } svg.dg .t-pur { fill: var(--dg-pur-t); }
+svg.dg .box { fill: var(--dg-surface); stroke: var(--dg-line); stroke-width: 1.3; }
+svg.dg .box-soft { fill: var(--dg-soft); stroke: var(--dg-line); stroke-width: 1.3; }
+svg.dg .box-hl { fill: var(--dg-hl-bg); stroke: var(--dg-hl); stroke-width: 1.8; }
+svg.dg .box-ac { fill: var(--dg-ac-bg); stroke: var(--dg-ac); stroke-width: 1.8; }
+svg.dg .box-bad { fill: var(--dg-bad-bg); stroke: var(--dg-bad); stroke-width: 1.5; }
+svg.dg .box-mut { fill: var(--dg-soft); stroke: var(--dg-faint); stroke-width: 1.2; }
+svg.dg .box-blue { fill: var(--dg-blue-bg); stroke: var(--dg-blue); stroke-width: 1.8; }
+svg.dg .box-pur { fill: var(--dg-pur-bg); stroke: var(--dg-pur); stroke-width: 1.8; }
+svg.dg .box-none { fill: none; stroke: none; }
+svg.dg .ln { stroke: var(--dg-line); stroke-width: 1.4; fill: none; }
+svg.dg .ln-hl { stroke: var(--dg-hl); stroke-width: 2.6; fill: none; }
+svg.dg .ln-ac { stroke: var(--dg-ac); stroke-width: 2.2; fill: none; }
+svg.dg .ln-bad { stroke: var(--dg-bad); stroke-width: 1.5; fill: none; stroke-dasharray: 5 4; }
+svg.dg .ln-mut { stroke: var(--dg-faint); stroke-width: 1.3; fill: none; stroke-dasharray: 4 4; }
+svg.dg .ln-blue { stroke: var(--dg-blue); stroke-width: 2.2; fill: none; }
+svg.dg .ln-pur { stroke: var(--dg-pur); stroke-width: 2.2; fill: none; }
+svg.dg .ln-axis { stroke: var(--dg-muted); stroke-width: 1.3; fill: none; }
+svg.dg .ln-grid { stroke: var(--dg-grid); stroke-width: 1; fill: none; }
+svg.dg .ah { fill: var(--dg-line); } svg.dg .ah-hl { fill: var(--dg-hl); } svg.dg .ah-ac { fill: var(--dg-ac); }
+svg.dg .ah-bad { fill: var(--dg-bad); } svg.dg .ah-blue { fill: var(--dg-blue); } svg.dg .ah-pur { fill: var(--dg-pur); }
