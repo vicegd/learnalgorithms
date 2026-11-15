@@ -12,47 +12,73 @@ These exercises practice the tools of the two lessons of the chapter: [sums, log
 
 ## Sums
 
-**8.1. Odd numbers.** Compute $1 + 3 + 5 + \dots + (2n - 1)$ in two ways: with the formula of the arithmetic series, and by induction.
+<span id="ex-8-1"></span>**8.1. Odd numbers.** Compute $1 + 3 + 5 + \dots + (2n - 1)$ in two ways: with the formula of the arithmetic series, and by induction.
 
-**8.2. A weighted sum.** Prove that $\sum_{i=1}^{n} i \cdot 2^i = (n - 1) 2^{n+1} + 2$. What is its order? Check the formula for $n = 10$.
+<ToSolution n="8.1" />
 
-**8.3. Bounding.** Without computing it exactly, find the order of $\sum_{i=1}^{n} \sqrt{i}$, giving both an upper and a lower bound.
+<span id="ex-8-2"></span>**8.2. A weighted sum.** Prove that $\sum_{i=1}^{n} i \cdot 2^i = (n - 1) 2^{n+1} + 2$. What is its order? Check the formula for $n = 10$.
+
+<ToSolution n="8.2" />
+
+<span id="ex-8-3"></span>**8.3. Bounding.** Without computing it exactly, find the order of $\sum_{i=1}^{n} \sqrt{i}$, giving both an upper and a lower bound.
+
+<ToSolution n="8.3" />
 
 ## Logarithms and factorials
 
-**8.4. Simplify.** Simplify each expression (logarithms in base 2):
+<span id="ex-8-4"></span>**8.4. Simplify.** Simplify each expression (logarithms in base 2):
 - (a) $4^{\log n}$
 - (b) $\log (8 n^3)$
 - (c) $n^{1 / \log n}$
 - (d) $\log (\log (2^{2^k}))$
 
-**8.5. Counting digits.** How many decimal digits does $2^{100}$ have? Answer without computing it, using logarithms.
+<ToSolution n="8.4" />
 
-**8.6. Stirling.** Estimate $50!$ with Stirling's formula. How many digits does it have? How accurate is the estimate?
+<span id="ex-8-5"></span>**8.5. Counting digits.** How many decimal digits does $2^{100}$ have? Answer without computing it, using logarithms.
 
-**8.7. Running maximum.** A loop scans an array of $n$ distinct numbers in random order and updates a variable `max` every time it finds a larger value. On average, how many times is `max` updated, for $n = 1{,}000$?
+<ToSolution n="8.5" />
+
+<span id="ex-8-6"></span>**8.6. Stirling.** Estimate $50!$ with Stirling's formula. How many digits does it have? How accurate is the estimate?
+
+<ToSolution n="8.6" />
+
+<span id="ex-8-7"></span>**8.7. Running maximum.** A loop scans an array of $n$ distinct numbers in random order and updates a variable `max` every time it finds a larger value. On average, how many times is `max` updated, for $n = 1{,}000$?
+
+<ToSolution n="8.7" />
 
 ## Induction and correctness
 
-**8.8. Find the error.** "Theorem: all horses are the same color. Proof by induction on the number $n$ of horses in a group. Base: a group of one horse has a single color. Step: take a group of $n + 1$ horses. Removing the first, the remaining $n$ have the same color by the hypothesis; removing the last, the first $n$ also have the same color. Both groups share the horses in the middle, so all $n + 1$ have the same color." Where is the mistake?
+<span id="ex-8-8"></span>**8.8. Find the error.** "Theorem: all horses are the same color. Proof by induction on the number $n$ of horses in a group. Base: a group of one horse has a single color. Step: take a group of $n + 1$ horses. Removing the first, the remaining $n$ have the same color by the hypothesis; removing the last, the first $n$ also have the same color. Both groups share the horses in the middle, so all $n + 1$ have the same color." Where is the mistake?
 
-**8.9. Euclid's invariant.** Euclid's algorithm repeats `(a, b) = (b, a % b)` while `b != 0`, and returns `a`. State the loop invariant that proves it computes $\gcd(a, b)$, and explain why the loop terminates.
+<ToSolution n="8.8" />
+
+<span id="ex-8-9"></span>**8.9. Euclid's invariant.** Euclid's algorithm repeats `(a, b) = (b, a % b)` while `b != 0`, and returns `a`. State the loop invariant that proves it computes $\gcd(a, b)$, and explain why the loop terminates.
+
+<ToSolution n="8.9" />
 
 ## Recurrences
 
-**8.10. Unroll.** Solve $T(n) = 2T(n/2) + 1$ with $T(1) = 1$, for $n$ a power of 2. Which algorithm has this recurrence?
+<span id="ex-8-10"></span>**8.10. Unroll.** Solve $T(n) = 2T(n/2) + 1$ with $T(1) = 1$, for $n$ a power of 2. Which algorithm has this recurrence?
 
-**8.11. A recursion tree.** Find the order of $T(n) = T(n/2) + T(n/4) + n$, which the formulas of the division scheme do not cover.
+<ToSolution n="8.10" />
 
-**8.12. Guess and verify.** Prove by substitution that $T(n) = T(n-1) + 2n - 1$, with $T(0) = 0$, satisfies $T(n) = n^2$.
+<span id="ex-8-11"></span>**8.11. A recursion tree.** Find the order of $T(n) = T(n/2) + T(n/4) + n$, which the formulas of the division scheme do not cover.
+
+<ToSolution n="8.11" />
+
+<span id="ex-8-12"></span>**8.12. Guess and verify.** Prove by substitution that $T(n) = T(n-1) + 2n - 1$, with $T(0) = 0$, satisfies $T(n) = n^2$.
+
+<ToSolution n="8.12" />
 
 ***
 
 ## Solutions
 
-**8.1.** It is an arithmetic series with $n$ terms, first term 1 and last term $2n - 1$, so its sum is $n \cdot \frac{1 + (2n - 1)}{2} = n^2$. By induction: for $n = 1$, $1 = 1^2$; if the sum of the first $n - 1$ odd numbers is $(n-1)^2$, adding the next one gives $(n-1)^2 + (2n - 1) = n^2$. For $n = 100$ the sum is 10,000. (Geometrically: each odd number adds an L-shaped border to a square.)
+<span id="sol-8-1"></span>**8.1.** It is an arithmetic series with $n$ terms, first term 1 and last term $2n - 1$, so its sum is $n \cdot \frac{1 + (2n - 1)}{2} = n^2$. By induction: for $n = 1$, $1 = 1^2$; if the sum of the first $n - 1$ odd numbers is $(n-1)^2$, adding the next one gives $(n-1)^2 + (2n - 1) = n^2$. For $n = 100$ the sum is 10,000. (Geometrically: each odd number adds an L-shaped border to a square.)
 
-**8.2.** By induction. For $n = 1$: $1 \cdot 2 = 2$ and $(1 - 1) \cdot 4 + 2 = 2$. Assuming the formula for $n - 1$:
+<ToStatement n="8.1" />
+
+<span id="sol-8-2"></span>**8.2.** By induction. For $n = 1$: $1 \cdot 2 = 2$ and $(1 - 1) \cdot 4 + 2 = 2$. Assuming the formula for $n - 1$:
 
 $$
 \sum_{i=1}^{n} i \cdot 2^i = (n - 2) 2^{n} + 2 + n \cdot 2^n = (2n - 2) 2^n + 2 = (n - 1) 2^{n+1} + 2
@@ -60,26 +86,48 @@ $$
 
 Its order is $\Theta(n \cdot 2^n)$: the last term alone is $n \cdot 2^n$, and the whole sum is less than twice that. For $n = 10$: $9 \cdot 2^{11} + 2 = 18{,}434$, which matches the direct sum.
 
-**8.3.** Upper bound: each of the $n$ terms is at most $\sqrt{n}$, so the sum is at most $n \sqrt{n} = n^{1.5}$. Lower bound: the largest half of the terms (those with $i \ge n/2$) are each at least $\sqrt{n/2}$, so the sum is at least $\frac{n}{2} \sqrt{\frac{n}{2}} = \frac{n^{1.5}}{2^{1.5}}$. Both are constants times $n^{1.5}$: the sum is $\Theta(n^{1.5})$. The integral gives the constant: $\int_0^n \sqrt{x}\,dx = \frac{2}{3} n^{1.5}$.
+<ToStatement n="8.2" />
 
-**8.4.**
+<span id="sol-8-3"></span>**8.3.** Upper bound: each of the $n$ terms is at most $\sqrt{n}$, so the sum is at most $n \sqrt{n} = n^{1.5}$. Lower bound: the largest half of the terms (those with $i \ge n/2$) are each at least $\sqrt{n/2}$, so the sum is at least $\frac{n}{2} \sqrt{\frac{n}{2}} = \frac{n^{1.5}}{2^{1.5}}$. Both are constants times $n^{1.5}$: the sum is $\Theta(n^{1.5})$. The integral gives the constant: $\int_0^n \sqrt{x}\,dx = \frac{2}{3} n^{1.5}$.
+
+<ToStatement n="8.3" />
+
+<span id="sol-8-4"></span>**8.4.**
 - (a) $4^{\log n} = (2^2)^{\log n} = (2^{\log n})^2 = n^2$.
 - (b) $\log (8 n^3) = \log 8 + 3 \log n = 3 + 3 \log n$.
 - (c) $n^{1 / \log n} = 2^{\log n \cdot (1 / \log n)} = 2^1 = 2$, a constant.
 - (d) $\log (\log (2^{2^k})) = \log (2^k) = k$. The "log log" of a number is tiny: for $n = 2^{64}$, $\log \log n = 6$.
 
-**8.5.** A positive integer $m$ has $\lfloor \log_{10} m \rfloor + 1$ decimal digits. $\log_{10} 2^{100} = 100 \log_{10} 2 \approx 30.10$, so $2^{100}$ has **31** digits. (It is about $1.27 \times 10^{30}$.)
+<ToStatement n="8.4" />
 
-**8.6.** $\sqrt{2 \pi \cdot 50} \left( \frac{50}{e} \right)^{50} \approx 3.0363 \times 10^{64}$, while the exact value is about $3.0414 \times 10^{64}$. The estimate is only **0.17%** too small. The number has **65** digits. (The relative error of Stirling's formula is about $\frac{1}{12n}$, here $\frac{1}{600}$.)
+<span id="sol-8-5"></span>**8.5.** A positive integer $m$ has $\lfloor \log_{10} m \rfloor + 1$ decimal digits. $\log_{10} 2^{100} = 100 \log_{10} 2 \approx 30.10$, so $2^{100}$ has **31** digits. (It is about $1.27 \times 10^{30}$.)
 
-**8.7.** The $i$-th element is a new maximum exactly when it is the largest of the first $i$, which happens with probability $1/i$ in a random order. Adding these probabilities, the expected number of updates is $H_n = 1 + \frac{1}{2} + \dots + \frac{1}{n}$. For $n = 1{,}000$, $H_{1000} \approx 7.49$: on average `max` changes only about 7 or 8 times. A simulation with 20,000 random arrays gave 7.48. In the worst case (ascending order) it changes $n$ times.
+<ToStatement n="8.5" />
 
-**8.8.** The step from $n = 1$ to $n + 1 = 2$ fails. With 2 horses, removing the first leaves the second and removing the last leaves the first: the two groups have **no horse in common**, so nothing connects their colors. The argument "both groups share the horses in the middle" needs $n \ge 2$, and the base case only covers $n = 1$. The lesson: the inductive step must work for **every** $n$ from the base case on, including the first one.
+<span id="sol-8-6"></span>**8.6.** $\sqrt{2 \pi \cdot 50} \left( \frac{50}{e} \right)^{50} \approx 3.0363 \times 10^{64}$, while the exact value is about $3.0414 \times 10^{64}$. The estimate is only **0.17%** too small. The number has **65** digits. (The relative error of Stirling's formula is about $\frac{1}{12n}$, here $\frac{1}{600}$.)
 
-**8.9.** Invariant: *$\gcd(a, b)$ is the same before and after each iteration*, equal to the gcd of the original values. It holds because $\gcd(a, b) = \gcd(b, a \bmod b)$: any number that divides $a$ and $b$ also divides $a \bmod b = a - q b$, and conversely. When the loop ends, $b = 0$ and $\gcd(a, 0) = a$, so the result is correct. It terminates because $b$ is a non-negative integer that strictly decreases at each iteration ($a \bmod b \lt b$), so it must reach 0. In fact it decreases fast: every two iterations the value at least halves, so the loop runs $O(\log b)$ times.
+<ToStatement n="8.6" />
 
-**8.10.** Unrolling: $T(n) = 2T(n/2) + 1 = 4T(n/4) + 2 + 1 = \dots = n \, T(1) + (n/2 + \dots + 2 + 1) = n + (n - 1) = 2n - 1$. For example $T(8) = 15$ and $T(1024) = 2047$. It is the recurrence of any divide and conquer algorithm that splits into two halves and combines in constant time: the recursive **sum** of an array or the search of the maximum by division. It is $O(n)$: the formula with $a = 2$, $b = 2$, $k = 0$ gives $a \gt b^k$ and $O(n^{\log_2 2}) = O(n)$.
+<span id="sol-8-7"></span>**8.7.** The $i$-th element is a new maximum exactly when it is the largest of the first $i$, which happens with probability $1/i$ in a random order. Adding these probabilities, the expected number of updates is $H_n = 1 + \frac{1}{2} + \dots + \frac{1}{n}$. For $n = 1{,}000$, $H_{1000} \approx 7.49$: on average `max` changes only about 7 or 8 times. A simulation with 20,000 random arrays gave 7.48. In the worst case (ascending order) it changes $n$ times.
 
-**8.11.** Level 0 of the tree costs $n$; level 1 has sizes $n/2$ and $n/4$, total $\frac{3}{4} n$; level 2 costs $\left(\frac{3}{4}\right)^2 n$, and so on. The levels form a geometric series of ratio $\frac{3}{4} \lt 1$, dominated by its first term: $T(n) \le n \left( 1 + \frac{3}{4} + \frac{9}{16} + \dots \right) = 4n$. Since $T(n) \ge n$, it is $\Theta(n)$. Computing it exactly with $T(1) = 1$, $T(n)/n$ is 3.47 for $n = 10^3$, 3.94 for $n = 10^6$ and 3.99 for $n = 10^9$, approaching 4. The general rule: if the sizes of the subproblems add up to **less** than $n$, a linear non-recursive cost gives linear total time.
+<ToStatement n="8.7" />
 
-**8.12.** Base: $T(0) = 0 = 0^2$. Step: assuming $T(n-1) = (n-1)^2$, $T(n) = (n - 1)^2 + 2n - 1 = n^2 - 2n + 1 + 2n - 1 = n^2$. This is the cost, counted exactly, of a loop whose $i$-th iteration does $2i - 1$ operations, and the same identity as exercise 8.1.
+<span id="sol-8-8"></span>**8.8.** The step from $n = 1$ to $n + 1 = 2$ fails. With 2 horses, removing the first leaves the second and removing the last leaves the first: the two groups have **no horse in common**, so nothing connects their colors. The argument "both groups share the horses in the middle" needs $n \ge 2$, and the base case only covers $n = 1$. The lesson: the inductive step must work for **every** $n$ from the base case on, including the first one.
+
+<ToStatement n="8.8" />
+
+<span id="sol-8-9"></span>**8.9.** Invariant: *$\gcd(a, b)$ is the same before and after each iteration*, equal to the gcd of the original values. It holds because $\gcd(a, b) = \gcd(b, a \bmod b)$: any number that divides $a$ and $b$ also divides $a \bmod b = a - q b$, and conversely. When the loop ends, $b = 0$ and $\gcd(a, 0) = a$, so the result is correct. It terminates because $b$ is a non-negative integer that strictly decreases at each iteration ($a \bmod b \lt b$), so it must reach 0. In fact it decreases fast: every two iterations the value at least halves, so the loop runs $O(\log b)$ times.
+
+<ToStatement n="8.9" />
+
+<span id="sol-8-10"></span>**8.10.** Unrolling: $T(n) = 2T(n/2) + 1 = 4T(n/4) + 2 + 1 = \dots = n \, T(1) + (n/2 + \dots + 2 + 1) = n + (n - 1) = 2n - 1$. For example $T(8) = 15$ and $T(1024) = 2047$. It is the recurrence of any divide and conquer algorithm that splits into two halves and combines in constant time: the recursive **sum** of an array or the search of the maximum by division. It is $O(n)$: the formula with $a = 2$, $b = 2$, $k = 0$ gives $a \gt b^k$ and $O(n^{\log_2 2}) = O(n)$.
+
+<ToStatement n="8.10" />
+
+<span id="sol-8-11"></span>**8.11.** Level 0 of the tree costs $n$; level 1 has sizes $n/2$ and $n/4$, total $\frac{3}{4} n$; level 2 costs $\left(\frac{3}{4}\right)^2 n$, and so on. The levels form a geometric series of ratio $\frac{3}{4} \lt 1$, dominated by its first term: $T(n) \le n \left( 1 + \frac{3}{4} + \frac{9}{16} + \dots \right) = 4n$. Since $T(n) \ge n$, it is $\Theta(n)$. Computing it exactly with $T(1) = 1$, $T(n)/n$ is 3.47 for $n = 10^3$, 3.94 for $n = 10^6$ and 3.99 for $n = 10^9$, approaching 4. The general rule: if the sizes of the subproblems add up to **less** than $n$, a linear non-recursive cost gives linear total time.
+
+<ToStatement n="8.11" />
+
+<span id="sol-8-12"></span>**8.12.** Base: $T(0) = 0 = 0^2$. Step: assuming $T(n-1) = (n-1)^2$, $T(n) = (n - 1)^2 + 2n - 1 = n^2 - 2n + 1 + 2n - 1 = n^2$. This is the cost, counted exactly, of a loop whose $i$-th iteration does $2i - 1$ operations, and the same identity as exercise 8.1.
+
+<ToStatement n="8.12" />

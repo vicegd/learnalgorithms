@@ -1,0 +1,40 @@
+.row {
+  margin: 0.35rem 0 1.6rem;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.2rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--ifm-color-primary-darker);
+  background: color-mix(in srgb, var(--ifm-color-primary) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ifm-color-primary) 35%, transparent);
+  transition: background var(--ifm-transition-fast), transform var(--ifm-transition-fast);
+}
+
+.pill:hover {
+  text-decoration: none;
+  color: var(--ifm-color-primary-darkest);
+  background: color-mix(in srgb, var(--ifm-color-primary) 18%, transparent);
+  transform: translateY(-1px);
+}
+
+[data-theme='dark'] .pill {
+  color: var(--ifm-color-primary-lighter);
+}
+
+.back {
+  color: var(--ifm-color-emphasis-700);
+  background: var(--ifm-color-emphasis-100);
+  border-color: var(--ifm-color-emphasis-300);
+}
+
+/* Leave room below the sticky navbar when jumping to an anchor. */
+:global([id^='ex-']),
+:global([id^='sol-']) {
+  scroll-margin-top: calc(var(--ifm-navbar-height) + 1rem);
+}
