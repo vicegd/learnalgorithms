@@ -1,6 +1,6 @@
 # learnalgorithms.dev
 
-> **From intuition to proof.** Structured algorithm sheets, theoretical foundations, and interactive visualizations.
+> **From intuition to proof.** Lessons on the design and analysis of algorithms, with diagrams, step-by-step traces, proofs and exercises.
 
 Live site: [https://learnalgorithms.dev](https://learnalgorithms.dev)
 
@@ -8,134 +8,133 @@ Live site: [https://learnalgorithms.dev](https://learnalgorithms.dev)
 
 ## About
 
-**learnalgorithms.dev** is an open educational resource for learning data structures and algorithms from first principles. It combines rigorous theoretical content with interactive React components and visual demonstrations — going beyond rote memorization to build deep understanding.
+**learnalgorithms.dev** is the companion website of the *Algorithmics* course (Software Engineering degree, University of Oviedo). It explains how algorithms are designed, why they work and how much they cost, from first principles to formal proofs.
 
-The site is organized into two parallel tracks:
+Each chapter contains:
 
-| Track | Path | Description |
-|---|---|---|
-| **Concepts** | `/concepts` | Theory, paradigms, and complexity analysis |
-| **Algorithms** | `/algorithms` | Concrete problems with interactive visualizations |
-
----
-
-## Content Structure
-
-### Concepts
-
-```
-01 — Foundations
-     ├── Algorithmic Thinking
-     ├── Case Study: Pairwise Problem
-     ├── Complexity Analysis
-     ├── Asymptotic Notation
-     └── Searching Case Studies
-
-02 — Fundamental Problem Domains
-     └── Sorting
-
-03 — Algorithm Design Paradigms
-     ├── Brute Force
-     ├── Divide and Conquer
-     ├── Greedy Algorithms
-     └── Dynamic Programming
-
-04 — State-Space Search & Optimization
-     ├── Backtracking
-     └── Branch and Bound
-
-05 — Advanced Execution Models
-     └── Parallel Algorithms
-```
-
-Also included: [Glossary](/concepts/glossary) · [Learning Roadmap](/concepts/roadmap)
-
-### Algorithms
-
-```
-06 — Dynamic Programming
-     └── Coin Change
-
-07 — Backtracking
-```
+- **Lessons** with explanations, diagrams and step-by-step traces.
+- **Practice boxes** with short activities to check understanding.
+- **Proofs** of the results used in the lessons.
+- **Exercises** at the end of the chapter, with solutions.
+- **References** and, for each classic algorithm, a link to its **original publication**.
+- **Code** for every algorithm in the [vicegd/algorithms](https://github.com/vicegd/algorithms) repository.
 
 ---
 
-## Tech Stack
+## Content
 
-- **[Docusaurus 3](https://docusaurus.io/)** — static site framework (MDX, React)
-- **[KaTeX](https://katex.org/)** — math rendering via `remark-math` + `rehype-katex`
-- **React 19** — interactive algorithm visualizers
-- **Custom plugins**
-  - `remark-autolink-concepts` — auto-links concept terms across pages
-  - `docusaurus-plugin-site-data` — aggregates site-wide metadata at build time
+All lessons live in `concepts/` and are served under `/concepts`.
+
+```
+Part I. Foundations
+    1. Principles of Algorithmics
+Part II. Problem Domains
+    2. Sorting
+Part III. Design Techniques
+    3. Brute Force
+    4. Divide and Conquer
+    5. Greedy Algorithms
+    6. Dynamic Programming
+    7. Backtracking
+    8. Branch and Bound
+Part IV. Execution Models
+    9. Parallel Algorithms
+Appendices
+    A. Mathematical Background
+Glossary
+```
+
+The `algorithms/` folder (algorithm sheets with interactive visualizers) and `blog/` are kept in the repository but are not published for now: they are switched off with `SHOW_ALGORITHMS` and `blog: false` in `docusaurus.config.js`.
 
 ---
 
-## Getting Started
+## Feedback
 
-**Prerequisites:** Node.js ≥ 18, npm or yarn.
+Found an error, have a suggestion or a question about a lesson? Use the links at the bottom of every page, or [open an issue](https://github.com/vicegd/learnalgorithms/issues/new/choose). The issue forms fill in the page automatically.
+
+---
+
+## Tech stack
+
+- **[Docusaurus 3](https://docusaurus.io/)** with React 19 and MDX, built with Docusaurus Faster (Rspack).
+- **[KaTeX](https://katex.org/)** for mathematics (`remark-math` + `rehype-katex`).
+- **SVG diagrams** imported as React components, with light and dark themes driven by CSS variables (`--dg-*`).
+- **Custom components** available in every MDX file (`src/theme/MDXComponents.js`):
+  `Figure`, `Origin`, `ProofLink`, `RepoCode`, `ToSolution`, `ToStatement`.
+- **Custom plugins** (`src/plugins/`):
+  - `remark-autolink-concepts` — links concept terms to their lessons.
+  - `remark-code-line-numbers` — line numbers in code blocks.
+  - `docusaurus-plugin-site-data` — site-wide metadata collected at build time.
+- **GitHub Pages** hosting, deployed by **GitHub Actions** on every push to `main`.
+
+---
+
+## Getting started
+
+**Prerequisites:** Node.js ≥ 20 and npm.
 
 ```bash
-# Install dependencies
-npm install
-
-# Start local dev server (http://localhost:3000)
-npm start
-
-# Production build
-npm run build
-
-# Preview the production build locally
-npm run serve
-
-# Clear Docusaurus cache
-npm run clear
+npm install      # install dependencies
+npm start        # dev server at http://localhost:3000
+npm run build    # production build in build/
+npm run serve    # preview the production build
+npm run clear    # clear the Docusaurus cache
 ```
+
+---
+
+## Project structure
+
+```
+├── concepts/                    # Lessons (MDX), one folder per chapter
+│   ├── 00-index.mdx             # Overview of all parts and chapters
+│   ├── glossary.mdx
+│   └── NN-chapter-name/
+│       ├── NN-lesson.mdx        # Lessons, in order
+│       ├── NN-exercises.mdx     # End-of-chapter exercises
+│       ├── proofs.mdx           # Proofs referenced from the lessons
+│       ├── references.mdx       # Bibliography
+│       └── img/                 # SVG diagrams of the chapter
+├── algorithms/                  # Algorithm sheets (not published yet)
+├── blog/                        # Blog (not published yet)
+├── src/
+│   ├── components/              # React components (Figure, Origin, ProofLink, RepoCode…)
+│   ├── css/custom.css           # Global styles, diagram colours, practice boxes
+│   ├── pages/                   # Home page
+│   ├── plugins/                 # Custom remark and Docusaurus plugins
+│   └── theme/                   # Swizzled/wrapped theme components (feedback links, cards, TOC)
+├── static/                      # Static files (images, CNAME)
+├── .github/
+│   ├── ISSUE_TEMPLATE/          # Issue forms: error, suggestion, question
+│   └── workflows/               # Build and deploy to GitHub Pages
+├── docusaurus.config.js
+└── sidebars.js                  # Parts and chapters of the sidebar
+```
+
+### Adding a chapter
+
+1. Create `concepts/NN-chapter-name/` with its lessons, exercises, proofs and references.
+2. Add one `chapter(...)` line to the right part in `sidebars.js`.
+3. Add its card to `CHAPTERS` in `src/pages/index.js`, and its icon and accent in `src/components/Icon.jsx`.
+
+Number prefixes in folder and file names set the order and are removed from the URLs.
 
 ---
 
 ## Deployment
 
-The site deploys automatically to GitHub Pages via CI on every push to `main`.
-
-To deploy manually:
-
-```bash
-GIT_USER=vicegd npm run deploy
-```
-
-This builds the site and pushes the output to the `gh-pages` branch, which is served at [https://learnalgorithms.dev](https://learnalgorithms.dev).
+Every push to `main` builds the site and publishes it to the `gh-pages` branch, served at [https://learnalgorithms.dev](https://learnalgorithms.dev). It takes about two minutes.
 
 ---
 
-## Project Structure
+## Author
 
-```
-├── concepts/          # MDX content — theory and paradigms
-├── algorithms/        # MDX content — concrete algorithm problems
-├── src/
-│   ├── components/    # React components (visualizers, indexes, roadmap)
-│   ├── css/           # Global styles
-│   ├── pages/         # Standalone pages (home, stats, glossary)
-│   └── plugins/       # Custom Docusaurus/remark plugins
-├── static/            # Static assets (images, algorithm data)
-├── docusaurus.config.js
-├── sidebars.js        # Concepts sidebar
-└── sidebarsAlgorithms.js
-```
+[Vicente García Díaz](https://www.vicentegarciadiaz.com)
+School of Computer Science, University of Oviedo
 
 ---
 
-## 👨‍💼 Author
+## License
 
-[Vicente García Díaz](http://www.vicentegarciadiaz.com)  
-School of Computer Science    
-University of Oviedo
-
----
-
-## 📜 License
-
-Copyright (c) 2026 Vicente García Díaz — All Rights Reserved.  
-See [LICENSE](LICENSE) file for details.
+Copyright (c) 2026 Vicente García Díaz — All Rights Reserved.
+See the [LICENSE](LICENSE) file for details.
