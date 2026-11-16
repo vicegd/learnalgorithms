@@ -99,7 +99,11 @@ export default function remarkLessonMeta() {
       children: [],
     };
 
-    const h1 = tree.children.findIndex((n) => n.type === 'heading' && n.depth === 1);
+    // Docusaurus wraps the leading h1 in a <header> element before this plugin runs.
+    const isTitle = (n) =>
+      (n.type === 'heading' && n.depth === 1) ||
+      (n.type === 'mdxJsxFlowElement' && n.name === 'header');
+    const h1 = tree.children.findIndex(isTitle);
     tree.children.splice(h1 + 1, 0, element);
   };
 }
