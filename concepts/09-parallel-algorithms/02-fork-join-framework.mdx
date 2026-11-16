@@ -13,10 +13,6 @@ import FigForkJoin from './img/fork-join.svg';
 import FigWorkStealing from './img/work-stealing.svg';
 import FigSumTasks from './img/sum-tasks.svg';
 
-<Origin who="Doug Lea" year="2000" title="A Java fork/join framework" venue="Proceedings of the ACM Java Grande Conference, 36–43" url="https://gee.cs.oswego.edu/dl/papers/fj.pdf">
-  The design that became java.util.concurrent.ForkJoinPool in Java 7.
-</Origin>
-
 # The Fork/Join Framework
 
 Creating and coordinating threads by hand is laborious and error-prone. Since Java 7, the package `java.util.concurrent` includes the **Fork/Join framework**, designed precisely to execute **divide and conquer** algorithms in parallel, using all the available processors automatically. This lesson explains how it works and how to use it, with the examples of the course repository.
@@ -28,6 +24,10 @@ Creating and coordinating threads by hand is laborious and error-prone. Since Ja
 - How to combine `fork`, `join` and `compute` correctly, and the most common mistake.
 - How to choose the **sequential threshold**.
 :::
+
+<Origin who="Doug Lea" year="2000" title="A Java fork/join framework" venue="Proceedings of the ACM Java Grande Conference, 36–43" url="https://gee.cs.oswego.edu/dl/papers/fj.pdf">
+  The design that became java.util.concurrent.ForkJoinPool in Java 7.
+</Origin>
 
 ---
 

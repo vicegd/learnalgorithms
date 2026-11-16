@@ -9,10 +9,6 @@ prerequisites:
 
 import FigFourOrders from './img/four-orders.svg';
 
-<Origin who="Ailsa H. Land and Alison G. Doig" year="1960" title="An automatic method of solving discrete programming problems" venue="Econometrica 28(3):497–520" url="https://www.jstor.org/stable/1910129">
-  The name “branch and bound” was introduced by Little, Murty, Sweeney and Karel in 1963.
-</Origin>
-
 # The Branch and Bound Scheme
 
 Branch and bound (B&B) is the last design technique of the course. Like [backtracking](../07-backtracking/01-backtracking-scheme.mdx), it searches an **implicit tree of states**: nodes represent states of the problem, edges represent valid changes, and solving the problem means finding a node (or a path) in that tree. The difference is **the order in which the tree is explored**, and that single change makes it suitable for different problems.
@@ -21,6 +17,10 @@ Branch and bound (B&B) is the last design technique of the course. Like [backtra
 - **Branch and bound** generates **all the children** of a node before moving on, keeps the generated nodes in a data structure, and always continues from the **most promising** one. It adds **bounds** (optimistic estimates) to discard whole subtrees that cannot contain the solution we are looking for.
 
 The name describes the two ingredients: **branch** (generate the children of a node, in an order chosen by a heuristic) and **bound** (estimate how good the best solution below a node can be, and prune the node if that estimate is not good enough).
+
+<Origin who="Ailsa H. Land and Alison G. Doig" year="1960" title="An automatic method of solving discrete programming problems" venue="Econometrica 28(3):497–520" url="https://www.jstor.org/stable/1910129">
+  The name “branch and bound” was introduced by Little, Murty, Sweeney and Karel in 1963.
+</Origin>
 
 ***
 
