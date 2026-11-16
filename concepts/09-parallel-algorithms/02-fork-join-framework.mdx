@@ -192,6 +192,14 @@ Notice that the tasks share the array, but each one writes **only its own range*
 
 <RepoCode files={['parallel/square/RecursiveActionSquare.java']} />
 
+<details>
+  <summary>🧠 <strong>Checkpoint: How many tasks?</strong></summary>
+
+  **Question:** With `SEQUENTIAL_THRESHOLD = 1000`, how many tasks does `RecursiveActionSquare` create for an array of 1,000,000 elements? How many of them do the work directly?
+
+  **Answer:** The halves have 500,000, 250,000, … elements, until they drop below 1,000: after 10 halvings they have about 977 elements. That gives **1,024** tasks that square elements directly and **2,047** tasks in total.
+</details>
+
 ---
 
 ## Example 2: Summing the Elements of an Array
@@ -436,6 +444,14 @@ We measured the effect of the threshold by squaring 20 million integers on a com
 With tiny thresholds, the program creates **millions of tasks** whose management costs far more than squaring a number: the parallel version is up to **40 times slower** than the sequential one. With reasonable thresholds, it is about **3 times faster** (more than the number of cores, partly because the sequential and parallel loops are optimized differently by the compiler; with a heavier operation per element, the speedup approaches the number of cores, as the next lesson shows).
 
 A useful rule of thumb is that each task at the base case should perform **at least a few thousand** simple operations, or fewer if each operation is expensive.
+
+<details>
+  <summary>🧠 <strong>Checkpoint: Extreme thresholds</strong></summary>
+
+  **Question:** What happens with a threshold of 1? And with a threshold larger than the size of the array?
+
+  **Answer:** With **1**, the program creates millions of tasks, and managing them costs far more than the work they do: it can be many times slower than the sequential loop. With a threshold **larger than the array**, the first task never divides, and all the work is done sequentially by a single thread.
+</details>
 
 ---
 

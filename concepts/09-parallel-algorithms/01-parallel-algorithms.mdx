@@ -49,6 +49,14 @@ Concurrency is extremely common in everyday programs:
 
 Concurrent tasks do **not** necessarily run at the same physical instant. With a **single** processor, the operating system alternates between them very quickly, giving the **feeling** of simultaneity, while the instructions are actually executed one after another. In Java, the basic tool to create concurrent units of execution is the class `Thread`.
 
+<details>
+  <summary>🧠 <strong>Checkpoint: Concurrent, parallel or both?</strong></summary>
+
+  **Question:** Classify each case: (a) a single-core computer plays music while you browse the web; (b) an 8-core computer sums the 8 parts of an array at the same time.
+
+  **Answer:** (a) **Concurrent but not parallel**: the two programs overlap in time, but a single core alternates between them. (b) **Parallel** (and also concurrent): the 8 sums run at the same moment on different cores.
+</details>
+
 ## Parallel Computing
 
 **Parallel computing** performs several tasks **at the same time**, using **more than one processor**. It is therefore intrinsically concurrent (multithreaded), but with real simultaneity.
@@ -102,6 +110,14 @@ Writing correct programs with raw threads and locks is difficult. Fortunately, f
 - **Expecting more threads to always mean less time.** Creating and coordinating threads also costs time.
 
 :::
+
+<details>
+  <summary>🧠 <strong>Checkpoint: A shared counter</strong></summary>
+
+  **Question:** Two threads increment the same shared `int` counter 1,000,000 times each, without any synchronization. What is the final value?
+
+  **Answer:** It is **unpredictable**, usually less than 2,000,000 and different in every run. `counter++` reads, adds and writes; when the two threads interleave those steps, increments are lost (a race condition). Synchronizing the increment, or using an `AtomicInteger`, gives exactly 2,000,000.
+</details>
 
 ---
 

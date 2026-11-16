@@ -90,6 +90,14 @@ The next lesson shows how to compute the complexity of both families. The intuit
 - **Subtraction with $a = 1$** gives polynomial algorithms, but with a recursion depth proportional to $n$.
 - **Subtraction with $a \gt 1$** is dangerous: the number of calls grows **exponentially**. The naive recursive Fibonacci, $F(n) = F(n-1) + F(n-2)$, is the classic example.
 
+<details>
+  <summary>🧠 <strong>Checkpoint: Division or subtraction?</strong></summary>
+
+  **Question:** Classify each algorithm as division or subtraction, and give its number of subproblems $a$: binary search, the recursive factorial, Mergesort and the naive recursive Fibonacci.
+
+  **Answer:** Binary search: **division**, $a = 1$ (a reduction). Factorial: **subtraction**, $a = 1$ (a reduction). Mergesort: **division**, $a = 2$. Naive Fibonacci: **subtraction**, $a = 2$, the dangerous combination that leads to exponential algorithms.
+</details>
+
 ---
 
 ## Worth Noting
@@ -153,6 +161,14 @@ All the examples of this chapter are implemented, with tests, in the [course rep
 - **Recursing where a loop is enough.** Reductions ($a = 1$) are usually better written iteratively.
 
 :::
+
+<details>
+  <summary>🧠 <strong>Checkpoint: Counting the calls</strong></summary>
+
+  **Question:** How many calls does `sumByDivision` make for a vector of 8 elements? And for $n$ elements?
+
+  **Answer:** **15** for 8 elements: the tree of calls has 8 leaves (one per element) and 7 internal nodes. In general, a tree that splits until single elements has $n$ leaves and $n - 1$ internal nodes: **$2n - 1$** calls, so the cost is still $O(n)$.
+</details>
 
 ---
 

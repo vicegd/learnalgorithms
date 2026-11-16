@@ -94,6 +94,14 @@ Although the code contains **two** recursive calls, only **one** of them is exec
 
 <RepoCode files={['divideconquer/search/BinarySearch.java']} />
 
+<details>
+  <summary>🧠 <strong>Checkpoint: How deep is binary search?</strong></summary>
+
+  **Question:** With the code above, how many calls does `searchByDivision` make, at most, on a sorted vector of 1,000,000 elements?
+
+  **Answer:** At most **21**: each call halves the part, and $\log_2 10^6 \approx 20$, so about 20 halvings reach a part of one element; an unsuccessful search makes one more call on an empty part. A sequential search may need a million comparisons.
+</details>
+
 ---
 
 ## The Fibonacci Numbers
@@ -316,6 +324,14 @@ Euclid's algorithm illustrates an important lesson: **finding the best algorithm
 - **Trusting the naive recursive Fibonacci.** It is exponential; the iterative version is $O(n)$.
 
 :::
+
+<details>
+  <summary>🧠 <strong>Checkpoint: Trace Euclid's algorithm</strong></summary>
+
+  **Question:** Compute $\gcd(1071, 462)$ with Euclid's algorithm. How many calls are made?
+
+  **Answer:** $\gcd(1071, 462) = \gcd(462, 147) = \gcd(147, 21) = \gcd(21, 0) = $ **21**, since $1071 \bmod 462 = 147$, $462 \bmod 147 = 21$ and $147 \bmod 21 = 0$. Three divisions and **four** calls.
+</details>
 
 ---
 
