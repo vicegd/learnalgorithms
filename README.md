@@ -8,7 +8,7 @@ Live site: [https://learnalgorithms.dev](https://learnalgorithms.dev)
 
 ## About
 
-**learnalgorithms.dev** is the companion website of the *Algorithmics* course (Software Engineering degree, University of Oviedo). It explains how algorithms are designed, why they work and how much they cost, from first principles to formal proofs.
+**learnalgorithms.dev** is the companion website of the *Algorithmics* course (Software Engineering degree, University of Oviedo). It explains how algorithms are designed, why they work and how much they cost, from first principles to formal proofs. The website is free for everyone, with no registration and no ads.
 
 Each chapter contains:
 
