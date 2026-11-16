@@ -95,6 +95,14 @@ Because threads share memory, they must be **synchronised** so that they do not 
 
 Writing correct programs with raw threads and locks is difficult. Fortunately, for divide and conquer algorithms there is a much simpler approach: if each task works on a **separate part of the data** and the results are combined only when the subtasks have finished, no synchronisation is needed beyond waiting for the subtasks. This is the model of the Fork/Join framework, presented in the next lesson.
 
+:::warning Common mistakes
+
+- **Confusing concurrency with parallelism.** Overlapping tasks are concurrent; running at the same time on several processors is parallel.
+- **Updating a shared variable from several threads without synchronization.** The result depends on the timing (race condition).
+- **Expecting more threads to always mean less time.** Creating and coordinating threads also costs time.
+
+:::
+
 ---
 
 ## Summary

@@ -440,6 +440,15 @@ Our specification said *non-negative* integers. Let us change it: the input may 
 
 </details>
 
+:::warning Common mistakes
+
+- **Storing an `int` product in a `long` and thinking it is safe.** `long r = a * b` overflows *before* the assignment. Promote an operand first: `(long) a * b`.
+- **Testing only with tiny inputs.** Small examples hide overflows and slow algorithms. Test with realistic sizes.
+- **Sorting the input inside the method.** It solves the problem but modifies the caller's array: a side effect nobody asked for.
+- **Trusting an optimization without checking it.** Compare the fast version against a slow one you trust (stress testing).
+
+:::
+
 ---
 
 ## Summary

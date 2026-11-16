@@ -223,6 +223,14 @@ The step must show $T(n) \le c n$ with the same $c$, but $2c(n-1) + 1$ is about 
 
 </details>
 
+:::warning Common mistakes
+
+- **Proving the inductive step and forgetting the base case.** Without it, nothing is proved.
+- **Using $O$ inside an inductive proof.** Use explicit constants; the hidden constant could grow at every step.
+- **Not showing that the loop invariant holds before the first iteration.** Initialization is part of the proof.
+
+:::
+
 ***
 
 ## Key ideas

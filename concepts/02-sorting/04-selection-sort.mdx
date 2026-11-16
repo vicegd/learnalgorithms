@@ -142,6 +142,14 @@ Times in milliseconds, **without optimization** (`-Xint`), with the course imple
 
 The times are almost **identical in the three cases**, as predicted: the number of comparisons does not depend on the input. Doubling $n$ multiplies them by about 4. Compared with the other simple algorithms for $n = 8{,}000$, selection sort is faster than bubble sort in every case, but much slower than insertion sort on sorted data, and slower on random data too (insertion: 329 ms).
 
+:::warning Common mistakes
+
+- **Expecting selection sort to profit from sorted input.** It always makes $\frac{n(n-1)}{2}$ comparisons.
+- **Swapping inside the inner loop.** Find the position of the minimum first, and swap once per pass.
+- **Calling it stable.** The long-distance swap can move an element past an equal one.
+
+:::
+
 ---
 
 ## Summary

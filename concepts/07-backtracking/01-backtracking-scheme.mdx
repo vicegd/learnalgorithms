@@ -391,6 +391,15 @@ Dynamic programming, because it solves each distinct subproblem once (usually in
 
 </details>
 
+:::warning Common mistakes
+
+- **Forgetting to undo a decision when going back.** Choose, explore, **unchoose**: every change must be reverted.
+- **Checking feasibility only at the leaves.** Prune as soon as a partial solution cannot lead to a valid one.
+- **Not stopping in the first-solution scheme.** Use a flag so that the search ends as soon as a solution is found.
+- **Keeping the best solution by reference.** Copy the vector; otherwise later changes overwrite it.
+
+:::
+
 ***
 
 ## Key ideas

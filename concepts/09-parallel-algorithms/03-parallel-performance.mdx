@@ -171,6 +171,15 @@ And what does not:
 Parallelism divides the time by (at most) a constant, the number of processors. It **does not change the complexity**. A parallel version of the naive Fibonacci with 64 cores is still exponential, and the sequential iterative version, $O(n)$, will beat it for any reasonable $n$. As with faster hardware in the first chapter, the first step is always to choose a good algorithm; parallelism comes after.
 :::
 
+:::warning Common mistakes
+
+- **Expecting a speedup equal to the number of processors.** Overheads, imbalance and the sequential part keep it lower.
+- **Ignoring Amdahl's law.** With a sequential fraction $1 - f$, the speedup never exceeds $\frac{1}{1-f}$.
+- **Thinking parallelism changes the complexity class.** It divides the time at most by $p$; a better algorithm can do much more.
+- **Parallelizing small inputs.** The cost of creating tasks dominates.
+
+:::
+
 ---
 
 ## Summary

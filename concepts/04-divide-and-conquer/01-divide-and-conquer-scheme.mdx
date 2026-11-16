@@ -145,6 +145,15 @@ All the examples of this chapter are implemented, with tests, in the [course rep
 
 <RepoCode files={['divideconquer/vectorsum/VectorSum.java']} />
 
+:::warning Common mistakes
+
+- **Missing or wrong base case.** The recursion never ends, or ends with a stack overflow.
+- **Subproblems that do not get smaller.** Every call must reduce the size, or it will not reach a base case.
+- **Using divide and conquer with repeated subproblems.** The naive Fibonacci solves the same subproblems again and again; use dynamic programming.
+- **Recursing where a loop is enough.** Reductions ($a = 1$) are usually better written iteratively.
+
+:::
+
 ---
 
 ## Summary

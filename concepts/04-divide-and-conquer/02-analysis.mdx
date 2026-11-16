@@ -218,6 +218,14 @@ $$
 
 And if the Towers of Hanoi ($O(2^n)$) take 1 second for 20 discs, then 30 discs will take about $2^{10} = 1{,}024$ seconds (17 minutes), and 64 discs, about $2^{44}$ seconds: more than 500,000 years.
 
+:::warning Common mistakes
+
+- **Counting the recursive calls written instead of those executed.** Binary search writes two calls but executes one: $a = 1$.
+- **Taking $k$ from the recursive calls.** $k$ is the cost of the non-recursive work (dividing and combining), $O(n^k)$.
+- **Applying the division formulas to a subtraction scheme.** First decide whether the size is divided ($n/b$) or reduced ($n - b$).
+
+:::
+
 ---
 
 ## Summary

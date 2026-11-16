@@ -378,6 +378,15 @@ Binary search showed us how much sorted data is worth. The next chapter focuses 
 2. **Stability:** if two elements have the same key (for example, two students with the same grade), does the algorithm preserve their original relative order? This matters when sorting by several criteria in successive passes.
 3. **Adaptivity:** does the algorithm take advantage of data that is already partially sorted, finishing faster, or does it perform the same work regardless of the input?
 
+:::warning Common mistakes
+
+- **Binary search on unsorted data.** It returns wrong answers silently; it needs sorted data with direct access.
+- **Writing `while (left < right)` or comparing the central element in a later iteration.** Use `left <= right` and compare the central element in the same iteration.
+- **Computing the middle as `(left + right) / 2`.** It can overflow for large indices; use `left + (right - left) / 2`.
+- **Sorting before a single search.** Sorting only pays off when there are many searches.
+
+:::
+
 ---
 
 ## Summary

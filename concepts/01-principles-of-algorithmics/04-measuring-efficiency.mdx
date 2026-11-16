@@ -260,6 +260,15 @@ long usedBytes = runtime.totalMemory() - runtime.freeMemory();
 
 This value includes everything in the heap (not only our data structures) and depends on when the garbage collector last ran, so it should only be used for coarse comparisons. For memory, the analytical approach (counting how many elements of each type an algorithm stores) is usually more informative than measurements.
 
+:::warning Common mistakes
+
+- **Measuring times below 50 ms.** They are dominated by noise; repeat the operation until the total time is large enough.
+- **Giving each algorithm different data.** Compare algorithms on exactly the same inputs.
+- **Timing the preparation too.** Generating or copying the data must stay outside the measured interval.
+- **Forgetting the JIT compiler.** The first executions are slower; warm up, or be aware of it when comparing.
+
+:::
+
 ---
 
 ## Summary

@@ -391,6 +391,15 @@ Spelling correctors use it to suggest the closest dictionary words, and bioinfor
   The distance itself was defined by Vladimir Levenshtein in 1965; Wagner and Fischer gave the dynamic programming algorithm (also for the LCS).
 </Origin>
 
+:::warning Common mistakes
+
+- **Calling $O(n \cdot W)$ polynomial.** It is pseudo-polynomial: $W$ is a value, exponential in its number of digits.
+- **Using the previous row when coins are unlimited.** In the change problem, using one more coin of the same value stays in the same row.
+- **Computing only the optimal value.** To give the solution, keep the table (or the decisions) and reconstruct it backwards.
+- **Mixing string indices and table indices.** $L(i, j)$ refers to prefixes of lengths $i$ and $j$, so character $i$ is at position $i - 1$.
+
+:::
+
 ---
 
 ## Summary

@@ -249,6 +249,14 @@ Observe that:
 When the same experiment is repeated **with** the JIT optimizer, bubble sort becomes **slower on random data than on reverse-sorted data** (for $n = 20{,}000$, about 570 ms versus 350 ms in our measurements), although random data requires half the swaps. The reason is the processor's **branch prediction**: with reverse data, the `if` is always true and the processor predicts it perfectly; with random data, the outcome is unpredictable, and every misprediction wastes cycles. Our cost model ignores such effects, which is one more reason to complement analysis with measurements.
 :::
 
+:::warning Common mistakes
+
+- **Expecting basic bubble sort to be fast on sorted data.** Without the sentinel (or a flag that detects no exchanges) it always makes $\frac{n(n-1)}{2}$ comparisons.
+- **Going one position too far in the inner loop.** Comparing `a[j]` with `a[j + 1]` requires `j` to stop before the last position.
+- **Saying that bubble with sentinel is $O(n)$.** Only its best case is linear; the average and worst cases are still $O(n^2)$.
+
+:::
+
 ---
 
 ## Summary

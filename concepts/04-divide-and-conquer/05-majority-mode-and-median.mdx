@@ -205,6 +205,15 @@ There is a famous algorithm, the **median of medians** ([Blum, Floyd, Pratt, Riv
 
 <ProofLink to="/concepts/divide-and-conquer/proofs#quickselect-runs-in-expected-linear-time" title="Quickselect runs in expected linear time" />
 
+:::warning Common mistakes
+
+- **Confusing the majority element with the mode.** A majority element appears more than $n/2$ times; the most frequent element may not.
+- **Sorting to find a single element.** Quickselect finds the median in $O(n)$ on average.
+- **Recursing into both parts in Quickselect.** Only the part that contains the position you are looking for is needed.
+- **Forgetting the worst case of Quickselect.** It is $O(n^2)$, like Quicksort.
+
+:::
+
 ---
 
 ## Summary

@@ -288,6 +288,15 @@ Times in milliseconds, **without optimization** (`-Xint`), with the course imple
 
 For $n = 8{,}000$ random elements, Quicksort takes about **4 ms**, while insertion sort takes 329 ms and bubble sort more than a second. And the gap grows with $n$: doubling the size roughly doubles the time of Quicksort (a little more, because of the $\log n$ factor), while it quadruples the time of the simple algorithms.
 
+:::warning Common mistakes
+
+- **Taking the first element as pivot.** Sorted or reverse-sorted inputs then give $O(n^2)$; use the median of three.
+- **Including the pivot in a recursive call.** A part may not shrink and the recursion never ends; exclude the pivot.
+- **Reading the average case as a guarantee.** The worst case is still $O(n^2)$.
+- **Ignoring the recursion depth.** In the worst case it reaches $n$; recursing first on the smaller part keeps it in $O(\log n)$.
+
+:::
+
 ---
 
 ## Summary

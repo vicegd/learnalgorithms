@@ -250,6 +250,14 @@ Because it is easy to trust, so it can be used as an oracle: comparing both algo
 
 </details>
 
+:::warning Common mistakes
+
+- **Discarding brute force without looking at the input size.** For small inputs it is often the best choice: simple and correct.
+- **Underestimating exhaustive search.** There are $2^n$ subsets and $n!$ permutations, not $n^2$.
+- **Generating candidates twice or missing some.** Exhaustive search is only correct if it visits every candidate exactly once.
+
+:::
+
 ***
 
 ## Key ideas

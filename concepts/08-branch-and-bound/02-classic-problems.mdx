@@ -335,6 +335,14 @@ On random instances with symmetric distances between 10 and 99, we compared this
 
 Both find the same optimum. As in the assignment problem, the difference comes from the bound, which accounts for the length still to travel. Real solvers such as Concorde use much stronger bounds (based on spanning trees and linear programming) and solve instances with tens of thousands of cities.
 
+:::warning Common mistakes
+
+- **Bounding the 0/1 knapsack with an integer greedy completion.** It is not an upper bound; use the fractional one.
+- **Searching a sliding puzzle that has no solution.** Check first whether the configuration is reachable.
+- **Ordering the priority queue in the wrong direction.** Minimize costs, maximize values: the most promising node must come out first.
+
+:::
+
 ***
 
 ## Summary

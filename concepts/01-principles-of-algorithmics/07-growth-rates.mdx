@@ -206,6 +206,14 @@ This principle has three important consequences:
 2. **It explains the time ratios of the lab.** When we compare the same algorithm in two environments (for example, Python and Java), the ratio of their times tends to a constant: the implementation constant.
 3. **It sets the limits of hardware.** Better hardware divides the time by a constant. As the previous tables show, that can compensate for a better algorithm only for small inputs: for large inputs, the algorithm with the better growth rate always wins.
 
+:::warning Common mistakes
+
+- **Using the ratio of sizes to predict a time.** The time scales with $\frac{f(n_2)}{f(n_1)}$, not with $\frac{n_2}{n_1}$, unless the algorithm is linear.
+- **Expecting faster hardware to rescue an exponential algorithm.** It only adds a constant to the size you can solve.
+- **Comparing algorithms at one small size.** Growth shows up for large $n$; at small sizes the constants may hide it.
+
+:::
+
 ---
 
 ## Summary

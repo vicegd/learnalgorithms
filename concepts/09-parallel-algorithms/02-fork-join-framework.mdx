@@ -449,6 +449,14 @@ Many parallel algorithms are already available in Java, implemented with Fork/Jo
 
 As with sequential algorithms, prefer the library when it solves your problem, and write your own tasks when it does not.
 
+:::warning Common mistakes
+
+- **A sequential threshold that is too small.** Creating tasks then costs more than the work they do.
+- **Forking both halves and leaving the current thread idle.** Fork one half and `compute()` the other in the current thread.
+- **Sharing mutable data between tasks.** Each task should work on its own part of the data.
+
+:::
+
 ---
 
 ## Summary

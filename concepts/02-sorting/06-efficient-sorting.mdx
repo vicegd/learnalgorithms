@@ -261,6 +261,15 @@ Real sorting libraries combine several algorithms to get the best of each:
 
 The lesson is that there is no single "best" sorting algorithm: each one has strengths, and good engineering combines them.
 
+:::warning Common mistakes
+
+- **Ending Shellsort with a gap greater than 1.** The last pass must use gap 1, or the vector may not be sorted.
+- **Calling Heapsort stable.** It is not; Mergesort is the stable $O(n \log n)$ option.
+- **Creating a new auxiliary array in every call of Mergesort.** Allocate one array of size $n$ once and reuse it.
+- **Using an unstable sort for each digit of radix sort.** Each pass must be stable, starting from the least significant digit.
+
+:::
+
 ---
 
 ## Summary
