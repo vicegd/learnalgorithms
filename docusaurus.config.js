@@ -10,6 +10,8 @@ import {themes as prismThemes} from 'prism-react-renderer';
 import remarkAutolinkConcepts from './src/plugins/remark-autolink-concepts.js';
 import pluginSiteData from './src/plugins/docusaurus-plugin-site-data.js';
 import remarkCodeLineNumbers from './src/plugins/remark-code-line-numbers.js';
+import remarkLessonMeta from './src/plugins/remark-lesson-meta.js';
+import pluginLocalSearch from './src/plugins/docusaurus-plugin-local-search.js';
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
@@ -59,7 +61,7 @@ const config = {
           path: './concepts',
           routeBasePath: 'concepts',
           sidebarPath: './sidebars.js',
-          remarkPlugins: [remarkMath, remarkAutolinkConcepts, remarkCodeLineNumbers],
+          remarkPlugins: [remarkMath, remarkAutolinkConcepts, remarkCodeLineNumbers, remarkLessonMeta],
           rehypePlugins: [rehypeKatex],
         },
         blog: false, // hidden — content preserved in blog/ folder
@@ -167,6 +169,7 @@ const config = {
 
   plugins: [
     [pluginSiteData, {includeAlgorithms: SHOW_ALGORITHMS}],
+    pluginLocalSearch,
     ...(SHOW_ALGORITHMS
       ? [
           [

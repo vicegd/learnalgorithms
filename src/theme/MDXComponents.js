@@ -4,6 +4,7 @@ import ProofLink from '@site/src/components/ProofLink';
 import { ToSolution, ToStatement } from '@site/src/components/ExerciseLinks';
 import Figure from '@site/src/components/Figure';
 import Origin from '@site/src/components/Origin';
+import LessonMeta from '@site/src/components/LessonMeta';
 
 // Components available in every MDX page without importing them.
 export default {
@@ -14,4 +15,5 @@ export default {
   ToStatement,
   Figure,
   Origin,
+  LessonMeta,
 };
