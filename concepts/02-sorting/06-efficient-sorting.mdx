@@ -100,6 +100,14 @@ The key operation is **sinking** (down-heap): if a node is smaller than one of i
   <FigHeap />
 </Figure>
 
+<details>
+  <summary>🧠 <strong>Checkpoint: Is it a heap?</strong></summary>
+
+  **Question:** Is the array 9 5 8 6 4 a max-heap? (The root is at position 0, and the children of position $i$ are at $2i + 1$ and $2i + 2$.)
+
+  **Answer:** **No.** The children of 9 (position 0) are 5 and 8, which is fine, but the children of 5 (position 1) are at positions 3 and 4: 6 and 4. Since $6 \gt 5$, the heap property fails. Sinking 5 (exchanging it with its larger child, 6) gives 9 6 8 5 4, which is a max-heap.
+</details>
+
 ### The algorithm
 
 1. **Build a heap** with all the elements, sinking every internal node from the last one up to the root. (This phase costs only $O(n)$, a remarkable result.)
@@ -208,6 +216,14 @@ Any comparison-based algorithm can be represented as a **decision tree**: each i
 This is a statement about the **problem**, not about a particular algorithm: no one will ever find a comparison-based algorithm that does better. Heapsort and Mergesort, which are $O(n \log n)$ in the worst case, are therefore **asymptotically optimal**.
 
 <ProofLink to="/concepts/sorting/proofs#no-comparison-sort-can-beat-n-log-n" title="No comparison sort can beat n log n" />
+
+<details>
+  <summary>🧠 <strong>Checkpoint: How many comparisons at least?</strong></summary>
+
+  **Question:** Can a comparison-based algorithm sort **any** array of 1,000 elements with at most 8,000 comparisons?
+
+  **Answer:** **No.** The decision tree needs at least $1000!$ leaves, so its height is at least $\lceil \log_2 (1000!) \rceil = 8{,}530$. Some input will always need at least 8,530 comparisons, whatever the algorithm.
+</details>
 
 ---
 

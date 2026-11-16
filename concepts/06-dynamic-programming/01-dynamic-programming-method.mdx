@@ -85,6 +85,14 @@ long fibonacci_dp(int n) {
 
 Each cell is computed from the two previous ones: $f[2] = 1 + 0$, $f[3] = 1 + 1$, $f[4] = 2 + 1$, $f[5] = 3 + 2$, $f[6] = 5 + 3$. The time drops from $O(1.6^n)$ to $O(n)$.
 
+<details>
+  <summary>🧠 <strong>Checkpoint: Calls versus cells</strong></summary>
+
+  **Question:** How many calls does the naive recursive Fibonacci make to compute $F(20)$ (with base cases $F(0)$ and $F(1)$)? How many cells does the table of the dynamic programming version fill?
+
+  **Answer:** The naive version makes $2F(21) - 1 = $ **21,891** calls to obtain $F(20) = 6{,}765$. The table has only **21** cells, $F(0)$ to $F(20)$, each computed once with one addition.
+</details>
+
 ### Divide and conquer versus dynamic programming
 
 | | Divide and conquer | Dynamic programming |
@@ -134,6 +142,14 @@ long fibonacciMemo(int n) {
 Both approaches have the same asymptotic complexity: **the number of different subproblems multiplied by the cost of computing each one** from the solutions of smaller subproblems. This is the general rule to analyze dynamic programming algorithms.
 
 <RepoCode files={['dynamic/fibonacci/Fibonacci.java']} />
+
+<details>
+  <summary>🧠 <strong>Checkpoint: Top-down or bottom-up?</strong></summary>
+
+  **Question:** You need the solution of one large problem, but only a small fraction of its subproblems are actually reached from it. Which form of dynamic programming fits better, and why?
+
+  **Answer:** **Top-down (memoization)**: it computes only the subproblems that are really needed, while bottom-up fills the whole table. Its price is the recursion: the call stack may become too deep for large inputs.
+</details>
 
 ---
 

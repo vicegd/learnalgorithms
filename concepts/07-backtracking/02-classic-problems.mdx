@@ -84,6 +84,14 @@ The call is `permutations(0)`. The order of the output follows the order of the 
 
 <RepoCode files={['backtracking/permutations/Permutations.java']} />
 
+<details>
+  <summary>🧠 <strong>Checkpoint: Size of the tree</strong></summary>
+
+  **Question:** How many nodes does the tree of permutations of 4 elements have below the root? How many leaves?
+
+  **Answer:** The levels have $4$, $4 \cdot 3 = 12$, $4 \cdot 3 \cdot 2 = 24$ and $24$ nodes: **64** nodes below the root, of which **24** are leaves, one per permutation ($4! = 24$).
+</details>
+
 ***
 
 ## Subset sum
@@ -373,6 +381,14 @@ void coloring(int v) {
 **Example.** For a cycle of 5 vertices (each vertex joined to the next, and the last to the first), the algorithm finds **no coloring with 2 colors** (an odd cycle cannot alternate two colors) and **30 colorings with 3 colors**. The first one found is $(0, 1, 0, 1, 2)$.
 
 **Complexity.** $O(m^n)$ nodes in the worst case, and $O(n)$ per feasibility check, so $O(n \cdot m^n)$. Deciding whether a graph can be colored with 3 colors is NP-complete.
+
+<details>
+  <summary>🧠 <strong>Checkpoint: Coloring a cycle</strong></summary>
+
+  **Question:** How many valid colorings does a cycle of 5 nodes have with $m = 2$ colors? And with $m = 3$?
+
+  **Answer:** With 2 colors, **none**: in a cycle the colors must alternate, which is impossible with an odd number of nodes. With 3 colors, **30** colorings. With 2 colors, the search alternates the colors along the cycle and every branch is pruned at the last node, which is adjacent to two nodes of different colors.
+</details>
 
 ***
 

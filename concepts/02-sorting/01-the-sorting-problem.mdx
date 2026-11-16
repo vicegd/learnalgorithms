@@ -85,6 +85,14 @@ Suppose we have a list of students already sorted alphabetically by name, and we
 
 Stability is what makes it possible to sort by several criteria in successive passes: first by the secondary criterion, then (stably) by the primary one. It does not matter when sorting plain integers, because equal integers are indistinguishable, but it is essential when sorting records.
 
+<details>
+  <summary>🧠 <strong>Checkpoint: Stable or not?</strong></summary>
+
+  **Question:** The students (Ana, 7), (Luis, 5), (Eva, 7) and (Juan, 5) are sorted by grade. Which order does a **stable** algorithm produce? Which other orders could an unstable one produce?
+
+  **Answer:** A stable algorithm keeps the relative order of equal grades: **(Luis, 5), (Juan, 5), (Ana, 7), (Eva, 7)**. An unstable one may also swap Luis and Juan, or Ana and Eva: any of the four combinations is possible. This matters when the list was already sorted by another key, for example by name.
+</details>
+
 ### Type of memory used: internal and external algorithms
 
 - **Internal algorithms** sort data that fits entirely in **main memory**, where any element can be accessed directly at a similar cost. All the algorithms in this chapter, except the last section, are internal.
@@ -96,6 +104,14 @@ Two more properties will help us describe the algorithms:
 
 - **Extra memory (in place or not).** An algorithm is **in place** if it sorts the elements within the original array, using only a constant (or very small) amount of additional memory. Some algorithms, such as Mergesort, need an auxiliary array of size $n$.
 - **Adaptivity.** An algorithm is **adaptive** if it takes advantage of the existing order in the input, running faster on data that is already sorted or almost sorted. This matters a lot in practice, because real data is often partially sorted (for example, a sorted list to which a few new elements have been appended).
+
+<details>
+  <summary>🧠 <strong>Checkpoint: Internal or external?</strong></summary>
+
+  **Question:** A 200 GB log file must be sorted on a laptop with 16 GB of RAM. Is this a job for an internal or an external algorithm? What should the algorithm try to minimize?
+
+  **Answer:** An **external** algorithm: the data does not fit in main memory, so it must be sorted in pieces that are written to disk and then merged. The cost is dominated by disk accesses, so the algorithm should minimize them and read and write **sequentially**, as external Mergesort does.
+</details>
 
 ---
 
