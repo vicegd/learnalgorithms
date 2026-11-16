@@ -1,0 +1,44 @@
+---
+title: "Summary: Parallel Algorithms"
+sidebar_label: Summary
+sidebar_position: 3.5
+tags: [Summary, Parallelism, Fork/Join]
+---
+
+# Summary: Parallel Algorithms
+
+Everything on one page, to review the chapter before moving on.
+
+## Key ideas
+
+- Processor frequencies stopped growing; performance now grows by adding **cores** ([Concurrency and Parallelism](./01-parallel-algorithms.mdx)).
+- **Concurrency** means dealing with several tasks whose executions overlap; **parallelism** means executing them at the same time on several processors.
+- Shared memory needs synchronisation; divide and conquer algorithms on **independent** parts of the data avoid most of the problems.
+- The **Fork/Join** framework runs divide and conquer in parallel: below a **sequential threshold**, solve directly; otherwise divide, solve the parts in parallel and combine ([The Fork/Join Framework](./02-fork-join-framework.mdx)).
+- Parallelism does not change the asymptotic complexity, but it can divide the time by up to the number of processors ([Performance of Parallel Algorithms](./03-parallel-performance.mdx)).
+- Prefer a better algorithm before adding cores.
+
+## Fork/Join in Java
+
+| Element | Use |
+| :--- | :--- |
+| `RecursiveAction` | Task that does not return a value |
+| `RecursiveTask<V>` | Task that returns a value of type `V` |
+| `compute()` | Where the algorithm is written |
+| `fork()` / `join()` | Launch a subtask / wait for its result |
+| `invokeAll(...)` | Run several tasks and wait for all of them |
+| `ForkJoinPool` | Pool of threads with work stealing |
+
+Never `join` a task before starting the others.
+
+## Formulas
+
+| Concept | Formula |
+| :--- | :--- |
+| Time of the parallel sum | $T_p \in O\left(\frac{n}{p} + \log p\right)$ |
+| Work and span | $T_p \approx \frac{W}{p} + S$ |
+| Speedup | $S(p) = \frac{T_1}{T_p}$ |
+| Efficiency | $E(p) = \frac{S(p)}{p}$ |
+| Amdahl's law | $S(p) = \frac{1}{(1 - f) + f/p}$, limit $\frac{1}{1 - f}$ |
+
+$f$ is the fraction of the time that can be parallelized.

@@ -1,0 +1,39 @@
+---
+title: "Summary: Branch and Bound"
+sidebar_label: Summary
+sidebar_position: 2.5
+tags: [Summary, Branch and Bound]
+---
+
+# Summary: Branch and Bound
+
+Everything on one page, to review the chapter before moving on.
+
+## Key ideas
+
+- Branch and bound explores the same implicit tree as backtracking, but **generates all the children** of a node and keeps the **live nodes** in a data structure ([The Branch and Bound Scheme](./01-branch-and-bound-scheme.mdx)).
+- With a FIFO queue it is breadth-first; with a **priority queue** ordered by a **heuristic** it is best-first, and it can jump to the most promising node at any level.
+- **Bounds** are optimistic estimates. A node is pruned when its bound cannot beat the best solution found so far; a good **initial limit** prunes from the very beginning.
+- Bounds must be **optimistic**, **cheap** and **tight**. With $f = g + h$ and an admissible $h$, best-first branch and bound is the **A\*** algorithm.
+- In the worst case it explores an exponential number of nodes, like backtracking: a good heuristic changes the practical behavior, not the theoretical complexity.
+
+## At a glance
+
+| Problem | Heuristic / bound | Initial limit |
+| :--- | :--- | :--- |
+| Task assignment | Cost so far + minimum of each free column | Cheaper diagonal |
+| 0/1 knapsack | Value so far + fractional greedy completion | Value of the greedy solution, or 0 |
+| Sliding puzzles | Moves made + Manhattan distance | Infinite (stop at the first goal) |
+| Rectangle placement | Area of the enclosing box so far | Infinite, or any valid arrangement |
+| N-queens | $(n - \text{placed}) \cdot 10 + \text{diagonal}$ | Not needed (first solution) |
+| Traveling salesman | Length so far + cheapest exit of each remaining city | Infinite, or a greedy tour |
+
+All the problems are in [Classic Problems](./02-classic-problems.mdx).
+
+## Backtracking or branch and bound?
+
+| | Backtracking | Branch and bound |
+| :--- | :--- | :--- |
+| Exploration | Depth-first | Breadth-first or best-first |
+| Memory | Low: $O(h)$ | High: may store an exponential number of live nodes |
+| Best suited for | Enumerating all solutions; no good heuristic | Optimization with good bounds; shallow solutions |

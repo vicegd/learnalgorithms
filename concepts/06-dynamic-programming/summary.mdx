@@ -1,0 +1,39 @@
+---
+title: "Summary: Dynamic Programming"
+sidebar_label: Summary
+sidebar_position: 2.5
+tags: [Summary, Dynamic Programming]
+---
+
+# Summary: Dynamic Programming
+
+Everything on one page, to review the chapter before moving on.
+
+## Key ideas
+
+- When the subproblems are **numerous and repeated**, divide and conquer wastes time. Dynamic programming solves **each subproblem once** and stores its solution in a table ([The Dynamic Programming Method](./01-dynamic-programming-method.mdx)).
+- **Bottom-up** dynamic programming fills the table iteratively, from the smallest subproblems; **top-down** (memoization) adds a table to the recursive algorithm.
+- The cost is (number of subproblems) × (cost per subproblem).
+- In optimization problems it relies on the **principle of optimality**: optimal solutions are made of optimal solutions of subproblems.
+- Design steps: characterise the subproblems, write the recurrence and its base cases, choose the table and its filling order, compute the value, reconstruct the solution, and analyze the cost.
+- If a cell depends only on the previous row, one or two rows are enough instead of the whole table.
+
+## At a glance
+
+| Problem | Subproblems | Complexity |
+| :--- | :--- | :--- |
+| Fibonacci | $F(i)$, $0 \le i \le n$ | $O(n)$ |
+| Combinations | $C(i, j)$ | $O(n \cdot k)$ |
+| 0/1 knapsack | $V(i, j)$: first $i$ objects, capacity $j$ | $O(n \cdot W)$, pseudo-polynomial |
+| Change | $C(i, j)$: first $i$ coin values, amount $j$ | $O(n \cdot A)$, pseudo-polynomial |
+| River | $C(i, j)$: from dock $i$ to dock $j$ | $O(n^3)$ |
+| Longest common subsequence | $L(i, j)$: prefixes of both strings | $O(\lvert a \rvert \cdot \lvert b \rvert)$ |
+| Edit distance | $D(i, j)$: prefixes of both strings | $O(\lvert a \rvert \cdot \lvert b \rvert)$ |
+
+The recurrences are in [Classic Problems](./02-classic-problems.mdx).
+
+## When to use it
+
+- The problem has **overlapping subproblems** and **optimal substructure**.
+- The number of different subproblems is reasonable (polynomial, or pseudo-polynomial in a numeric value such as the capacity).
+- Compared with greedy: slower, but it does not depend on a heuristic being optimal. Compared with backtracking: much faster when it applies.
