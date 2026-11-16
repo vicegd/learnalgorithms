@@ -254,6 +254,15 @@ Recursive algorithms consume memory even if they do not create any data structur
 
 Time and space are often exchanged: we can sometimes save a lot of time by storing results that would otherwise have to be recomputed (the main idea of dynamic programming), or save memory at the cost of recomputing. An engineer must consider both resources and choose the balance that fits the constraints of the problem.
 
+:::warning Common mistakes
+
+- **Counting a library call as one operation.** `Arrays.sort`, `contains` or `indexOf` hide loops; count their real cost.
+- **Taking the best case as "small $n$".** The best case is the most favourable *input of size $n$*, not $n = 1$.
+- **Taking the average case as the mean of the best and worst cases.** It needs assumptions about the probability of each input.
+- **Forgetting the call stack in $S(n)$.** A recursion of depth $n$ uses $O(n)$ memory even if it creates no arrays.
+
+:::
+
 ---
 
 ## Summary

@@ -178,6 +178,15 @@ Dynamic programming appears in many fields:
 - **Shortest paths:** the Floyd-Warshall and Bellman-Ford algorithms.
 - **Operations research and economics:** inventory management, resource allocation, investment planning.
 
+:::warning Common mistakes
+
+- **Filling the table in the wrong order.** A cell can only be computed when the cells it depends on are already filled.
+- **Forgetting the base cases or the extra row and column.** Tables usually have size $n + 1$ to include the empty subproblem.
+- **Memoizing without checking the table first.** Look up the stored value *before* recursing, or nothing is saved.
+- **Using dynamic programming when subproblems do not repeat.** Then divide and conquer is simpler and just as fast.
+
+:::
+
 ---
 
 ## Summary

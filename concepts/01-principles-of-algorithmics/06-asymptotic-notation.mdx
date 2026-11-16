@@ -266,6 +266,15 @@ Some of these examples contain a trap:
 
 </details>
 
+:::warning Common mistakes
+
+- **Reading $O$ as an exact order.** $3n \in O(n^2)$ is true but not tight; use $\Theta$ to state the exact order.
+- **Identifying $O$ with the worst case and $\Omega$ with the best case.** Bounds and cases are independent ideas: each case has its own $O$, $\Omega$ and $\Theta$.
+- **Dropping powers of logarithms.** The base of a logarithm does not matter, but $\log^2 n \notin O(\log n)$.
+- **Not simplifying.** Write $O(n^2)$, not $O(3n^2 + n)$ or $O(2n^2)$.
+
+:::
+
 ---
 
 ## Summary

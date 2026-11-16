@@ -290,6 +290,14 @@ Backtracking develops it depth-first. Branch and bound generates all the childre
 
 </details>
 
+:::warning Common mistakes
+
+- **Using a bound that is not optimistic.** It can prune the branch that contains the optimal solution.
+- **Taking as initial limit a value that is not a real solution.** It must come from a valid solution (or be infinite).
+- **Expanding a node without comparing it again with the limit.** The limit may have improved since the node was inserted; the loop condition `estimateBest() < globalUpperBound` takes care of it.
+
+:::
+
 ***
 
 ## Key ideas

@@ -466,6 +466,14 @@ Studying algorithmics is not about memorizing a catalog of programming tricks. I
 5. **It lets you evaluate designs before building them.** By analyzing how a strategy behaves as the input grows, you can detect bottlenecks early and compare alternatives on paper, instead of discovering the problem after months of development.
 6. **It is challenging, and good for the brain.** Designing an elegant algorithm is an intellectual exercise that combines creativity and rigour.
 
+:::warning Common mistakes
+
+- **Calling a program that works on a few examples an algorithm.** An algorithm must solve *every* instance that satisfies the precondition.
+- **Ignoring the domain of the input.** Negative values, empty inputs and machine limits (overflow, stack size) are part of the design, as the factorial shows.
+- **Confusing a problem with one of its instances.** "Sort this list" is an instance; the problem is sorting any list.
+
+:::
+
 ---
 
 ## Summary

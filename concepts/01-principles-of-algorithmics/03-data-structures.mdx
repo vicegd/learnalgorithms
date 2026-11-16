@@ -473,6 +473,15 @@ Some additional vocabulary: nodes without children are **leaves**; the **depth**
 In a search tree, the cost of an operation depends on the **height** of the tree. A balanced tree with $n$ nodes has a height of about $\log_2 n$: about 20 levels for a million elements. A degenerate tree (for example, one built by inserting already sorted keys into a plain binary search tree) can have height $n$, and then it is no better than a linked list. Keeping the tree balanced is what makes `TreeSet` and `TreeMap` efficient.
 :::
 
+:::warning Common mistakes
+
+- **Choosing a collection without looking at the operations you use most.** `contains` is linear in a `List` and constant on average in a `HashSet`.
+- **Comparing objects with `==`.** It compares references; use `equals` (and keep `hashCode` consistent with it).
+- **Removing elements from a collection inside a for-each loop over it.** It throws `ConcurrentModificationException`; use an iterator's `remove` or `removeIf`.
+- **Using `float` or `double` for exact quantities.** Real numbers are approximate; use integers or `BigDecimal`.
+
+:::
+
 ---
 
 ## Summary

@@ -457,6 +457,15 @@ For some important problems, a well-chosen greedy algorithm is provably optimal.
 - **Huffman coding** ([Huffman, 1952](https://doi.org/10.1109/JRPROC.1952.273898)) builds an optimal prefix code for data compression, by repeatedly merging the two least frequent symbols.
 - **Interval scheduling**: to attend the maximum number of non-overlapping activities, repeatedly choose the one that **finishes first**.
 
+:::warning Common mistakes
+
+- **Solving the 0/1 knapsack greedily by value/weight.** It is optimal only for the fractional knapsack.
+- **Sorting by the wrong criterion.** By value alone or by weight alone fails even in the fractional knapsack.
+- **Taking the colors of the greedy coloring as the minimum.** The result depends on the order of the nodes.
+- **Adding an edge that closes a cycle in Kruskal's algorithm.** Check it with a union-find structure.
+
+:::
+
 ---
 
 ## Summary

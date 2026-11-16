@@ -299,6 +299,14 @@ The Tromino puzzle is also a beautiful example of a **proof by induction**: the 
 
 <Origin who="Solomon W. Golomb" year="1954" title="Checker boards and polyominoes" venue="The American Mathematical Monthly 61(10):675–682" url="https://doi.org/10.2307/2307321" />
 
+:::warning Common mistakes
+
+- **Expecting four half-size products to beat the classic multiplication.** With $a = 4$, $b = 2$, $k = 1$ it is still $O(n^2)$; Karatsuba needs only three.
+- **Forgetting the auxiliary array of Mergesort.** It is not in place: it needs $O(n)$ extra memory.
+- **Looking for a polynomial algorithm for the Towers of Hanoi.** $2^n - 1$ moves are necessary: the problem itself is exponential.
+
+:::
+
 ---
 
 ## Summary

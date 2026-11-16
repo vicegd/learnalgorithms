@@ -524,6 +524,15 @@ Before calling `solve()`, the given digits are written in the grid and marked in
 
 The heuristic generates **five times fewer nodes**, but each node is more expensive, because it counts the candidates of every empty cell. For a single Sudoku both are instantaneous; the lesson is the trade-off between the size of the tree and the cost of each node, which appears in every backtracking algorithm. (Keeping the candidate counts updated incrementally, instead of recounting them, gets the best of both.)
 
+:::warning Common mistakes
+
+- **Checking the queens with loops.** Arrays of used rows and diagonals make each check $O(1)$.
+- **Generating permutations with repeated elements.** Mark the elements already used.
+- **Pruning subset sum only when the sum exceeds the target.** Also prune when the remaining elements cannot reach it.
+- **Not emptying the cell again when backtracking in Sudoku.** The next candidates are then checked against a wrong board.
+
+:::
+
 ## Summary
 
 | Problem | Tree | Worst-case time | Main pruning |

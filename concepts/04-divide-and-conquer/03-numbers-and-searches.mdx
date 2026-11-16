@@ -309,6 +309,14 @@ Euclid's algorithm illustrates an important lesson: **finding the best algorithm
 
 <Origin who="Euclid" year="c. 300 BC" title="Elements, Book VII, Propositions 1–2" venue="English translation by D. E. Joyce, Clark University" url="https://mathcs.clarku.edu/~djoyce/java/elements/bookVII/propVII2.html" />
 
+:::warning Common mistakes
+
+- **Taking the value as the size of a numeric input.** The size is the number of digits: the naive GCD is exponential in it.
+- **Copying the subarray in each recursive call.** `Arrays.copyOfRange` costs $O(n)$ per call; pass the limits instead.
+- **Trusting the naive recursive Fibonacci.** It is exponential; the iterative version is $O(n)$.
+
+:::
+
 ---
 
 ## Summary
