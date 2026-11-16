@@ -1,0 +1,37 @@
+---
+title: "Summary: Brute Force"
+sidebar_label: Summary
+sidebar_position: 1.5
+tags: [Summary, Brute Force, Exhaustive Search]
+---
+
+# Summary: Brute Force
+
+Everything on one page, to review the chapter before moving on.
+
+## Key ideas
+
+- **Brute force** solves a problem in the most direct way, following its statement. **Exhaustive search** generates and tests every candidate of a combinatorial space ([Brute Force and Exhaustive Search](./01-brute-force-and-exhaustive-search.mdx)).
+- It is simple, general and easy to get right, and for small inputs it is often good enough.
+- Exhaustive search over subsets costs $O(2^n)$ and over permutations $O(n!)$: only very small instances are feasible, and faster hardware barely helps.
+- Brute force is the **baseline** to measure other algorithms and an excellent **testing oracle**.
+- The other techniques of the course are ways of avoiding its work: splitting, choosing greedily, reusing subproblems, pruning and bounding.
+
+## At a glance
+
+| Problem | Brute-force cost | Better approach in the course |
+| :--- | :--- | :--- |
+| Searching an element | $O(n)$ | Binary search on sorted data, $O(\log n)$ |
+| Maximum pairwise product | $O(n^2)$ | Linear scan, $O(n)$ |
+| Sorting by definition (selection, bubble) | $O(n^2)$ | Quicksort, Mergesort, $O(n \log n)$ |
+| Computing $a^n$ | $O(n)$ multiplications | Divide and conquer, $O(\log n)$ |
+| Matrix multiplication | $O(n^3)$ | — |
+| Naive string matching | $O(m)$ best, $O(n \cdot m)$ worst | Knuth-Morris-Pratt or Boyer-Moore, $O(n + m)$ |
+| Exhaustive search over subsets | $O(n \cdot 2^n)$ | Meet in the middle, about $O(2^{n/2} \cdot n)$; backtracking with pruning |
+| Exhaustive search over permutations | $O(n!)$ | Backtracking, branch and bound |
+
+## When brute force is the right choice
+
+- The input is **small** and will stay small.
+- The algorithm runs **once**, and writing it quickly matters more than running it quickly.
+- You need a **trusted reference** to test a faster algorithm.

@@ -1,0 +1,36 @@
+---
+title: "Summary: Mathematical Background"
+sidebar_label: Summary
+sidebar_position: 2.5
+tags: [Summary, Sums, Logarithms, Recurrences]
+---
+
+# Summary: Mathematical Background
+
+Everything on one page, to review the appendix or to look up a formula.
+
+## Sums, logarithms and factorials
+
+From [Sums, Logarithms and Factorials](./01-sums-and-logarithms.mdx):
+
+| Result | Formula |
+| :--- | :--- |
+| Arithmetic series | $\sum_{i=1}^{n} i = \frac{n(n+1)}{2} \in \Theta(n^2)$ |
+| Sums of powers | $\sum_{i=1}^{n} i^k \in \Theta(n^{k+1})$ |
+| Geometric series, $r \gt 1$ | Dominated by the last term |
+| Geometric series, $r \lt 1$ | Dominated by the first term |
+| Harmonic numbers | $H_n = \sum_{i=1}^{n} \frac{1}{i} \approx \ln n$ |
+| Stirling's formula | $n! \approx \sqrt{2\pi n}\left(\frac{n}{e}\right)^n$ |
+| Logarithm of the factorial | $\log(n!) \in \Theta(n \log n)$ |
+
+- $\log_2 n$ counts how many times $n$ can be halved.
+- The base of a logarithm does not matter inside $O$, but it does inside an exponent.
+
+## Induction, correctness and recurrences
+
+From [Induction, Correctness and Recurrences](./02-induction-and-recurrences.mdx):
+
+- **Induction**: base case plus inductive step. **Strong induction** may assume all smaller cases, which fits divide and conquer.
+- A recursive algorithm is correct if its **base cases** are correct, its **combination** is correct assuming the recursive calls are, and every call **reaches** a base case.
+- **Loop invariants** prove iterative algorithms: initialization, maintenance and termination.
+- Recurrences are solved by **unrolling**, the **recursion tree**, **guess and verify** (with explicit constants), or, for linear recurrences, **characteristic roots**.

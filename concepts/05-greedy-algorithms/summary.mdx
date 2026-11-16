@@ -1,0 +1,43 @@
+---
+title: "Summary: Greedy Algorithms"
+sidebar_label: Summary
+sidebar_position: 2.5
+tags: [Summary, Greedy Algorithms]
+---
+
+# Summary: Greedy Algorithms
+
+Everything on one page, to review the chapter before moving on.
+
+## Key ideas
+
+- Greedy algorithms build the solution step by step, taking the **locally best** choice according to a **heuristic**, and never reconsider a decision ([The Greedy Method](./01-greedy-method.mdx)).
+- They are fast and simple, but their results depend on the heuristic: they may be optimal, merely good, or even fail to find a solution.
+- Their elements are the candidates and the selection, feasibility, solution and objective functions.
+- A single **counterexample** proves that a greedy algorithm is not optimal. Proving optimality needs the greedy choice property and optimal substructure, usually with an **exchange argument**.
+- When the selection takes candidates in a fixed order, the algorithm usually starts by **sorting**, and its cost is that of sorting.
+
+## At a glance
+
+| Problem | Heuristic | Optimal? | Cost |
+| :--- | :--- | :--- | :--- |
+| Change (canonical coins, unlimited) | Highest coin that fits | Yes | $O(m)$, $m$ coin values |
+| Change (any coins) | Highest coin that fits | No | $O(m)$ |
+| Maximize the number of files | Smallest files first | Yes | $O(n \log n)$ |
+| Minimize free space on a disk | Largest files first | No | — |
+| Fractional knapsack | Highest value per weight first | Yes | $O(n \log n)$ |
+| 0/1 knapsack | Highest value per weight first | No | $O(n \log n)$ |
+| One or several plumbers | Shortest tasks first | Yes | $O(n \log n)$ |
+| Knight's tour | Fewest onward jumps (Warnsdorff) | Usually finds a tour | $O(n^2)$ |
+| Tasks to agents | Cheapest per row or per column | See the exercises | $O(n^2)$ |
+| Graph coloring | Lowest available color | No | $O(n^2)$ |
+| Minimum spanning tree | Prim: closest node | Yes | $O(n^2)$ with a matrix, $O(m \log n)$ with lists |
+| Minimum spanning tree | Kruskal: cheapest edge without cycle | Yes | Sorting the edges + union-find |
+
+All the problems are in [Classic Problems](./02-classic-problems.mdx), except change, in [The Greedy Method](./01-greedy-method.mdx).
+
+## When to use it
+
+- When a heuristic is **provably optimal** (canonical change, files, plumbers, minimum spanning trees, Dijkstra, Huffman).
+- When an approximate solution found **fast** is good enough.
+- As an **initial bound** for branch and bound, or as a heuristic to order the candidates in backtracking.

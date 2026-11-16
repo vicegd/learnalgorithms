@@ -1,0 +1,40 @@
+---
+title: "Summary: Backtracking"
+sidebar_label: Summary
+sidebar_position: 2.5
+tags: [Summary, Backtracking]
+---
+
+# Summary: Backtracking
+
+Everything on one page, to review the chapter before moving on.
+
+## Key ideas
+
+- Backtracking performs a **depth-first search** of an **implicit tree of states**, generating nodes only when they are reached ([The Backtracking Scheme](./01-backtracking-scheme.mdx)).
+- A solution is a **vector** of decisions $(x_1, \dots, x_n)$; each level of the tree fixes one decision.
+- The pattern is **choose, explore, unchoose**: every change must be undone when going back.
+- Two schemes: **first solution** (stop as soon as one is found) and **all solutions** (enumerate, count or keep the best).
+- **Pruning** and a good **ordering** of the candidates make the difference between a usable algorithm and brute force.
+- The worst-case time is usually exponential or factorial; the memory is only $O(h)$ for the stack.
+
+## At a glance
+
+| Problem | Tree | Worst-case time | Main pruning |
+| :--- | :--- | :--- | :--- |
+| Permutations | Degree $n, n-1, \dots, 1$ | $O(n!)$ | None |
+| Subset sum | Binary, height $n$ | $O(2^n)$ | Sum exceeds the target, or cannot reach it |
+| N-queens | Degree $n$, height $n$ | $O(n!)$ | Row and diagonal checks in $O(1)$ |
+| Knight's tour | Degree 8, height $n^2$ | $O(8^{n^2})$ | Visited squares; Warnsdorff ordering |
+| Graph coloring | Degree $m$, height $n$ | $O(n \cdot m^n)$ | Adjacent vertex with the same color |
+| Task assignment | Degree $n, n-1, \dots, 1$ | $O(n!)$ | Cost so far reaches the best cost |
+| Magic squares | Degree $9, 8, \dots, 1$ | $O(9!)$ | Each line must add up to 15 |
+| Sudoku | Degree at most 9 | $O(9^e)$, $e$ empty cells | Row, column and box checks |
+
+All the problems are in [Classic Problems](./02-classic-problems.mdx).
+
+## When to use it
+
+- To **enumerate** all the solutions, or to count them.
+- For hard combinatorial problems with no good bound, or when **memory** is limited.
+- If dynamic programming applies, it is usually better. If you need the optimum and have a good bound, consider branch and bound.

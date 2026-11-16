@@ -1,0 +1,40 @@
+---
+title: "Summary: Sorting"
+sidebar_label: Summary
+sidebar_position: 7.5
+tags: [Summary, Sorting]
+---
+
+# Summary: Sorting
+
+Everything on one page, to review the chapter before moving on. The [comparison lesson](./07-comparing-sorting-algorithms.mdx) has the full table, with comparisons, moves and real measurements.
+
+## Key ideas
+
+- Sorting is one of the most frequent operations in computing, and a classic benchmark for algorithm design ([The Sorting Problem](./01-the-sorting-problem.mdx)).
+- The simple algorithms ([bubble](./02-bubble-sort.mdx), [insertion](./03-insertion-sort.mdx), [selection](./04-selection-sort.mdx)) are $O(n^2)$. Insertion sort is the best of them in practice and is linear on almost sorted data.
+- [Quicksort](./05-quicksort.mdx) partitions around a pivot: $O(n \log n)$ on average, $O(n^2)$ in the worst case, and usually the fastest in practice.
+- [Shellsort, Heapsort, Mergesort and radix sort](./06-efficient-sorting.mdx) break the quadratic barrier in different ways.
+- Choose according to the size, the initial order of the data, the need for stability, the available memory and the cost of moves, and prefer the library implementation in real programs ([Comparing Sorting Algorithms](./07-comparing-sorting-algorithms.mdx)).
+
+## At a glance
+
+| Algorithm | Best | Average | Worst | In place | Stable |
+| :--- | :--- | :--- | :--- | :---: | :---: |
+| Bubble | $O(n^2)$ | $O(n^2)$ | $O(n^2)$ | Yes | Yes |
+| Bubble with sentinel | $O(n)$ | $O(n^2)$ | $O(n^2)$ | Yes | Yes |
+| Direct insertion | $O(n)$ | $O(n^2)$ | $O(n^2)$ | Yes | Yes |
+| Direct selection | $O(n^2)$ | $O(n^2)$ | $O(n^2)$ | Yes | No |
+| Shellsort | $O(n \log n)$ | depends on the gaps | $O(n^2)$ (Shell's gaps) | Yes | No |
+| Heapsort | $O(n \log n)$ | $O(n \log n)$ | $O(n \log n)$ | Yes | No |
+| Mergesort | $O(n \log n)$ | $O(n \log n)$ | $O(n \log n)$ | No ($O(n)$) | Yes |
+| Quicksort | $O(n \log n)$ | $O(n \log n)$ | $O(n^2)$ | Yes (stack) | No |
+| Radix sort | $O(d \cdot n)$ | $O(d \cdot n)$ | $O(d \cdot n)$ | No | Yes |
+
+## Which one to use
+
+- **Small or almost sorted data**: insertion sort.
+- **General purpose, fastest in practice**: Quicksort with median-of-three.
+- **Guaranteed $O(n \log n)$ without extra memory**: Heapsort.
+- **Stability with $O(n \log n)$**, or data in external memory: Mergesort.
+- **Integer keys with few digits**: radix sort.

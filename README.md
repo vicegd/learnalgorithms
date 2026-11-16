@@ -15,7 +15,8 @@ Each chapter contains:
 - **Lessons** with explanations, diagrams and step-by-step traces.
 - **Practice boxes** with short activities to check understanding.
 - **Proofs** of the results used in the lessons.
-- **Exercises** at the end of the chapter, with solutions.
+- A **summary** page to review the chapter, and **exercises** with solutions.
+- A header in every lesson with its **reading time** and the lessons to **read first**.
 - **References** and, for each classic algorithm, a link to its **original publication**.
 - **Code** for every algorithm in the [vicegd/algorithms](https://github.com/vicegd/algorithms) repository.
 
@@ -64,7 +65,10 @@ Found an error, have a suggestion or a question about a lesson? Use the links at
 - **Custom plugins** (`src/plugins/`):
   - `remark-autolink-concepts` — links concept terms to their lessons.
   - `remark-code-line-numbers` — line numbers in code blocks.
+  - `remark-lesson-meta` — reading time and prerequisites under the title of each lesson. Prerequisites are listed in the front matter as permalinks (`prerequisites:`), and a wrong one fails the build.
+  - `docusaurus-plugin-local-search` — builds `search-index.json` from the generated pages; the search box (`src/theme/SearchBar`) uses it in the browser, with no external service. Shortcut: Ctrl/Cmd + K or `/`.
   - `docusaurus-plugin-site-data` — site-wide metadata collected at build time.
+- **Matomo** for usage statistics (`stats.garcia.at`).
 - **GitHub Pages** hosting, deployed by **GitHub Actions** on every push to `main`.
 
 ---
@@ -91,6 +95,7 @@ npm run clear    # clear the Docusaurus cache
 │   ├── glossary.mdx
 │   └── NN-chapter-name/
 │       ├── NN-lesson.mdx        # Lessons, in order
+│       ├── summary.mdx          # Chapter summary (placed before the exercises)
 │       ├── NN-exercises.mdx     # End-of-chapter exercises
 │       ├── proofs.mdx           # Proofs referenced from the lessons
 │       ├── references.mdx       # Bibliography
@@ -113,7 +118,7 @@ npm run clear    # clear the Docusaurus cache
 
 ### Adding a chapter
 
-1. Create `concepts/NN-chapter-name/` with its lessons, exercises, proofs and references.
+1. Create `concepts/NN-chapter-name/` with its lessons, summary, exercises, proofs and references.
 2. Add one `chapter(...)` line to the right part in `sidebars.js`.
 3. Add its card to `CHAPTERS` in `src/pages/index.js`, and its icon and accent in `src/components/Icon.jsx`.
 

@@ -1,0 +1,64 @@
+---
+title: "Summary: Principles of Algorithmics"
+sidebar_label: Summary
+sidebar_position: 9.5
+tags: [Summary, Complexity, Asymptotic Notation]
+---
+
+# Summary: Principles of Algorithmics
+
+Everything on one page, to review the chapter before moving on. Each section links to the lesson where it is explained.
+
+## Key ideas
+
+- An algorithm solves a **problem** for all its instances, defined by a precondition and a postcondition. It must be finite, definite and effective ([Algorithmic Thinking](./01-algorithmic-thinking.mdx)).
+- We judge algorithms mainly by their **efficiency** in time and memory, and above all by how their cost **grows** with the size of the input ([Measuring Efficiency](./04-measuring-efficiency.mdx)).
+- $T(n)$ is obtained by **counting** elementary operations; when the cost depends on the data, we distinguish the **best**, **worst** and **average** cases ([Complexity Analysis](./05-complexity-analysis.mdx)).
+- **Asymptotic notation** keeps only the growth rate: $O$ is an upper bound, $\Omega$ a lower bound and $\Theta$ an exact order ([Asymptotic Notation](./06-asymptotic-notation.mdx)).
+- Implementation, language and hardware change only the **constant**, never the complexity (principle of invariance) ([Growth Rates](./07-growth-rates.mdx)).
+- Data structures and algorithms are designed together: the same algorithm can be fast or slow depending on how the data is organized ([Data Structures](./03-data-structures.mdx)).
+
+## Complexity classes
+
+From best to worst, with an example from the course ([Growth Rates](./07-growth-rates.mdx)):
+
+| Class | Name | Example |
+| :--- | :--- | :--- |
+| $O(1)$ | Constant | Accessing an element of an array |
+| $O(\log n)$ | Logarithmic | Binary search |
+| $O(n)$ | Linear | Sequential search, sum of a vector |
+| $O(n \log n)$ | Linearithmic | Mergesort, Heapsort |
+| $O(n^2)$ | Quadratic | Bubble, insertion and selection sort |
+| $O(n^3)$ | Cubic | Matrix multiplication by definition |
+| $O(2^n)$ | Exponential | Exhaustive search over subsets |
+| $O(n!)$ | Factorial | Exhaustive search over permutations |
+
+Polynomial classes are considered tractable; exponential ones are not. For exponential algorithms, faster hardware only adds a **constant** to the size that can be solved.
+
+## Complexity of loops
+
+| Pattern | Cost ([Complexity of Loops](./08-complexity-of-loops.mdx)) |
+| :--- | :--- |
+| Additive step over a range proportional to $n$ | $O(n)$ |
+| Multiplicative step (`i *= 2`, `i /= 2`) | $O(\log n)$, even if the range is $n^2$ or $n^3$ |
+| Independent nested loops | Multiply the iterations |
+| Dependent nested loops | Use a summation |
+| Sequential blocks | Add; the largest term dominates |
+| Loop up to $\sqrt{n}$ | $O(\sqrt{n})$ |
+| Harmonic sum ($n/1 + n/2 + \dots + n/n$) | $O(n \log n)$ |
+| Geometric sum ($n + n/2 + n/4 + \dots$) | $O(n)$ |
+
+## Useful formulas
+
+- **Predicting times** with $T(n) \in O(f(n))$: $t_2 = \frac{f(n_2)}{f(n_1)} \cdot t_1$.
+- **Predicting sizes**: $n_2 = f^{-1}\left(\frac{t_2}{t_1} \cdot f(n_1)\right)$.
+- **Doubling test**: if doubling $n$ multiplies the time by about 2, 4 or 8, the algorithm is linear, quadratic or cubic ([Measuring Efficiency](./04-measuring-efficiency.mdx)).
+
+## Searching
+
+| Algorithm | Requires | Best | Worst and average |
+| :--- | :--- | :--- | :--- |
+| Sequential search | Any sequence | $O(1)$ | $O(n)$ |
+| Binary search | Sorted data with direct access | $O(1)$ | $O(\log n)$ |
+
+Sorting first pays off when the number of searches is large enough ([Case Studies: Searching](./09-searching-case-studies.mdx)).

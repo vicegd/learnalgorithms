@@ -1,0 +1,54 @@
+---
+title: "Summary: Divide and Conquer"
+sidebar_label: Summary
+sidebar_position: 5.5
+tags: [Summary, Divide and Conquer, Recurrences]
+---
+
+# Summary: Divide and Conquer
+
+Everything on one page, to review the chapter before moving on.
+
+## Key ideas
+
+- Divide and conquer **divides** a problem into smaller subproblems of the same kind, **solves** them recursively and **combines** their solutions ([The Divide and Conquer Scheme](./01-divide-and-conquer-scheme.mdx)).
+- The number of subproblems should be small, and the subproblems **independent**. When they repeat, dynamic programming is the right tool.
+- With a single subproblem ($a = 1$) the process is a **reduction**, often better written as a loop. Recursion uses stack memory proportional to its depth.
+- Count the recursive calls that are **executed**, not the ones written ([Analyzing Divide and Conquer](./02-analysis.mdx)).
+- Discarding the subproblems that cannot contain the answer is what makes binary search and Quickselect fast ([Majority, Mode and Median](./05-majority-mode-and-median.mdx)).
+
+## Solving the recurrences
+
+With $a$ subproblems and a cost of dividing and combining in $O(n^k)$ ([Analyzing Divide and Conquer](./02-analysis.mdx)):
+
+| Scheme | Condition | Complexity |
+| :--- | :--- | :--- |
+| Division ($n/b$) | $a \lt b^k$ | $O(n^k)$ |
+| Division ($n/b$) | $a = b^k$ | $O(n^k \log n)$ |
+| Division ($n/b$) | $a \gt b^k$ | $O(n^{\log_b a})$ |
+| Subtraction ($n - b$) | $a = 1$ | $O(n^{k+1})$ |
+| Subtraction ($n - b$) | $a \gt 1$ | $O(a^{n/b})$, exponential |
+
+## At a glance
+
+| Problem | Algorithm | Complexity | Lesson |
+| :--- | :--- | :--- | :--- |
+| Factorial | Subtraction, $a = 1$ | $O(n)$ | [Numbers and Searches](./03-numbers-and-searches.mdx) |
+| Search in a sorted vector | Binary search | $O(\log n)$ | [Numbers and Searches](./03-numbers-and-searches.mdx) |
+| Fibonacci | Naive recursion | $\Theta(\varphi^n)$, exponential | [Numbers and Searches](./03-numbers-and-searches.mdx) |
+| Fibonacci | Iterative / matrix power | $O(n)$ / $O(\log n)$ | [Numbers and Searches](./03-numbers-and-searches.mdx) |
+| Greatest common divisor | Euclid's algorithm | Linear in the number of digits | [Numbers and Searches](./03-numbers-and-searches.mdx) |
+| Sorting | Mergesort | $O(n \log n)$ | [Classic Problems](./04-classic-problems.mdx) |
+| Sorting | Quicksort | $O(n \log n)$ best, $O(n^2)$ worst | [Classic Problems](./04-classic-problems.mdx) |
+| Towers of Hanoi | Subtraction, $a = 2$ | $O(2^n)$ | [Classic Problems](./04-classic-problems.mdx) |
+| Large integers | Karatsuba | $O(n^{1.585})$ | [Classic Problems](./04-classic-problems.mdx) |
+| Tennis tournament | Division, $k = 2$ | $O(n^2)$ | [Classic Problems](./04-classic-problems.mdx) |
+| Tromino puzzle ($n$ = side) | Division, $a = 4$ | $O(n^2)$ | [Classic Problems](./04-classic-problems.mdx) |
+| Majority element, mode | Sorting first | $O(n \log n)$ | [Majority, Mode and Median](./05-majority-mode-and-median.mdx) |
+| Median | Quickselect | $O(n)$ average, $O(n^2)$ worst | [Majority, Mode and Median](./05-majority-mode-and-median.mdx) |
+
+## When to use it
+
+- The problem splits into **independent** subproblems of the same kind, and their solutions combine cheaply.
+- Avoid it when the subproblems **overlap** (naive Fibonacci): use dynamic programming instead.
+- Prefer division schemes ($n/b$) to subtraction schemes ($n - b$) with several subproblems, which are exponential.
