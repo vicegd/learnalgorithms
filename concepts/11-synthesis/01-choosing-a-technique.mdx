@@ -1,0 +1,149 @@
+---
+title: Choosing a Design Technique
+sidebar_label: Choosing a Technique
+tags: [Paradigms, Brute Force, Divide and Conquer, Greedy Algorithms, Dynamic Programming, Backtracking, Branch and Bound]
+prerequisites:
+  - /concepts/greedy-algorithms/classic-problems
+  - /concepts/dynamic-programming/classic-problems
+  - /concepts/branch-and-bound/classic-problems
+---
+
+import FigChoosingTechnique from './img/choosing-technique.svg';
+
+# Choosing a Design Technique
+
+You have now seen six design techniques: brute force, divide and conquer, greedy algorithms, dynamic programming, backtracking and branch and bound. Each chapter studied one of them in isolation. In practice, the question comes the other way round: you have a **problem**, and you must decide **which technique** to use.
+
+This lesson solves the same problems with several techniques side by side, so that you can compare what each one costs and what it guarantees, and ends with a guide to choose.
+
+:::note What you will learn in this lesson
+- How the **0/1 knapsack** problem is solved with all six techniques, and what each one gives.
+- Why the **change** problem and the **Fibonacci** numbers are solved so differently by different techniques.
+- A set of **questions** that lead to the right technique for a new problem.
+:::
+
+---
+
+## One Problem, Six Techniques: the 0/1 Knapsack
+
+We use the instance of the [dynamic programming lesson](../06-dynamic-programming/02-classic-problems.mdx#the-01-knapsack-problem): a knapsack with capacity $W = 10$ and three objects that cannot be broken.
+
+| Object | 1 | 2 | 3 |
+| :--- | :---: | :---: | :---: |
+| Weight $w_i$ | 6 | 5 | 5 |
+| Value $v_i$ | 8 | 5 | 5 |
+
+The optimum is to take objects 2 and 3: weight 10, value **10**.
+
+| Technique | How it attacks the problem | Result on the instance | Cost | Optimal? |
+| :--- | :--- | :--- | :--- | :---: |
+| [Brute force](../03-brute-force/01-brute-force-and-exhaustive-search.mdx) | Generate the $2^n$ subsets of objects and keep the best one that fits | 8 subsets, 5 of them fit; value 10 | $O(n \cdot 2^n)$ | Yes |
+| [Divide and conquer](../04-divide-and-conquer/01-divide-and-conquer-scheme.mdx) | Recurrence "take object $i$ or leave it", without a table | Value 10, but the same subproblems are solved again and again | $O(2^n)$ | Yes |
+| [Greedy](../05-greedy-algorithms/02-classic-problems.mdx#the-knapsack-problem) | Take the objects by decreasing value per weight while they fit | Takes object 1 (ratio 1.33), then nothing else fits: value **8** | $O(n \log n)$ | **No** |
+| [Dynamic programming](../06-dynamic-programming/02-classic-problems.mdx#the-01-knapsack-problem) | Table $V(i, j)$: best value with the first $i$ objects and capacity $j$ | $(n + 1)(W + 1) = 44$ cells; value 10 | $O(n \cdot W)$, pseudo-polynomial | Yes |
+| [Backtracking](../07-backtracking/01-backtracking-scheme.mdx) | Depth-first search over the binary tree of decisions, pruning objects that do not fit | Visits 11 of the 15 nodes of the tree; value 10 | $O(2^n)$ in the worst case | Yes |
+| [Branch and bound](../08-branch-and-bound/02-classic-problems.mdx#01-knapsack) | Best-first search, bounding each node with the fractional greedy completion | Explores "take 1" first (bound 12), finds 8 there, then the optimum 10 in the other branch | $O(2^n)$ in the worst case | Yes |
+
+The table shows the three questions that separate the techniques:
+
+- **Is the answer guaranteed to be optimal?** Every technique except greedy is exact here. The greedy rule by value per weight is optimal only for the [fractional knapsack](../05-greedy-algorithms/02-classic-problems.mdx#the-knapsack-problem); for the 0/1 knapsack it is a fast **approximation**.
+- **How does the cost grow?** Brute force, plain recursion, backtracking and branch and bound are exponential in the worst case. Dynamic programming is $O(n \cdot W)$, which is excellent when the capacity $W$ is a small integer and useless when it is huge.
+- **What else does it need?** Dynamic programming needs a table of $(n + 1)(W + 1)$ cells; backtracking only the recursion stack; branch and bound a priority queue that can grow a lot.
+
+### Which one would you use?
+
+The best technique depends on the **data**, not only on the problem:
+
+- **A few objects, a program that runs once:** brute force. With 20 objects there are about a million subsets, and the code is trivial to get right.
+- **Integer weights and a moderate capacity** (say $W$ up to a few million): dynamic programming. With 30 objects and $W = 1000$, its table has 31,031 cells, while brute force would examine $2^{30} = 1{,}073{,}741{,}824$ subsets.
+- **Huge capacities, or real-valued weights:** the table of dynamic programming is impossible. Branch and bound, with the fractional bound, usually prunes most of the tree.
+- **Objects that can be broken:** the greedy algorithm, which is then optimal and the fastest of all.
+- **You need every combination that fits** (for example, to list them): backtracking.
+
+---
+
+## The Change Problem: When Greedy Is Enough
+
+Paying an amount with the fewest coins shows how much the coin system matters:
+
+- For **canonical systems** such as the euro, the [greedy algorithm](../05-greedy-algorithms/01-greedy-method.mdx#the-problem-of-the-change) (largest coin first) is optimal and costs only $O(m)$ for $m$ coin values. Nothing can beat it.
+- For other systems, greedy can fail. Paying 60 cents with coins of 50, 20 and 2 cents, greedy gives $50 + 5 \times 2$, six coins, while three coins of 20 were enough.
+- [Dynamic programming](../06-dynamic-programming/02-classic-problems.mdx#the-problem-of-the-change) is optimal for **any** coin system, in $O(n \cdot A)$ for $n$ coin values and an amount $A$. On the example above it finds the three coins of 20.
+- **Backtracking** handles variants that the other two do not, such as a **limited** number of coins of each value, or listing **all** the ways to pay an amount.
+
+The lesson: first check whether a greedy choice is **provably** optimal for your data. If it is, use it; if not, the same problem needs a more expensive technique.
+
+---
+
+## Fibonacci: From Exponential to Logarithmic
+
+The Fibonacci numbers show how much the choice of technique can change the cost of the *same* recurrence $F(n) = F(n-1) + F(n-2)$:
+
+| Technique | Cost | Computing $F(40) = 102{,}334{,}155$ |
+| :--- | :--- | :--- |
+| [Divide and conquer](../04-divide-and-conquer/03-numbers-and-searches.mdx#the-fibonacci-numbers) (naive recursion) | $\Theta(\varphi^n)$, exponential | 331,160,281 calls |
+| [Dynamic programming](../06-dynamic-programming/01-dynamic-programming-method.mdx) (table or two variables) | $O(n)$ | 41 values, each computed once |
+| Fast exponentiation of a matrix | $O(\log n)$ | About $\log_2 40 \approx 5$ squarings of a $2 \times 2$ matrix |
+
+The naive recursion fails because its subproblems **overlap**: that is the signal to move from divide and conquer to dynamic programming. And a deeper look at the problem (the matrix form) brings it down to a logarithmic number of operations.
+
+---
+
+## A Guide for Choosing
+
+No recipe works for every problem, but asking these questions in order leads to a good first choice:
+
+<Figure caption="A guide for choosing a design technique. Ask the questions from top to bottom; the first yes suggests a technique. It is a starting point: a problem may fit several techniques, and the data (sizes, values) decides between them.">
+  <FigChoosingTechnique />
+</Figure>
+
+1. **Is the input small, and the program run only once?** Brute force is simple and correct, and it will also be the **oracle** to test any faster algorithm.
+2. **Does it split into independent subproblems?** Divide and conquer, as in Mergesort or binary search.
+3. **Do the subproblems repeat, and are there few of them** (polynomially many, or pseudo-polynomially in a numeric value)? Dynamic programming, as in the knapsack with small capacity or the edit distance.
+4. **Is there a greedy choice that you can prove optimal** (with an exchange argument)? A greedy algorithm, as in minimum spanning trees or the plumber. Without a proof, greedy is only a fast heuristic.
+5. **Do you need all the solutions, or is there no good bound?** Backtracking, as in N-queens or Sudoku. **Otherwise**, for an optimization problem with a good bound, branch and bound.
+
+The techniques also **combine**: greedy algorithms provide the initial limit and the bounds of branch and bound, and a good ordering of candidates in backtracking is usually a greedy heuristic (such as Warnsdorff's rule).
+
+### The techniques at a glance
+
+| Technique | How it explores | Optimal? | Typical cost | Use it when |
+| :--- | :--- | :--- | :--- | :--- |
+| Brute force | Every candidate | Yes | Exponential or factorial for combinatorial problems | The input is small, or you need a reference |
+| Divide and conquer | Independent subproblems, recursively | Yes | Given by its recurrence | The subproblems are independent |
+| Greedy | One irrevocable choice per step | Only if proved | Usually $O(n \log n)$ | The greedy choice is provably optimal, or an approximation is enough |
+| Dynamic programming | Each distinct subproblem once | Yes | Subproblems × cost of each | The subproblems overlap and are not too many |
+| Backtracking | Depth-first, with pruning | Yes | Exponential worst case, $O(h)$ memory | You need all the solutions, or memory is limited |
+| Branch and bound | Best-first, with bounds | Yes | Exponential worst case, much memory | Optimization with good bounds |
+
+:::warning Common mistakes
+
+- **Choosing the technique by the problem alone.** The same knapsack is best solved by brute force, dynamic programming or branch and bound depending on its size and on its weights.
+- **Using a greedy algorithm without a proof.** It may look right on every example you try and still not be optimal; find a proof or a counterexample.
+- **Calling dynamic programming polynomial when the table depends on a value.** $O(n \cdot W)$ is pseudo-polynomial: it explodes when $W$ is large.
+- **Writing a complex algorithm without a simple one to test it.** Keep a brute-force version as an oracle and compare both on many small random inputs.
+
+:::
+
+---
+
+## Summary
+
+- The same problem can be solved with several techniques, which differ in **what they guarantee** (optimality), **how their cost grows** and **how much memory they need**.
+- On the 0/1 knapsack, every technique except greedy finds the optimum; dynamic programming is the best when the capacity is a small integer, and branch and bound when it is not.
+- Greedy is unbeatable when it is **provably** optimal (canonical change, fractional knapsack) and only a heuristic otherwise.
+- Overlapping subproblems are the signal to move from divide and conquer to dynamic programming.
+- Ask, in order: small input? independent subproblems? repeated subproblems? provable greedy choice? all solutions or no bound? The answers suggest a technique; the data decides.
+
+---
+
+## Practice
+
+<div className="practice-box">
+
+- **🎒 Five ways.** Implement the 0/1 knapsack with brute force, greedy, dynamic programming and backtracking, and check on 1,000 random instances with 10 objects that the exact ones always agree.
+- **📈 Where is the crossover?** With 25 objects, increase the capacity $W$ from $10^2$ to $10^7$ and measure dynamic programming against backtracking. From which capacity is backtracking faster?
+- **🪙 Find a counterexample.** Find a coin system with a coin of 1 cent for which the greedy change fails, and the smallest amount for which it happens.
+- **🧭 Classify.** For each problem of the course (N-queens, Mergesort, edit distance, minimum spanning tree, sliding puzzles, Hanoi), follow the guide above and check whether it leads to the technique used in the course.
+
+</div>
