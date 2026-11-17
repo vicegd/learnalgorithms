@@ -213,6 +213,8 @@ export default function Icon({ name, size = 28, className, title }) {
  */
 const RULES = [
   ['exercises', 'pencil'],
+  ['summary', 'grid'],
+  ['choosing-a-technique', 'split'],
   ['glossary', 'glossary'],
   ['references', 'book'],
   ['proofs', 'stairs'],
@@ -267,6 +269,7 @@ const ACCENTS = [
   ['dynamic-programming', '#2e8555'],
   ['backtracking', '#ea580c'],
   ['branch-and-bound', '#ea580c'],
+  ['synthesis', '#2e8555'],
   ['parallel-algorithms', '#0d9488'],
   ['mathematical-background', '#db2777'],
 ];

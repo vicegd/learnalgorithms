@@ -146,6 +146,20 @@ const CHAPTERS = [
     to: '/concepts/branch-and-bound',
   },
   {
+    accentClass: styles.accentGreen,
+    icon: <Icon name="split" size={30} />,
+    eyebrow: 'Part III · Synthesis',
+    title: 'Choosing a Technique',
+    topics: [
+      { label: "One problem, six techniques", to: '/concepts/synthesis/choosing-a-technique#one-problem-six-techniques-the-01-knapsack' },
+      { label: "Change", to: '/concepts/synthesis/choosing-a-technique#the-change-problem-when-greedy-is-enough' },
+      { label: "Fibonacci", to: '/concepts/synthesis/choosing-a-technique#fibonacci-from-exponential-to-logarithmic' },
+      { label: "A guide for choosing", to: '/concepts/synthesis/choosing-a-technique#a-guide-for-choosing' },
+    ],
+    cta: '1 lesson',
+    to: '/concepts/synthesis/choosing-a-technique',
+  },
+  {
     accentClass: styles.accentTeal,
     icon: <Icon name="cpu" size={30} />,
     eyebrow: 'Part IV · Chapter 9',

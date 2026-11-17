@@ -54,6 +54,7 @@ const sidebars = {
         'Systematic search over an implicit tree of states: building solutions step by step, abandoning partial solutions that cannot succeed, and classic problems such as N-queens, subset sum, graph coloring, magic squares and Sudoku.'),
       chapter('8. Branch and Bound', '08-branch-and-bound', '/branch-and-bound',
         'Exploring the most promising states first and discarding those whose bound shows they cannot beat the best solution: live nodes, priority queues, bounds and heuristics, A*, and classic problems such as task assignment, knapsack, sliding puzzles and the traveling salesman.'),
+      {type: 'doc', id: 'synthesis/choosing-a-technique', label: 'Choosing a Technique'},
     ]),
     part('Part IV. Execution Models', [
       chapter('9. Parallel Algorithms', '09-parallel-algorithms', '/parallel-algorithms',

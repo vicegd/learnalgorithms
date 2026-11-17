@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 720 470" width="720" height="470" role="img">
+  <title>Flowchart for choosing a design technique: five yes-or-no questions, each yes leading to a technique and the last no leading to branch and bound</title>
+  <rect class="box-soft" x="20.0" y="20.0" width="420.0" height="44.0" rx="8"/>
+  <text class="t-s" x="230.0" y="42.0" text-anchor="middle" dominant-baseline="central">Is the input small, and the program run only once?</text>
+  <rect class="box-mut" x="540.0" y="22.0" width="170.0" height="40.0" rx="8"/>
+  <text class="t-b t-s" x="625.0" y="42.0" text-anchor="middle" dominant-baseline="central">Brute force</text>
+  <line class="ln" x1="440.0" y1="42.0" x2="533.0" y2="42.0"/>
+  <polygon class="ah" points="540.0,42.0 533.0,45.5 533.0,38.5"/>
+  <text class="t-xs t-hl" x="490.0" y="33.0" text-anchor="middle" dominant-baseline="central">yes</text>
+  <line class="ln" x1="230.0" y1="64.0" x2="230.0" y2="95.0"/>
+  <polygon class="ah" points="230.0,102.0 226.5,95.0 233.5,95.0"/>
+  <text class="t-xs t-bad" x="246.0" y="83.0" text-anchor="middle" dominant-baseline="central">no</text>
+  <rect class="box-soft" x="20.0" y="102.0" width="420.0" height="44.0" rx="8"/>
+  <text class="t-s" x="230.0" y="124.0" text-anchor="middle" dominant-baseline="central">Does it split into independent subproblems?</text>
+  <rect class="box-blue" x="540.0" y="104.0" width="170.0" height="40.0" rx="8"/>
+  <text class="t-b t-s" x="625.0" y="124.0" text-anchor="middle" dominant-baseline="central">Divide and conquer</text>
+  <line class="ln" x1="440.0" y1="124.0" x2="533.0" y2="124.0"/>
+  <polygon class="ah" points="540.0,124.0 533.0,127.5 533.0,120.5"/>
+  <text class="t-xs t-hl" x="490.0" y="115.0" text-anchor="middle" dominant-baseline="central">yes</text>
+  <line class="ln" x1="230.0" y1="146.0" x2="230.0" y2="177.0"/>
+  <polygon class="ah" points="230.0,184.0 226.5,177.0 233.5,177.0"/>
+  <text class="t-xs t-bad" x="246.0" y="165.0" text-anchor="middle" dominant-baseline="central">no</text>
+  <rect class="box-soft" x="20.0" y="184.0" width="420.0" height="44.0" rx="8"/>
+  <text class="t-s" x="230.0" y="206.0" text-anchor="middle" dominant-baseline="central">Do the subproblems repeat, and are there few of them?</text>
+  <rect class="box-pur" x="540.0" y="186.0" width="170.0" height="40.0" rx="8"/>
+  <text class="t-b t-s" x="625.0" y="206.0" text-anchor="middle" dominant-baseline="central">Dynamic programming</text>
+  <line class="ln" x1="440.0" y1="206.0" x2="533.0" y2="206.0"/>
+  <polygon class="ah" points="540.0,206.0 533.0,209.5 533.0,202.5"/>
+  <text class="t-xs t-hl" x="490.0" y="197.0" text-anchor="middle" dominant-baseline="central">yes</text>
+  <line class="ln" x1="230.0" y1="228.0" x2="230.0" y2="259.0"/>
+  <polygon class="ah" points="230.0,266.0 226.5,259.0 233.5,259.0"/>
+  <text class="t-xs t-bad" x="246.0" y="247.0" text-anchor="middle" dominant-baseline="central">no</text>
+  <rect class="box-soft" x="20.0" y="266.0" width="420.0" height="44.0" rx="8"/>
+  <text class="t-s" x="230.0" y="288.0" text-anchor="middle" dominant-baseline="central">Is there a greedy choice that you can prove optimal?</text>
+  <rect class="box-hl" x="540.0" y="268.0" width="170.0" height="40.0" rx="8"/>
+  <text class="t-b t-s" x="625.0" y="288.0" text-anchor="middle" dominant-baseline="central">Greedy</text>
+  <line class="ln" x1="440.0" y1="288.0" x2="533.0" y2="288.0"/>
+  <polygon class="ah" points="540.0,288.0 533.0,291.5 533.0,284.5"/>
+  <text class="t-xs t-hl" x="490.0" y="279.0" text-anchor="middle" dominant-baseline="central">yes</text>
+  <line class="ln" x1="230.0" y1="310.0" x2="230.0" y2="341.0"/>
+  <polygon class="ah" points="230.0,348.0 226.5,341.0 233.5,341.0"/>
+  <text class="t-xs t-bad" x="246.0" y="329.0" text-anchor="middle" dominant-baseline="central">no</text>
+  <rect class="box-soft" x="20.0" y="348.0" width="420.0" height="44.0" rx="8"/>
+  <text class="t-s" x="230.0" y="370.0" text-anchor="middle" dominant-baseline="central">Do you need all the solutions, or is there no good bound?</text>
+  <rect class="box-ac" x="540.0" y="350.0" width="170.0" height="40.0" rx="8"/>
+  <text class="t-b t-s" x="625.0" y="370.0" text-anchor="middle" dominant-baseline="central">Backtracking</text>
+  <line class="ln" x1="440.0" y1="370.0" x2="533.0" y2="370.0"/>
+  <polygon class="ah" points="540.0,370.0 533.0,373.5 533.0,366.5"/>
+  <text class="t-xs t-hl" x="490.0" y="361.0" text-anchor="middle" dominant-baseline="central">yes</text>
+  <line class="ln" x1="230.0" y1="392.0" x2="230.0" y2="423.0"/>
+  <polygon class="ah" points="230.0,430.0 226.5,423.0 233.5,423.0"/>
+  <text class="t-xs t-bad" x="246.0" y="411.0" text-anchor="middle" dominant-baseline="central">no</text>
+  <rect class="box-ac" x="135.0" y="430.0" width="190.0" height="40.0" rx="8"/>
+  <text class="t-b t-s" x="230.0" y="450.0" text-anchor="middle" dominant-baseline="central">Branch and bound</text>
+</svg>
