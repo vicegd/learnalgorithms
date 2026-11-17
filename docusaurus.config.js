@@ -84,7 +84,7 @@ const config = {
       navbar: {
         title: 'learnalgorithms.dev',
         logo: {
-          alt: 'My Site Logo',
+          alt: 'learnalgorithms.dev logo',
           src: 'img/logo.svg',
         },
         items: [
