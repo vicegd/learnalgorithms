@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 360 260" width="360" height="260" role="img">
-  <title>A weighted graph with six nodes</title>
+  <title>A weighted graph with six nodes, used to build a minimum spanning tree with the algorithms of Prim and Kruskal</title>
   <line class="ln" x1="180.0" y1="40.0" x2="55.0" y2="115.0"/>
   <line class="ln" x1="180.0" y1="40.0" x2="180.0" y2="135.0"/>
   <line class="ln" x1="180.0" y1="40.0" x2="305.0" y2="115.0"/>

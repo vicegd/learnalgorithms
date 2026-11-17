@@ -153,6 +153,11 @@ export default function SearchBar() {
         className={styles.input}
         placeholder="Search"
         aria-label="Search the lessons"
+        role="combobox"
+        aria-autocomplete="list"
+        aria-expanded={open && results.length > 0}
+        aria-controls="search-results"
+        aria-activedescendant={open && results[active] ? `search-result-${active}` : undefined}
         value={query}
         onFocus={() => {
           load();
@@ -167,13 +172,14 @@ export default function SearchBar() {
         onKeyDown={onKeyDown}
       />
       {open && query.trim().length > 1 && (
-        <div className={styles.panel} role="listbox">
+        <div className={styles.panel} role="listbox" id="search-results" aria-label="Search results">
           {failed && <div className={styles.empty}>The search index could not be loaded.</div>}
           {!failed && !index && <div className={styles.empty}>Loading…</div>}
           {index && results.length === 0 && <div className={styles.empty}>No results for “{query}”.</div>}
           {results.map((r, i) => (
             <a
               key={urlOf(r)}
+              id={`search-result-${i}`}
               href={urlOf(r)}
               role="option"
               aria-selected={i === active}

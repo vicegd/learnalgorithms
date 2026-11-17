@@ -105,10 +105,13 @@
   --dg-fg: #1f2937; --dg-muted: #6b7280; --dg-line: #9ca3af; --dg-faint: #d1d5db; --dg-grid: #e5e7eb;
   --dg-surface: #ffffff; --dg-soft: #f3f4f6;
   --dg-hl: #2e8555; --dg-hl-bg: #e3f4ea;
-  --dg-ac: #ea580c; --dg-ac-t: #c2410c; --dg-ac-bg: #fdebdc;
+  --dg-ac: #ea580c; --dg-ac-t: #9a3412; --dg-ac-bg: #fdebdc;
   --dg-bad: #dc2626; --dg-bad-bg: #fde2e2;
-  --dg-blue: #3b82f6; --dg-blue-t: #2563eb; --dg-blue-bg: #dbeafe;
-  --dg-pur: #8b5cf6; --dg-pur-t: #7c3aed; --dg-pur-bg: #ede9fe;
+  --dg-blue: #3b82f6; --dg-blue-t: #1d4ed8; --dg-blue-bg: #dbeafe;
+  --dg-pur: #8b5cf6; --dg-pur-t: #6d28d9; --dg-pur-bg: #ede9fe;
+  /* Text colours, darker than the line colours so that small labels keep a
+     contrast of at least 4.5:1 on every diagram fill (WCAG AA). */
+  --dg-muted-t: #4b5563; --dg-hl-t: #1f6b43; --dg-bad-t: #b91c1c;
 }
 [data-theme='dark'] {
   --dg-fg: #e5e7eb; --dg-muted: #9ca3af; --dg-line: #6b7280; --dg-faint: #4b5563; --dg-grid: #374151;
@@ -118,6 +121,7 @@
   --dg-bad: #f87171; --dg-bad-bg: #3b1a1a;
   --dg-blue: #60a5fa; --dg-blue-t: #93c5fd; --dg-blue-bg: #172a46;
   --dg-pur: #a78bfa; --dg-pur-t: #c4b5fd; --dg-pur-bg: #2a2346;
+  --dg-muted-t: #9ca3af; --dg-hl-t: #4cc38a; --dg-bad-t: #f87171;
 }
 .dg-figure { margin: 1.5rem 0 1.75rem; text-align: center; }
 .dg-figure svg.dg { max-width: 100%; height: auto; }
@@ -125,8 +129,8 @@
 svg.dg text { font-family: var(--ifm-font-family-base); font-size: 14px; fill: var(--dg-fg); }
 svg.dg .t-s { font-size: 12px; } svg.dg .t-xs { font-size: 10.5px; } svg.dg .t-b { font-weight: 700; }
 svg.dg .t-m { font-family: var(--ifm-font-family-monospace); }
-svg.dg .t-mut { fill: var(--dg-muted); } svg.dg .t-hl { fill: var(--dg-hl); } svg.dg .t-ac { fill: var(--dg-ac-t); }
-svg.dg .t-bad { fill: var(--dg-bad); } svg.dg .t-blue { fill: var(--dg-blue-t); } svg.dg .t-pur { fill: var(--dg-pur-t); }
+svg.dg .t-mut { fill: var(--dg-muted-t); } svg.dg .t-hl { fill: var(--dg-hl-t); } svg.dg .t-ac { fill: var(--dg-ac-t); }
+svg.dg .t-bad { fill: var(--dg-bad-t); } svg.dg .t-blue { fill: var(--dg-blue-t); } svg.dg .t-pur { fill: var(--dg-pur-t); }
 svg.dg .box { fill: var(--dg-surface); stroke: var(--dg-line); stroke-width: 1.3; }
 svg.dg .box-soft { fill: var(--dg-soft); stroke: var(--dg-line); stroke-width: 1.3; }
 svg.dg .box-hl { fill: var(--dg-hl-bg); stroke: var(--dg-hl); stroke-width: 1.8; }

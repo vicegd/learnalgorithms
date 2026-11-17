@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" class="dg" viewBox="0 0 240 180" width="240" height="180" role="img">
-  <title>sum 37 + x 0 = 37, odd</title>
+  <title>Example 1 of the reachability test of the 15-puzzle: the empty cell is in cell 6, which is not shaded, and the sum is 37, odd, so the goal is unreachable</title>
   <rect class="f-hl" x="56.0" y="26.0" width="32.0" height="32.0" rx="0"/>
   <text class="t-s t-m" x="72.0" y="42.0" text-anchor="middle" dominant-baseline="central">1</text>
   <rect class="f-pur" x="88.0" y="26.0" width="32.0" height="32.0" rx="0"/>

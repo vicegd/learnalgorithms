@@ -18,6 +18,7 @@
   width: 16rem;
   outline: none;
   border-color: var(--ifm-color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ifm-color-primary) 35%, transparent);
 }
 
 .panel {
