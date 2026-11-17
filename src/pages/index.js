@@ -2,9 +2,11 @@ import React from 'react';
 import clsx from 'clsx';
 import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
+import {usePluginData} from '@docusaurus/useGlobalData';
 import Layout from '@theme/Layout';
 import styles from './index.module.css';
 import Icon from '@site/src/components/Icon';
+import {normalizePermalink, useStudyProgress} from '@site/src/utils/studyProgress';
 
 const CHAPTERS = [
   {
@@ -204,7 +206,8 @@ const ALGORITHMS_SECTION = {
   to: '/algorithms/',
 };
 
-function Intro() {
+function Intro({ totalCompleted, totalLessons, onResetProgress }) {
+  const pct = totalLessons > 0 ? Math.round((totalCompleted / totalLessons) * 100) : 0;
   return (
     <header className={styles.intro}>
       <p className={styles.heroEyebrow}>Learn Algorithms</p>
@@ -218,15 +221,38 @@ function Intro() {
         <Link className={clsx('button button--lg', styles.btnPrimary)} to="/concepts/">
           Start the course →
         </Link>
+        <Link className={clsx('button button--lg', styles.btnGhost)} to="/cheat-sheet">
+          Big-O Cheat Sheet
+        </Link>
         <Link className={clsx('button button--lg', styles.btnGhost)} to="/concepts/glossary">
           Glossary
         </Link>
       </div>
+      {totalCompleted > 0 && (
+        <div className={styles.overallProgress}>
+          <div className={styles.overallProgressHeader}>
+            <span>
+              Study progress: <strong>{totalCompleted}</strong> / {totalLessons} lessons ({pct}%)
+            </span>
+            <button
+              type="button"
+              onClick={onResetProgress}
+              className={styles.resetProgressBtn}>
+              Reset
+            </button>
+          </div>
+          <div className={styles.progressTrack} aria-hidden="true">
+            <div className={styles.progressFill} style={{ width: `${pct}%` }} />
+          </div>
+        </div>
+      )}
     </header>
   );
 }
 
-function SectionCard({ accentClass, icon, eyebrow, title, description, topics, cta, to }) {
+function SectionCard({ accentClass, icon, eyebrow, title, description, topics, cta, to, progress }) {
+  const hasProgress = progress && progress.completed > 0 && progress.total > 0;
+  const pct = hasProgress ? Math.round((progress.completed / progress.total) * 100) : 0;
   return (
     <article className={clsx(styles.card, accentClass)}>
       {icon && <div className={styles.cardIcon}>{icon}</div>}
@@ -251,6 +277,17 @@ function SectionCard({ accentClass, icon, eyebrow, title, description, topics, c
           })}
         </ul>
       )}
+      {hasProgress && (
+        <div className={styles.cardProgress}>
+          <div className={styles.cardProgressLabel}>
+            <span>{progress.completed} / {progress.total} completed</span>
+            <span>{pct}%</span>
+          </div>
+          <div className={styles.progressTrack} aria-hidden="true">
+            <div className={styles.progressFill} style={{ width: `${pct}%` }} />
+          </div>
+        </div>
+      )}
       <div className={styles.cardFooter}>
         {to ? (
           <Link className={clsx(styles.cardLink, accentClass)} to={to}>
@@ -264,17 +301,44 @@ function SectionCard({ accentClass, icon, eyebrow, title, description, topics, c
   );
 }
 
+function getChapterLessons(chapterTo, concepts) {
+  const base = normalizePermalink(chapterTo);
+  if (base === '/concepts/synthesis/choosing-a-technique') {
+    return concepts.filter((c) => normalizePermalink(c.url) === base);
+  }
+  return concepts.filter((c) => normalizePermalink(c.url).startsWith(`${base}/`));
+}
+
 export default function Home() {
   const { siteConfig } = useDocusaurusContext();
+  const siteData = usePluginData('docusaurus-plugin-site-data');
+  const concepts = siteData?.concepts || [];
+  const { isCompleted, resetProgress } = useStudyProgress();
   const showAlgorithms = siteConfig.customFields?.showAlgorithms !== false;
+
+  const totalLessons = concepts.length;
+  const totalCompleted = concepts.filter((c) => isCompleted(c.url)).length;
+
   return (
     <Layout title="Home" description={siteConfig.tagline}>
       <main className={styles.main}>
-        <Intro />
+        <Intro
+          totalCompleted={totalCompleted}
+          totalLessons={totalLessons}
+          onResetProgress={resetProgress}
+        />
         <div className={styles.grid}>
-          {CHAPTERS.map((s) => (
-            <SectionCard key={s.title} {...s} />
-          ))}
+          {CHAPTERS.map((s) => {
+            const lessons = getChapterLessons(s.to, concepts);
+            const completedCount = lessons.filter((c) => isCompleted(c.url)).length;
+            return (
+              <SectionCard
+                key={s.title}
+                {...s}
+                progress={{ completed: completedCount, total: lessons.length }}
+              />
+            );
+          })}
         </div>
         {showAlgorithms && (
           <section className={styles.part}>
