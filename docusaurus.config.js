@@ -123,6 +123,11 @@ const config = {
               ]
             : []),
           {
+            to: '/cheat-sheet',
+            label: 'Cheat Sheet',
+            position: 'left',
+          },
+          {
             href: 'https://github.com/vicegd/learnalgorithms',
             label: 'GitHub',
             position: 'right',
