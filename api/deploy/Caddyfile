@@ -1,0 +1,17 @@
+# HTTPS with automatic Let's Encrypt certificates.
+api.learnalgorithms.dev {
+	request_body {
+		max_size 1MB
+	}
+	reverse_proxy api:8080 {
+		# The API trusts only this header for the client IP; Caddy overwrites
+		# any value sent by the client.
+		header_up X-Real-IP {remote_host}
+	}
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		-Server
+	}
+	encode gzip
+	# No "log" directive: Caddy keeps no access log, so no IP addresses are stored.
+}
