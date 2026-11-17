@@ -16,6 +16,7 @@ const ALGORITHMS = [
     average: 'O(n²)',
     worst: 'O(n²)',
     space: 'O(1)',
+    props: ['In-place', 'Optimal'],
     notes: 'Checks every pair (i, j); baseline for stress testing.',
     lessonUrl: '/concepts/principles-of-algorithmics/case-study-pairwise#step-4-the-brute-force-approach',
     codeUrl: `${JAVA_REPO}/foundation`,
@@ -28,6 +29,7 @@ const ALGORITHMS = [
     average: 'O(n log n)',
     worst: 'O(n log n)',
     space: 'O(log n)',
+    props: ['Optimal'],
     notes: 'Sorts the array first and multiplies the last two elements.',
     lessonUrl: '/concepts/principles-of-algorithmics/case-study-pairwise#step-5-improving-time-by-sorting',
     codeUrl: `${JAVA_REPO}/foundation`,
@@ -40,6 +42,7 @@ const ALGORITHMS = [
     average: 'O(n)',
     worst: 'O(n)',
     space: 'O(1)',
+    props: ['In-place', 'Optimal'],
     notes: 'Single pass tracking the two largest elements.',
     lessonUrl: '/concepts/principles-of-algorithmics/case-study-pairwise#step-7-the-optimal-linear-solution',
     codeUrl: `${JAVA_REPO}/foundation`,
@@ -52,6 +55,7 @@ const ALGORITHMS = [
     average: 'O(n)',
     worst: 'O(n)',
     space: 'O(1)',
+    props: ['In-place', 'Optimal'],
     notes: 'Works on unsorted arrays.',
     lessonUrl: '/concepts/principles-of-algorithmics/searching-case-studies',
     codeUrl: `${JAVA_REPO}/foundation`,
@@ -64,6 +68,7 @@ const ALGORITHMS = [
     average: 'O(n)',
     worst: 'O(n)',
     space: 'O(1)',
+    props: ['In-place', 'Optimal'],
     notes: 'Eliminates the bounds check inside the loop.',
     lessonUrl: '/concepts/principles-of-algorithmics/searching-case-studies#sequential-search-with-a-sentinel',
     codeUrl: `${JAVA_REPO}/foundation`,
@@ -76,6 +81,7 @@ const ALGORITHMS = [
     average: 'O(n + m)',
     worst: 'O(n · m)',
     space: 'O(1)',
+    props: ['In-place', 'Optimal'],
     notes: 'Brute-force pattern search of length m in text of length n.',
     lessonUrl: '/concepts/brute-force/brute-force-and-exhaustive-search#example-naive-string-matching',
     codeUrl: `${JAVA_REPO}/foundation`,
@@ -88,6 +94,7 @@ const ALGORITHMS = [
     average: 'O(2^n · n)',
     worst: 'O(2^n · n)',
     space: 'O(n)',
+    props: ['Optimal'],
     notes: 'Generates and tests all 2^n subsets; useful only for small n or as a test oracle.',
     lessonUrl: '/concepts/brute-force/brute-force-and-exhaustive-search#example-exhaustive-search-over-subsets',
     codeUrl: `${JAVA_REPO}/foundation`,
@@ -102,7 +109,8 @@ const ALGORITHMS = [
     average: 'O(n²)',
     worst: 'O(n²)',
     space: 'O(1)',
-    notes: 'Stable, in-place; O(n) best case with early-exit flag.',
+    props: ['Stable', 'In-place'],
+    notes: 'O(n) best case with early-exit flag.',
     lessonUrl: '/concepts/sorting/bubble-sort',
     codeUrl: `${JAVA_REPO}/sorting`,
   },
@@ -114,6 +122,7 @@ const ALGORITHMS = [
     average: 'O(n²)',
     worst: 'O(n²)',
     space: 'O(1)',
+    props: ['Stable', 'In-place'],
     notes: 'Tracks the last swap index to skip already-sorted suffixes.',
     lessonUrl: '/concepts/sorting/bubble-sort#bubble-sort-with-a-sentinel',
     codeUrl: `${JAVA_REPO}/sorting`,
@@ -126,6 +135,7 @@ const ALGORITHMS = [
     average: 'O(n²)',
     worst: 'O(n²)',
     space: 'O(1)',
+    props: ['Stable', 'In-place'],
     notes: 'Cocktail shaker sort; mitigates the "turtles" problem.',
     lessonUrl: '/concepts/sorting/bubble-sort#bidirectional-bubble-sort',
     codeUrl: `${JAVA_REPO}/sorting`,
@@ -138,7 +148,8 @@ const ALGORITHMS = [
     average: 'O(n²)',
     worst: 'O(n²)',
     space: 'O(1)',
-    notes: 'Stable, in-place, adaptive; very fast on small or nearly sorted inputs.',
+    props: ['Stable', 'In-place'],
+    notes: 'Adaptive; very fast on small or nearly sorted inputs.',
     lessonUrl: '/concepts/sorting/insertion-sort',
     codeUrl: `${JAVA_REPO}/sorting`,
   },
@@ -150,6 +161,7 @@ const ALGORITHMS = [
     average: 'O(n²)',
     worst: 'O(n²)',
     space: 'O(1)',
+    props: ['Stable', 'In-place'],
     notes: 'Reduces comparisons to O(n log n), but shifts remain O(n²).',
     lessonUrl: '/concepts/sorting/insertion-sort#binary-insertion',
     codeUrl: `${JAVA_REPO}/sorting`,
@@ -162,7 +174,8 @@ const ALGORITHMS = [
     average: 'O(n²)',
     worst: 'O(n²)',
     space: 'O(1)',
-    notes: 'In-place, not stable; performs at most n - 1 swaps.',
+    props: ['In-place'],
+    notes: 'Not stable; performs at most n - 1 swaps.',
     lessonUrl: '/concepts/sorting/selection-sort',
     codeUrl: `${JAVA_REPO}/sorting`,
   },
@@ -174,7 +187,8 @@ const ALGORITHMS = [
     average: 'O(n^1.3–n^1.5)',
     worst: 'O(n²)',
     space: 'O(1)',
-    notes: 'In-place, not stable; complexity depends on gap sequence.',
+    props: ['In-place'],
+    notes: 'Not stable; complexity depends on gap sequence.',
     lessonUrl: '/concepts/sorting/efficient-sorting#shellsort-insertion-over-long-distances',
     codeUrl: `${JAVA_REPO}/sorting`,
   },
@@ -186,7 +200,8 @@ const ALGORITHMS = [
     average: 'O(n log n)',
     worst: 'O(n²)',
     space: 'O(log n)',
-    notes: 'In-place, not stable; median-of-three reduces worst-case risk.',
+    props: ['In-place'],
+    notes: 'Not stable; median-of-three reduces worst-case risk.',
     lessonUrl: '/concepts/sorting/quicksort',
     codeUrl: `${JAVA_REPO}/sorting`,
   },
@@ -198,7 +213,8 @@ const ALGORITHMS = [
     average: 'O(n log n)',
     worst: 'O(n log n)',
     space: 'O(1)',
-    notes: 'In-place, not stable; guaranteed O(n log n) worst case.',
+    props: ['In-place'],
+    notes: 'Not stable; guaranteed O(n log n) worst case.',
     lessonUrl: '/concepts/sorting/efficient-sorting#heapsort-selection-with-a-heap',
     codeUrl: `${JAVA_REPO}/sorting`,
   },
@@ -210,7 +226,8 @@ const ALGORITHMS = [
     average: 'O(n log n)',
     worst: 'O(n log n)',
     space: 'O(n)',
-    notes: 'Stable; classic Divide & Conquer with guaranteed O(n log n).',
+    props: ['Stable'],
+    notes: 'Classic Divide & Conquer with guaranteed O(n log n).',
     lessonUrl: '/concepts/sorting/efficient-sorting#mergesort-sorting-by-merging',
     codeUrl: `${JAVA_REPO}/sorting`,
   },
@@ -222,7 +239,8 @@ const ALGORITHMS = [
     average: 'O(n + k)',
     worst: 'O(n + k)',
     space: 'O(n + k)',
-    notes: 'Non-comparison stable sort for integer keys in range [0, k).',
+    props: ['Stable'],
+    notes: 'Non-comparison sort for integer keys in range [0, k).',
     lessonUrl: '/concepts/sorting/efficient-sorting#counting-sort-and-binsort',
     codeUrl: `${JAVA_REPO}/sorting`,
   },
@@ -234,6 +252,7 @@ const ALGORITHMS = [
     average: 'O(d(n + k))',
     worst: 'O(d(n + k))',
     space: 'O(n + k)',
+    props: ['Stable'],
     notes: 'Non-comparison sort; linear when digit count d and base k are small.',
     lessonUrl: '/concepts/sorting/efficient-sorting#sorting-without-comparisons',
     codeUrl: `${JAVA_REPO}/sorting`,
@@ -248,6 +267,7 @@ const ALGORITHMS = [
     average: 'O(log n)',
     worst: 'O(log n)',
     space: 'O(1)',
+    props: ['In-place', 'Optimal'],
     notes: 'Requires a sorted array; iterative uses O(1) space.',
     lessonUrl: '/concepts/divide-and-conquer/numbers-and-searches#sequential-and-binary-search',
     codeUrl: `${JAVA_REPO}/divideconquer`,
@@ -260,6 +280,7 @@ const ALGORITHMS = [
     average: 'O(n)',
     worst: 'O(n)',
     space: 'O(log n)',
+    props: ['Optimal'],
     notes: 'Splits array in half recursively; O(log n) call stack.',
     lessonUrl: '/concepts/divide-and-conquer/divide-and-conquer-scheme#a-first-example-three-ways-of-summing-a-vector',
     codeUrl: `${JAVA_REPO}/divideconquer`,
@@ -272,6 +293,7 @@ const ALGORITHMS = [
     average: 'O(2^n)',
     worst: 'O(2^n)',
     space: 'O(n)',
+    props: ['Optimal'],
     notes: 'Actually Θ(φ^n); exponential due to overlapping subproblems.',
     lessonUrl: '/concepts/divide-and-conquer/numbers-and-searches#the-fibonacci-numbers',
     codeUrl: `${JAVA_REPO}/divideconquer`,
@@ -284,6 +306,7 @@ const ALGORITHMS = [
     average: 'O(log b)',
     worst: 'O(log b)',
     space: 'O(1)',
+    props: ['In-place', 'Optimal'],
     notes: 'Computes gcd(a, b) via repeated modulo reduction.',
     lessonUrl: '/concepts/divide-and-conquer/numbers-and-searches#euclids-algorithm',
     codeUrl: `${JAVA_REPO}/divideconquer`,
@@ -296,6 +319,7 @@ const ALGORITHMS = [
     average: 'O(2^n)',
     worst: 'O(2^n)',
     space: 'O(n)',
+    props: ['Optimal'],
     notes: 'Minimum 2^n - 1 moves; classic subtraction recurrence T(n) = 2T(n-1) + 1.',
     lessonUrl: '/concepts/divide-and-conquer/classic-problems#the-towers-of-hanoi',
     codeUrl: `${JAVA_REPO}/divideconquer`,
@@ -308,6 +332,7 @@ const ALGORITHMS = [
     average: 'O(n^1.585)',
     worst: 'O(n^1.585)',
     space: 'O(n)',
+    props: ['Optimal'],
     notes: 'Multiplies n-digit integers with 3 recursive calls instead of 4.',
     lessonUrl: '/concepts/divide-and-conquer/classic-problems#multiplication-of-large-integers',
     codeUrl: `${JAVA_REPO}/divideconquer`,
@@ -320,6 +345,7 @@ const ALGORITHMS = [
     average: 'O(n²)',
     worst: 'O(n²)',
     space: 'O(n²)',
+    props: ['Optimal'],
     notes: 'Builds a round-robin schedule for n = 2^k players; optimal for output size.',
     lessonUrl: '/concepts/divide-and-conquer/classic-problems#the-tennis-tournament',
     codeUrl: `${JAVA_REPO}/divideconquer`,
@@ -332,6 +358,7 @@ const ALGORITHMS = [
     average: 'O(n²)',
     worst: 'O(n²)',
     space: 'O(n²)',
+    props: ['Optimal'],
     notes: 'Tiles a 2^k × 2^k board (n = 2^k) minus one square in 4 quadrants.',
     lessonUrl: '/concepts/divide-and-conquer/classic-problems#the-tromino-puzzle',
     codeUrl: `${JAVA_REPO}/divideconquer`,
@@ -344,6 +371,7 @@ const ALGORITHMS = [
     average: 'O(n log n)',
     worst: 'O(n log n)',
     space: 'O(log n)',
+    props: ['Optimal'],
     notes: 'Finds an element appearing > n/2 times by halving and counting.',
     lessonUrl: '/concepts/divide-and-conquer/majority-mode-and-median#the-majority-element',
     codeUrl: `${JAVA_REPO}/divideconquer`,
@@ -356,6 +384,7 @@ const ALGORITHMS = [
     average: 'O(n log n)',
     worst: 'O(n log n)',
     space: 'O(log n)',
+    props: ['Optimal'],
     notes: 'Improves over O(n²) brute force by sorting or partitioning.',
     lessonUrl: '/concepts/divide-and-conquer/majority-mode-and-median#the-mode',
     codeUrl: `${JAVA_REPO}/divideconquer`,
@@ -368,6 +397,7 @@ const ALGORITHMS = [
     average: 'O(n)',
     worst: 'O(n²)',
     space: 'O(log n)',
+    props: ['In-place', 'Optimal'],
     notes: 'Finds the k-th smallest element without sorting the whole array.',
     lessonUrl: '/concepts/divide-and-conquer/majority-mode-and-median#the-median',
     codeUrl: `${JAVA_REPO}/divideconquer`,
@@ -382,6 +412,7 @@ const ALGORITHMS = [
     average: 'O(n)',
     worst: 'O(n)',
     space: 'O(1)',
+    props: ['In-place'],
     notes: 'Optimal only for canonical coin systems (e.g. euros); can fail otherwise.',
     lessonUrl: '/concepts/greedy-algorithms/greedy-method#the-problem-of-the-change',
     codeUrl: `${JAVA_REPO}/greedy`,
@@ -394,6 +425,7 @@ const ALGORITHMS = [
     average: 'O(n log n)',
     worst: 'O(n log n)',
     space: 'O(1)',
+    props: ['Optimal'],
     notes: 'Optimal for maximizing file count (smallest first), not for minimizing free space.',
     lessonUrl: '/concepts/greedy-algorithms/classic-problems#files-on-a-disk',
     codeUrl: `${JAVA_REPO}/greedy`,
@@ -406,6 +438,7 @@ const ALGORITHMS = [
     average: 'O(n log n)',
     worst: 'O(n log n)',
     space: 'O(1)',
+    props: ['Optimal'],
     notes: 'Optimal when items can be broken; sort by value/weight ratio.',
     lessonUrl: '/concepts/greedy-algorithms/classic-problems#the-knapsack-problem',
     codeUrl: `${JAVA_REPO}/greedy`,
@@ -418,6 +451,7 @@ const ALGORITHMS = [
     average: 'O(n log n)',
     worst: 'O(n log n)',
     space: 'O(1)',
+    props: ['Optimal'],
     notes: 'Shortest processing time first minimizes total waiting time.',
     lessonUrl: '/concepts/greedy-algorithms/classic-problems#the-diligent-plumber',
     codeUrl: `${JAVA_REPO}/greedy`,
@@ -430,6 +464,7 @@ const ALGORITHMS = [
     average: 'O(n²)',
     worst: 'O(n²)',
     space: 'O(n²)',
+    props: [],
     notes: 'Heuristic choosing the square with fewest onward moves on an n × n board.',
     lessonUrl: '/concepts/greedy-algorithms/classic-problems#the-knights-tour',
     codeUrl: `${JAVA_REPO}/greedy`,
@@ -442,6 +477,7 @@ const ALGORITHMS = [
     average: 'O(n²)',
     worst: 'O(n²)',
     space: 'O(n)',
+    props: [],
     notes: 'Fast heuristic, but does not guarantee the global minimum cost.',
     lessonUrl: '/concepts/greedy-algorithms/classic-problems#assigning-tasks-to-agents',
     codeUrl: `${JAVA_REPO}/greedy`,
@@ -454,6 +490,7 @@ const ALGORITHMS = [
     average: 'O(V + E)',
     worst: 'O(V²)',
     space: 'O(V)',
+    props: [],
     notes: 'Produces a valid coloring quickly, though not always with minimum colors.',
     lessonUrl: '/concepts/greedy-algorithms/classic-problems#graph-coloring',
     codeUrl: `${JAVA_REPO}/greedy`,
@@ -466,6 +503,7 @@ const ALGORITHMS = [
     average: 'O(E log V)',
     worst: 'O(E log V)',
     space: 'O(V + E)',
+    props: ['Optimal'],
     notes: 'Guaranteed optimal Minimum Spanning Tree via priority queue or Union-Find.',
     lessonUrl: '/concepts/greedy-algorithms/classic-problems#minimum-spanning-trees-prim-and-kruskal',
     codeUrl: `${JAVA_REPO}/greedy`,
@@ -480,6 +518,7 @@ const ALGORITHMS = [
     average: 'O(n)',
     worst: 'O(n)',
     space: 'O(n)',
+    props: ['Optimal'],
     notes: 'Eliminates redundant calls; space can be reduced to O(1).',
     lessonUrl: '/concepts/dynamic-programming/dynamic-programming-method#fibonacci-with-a-table',
     codeUrl: `${JAVA_REPO}/dynamic`,
@@ -492,6 +531,7 @@ const ALGORITHMS = [
     average: 'O(n · k)',
     worst: 'O(n · k)',
     space: 'O(n · k)',
+    props: ['Optimal'],
     notes: 'Avoids exponential recursion by filling Pascal’s triangle bottom-up.',
     lessonUrl: '/concepts/dynamic-programming/classic-problems#combinations',
     codeUrl: `${JAVA_REPO}/dynamic`,
@@ -504,6 +544,7 @@ const ALGORITHMS = [
     average: 'O(n · W)',
     worst: 'O(n · W)',
     space: 'O(n · W)',
+    props: ['Optimal'],
     notes: 'Pseudo-polynomial optimal solution; space can be reduced to O(W).',
     lessonUrl: '/concepts/dynamic-programming/classic-problems#the-01-knapsack-problem',
     codeUrl: `${JAVA_REPO}/dynamic`,
@@ -516,6 +557,7 @@ const ALGORITHMS = [
     average: 'O(n · A)',
     worst: 'O(n · A)',
     space: 'O(A)',
+    props: ['Optimal'],
     notes: 'Optimal for arbitrary coin systems where Greedy can fail.',
     lessonUrl: '/concepts/dynamic-programming/classic-problems#the-problem-of-the-change',
     codeUrl: `${JAVA_REPO}/dynamic`,
@@ -528,6 +570,7 @@ const ALGORITHMS = [
     average: 'O(n²)',
     worst: 'O(n²)',
     space: 'O(n²)',
+    props: ['Optimal'],
     notes: 'All-pairs minimum cost along a DAG of river piers.',
     lessonUrl: '/concepts/dynamic-programming/classic-problems#cheaper-travel-on-the-river',
     codeUrl: `${JAVA_REPO}/dynamic`,
@@ -540,6 +583,7 @@ const ALGORITHMS = [
     average: 'O(n · m)',
     worst: 'O(n · m)',
     space: 'O(n · m)',
+    props: ['Optimal'],
     notes: '2D table over prefixes of two strings of lengths n and m.',
     lessonUrl: '/concepts/dynamic-programming/classic-problems#longest-common-subsequence-lcs',
     codeUrl: `${JAVA_REPO}/dynamic`,
@@ -552,6 +596,7 @@ const ALGORITHMS = [
     average: 'O(n · m)',
     worst: 'O(n · m)',
     space: 'O(n · m)',
+    props: ['Optimal'],
     notes: 'Minimum insertions, deletions, and substitutions between two strings.',
     lessonUrl: '/concepts/dynamic-programming/classic-problems#edit-distance',
     codeUrl: `${JAVA_REPO}/dynamic`,
@@ -566,6 +611,7 @@ const ALGORITHMS = [
     average: 'O(n!)',
     worst: 'O(n!)',
     space: 'O(n)',
+    props: ['Optimal'],
     notes: 'Explores all n! orderings using a state vector and visited flags.',
     lessonUrl: '/concepts/backtracking/classic-problems#permutations',
     codeUrl: `${JAVA_REPO}/backtracking`,
@@ -578,6 +624,7 @@ const ALGORITHMS = [
     average: 'O(2^n)',
     worst: 'O(2^n)',
     space: 'O(n)',
+    props: ['Optimal'],
     notes: 'Prunes branches when current sum exceeds target or remaining sum is insufficient.',
     lessonUrl: '/concepts/backtracking/classic-problems#subset-sum',
     codeUrl: `${JAVA_REPO}/backtracking`,
@@ -590,6 +637,7 @@ const ALGORITHMS = [
     average: 'O(n!)',
     worst: 'O(n!)',
     space: 'O(n)',
+    props: ['Optimal'],
     notes: 'Prunes invalid column/diagonal placements in O(1) per step.',
     lessonUrl: '/concepts/backtracking/classic-problems#n-queens',
     codeUrl: `${JAVA_REPO}/backtracking`,
@@ -602,6 +650,7 @@ const ALGORITHMS = [
     average: 'O(8^(n²))',
     worst: 'O(8^(n²))',
     space: 'O(n²)',
+    props: ['Optimal'],
     notes: 'Finds one or all tours; Warnsdorff ordering dramatically speeds up first solution.',
     lessonUrl: '/concepts/backtracking/classic-problems#knights-tour',
     codeUrl: `${JAVA_REPO}/backtracking`,
@@ -614,6 +663,7 @@ const ALGORITHMS = [
     average: 'O(m^V)',
     worst: 'O(m^V)',
     space: 'O(V)',
+    props: ['Optimal'],
     notes: 'Finds exact k-coloring or chromatic number with m available colors.',
     lessonUrl: '/concepts/backtracking/classic-problems#graph-coloring',
     codeUrl: `${JAVA_REPO}/backtracking`,
@@ -626,6 +676,7 @@ const ALGORITHMS = [
     average: 'O(n!)',
     worst: 'O(n!)',
     space: 'O(n)',
+    props: ['Optimal'],
     notes: 'Exact minimum-cost assignment with bound pruning.',
     lessonUrl: '/concepts/backtracking/classic-problems#task-assignment',
     codeUrl: `${JAVA_REPO}/backtracking`,
@@ -638,6 +689,7 @@ const ALGORITHMS = [
     average: 'O(9^k)',
     worst: 'O(9^k)',
     space: 'O(k)',
+    props: ['Optimal'],
     notes: 'k empty cells; row/column/box constraints prune almost all invalid branches.',
     lessonUrl: '/concepts/backtracking/classic-problems#sudoku',
     codeUrl: `${JAVA_REPO}/backtracking`,
@@ -652,6 +704,7 @@ const ALGORITHMS = [
     average: 'O(2^n)',
     worst: 'O(n!)',
     space: 'O(n!)',
+    props: ['Optimal'],
     notes: 'Best-first search using row-minimum lower bounds.',
     lessonUrl: '/concepts/branch-and-bound/classic-problems#task-assignment',
     codeUrl: `${JAVA_REPO}/branchandbound`,
@@ -664,6 +717,7 @@ const ALGORITHMS = [
     average: 'O(2^n)',
     worst: 'O(2^n)',
     space: 'O(2^n)',
+    props: ['Optimal'],
     notes: 'Uses fractional-knapsack upper bound to prune non-promising subtrees.',
     lessonUrl: '/concepts/branch-and-bound/classic-problems#01-knapsack',
     codeUrl: `${JAVA_REPO}/branchandbound`,
@@ -676,6 +730,7 @@ const ALGORITHMS = [
     average: 'O(b^d)',
     worst: 'O(b^d)',
     space: 'O(b^d)',
+    props: ['Optimal'],
     notes: 'Uses admissible Manhattan-distance heuristic g + h; checks parity reachability.',
     lessonUrl: '/concepts/branch-and-bound/classic-problems#sliding-puzzles',
     codeUrl: `${JAVA_REPO}/branchandbound`,
@@ -688,6 +743,7 @@ const ALGORITHMS = [
     average: 'O(2^n · n)',
     worst: 'O(n!)',
     space: 'O(n!)',
+    props: ['Optimal'],
     notes: 'Priority-queue search guided by lower-bound cost estimates.',
     lessonUrl: '/concepts/branch-and-bound/classic-problems#the-traveling-salesman',
     codeUrl: `${JAVA_REPO}/branchandbound`,
@@ -702,6 +758,7 @@ const ALGORITHMS = [
     average: 'O(n / p + log n)',
     worst: 'O(n / p + log n)',
     space: 'O(log n)',
+    props: ['Optimal'],
     notes: 'Work W(n) = O(n), Span D(n) = O(log n) using sequential threshold.',
     lessonUrl: '/concepts/parallel-algorithms/fork-join-framework#example-2-summing-the-elements-of-an-array',
     codeUrl: `${JAVA_REPO}/parallel`,
@@ -714,6 +771,7 @@ const ALGORITHMS = [
     average: 'O((n log n) / p)',
     worst: 'O(n²)',
     space: 'O(log n)',
+    props: ['In-place'],
     notes: 'Forks subarray sorting above threshold; span limited by sequential partition.',
     lessonUrl: '/concepts/parallel-algorithms/fork-join-framework#example-5-parallel-quicksort',
     codeUrl: `${JAVA_REPO}/parallel`,
@@ -733,6 +791,8 @@ const PARADIGMS = [
   'Parallel',
 ];
 
+const PROPERTY_FILTERS = ['All', 'Stable', 'In-place', 'Optimal'];
+
 function complexityTier(expr) {
   const s = expr.toLowerCase();
   if (s.includes('2^n') || s.includes('n!') || s.includes('^k') || s.includes('^v') || s.includes('8^(')) {
@@ -748,23 +808,60 @@ function complexityTier(expr) {
   return styles.tierMedium;
 }
 
+function complexityRank(expr) {
+  const s = expr.toLowerCase();
+  if (s === 'o(1)') return 1;
+  if (s === 'o(d)' || s.includes('log b') || (s.includes('log n') && !s.includes('n log n') && !s.includes('/ p'))) return 2;
+  if (s.includes('n / p')) return 3;
+  if (s === 'o(n)' || s === 'o(k)') return 4;
+  if (s.includes('n + k') || s.includes('n + m') || s.includes('v + e') || s === 'o(v)' || s === 'o(a)') return 5;
+  if (s.includes('n log n') || s.includes('e log v')) return 6;
+  if (s.includes('^1.3')) return 7;
+  if (s.includes('^1.585')) return 8;
+  if (s.includes('n²') || s.includes('v²')) return 9;
+  if (s.includes('n · m') || s.includes('n · w') || s.includes('n · a') || s.includes('n · k')) return 10;
+  if (s.includes('2^n · n')) return 12;
+  if (s.includes('2^n')) return 11;
+  if (s.includes('^d') || s.includes('^v') || s.includes('^k')) return 13;
+  if (s.includes('8^(')) return 14;
+  if (s.includes('n!')) return 15;
+  return 99;
+}
+
 export default function CheatSheetPage() {
   const [query, setQuery] = useState('');
   const [paradigm, setParadigm] = useState('All');
+  const [propFilter, setPropFilter] = useState('All');
+  const [sortBy, setSortBy] = useState({key: null, dir: 'asc'});
   const [selectedIds, setSelectedIds] = useState([]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return ALGORITHMS.filter((alg) => {
+    const list = ALGORITHMS.filter((alg) => {
       if (paradigm !== 'All' && alg.paradigm !== paradigm) return false;
+      if (propFilter !== 'All' && !alg.props.includes(propFilter)) return false;
       if (!q) return true;
       return (
         alg.name.toLowerCase().includes(q) ||
         alg.paradigm.toLowerCase().includes(q) ||
-        alg.notes.toLowerCase().includes(q)
+        alg.notes.toLowerCase().includes(q) ||
+        alg.props.some((p) => p.toLowerCase().includes(q))
       );
     });
-  }, [query, paradigm]);
+
+    if (!sortBy.key) return list;
+
+    return [...list].sort((a, b) => {
+      let cmp = 0;
+      if (sortBy.key === 'name') {
+        cmp = a.name.localeCompare(b.name);
+      } else {
+        cmp = complexityRank(a[sortBy.key]) - complexityRank(b[sortBy.key]);
+        if (cmp === 0) cmp = a.name.localeCompare(b.name);
+      }
+      return sortBy.dir === 'asc' ? cmp : -cmp;
+    });
+  }, [query, paradigm, propFilter, sortBy]);
 
   const selectedAlgorithms = useMemo(
     () => ALGORITHMS.filter((alg) => selectedIds.includes(alg.id)),
@@ -779,6 +876,19 @@ export default function CheatSheetPage() {
     });
   }
 
+  function cycleSort(key) {
+    setSortBy((prev) => {
+      if (prev.key !== key) return {key, dir: 'asc'};
+      if (prev.dir === 'asc') return {key, dir: 'desc'};
+      return {key: null, dir: 'asc'};
+    });
+  }
+
+  function sortIndicator(key) {
+    if (sortBy.key !== key) return '↕';
+    return sortBy.dir === 'asc' ? '↑' : '↓';
+  }
+
   return (
     <Layout
       title="Big-O Cheat Sheet"
@@ -788,7 +898,7 @@ export default function CheatSheetPage() {
           <p className={styles.eyebrow}>Quick Reference</p>
           <h1 className={styles.title}>Big-O Complexity Cheat Sheet</h1>
           <p className={styles.subtitle}>
-            Filter by paradigm, search by algorithm or property, and select up to 3 algorithms to
+            Filter by paradigm or property, sort by complexity, and select up to 3 algorithms to
             compare their time and space complexities side by side.
           </p>
         </header>
@@ -817,6 +927,20 @@ export default function CheatSheetPage() {
                 className={clsx(styles.filterBtn, paradigm === p && styles.filterBtnActive)}
                 aria-pressed={paradigm === p}>
                 {p}
+              </button>
+            ))}
+          </div>
+
+          <div className={styles.propertyRow} role="group" aria-label="Filter by property">
+            <span className={styles.propertyLabel}>Properties:</span>
+            {PROPERTY_FILTERS.map((prop) => (
+              <button
+                key={prop}
+                type="button"
+                onClick={() => setPropFilter(prop)}
+                className={clsx(styles.filterBtn, propFilter === prop && styles.filterBtnActive)}
+                aria-pressed={propFilter === prop}>
+                {prop}
               </button>
             ))}
           </div>
@@ -871,12 +995,32 @@ export default function CheatSheetPage() {
             <thead>
               <tr>
                 <th>Compare</th>
-                <th>Algorithm</th>
+                <th>
+                  <button type="button" className={styles.sortBtn} onClick={() => cycleSort('name')}>
+                    Algorithm <span>{sortIndicator('name')}</span>
+                  </button>
+                </th>
                 <th>Paradigm</th>
-                <th>Best</th>
-                <th>Average</th>
-                <th>Worst</th>
-                <th>Space</th>
+                <th>
+                  <button type="button" className={styles.sortBtn} onClick={() => cycleSort('best')}>
+                    Best <span>{sortIndicator('best')}</span>
+                  </button>
+                </th>
+                <th>
+                  <button type="button" className={styles.sortBtn} onClick={() => cycleSort('average')}>
+                    Average <span>{sortIndicator('average')}</span>
+                  </button>
+                </th>
+                <th>
+                  <button type="button" className={styles.sortBtn} onClick={() => cycleSort('worst')}>
+                    Worst <span>{sortIndicator('worst')}</span>
+                  </button>
+                </th>
+                <th>
+                  <button type="button" className={styles.sortBtn} onClick={() => cycleSort('space')}>
+                    Space <span>{sortIndicator('space')}</span>
+                  </button>
+                </th>
                 <th>Resources</th>
               </tr>
             </thead>
@@ -903,6 +1047,13 @@ export default function CheatSheetPage() {
                       <td>
                         <span className={styles.algName}>{alg.name}</span>
                         <span className={styles.algNotes}>{alg.notes}</span>
+                        {alg.props.length > 0 && (
+                          <div className={styles.propTags}>
+                            {alg.props.map((p) => (
+                              <span key={p} className={styles.propTag}>{p}</span>
+                            ))}
+                          </div>
+                        )}
                       </td>
                       <td>
                         <span className={styles.paradigmTag}>{alg.paradigm}</span>
