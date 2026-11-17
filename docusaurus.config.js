@@ -150,6 +150,21 @@ const config = {
   clientModules: ['./src/matomo.js'],
 
   headTags: [
+    // Security: Content Security Policy. GitHub Pages cannot send HTTP headers,
+    // so the policy goes in a <meta> tag (frame-ancestors and report-uri are
+    // not available this way). 'unsafe-inline' is needed by the inline scripts
+    // of Docusaurus and Matomo; every external origin is listed explicitly.
+    {
+      tagName: 'meta',
+      attributes: {
+        'http-equiv': 'Content-Security-Policy',
+        content: "default-src 'self'; script-src 'self' 'unsafe-inline' https://stats.garcia.at; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' data: https://cdn.jsdelivr.net; img-src 'self' data: https://stats.garcia.at; connect-src 'self' https://stats.garcia.at https://api.learnalgorithms.dev; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests",
+      },
+    },
+    {
+      tagName: 'meta',
+      attributes: {name: 'referrer', content: 'strict-origin-when-cross-origin'},
+    },
     {
       tagName: 'script',
       attributes: {},
