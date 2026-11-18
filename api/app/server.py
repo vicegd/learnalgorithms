@@ -10,8 +10,11 @@ GET  /health                    Liveness check.
 POST /feedback                  "Was this page helpful?" vote, with an optional comment.
 GET  /feedback/summary?page=... Aggregated votes of one page.
 GET  /popular                   Most read lessons of the last 7 days (from Matomo).
+POST /events                    Anonymous student/usage telemetry events.
 POST /webhooks/github           GitHub "issues" events, verified with HMAC-SHA256.
 GET  /admin/feedback            Latest votes and comments (Bearer token).
+GET  /admin/stats               Aggregated telemetry for teaching innovation (Bearer token).
+GET  /admin/events              Raw anonymized telemetry events in JSON or CSV (Bearer token).
 
 Security
 --------
@@ -24,9 +27,11 @@ Security
   variables; tokens compared in constant time.
 * Restrictive security headers on every response.
 """
+import csv
 import datetime as dt
 import hashlib
 import hmac
+import io
 import json
 import logging
 import os
@@ -54,13 +59,30 @@ PORT = int(os.environ.get("PORT", "8080"))
 MAX_BODY = 4 * 1024             # bytes, public endpoints
 MAX_WEBHOOK_BODY = 512 * 1024   # bytes, GitHub webhooks
 MAX_COMMENT = 500               # characters
+MAX_META = 512                  # bytes, serialized event metadata
+MAX_EVENT_BATCH = 20            # events per POST /events request
+MAX_DURATION_MS = 3_600_000     # 1 hour cap per page_leave event
 MIN_TIME_ON_PAGE_MS = 3000      # faster submissions are treated as bots
 RATE_LIMIT = 60                 # votes per window and IP (a campus may share one IP)
+EVENT_RATE_LIMIT = 1200         # telemetry events per window and IP
 READ_RATE_LIMIT = 600           # read requests per window and IP
 RATE_WINDOW = 3600              # seconds
 POPULAR_TTL = 900               # seconds the Matomo answer is cached
 
 PAGE_RE = re.compile(r"^/concepts(/[a-z0-9][a-z0-9-]{0,80}){1,3}/?$")
+TELEMETRY_PAGE_RE = re.compile(
+    r"^/(?:(?:concepts|algorithms)(?:/[a-z0-9][a-z0-9-]{0,80}){0,3}|cheat-sheet|stats)?/?$"
+)
+ALLOWED_EVENT_TYPES = frozenset({
+    "page_view",
+    "page_leave",
+    "lesson_complete",
+    "lesson_uncomplete",
+    "cheat_sheet_filter",
+    "cheat_sheet_compare",
+    "visualizer_interact",
+    "search",
+})
 CONTROL_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
 CLIENT_RE = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")
 
@@ -94,6 +116,20 @@ CREATE TABLE IF NOT EXISTS github_issues (
     url      TEXT,
     received TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS telemetry_events (
+    id          INTEGER PRIMARY KEY,
+    ts          TEXT    NOT NULL,
+    day         TEXT    NOT NULL,
+    session_id  TEXT    NOT NULL,
+    event_type  TEXT    NOT NULL,
+    page        TEXT    NOT NULL,
+    duration_ms INTEGER,
+    scroll_pct  INTEGER,
+    meta        TEXT
+);
+CREATE INDEX IF NOT EXISTS telemetry_day ON telemetry_events (day);
+CREATE INDEX IF NOT EXISTS telemetry_type ON telemetry_events (event_type);
+CREATE INDEX IF NOT EXISTS telemetry_page ON telemetry_events (page);
 """
 
 
@@ -138,6 +174,141 @@ class Store:
                 (delivery, action, number, title, url, dt.datetime.now(dt.timezone.utc).isoformat()),
             )
             self.db.commit()
+
+    def add_events(self, events):
+        now_dt = dt.datetime.now(dt.timezone.utc)
+        ts = now_dt.isoformat()
+        day = now_dt.date().isoformat()
+        rows = [
+            (
+                ts,
+                day,
+                e["session_id"],
+                e["event_type"],
+                e["page"],
+                e["duration_ms"],
+                e["scroll_pct"],
+                e["meta"],
+            )
+            for e in events
+        ]
+        with self.lock:
+            self.db.executemany(
+                """INSERT INTO telemetry_events
+                   (ts, day, session_id, event_type, page, duration_ms, scroll_pct, meta)
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+                rows,
+            )
+            self.db.commit()
+        return len(rows)
+
+    def stats_summary(self, days=30):
+        cutoff = (dt.date.today() - dt.timedelta(days=max(1, days) - 1)).isoformat()
+        with self.lock:
+            totals = self.db.execute(
+                """SELECT COUNT(*), COUNT(DISTINCT session_id), COUNT(DISTINCT day)
+                   FROM telemetry_events WHERE day >= ?""",
+                (cutoff,),
+            ).fetchone()
+            by_type = self.db.execute(
+                """SELECT event_type, COUNT(*)
+                   FROM telemetry_events WHERE day >= ?
+                   GROUP BY event_type ORDER BY COUNT(*) DESC""",
+                (cutoff,),
+            ).fetchall()
+            top_pages = self.db.execute(
+                """SELECT page,
+                          SUM(CASE WHEN event_type = 'page_view' THEN 1 ELSE 0 END) AS views,
+                          COUNT(DISTINCT session_id) AS sessions,
+                          ROUND(AVG(CASE WHEN event_type = 'page_leave' AND duration_ms IS NOT NULL THEN duration_ms END)) AS avg_ms,
+                          ROUND(AVG(CASE WHEN event_type = 'page_leave' AND scroll_pct IS NOT NULL THEN scroll_pct END)) AS avg_scroll
+                   FROM telemetry_events
+                   WHERE day >= ? AND event_type IN ('page_view', 'page_leave')
+                   GROUP BY page
+                   ORDER BY views DESC, sessions DESC
+                   LIMIT 50""",
+                (cutoff,),
+            ).fetchall()
+            completions = self.db.execute(
+                """SELECT page,
+                          SUM(CASE WHEN event_type = 'lesson_complete' THEN 1 ELSE 0 END) AS completed,
+                          SUM(CASE WHEN event_type = 'lesson_uncomplete' THEN 1 ELSE 0 END) AS uncompleted
+                   FROM telemetry_events
+                   WHERE day >= ? AND event_type IN ('lesson_complete', 'lesson_uncomplete')
+                   GROUP BY page
+                   ORDER BY completed DESC
+                   LIMIT 50""",
+                (cutoff,),
+            ).fetchall()
+            daily = self.db.execute(
+                """SELECT day,
+                          COUNT(DISTINCT session_id) AS sessions,
+                          SUM(CASE WHEN event_type = 'page_view' THEN 1 ELSE 0 END) AS page_views,
+                          SUM(CASE WHEN event_type = 'lesson_complete' THEN 1 ELSE 0 END) AS completions
+                   FROM telemetry_events
+                   WHERE day >= ?
+                   GROUP BY day
+                   ORDER BY day DESC""",
+                (cutoff,),
+            ).fetchall()
+        return {
+            "days": days,
+            "since": cutoff,
+            "totals": {
+                "events": totals[0],
+                "sessions": totals[1],
+                "activeDays": totals[2],
+            },
+            "eventsByType": {t: c for t, c in by_type},
+            "topPages": [
+                {
+                    "page": p,
+                    "views": v or 0,
+                    "sessions": s or 0,
+                    "avgDurationMs": int(ms) if ms is not None else None,
+                    "avgScrollPct": int(sc) if sc is not None else None,
+                }
+                for p, v, s, ms, sc in top_pages
+            ],
+            "lessonCompletions": [
+                {"page": p, "completed": c or 0, "uncompleted": u or 0}
+                for p, c, u in completions
+            ],
+            "daily": [
+                {
+                    "day": d,
+                    "sessions": s or 0,
+                    "pageViews": pv or 0,
+                    "completions": comp or 0,
+                }
+                for d, s, pv, comp in daily
+            ],
+        }
+
+    def latest_events(self, days=30, limit=500):
+        cutoff = (dt.date.today() - dt.timedelta(days=max(1, days) - 1)).isoformat()
+        with self.lock:
+            rows = self.db.execute(
+                """SELECT ts, day, session_id, event_type, page, duration_ms, scroll_pct, meta
+                   FROM telemetry_events
+                   WHERE day >= ?
+                   ORDER BY id DESC
+                   LIMIT ?""",
+                (cutoff, limit),
+            ).fetchall()
+        return [
+            {
+                "ts": ts,
+                "day": day,
+                "sessionId": sid,
+                "eventType": et,
+                "page": pg,
+                "durationMs": dur,
+                "scrollPct": sc,
+                "meta": json.loads(m) if m else None,
+            }
+            for ts, day, sid, et, pg, dur, sc, m in rows
+        ]
 
 
 # --------------------------------------------------------------------------- helpers
@@ -194,6 +365,88 @@ def clean_comment(value):
 
 def valid_page(value):
     return isinstance(value, str) and len(value) <= 200 and bool(PAGE_RE.match(value))
+
+
+def valid_telemetry_page(value):
+    return isinstance(value, str) and len(value) <= 200 and bool(TELEMETRY_PAGE_RE.match(value))
+
+
+def clean_meta(value):
+    if value is None:
+        return None
+    if not isinstance(value, dict):
+        raise ValueError("meta must be an object")
+    cleaned = {}
+    for k, v in value.items():
+        if not isinstance(k, str) or len(k) > 32:
+            raise ValueError("invalid meta key")
+        key = CONTROL_RE.sub("", k).strip()
+        if not key:
+            continue
+        if isinstance(v, str):
+            cleaned[key] = CONTROL_RE.sub("", v).strip()[:120]
+        elif isinstance(v, (int, float, bool)) or v is None:
+            cleaned[key] = v
+        else:
+            raise ValueError("invalid meta value")
+    if not cleaned:
+        return None
+    encoded = json.dumps(cleaned, separators=(",", ":"))
+    if len(encoded.encode("utf-8")) > MAX_META:
+        raise ValueError("meta too large")
+    return encoded
+
+
+def parse_event(raw):
+    if not isinstance(raw, dict):
+        raise ValueError("event must be an object")
+    event_type = raw.get("eventType")
+    if not isinstance(event_type, str) or event_type not in ALLOWED_EVENT_TYPES:
+        raise ValueError("invalid eventType")
+    page = raw.get("page")
+    if not valid_telemetry_page(page):
+        raise ValueError("invalid page")
+    normalized_page = "/" if page in ("", "/") else page.rstrip("/")
+    session_id = raw.get("sessionId")
+    if not isinstance(session_id, str) or not CLIENT_RE.match(session_id):
+        raise ValueError("invalid sessionId")
+    duration_ms = raw.get("durationMs")
+    if duration_ms is not None:
+        if isinstance(duration_ms, bool) or not isinstance(duration_ms, int):
+            raise ValueError("invalid durationMs")
+        duration_ms = max(0, min(duration_ms, MAX_DURATION_MS))
+    scroll_pct = raw.get("scrollPct")
+    if scroll_pct is not None:
+        if isinstance(scroll_pct, bool) or not isinstance(scroll_pct, int):
+            raise ValueError("invalid scrollPct")
+        scroll_pct = max(0, min(scroll_pct, 100))
+    meta = clean_meta(raw.get("meta"))
+    return {
+        "session_id": session_id,
+        "event_type": event_type,
+        "page": normalized_page,
+        "duration_ms": duration_ms,
+        "scroll_pct": scroll_pct,
+        "meta": meta,
+    }
+
+
+def events_to_csv(events):
+    buf = io.StringIO()
+    writer = csv.writer(buf)
+    writer.writerow(["ts", "day", "sessionId", "eventType", "page", "durationMs", "scrollPct", "meta"])
+    for e in events:
+        writer.writerow([
+            e["ts"],
+            e["day"],
+            e["sessionId"],
+            e["eventType"],
+            e["page"],
+            "" if e["durationMs"] is None else e["durationMs"],
+            "" if e["scrollPct"] is None else e["scrollPct"],
+            "" if e["meta"] is None else json.dumps(e["meta"], separators=(",", ":")),
+        ])
+    return buf.getvalue().encode("utf-8")
 
 
 def verify_github_signature(secret, body, header):
@@ -253,6 +506,7 @@ class App:
         self.store = store
         self.hasher = DailyHasher()
         self.limiter = RateLimiter(RATE_LIMIT, RATE_WINDOW)
+        self.event_limiter = RateLimiter(EVENT_RATE_LIMIT, RATE_WINDOW)
         self.read_limiter = RateLimiter(READ_RATE_LIMIT, RATE_WINDOW)
         self.popular = PopularCache(POPULAR_TTL)
         self.popular_fetch = popular_fetch
@@ -352,15 +606,70 @@ def make_handler(app):
                 if not ADMIN_TOKEN or not hmac.compare_digest(auth, "Bearer " + ADMIN_TOKEN):
                     return self.send_json(401, {"error": "unauthorized"}, {"WWW-Authenticate": "Bearer"})
                 return self.send_json(200, {"feedback": app.store.latest()}, {"Cache-Control": "no-store"})
+            if url.path == "/admin/stats":
+                auth = self.headers.get("Authorization", "")
+                if not ADMIN_TOKEN or not hmac.compare_digest(auth, "Bearer " + ADMIN_TOKEN):
+                    return self.send_json(401, {"error": "unauthorized"}, {"WWW-Authenticate": "Bearer"})
+                qs = urllib.parse.parse_qs(url.query)
+                try:
+                    days = max(1, min(365, int(qs.get("days", ["30"])[0])))
+                except ValueError:
+                    return self.send_json(400, {"error": "invalid days"})
+                return self.send_json(200, app.store.stats_summary(days), {"Cache-Control": "no-store"})
+            if url.path == "/admin/events":
+                auth = self.headers.get("Authorization", "")
+                if not ADMIN_TOKEN or not hmac.compare_digest(auth, "Bearer " + ADMIN_TOKEN):
+                    return self.send_json(401, {"error": "unauthorized"}, {"WWW-Authenticate": "Bearer"})
+                qs = urllib.parse.parse_qs(url.query)
+                try:
+                    days = max(1, min(365, int(qs.get("days", ["30"])[0])))
+                    limit = max(1, min(5000, int(qs.get("limit", ["500"])[0])))
+                except ValueError:
+                    return self.send_json(400, {"error": "invalid query"})
+                events = app.store.latest_events(days=days, limit=limit)
+                if qs.get("format", ["json"])[0] == "csv":
+                    body = events_to_csv(events)
+                    self.send_response(200)
+                    for k, v in SECURITY_HEADERS.items():
+                        self.send_header(k, v)
+                    self.send_header("Cache-Control", "no-store")
+                    self.send_header("Content-Type", "text/csv; charset=utf-8")
+                    self.send_header("Content-Disposition", 'attachment; filename="learnalgorithms-events.csv"')
+                    self.send_header("Content-Length", str(len(body)))
+                    self.end_headers()
+                    if self.command != "HEAD":
+                        self.wfile.write(body)
+                    return
+                return self.send_json(200, {"events": events}, {"Cache-Control": "no-store"})
             self.send_json(404, {"error": "not found"})
 
         def do_POST(self):
             path = urllib.parse.urlparse(self.path).path
             if path == "/feedback":
                 return self.post_feedback()
+            if path == "/events":
+                return self.post_events()
             if path == "/webhooks/github":
                 return self.post_github()
             self.send_json(404, {"error": "not found"})
+
+        def post_events(self):
+            if self.headers.get("Origin") != ALLOWED_ORIGIN:
+                return self.send_json(403, {"error": "origin not allowed"})
+            if self.rate_limited(app.event_limiter):
+                return
+            data = self.read_json()
+            if data is None:
+                return self.send_json(400, {"error": "invalid request"})
+            raw_events = data.get("events") if "events" in data else [data]
+            if not isinstance(raw_events, list) or not (1 <= len(raw_events) <= MAX_EVENT_BATCH):
+                return self.send_json(400, {"error": "invalid events batch"})
+            try:
+                parsed = [parse_event(item) for item in raw_events]
+            except ValueError as e:
+                return self.send_json(400, {"error": str(e)})
+            stored = app.store.add_events(parsed)
+            self.send_json(201, {"status": "stored", "count": stored}, {"Cache-Control": "no-store"})
 
         def post_feedback(self):
             if self.headers.get("Origin") != ALLOWED_ORIGIN:

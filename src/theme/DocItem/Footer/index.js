@@ -3,6 +3,7 @@ import Footer from '@theme-original/DocItem/Footer';
 import {useDoc} from '@docusaurus/plugin-content-docs/client';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import {normalizePermalink, useStudyProgress} from '@site/src/utils/studyProgress';
+import {trackEvent} from '@site/src/telemetry';
 import styles from './styles.module.css';
 
 const REPO = 'https://github.com/vicegd/learnalgorithms';
@@ -38,7 +39,14 @@ export default function FooterWrapper(props) {
         <div className={styles.progressBar}>
           <button
             type="button"
-            onClick={() => toggleCompleted(metadata.permalink)}
+            onClick={() => {
+              toggleCompleted(metadata.permalink);
+              trackEvent(
+                completed ? 'lesson_uncomplete' : 'lesson_complete',
+                null,
+                metadata.permalink,
+              );
+            }}
             className={`${styles.progressBtn} ${completed ? styles.progressBtnDone : ''}`}
             aria-pressed={completed}>
             <span className={styles.progressIcon} aria-hidden="true">

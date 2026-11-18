@@ -2,6 +2,7 @@ import React, {useMemo, useState} from 'react';
 import clsx from 'clsx';
 import Link from '@docusaurus/Link';
 import Layout from '@theme/Layout';
+import {trackEvent} from '@site/src/telemetry';
 import styles from './cheat-sheet.module.css';
 
 const JAVA_REPO = 'https://github.com/vicegd/algorithms/tree/master/src/topics';
@@ -871,6 +872,7 @@ export default function CheatSheetPage() {
   function toggleSelect(id) {
     setSelectedIds((prev) => {
       if (prev.includes(id)) return prev.filter((x) => x !== id);
+      trackEvent('cheat_sheet_compare', {algorithm: id}, '/cheat-sheet');
       if (prev.length >= 3) return [...prev.slice(1), id];
       return [...prev, id];
     });
@@ -923,7 +925,10 @@ export default function CheatSheetPage() {
               <button
                 key={p}
                 type="button"
-                onClick={() => setParadigm(p)}
+                onClick={() => {
+                  setParadigm(p);
+                  trackEvent('cheat_sheet_filter', {paradigm: p}, '/cheat-sheet');
+                }}
                 className={clsx(styles.filterBtn, paradigm === p && styles.filterBtnActive)}
                 aria-pressed={paradigm === p}>
                 {p}
@@ -937,7 +942,10 @@ export default function CheatSheetPage() {
               <button
                 key={prop}
                 type="button"
-                onClick={() => setPropFilter(prop)}
+                onClick={() => {
+                  setPropFilter(prop);
+                  trackEvent('cheat_sheet_filter', {property: prop}, '/cheat-sheet');
+                }}
                 className={clsx(styles.filterBtn, propFilter === prop && styles.filterBtnActive)}
                 aria-pressed={propFilter === prop}>
                 {prop}
