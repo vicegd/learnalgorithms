@@ -8,8 +8,11 @@ Backend of [learnalgorithms.dev](https://learnalgorithms.dev), served at `api.le
 | `POST /feedback` | "Was this page helpful?" vote, with an optional comment |
 | `GET /feedback/summary?page=/concepts/...` | Votes of one page |
 | `GET /popular` | Most read lessons of the last 7 days, from Matomo |
+| `POST /events` | Anonymous student/usage telemetry events (page views, time on page, scroll depth, completions, cheat-sheet filters) |
 | `POST /webhooks/github` | GitHub `issues` events, verified with HMAC-SHA256 |
 | `GET /admin/feedback` | Latest votes and comments (bearer token) |
+| `GET /admin/stats?days=30` | Aggregated student/usage statistics for teaching innovation (bearer token) |
+| `GET /admin/events?days=30&format=csv` | Raw anonymized telemetry events in JSON or CSV (bearer token) |
 
 It is written with the Python standard library only, runs in a hardened Docker container behind a reverse proxy with HTTPS, and stores its data in SQLite. See [THREAT-MODEL.md](THREAT-MODEL.md) for the security design.
 

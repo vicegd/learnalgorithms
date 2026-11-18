@@ -152,7 +152,7 @@ const config = {
       },
     }),
 
-  clientModules: ['./src/matomo.js'],
+  clientModules: ['./src/matomo.js', './src/telemetry.js'],
 
   headTags: [
     // Security: Content Security Policy. GitHub Pages cannot send HTTP headers,

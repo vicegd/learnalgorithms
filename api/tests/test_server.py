@@ -31,6 +31,8 @@ class ApiTest(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         cls.httpd.shutdown()
+        cls.httpd.server_close()
+        cls.app.store.db.close()
         cls.tmp.cleanup()
 
     def req(self, method, path, body=None, headers=None, raw=None):
@@ -137,6 +139,77 @@ class ApiTest(unittest.TestCase):
 
     def test_unknown_route(self):
         self.assertEqual(self.req("GET", "/../../etc/passwd")[0], 404)
+
+    def test_events_validation_and_admin_stats(self):
+        sid = "11111111-1111-4111-8111-111111111111"
+        # Wrong origin is rejected
+        s, _, _ = self.req("POST", "/events", body={
+            "sessionId": sid, "eventType": "page_view", "page": "/cheat-sheet",
+        }, headers={"Origin": "https://evil.example"})
+        self.assertEqual(s, 403)
+
+        # Invalid eventType or page or sessionId
+        self.assertEqual(self.req("POST", "/events", body={
+            "sessionId": sid, "eventType": "hack", "page": "/cheat-sheet",
+        })[0], 400)
+        self.assertEqual(self.req("POST", "/events", body={
+            "sessionId": sid, "eventType": "page_view", "page": "/../../etc/passwd",
+        })[0], 400)
+        self.assertEqual(self.req("POST", "/events", body={
+            "sessionId": "bad", "eventType": "page_view", "page": "/",
+        })[0], 400)
+
+        # Valid batch of events
+        s, data, _ = self.req("POST", "/events", body={
+            "events": [
+                {
+                    "sessionId": sid,
+                    "eventType": "page_view",
+                    "page": "/concepts/sorting/quicksort",
+                    "meta": {"viewport": "desktop"},
+                },
+                {
+                    "sessionId": sid,
+                    "eventType": "page_leave",
+                    "page": "/concepts/sorting/quicksort",
+                    "durationMs": 45000,
+                    "scrollPct": 85,
+                },
+                {
+                    "sessionId": sid,
+                    "eventType": "lesson_complete",
+                    "page": "/concepts/sorting/quicksort",
+                },
+            ]
+        })
+        self.assertEqual(s, 201)
+        self.assertEqual(data["count"], 3)
+
+        # Admin endpoints require token
+        self.assertEqual(self.req("GET", "/admin/stats")[0], 401)
+        self.assertEqual(self.req("GET", "/admin/events")[0], 401)
+
+        # Admin stats aggregation
+        s, stats, _ = self.req("GET", "/admin/stats?days=7", headers={"Authorization": "Bearer admintoken"})
+        self.assertEqual(s, 200)
+        self.assertGreaterEqual(stats["totals"]["events"], 3)
+        self.assertGreaterEqual(stats["totals"]["sessions"], 1)
+        qs = [p for p in stats["topPages"] if p["page"] == "/concepts/sorting/quicksort"][0]
+        self.assertEqual(qs["views"], 1)
+        self.assertEqual(qs["avgDurationMs"], 45000)
+        self.assertEqual(qs["avgScrollPct"], 85)
+
+        # Admin events CSV export
+        req = urllib.request.Request(
+            self.base + "/admin/events?days=7&format=csv",
+            headers={"Authorization": "Bearer admintoken"},
+        )
+        with urllib.request.urlopen(req) as resp:
+            self.assertEqual(resp.status, 200)
+            self.assertIn("text/csv", resp.headers.get("Content-Type", ""))
+            csv_text = resp.read().decode("utf-8")
+            self.assertIn("ts,day,sessionId,eventType,page,durationMs,scrollPct,meta", csv_text)
+            self.assertIn("/concepts/sorting/quicksort", csv_text)
 
 
 if __name__ == "__main__":
