@@ -19,6 +19,8 @@ Each chapter contains:
 - A header in every lesson with its **reading time** and the lessons to **read first**.
 - **References** and, for each classic algorithm, a link to its **original publication**.
 - **Code** for every algorithm in the [vicegd/algorithms](https://github.com/vicegd/algorithms) repository.
+- **Big-O Cheat Sheet** (`/cheat-sheet`): interactive complexity comparison table with search, paradigm and property filters (*Stable*, *In-place*, *Optimal*), column sorting, and side-by-side comparison.
+- **Local study progress**: mark lessons as completed in `localStorage`, reflected with checkmarks in the sidebar and progress bars on the home page.
 
 ---
 
@@ -68,21 +70,25 @@ Found an error, have a suggestion or a question about a lesson? Use the links at
   - `remark-lesson-meta` — reading time and prerequisites under the title of each lesson. Prerequisites are listed in the front matter as permalinks (`prerequisites:`), and a wrong one fails the build.
   - `docusaurus-plugin-local-search` — builds `search-index.json` from the generated pages; the search box (`src/theme/SearchBar`) uses it in the browser, with no external service. Shortcut: Ctrl/Cmd + K or `/`.
   - `docusaurus-plugin-site-data` — site-wide metadata collected at build time.
-- **Matomo** for usage statistics (`stats.garcia.at`).
+- **Matomo** (`stats.garcia.at`) and an optional privacy-preserving **telemetry API** (`api/`, served at `api.learnalgorithms.dev` using Python stdlib + SQLite) for anonymous learning analytics and CSV export.
 - **GitHub Pages** hosting, deployed by **GitHub Actions** on every push to `main`.
 
 ---
 
 ## Getting started
 
-**Prerequisites:** Node.js ≥ 20 and npm.
+**Prerequisites:** Node.js ≥ 20 and npm (plus Python 3.12+ if running API tests).
 
 ```bash
 npm install      # install dependencies
 npm start        # dev server at http://localhost:3000
+npm test         # run JavaScript unit tests (node --test)
 npm run build    # production build in build/
 npm run serve    # preview the production build
 npm run clear    # clear the Docusaurus cache
+
+# Backend API tests
+python -m unittest discover -s api/tests -v
 ```
 
 ---
@@ -101,13 +107,18 @@ npm run clear    # clear the Docusaurus cache
 │       ├── references.mdx       # Bibliography
 │       └── img/                 # SVG diagrams of the chapter
 ├── algorithms/                  # Algorithm sheets (not published yet)
+├── api/                         # Privacy-preserving backend API (Python stdlib + SQLite)
 ├── blog/                        # Blog (not published yet)
 ├── src/
 │   ├── components/              # React components (Figure, Origin, ProofLink, RepoCode…)
 │   ├── css/custom.css           # Global styles, diagram colours, practice boxes
-│   ├── pages/                   # Home page
+│   ├── pages/                   # Home page, Big-O Cheat Sheet (/cheat-sheet), Site Stats (/stats)
 │   ├── plugins/                 # Custom remark and Docusaurus plugins
-│   └── theme/                   # Swizzled/wrapped theme components (feedback links, cards, TOC)
+│   ├── theme/                   # Swizzled/wrapped theme components (progress, feedback, sidebar, TOC)
+│   ├── utils/                   # Shared client utilities (studyProgress.js)
+│   ├── matomo.js                # Matomo SPA pageview tracking
+│   └── telemetry.js             # Anonymous telemetry client (page views, reading time, scroll, events)
+├── tests/                       # JavaScript unit tests (node --test)
 ├── static/                      # Static files (images, CNAME)
 ├── .github/
 │   ├── ISSUE_TEMPLATE/          # Issue forms: error, suggestion, question
