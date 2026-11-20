@@ -5,6 +5,7 @@ tags: [Paradigms, State Space Search, Backtracking, Graphs, DFS]
 prerequisites:
   - /concepts/brute-force/brute-force-and-exhaustive-search
   - /concepts/divide-and-conquer/divide-and-conquer-scheme
+description: "Implicit state-space trees, choose-explore-unchoose, first-solution vs. all-solutions schemes, pruning techniques, and complexity."
 ---
 
 import Tabs from '@theme/Tabs';
@@ -19,6 +20,14 @@ Some problems resist every technique seen so far. There is no greedy criterion t
 The central idea fits in one sentence: **build the solution step by step, and as soon as a partial solution cannot be completed into a valid one, undo the last step and try something else**. The name comes from that "undo": when the algorithm reaches a dead end, it goes *back* along the *track* it has followed and takes a different turn.
 
 Backtracking is the second-to-last design technique of the course. The last one, [branch and bound](../08-branch-and-bound/01-branch-and-bound-scheme.mdx), explores the same kind of search space with a different strategy.
+
+:::note What you will learn in this lesson
+- How combinatorial problems are modeled as **implicit state-space trees** and solutions as decision vectors.
+- The **choose, explore, unchoose** pattern and why undoing decisions is essential.
+- The difference between the **first-solution** scheme and the **all-solutions / optimization** scheme.
+- How **pruning** (feasibility, look-ahead, bounds, symmetry) turns brute force into a practical search.
+- Time and memory complexity of backtracking ($O(h)$ stack space) and when to prefer dynamic programming.
+:::
 
 ***
 

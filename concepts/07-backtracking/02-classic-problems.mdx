@@ -5,6 +5,7 @@ sidebar_position: 2
 tags: [Paradigms, State Space Search, Backtracking, N-Queens, Subset Sum, Permutations]
 prerequisites:
   - /concepts/backtracking/backtracking-scheme
+description: "Classic backtracking problems: permutations, subset sum, N-queens, knight tour, graph coloring, task assignment, magic squares, and Sudoku."
 ---
 
 import Tabs from '@theme/Tabs';
@@ -17,6 +18,13 @@ import FigKnightMoves from './img/knight-moves.svg';
 # Backtracking: Classic Problems
 
 This lesson applies the [general schemes of backtracking](./01-backtracking-scheme.mdx) to a series of classic problems. They are ordered from simple to more demanding, and each one illustrates a different aspect of the paradigm:
+
+:::note What you will learn in this lesson
+- How to design the **state representation** and **feasibility checks** for eight classic backtracking problems.
+- How $O(1)$ bookkeeping arrays (rows, columns, diagonals) drastically reduce the cost per node in **N-queens** and **Sudoku**.
+- How **look-ahead pruning** (Subset sum), **bound pruning** (Task assignment), and **candidate ordering** (Warnsdorff's rule for Knight's tour) shrink huge search trees.
+- The trade-off between visiting fewer nodes and spending more time per node.
+:::
 
 | Problem | Scheme | What it illustrates |
 |---|---|---|
@@ -561,3 +569,16 @@ The heuristic generates **five times fewer nodes**, but each node is more expens
 | Task assignment | Degree $n, n-1, \dots, 1$ | $O(n!)$ | Cost so far reaches the best cost |
 | Magic squares | Degree $9, 8, \dots, 1$, height 9 | $O(9!)$ | Each line must add up to 15 when complete |
 | Sudoku | Degree at most 9, one level per empty cell | $O(9^e)$ for $e$ empty cells | Row, column and box checks; fewest candidates first |
+
+---
+
+## Practice
+
+<div className="practice-box">
+
+- **👑 Measure the $O(1)$ check.** In N-queens for $n = 12$, compare counting all solutions with a loop-based conflict check versus boolean arrays for rows and diagonals. How much faster is the $O(1)$ version?
+- **🎯 Look-ahead pruning.** Run Subset sum on 25 positive integers with and without the remaining-sum pruning condition. Compare the number of visited nodes.
+- **🐴 Candidate ordering.** Run Knight's tour on an $8 \times 8$ board with fixed move order versus Warnsdorff's heuristic, and count how many backtracks each one needs to find the first tour.
+- **🧩 Most-constrained cell.** In Sudoku, trace by hand which empty cell is picked first by the fewest-candidates heuristic on a partially filled $4 \times 4$ board.
+
+</div>

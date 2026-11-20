@@ -5,6 +5,7 @@ tags: [Paradigms, Brute Force, Exhaustive Search, Baseline, Algorithm Design]
 prerequisites:
   - /concepts/principles-of-algorithmics/growth-rates
   - /concepts/principles-of-algorithmics/complexity-of-loops
+description: "Direct brute force and exhaustive search, naive string matching, subset enumeration, and using brute force as a testing oracle."
 ---
 
 import FigStringMatching from './img/string-matching.svg';
@@ -21,6 +22,13 @@ It is the starting point of algorithm design, for three reasons:
 - it is the **reference** against which every cleverer algorithm is measured and tested.
 
 All the design techniques of the following chapters can be seen as ways of avoiding part of the work that brute force does.
+
+:::note What you will learn in this lesson
+- The difference between **straightforward brute force** and **exhaustive search** over combinatorial spaces.
+- Two concrete examples: **naive string matching** ($O(n \cdot m)$) and **exhaustive search over subsets** ($O(2^n)$).
+- Why exponential and factorial growth make exhaustive search impractical even with much faster hardware.
+- When brute force is still the right choice: small inputs, baselines, and **testing oracles** for more complex algorithms.
+:::
 
 ***
 
