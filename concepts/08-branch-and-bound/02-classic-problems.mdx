@@ -6,6 +6,7 @@ tags: [Paradigms, State Space Search, Branch and Bound, Optimization, Heuristics
 prerequisites:
   - /concepts/branch-and-bound/branch-and-bound-scheme
   - /concepts/greedy-algorithms/classic-problems
+description: "Classic branch-and-bound problems: task assignment, 0/1 knapsack, sliding puzzles, rectangle placement, N-queens, and traveling salesman."
 ---
 
 import FigAssignmentTree from './img/assignment-tree.svg';
@@ -22,6 +23,13 @@ This lesson applies the [general scheme of branch and bound](./01-branch-and-bou
 1. **What is a state**, and what are its children?
 2. **What is the heuristic** (the lower bound, for minimization) that orders the live nodes and decides what to prune?
 3. **What is the initial pruning limit**?
+
+:::note What you will learn in this lesson
+- How to define states, optimistic bounds, and initial limits for six classic problems: **task assignment**, **0/1 knapsack**, **sliding puzzles**, **rectangle placement**, **N-queens**, and the **traveling salesman**.
+- Why a **tight bound** (such as the fractional greedy bound for 0/1 knapsack) can cut the number of expanded nodes by orders of magnitude.
+- How **admissible heuristics** ($g + h$, Manhattan distance) and **parity reachability** apply to the 8/15-puzzle.
+- How to mirror minimization bounds into upper bounds for maximization problems.
+:::
 
 | Problem | Type | Heuristic | What it illustrates |
 |---|---|---|---|
@@ -371,3 +379,16 @@ Both find the same optimum. As in the assignment problem, the difference comes f
 | Rectangle placement | Board matrix with the pieces placed | Area of the enclosing box so far | Infinite, or any valid arrangement |
 | N-queens | Queens placed so far, without attacks | $(n - \text{placed}) \cdot 10 + \text{diagonal}$ | Not needed (first solution) |
 | Traveling salesman | Partial tour from A | Length so far + cheapest exit of the current and of each unvisited city | Infinite, or the length of a greedy tour |
+
+---
+
+## Practice
+
+<div className="practice-box">
+
+- **⚖️ Loose vs. tight bound.** On a 0/1 knapsack instance with 20 items, compare the number of nodes expanded using the fractional greedy upper bound versus the trivial bound (value so far + sum of all remaining values).
+- **🧮 Initial limit.** In the task assignment problem ($n = 12$), compare starting with an infinite initial limit versus starting with the cost of the main diagonal or a greedy assignment.
+- **🧩 Reachability first.** Given two 8-puzzle start states (one solvable and one with two tiles swapped), verify their inversion parity before running A\* and observe what happens if the check is skipped.
+- **🗺️ TSP at scale.** Measure how many nodes branch and bound expands on random symmetric TSP instances for $n = 8, 10, 12$ and note both execution time and peak heap size.
+
+</div>

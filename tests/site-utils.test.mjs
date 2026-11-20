@@ -43,7 +43,7 @@ test('docusaurus-plugin-site-data scans concepts without coming-soon placeholder
   }
 });
 
-test('all numbered lessons have frontmatter title and no TODO placeholders', () => {
+test('all numbered lessons have frontmatter title, description, objectives, practice, and no TODOs', () => {
   const conceptsDir = path.join(ROOT, 'concepts');
   const chapters = fs.readdirSync(conceptsDir, {withFileTypes: true}).filter((d) => d.isDirectory());
   let checked = 0;
@@ -54,6 +54,9 @@ test('all numbered lessons have frontmatter title and no TODO placeholders', () 
       if (!/^\d{2}-.*\.mdx$/.test(file) || /exercises|index/.test(file)) continue;
       const content = fs.readFileSync(path.join(dir, file), 'utf8');
       assert.match(content, /^---[\s\S]*?\ntitle:\s*.+/m, `Missing frontmatter title in ${chapter.name}/${file}`);
+      assert.match(content, /^---[\s\S]*?\ndescription:\s*.+/m, `Missing frontmatter description in ${chapter.name}/${file}`);
+      assert.match(content, /What you will learn/, `Missing learning objectives box in ${chapter.name}/${file}`);
+      assert.match(content, /^## (Practice|Self-check)/m, `Missing Practice/Self-check section in ${chapter.name}/${file}`);
       assert.doesNotMatch(content, /\b(TODO|FIXME|TBD)\b/, `Found placeholder in ${chapter.name}/${file}`);
       checked += 1;
     }

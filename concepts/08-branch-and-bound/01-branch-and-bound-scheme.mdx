@@ -5,6 +5,7 @@ tags: [Paradigms, State Space Search, Branch and Bound, Optimization, BFS, Heuri
 prerequisites:
   - /concepts/backtracking/backtracking-scheme
   - /concepts/principles-of-algorithmics/data-structures
+description: "Best-first state-space search with priority queues, optimistic bounds, initial pruning limits, and the connection to A*."
 ---
 
 import FigFourOrders from './img/four-orders.svg';
@@ -21,6 +22,14 @@ The name describes the two ingredients: **branch** (generate the children of a n
 <Origin who="Ailsa H. Land and Alison G. Doig" year="1960" title="An automatic method of solving discrete programming problems" venue="Econometrica 28(3):497–520" url="https://www.jstor.org/stable/1910129">
   The name “branch and bound” was introduced by Little, Murty, Sweeney and Karel in 1963.
 </Origin>
+
+:::note What you will learn in this lesson
+- How **breadth-first** and **best-first** exploration differ from depth-first backtracking.
+- The role of the **priority queue** of live nodes and the **branching heuristic**.
+- What makes a valid **bound** (optimistic, cheap, and tight) and how the **initial pruning limit** accelerates search.
+- How **A\*** arises as a special case of best-first branch and bound with $f(n) = g(n) + h(n)$.
+- When to choose branch and bound over backtracking, and the memory trade-offs involved.
+:::
 
 ***
 

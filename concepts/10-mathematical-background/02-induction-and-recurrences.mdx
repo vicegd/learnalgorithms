@@ -4,6 +4,7 @@ sidebar_position: 2
 tags: [Mathematics, Induction, Correctness, Loop Invariants, Recurrences, Reference]
 prerequisites:
   - /concepts/mathematical-background/sums-and-logarithms
+description: "Mathematical and strong induction, proving recursive and iterative algorithms with loop invariants, and four methods to solve recurrences."
 ---
 
 import FigUnequalRecursionTree from './img/unequal-recursion-tree.svg';
@@ -14,6 +15,13 @@ import FigLoopInvariants from './img/loop-invariants.svg';
 Recursive algorithms raise two questions: **is the algorithm correct**, and **how long does it take**? The answer to both uses the same idea. A recursive algorithm solves a problem by trusting that the smaller calls work; **mathematical induction** is the tool that makes that trust rigorous, and a **recurrence** is the equation that describes its cost in terms of the cost of the smaller calls.
 
 This lesson presents induction, its use to prove algorithms correct (including loops, through invariants), and the methods to solve recurrences. The [Analyzing Divide and Conquer](../04-divide-and-conquer/02-analysis.mdx) lesson gives ready-made formulas for the most common recurrences; this lesson explains the techniques behind them and what to do when the formulas do not apply.
+
+:::note What you will learn in this lesson
+- How **mathematical induction** and **strong induction** work, and how to prove recursive algorithms correct.
+- How **loop invariants** (initialization, maintenance, termination) prove iterative algorithms correct.
+- Four general methods to solve **recurrences**: unrolling, recursion trees, substitution (guess and verify), and characteristic roots.
+- Common pitfalls when using asymptotic notation inside inductive proofs.
+:::
 
 ***
 
