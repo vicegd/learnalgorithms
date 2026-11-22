@@ -114,6 +114,9 @@ def transform(events, feedback=None, issues=None, popular=None):
     resource_by_kind = Counter()
     cheat_filters = Counter()
     cheat_compares = 0
+    daily_events = Counter()
+    daily_sessions = defaultdict(set)
+    device_counts = Counter()
     ttfb_vals, lcp_vals, cls_vals = [], [], []
 
     for e in events:
@@ -121,6 +124,9 @@ def transform(events, feedback=None, issues=None, popular=None):
             sessions.add(e["sessionId"])
         if e["day"]:
             days.add(e["day"])
+            daily_events[e["day"]] += 1
+            if e["sessionId"]:
+                daily_sessions[e["day"]].add(e["sessionId"])
         et = e["eventType"]
         by_type[et] += 1
         page = e["page"]
@@ -128,6 +134,18 @@ def transform(events, feedback=None, issues=None, popular=None):
 
         if et == "page_view":
             page_views[page] += 1
+            vp = str(meta.get("viewport") or "")
+            if "x" in vp:
+                try:
+                    w = int(vp.split("x", 1)[0])
+                    if w < 768:
+                        device_counts["mobile"] += 1
+                    elif w < 1024:
+                        device_counts["tablet"] += 1
+                    else:
+                        device_counts["desktop"] += 1
+                except ValueError:
+                    pass
         elif et == "page_leave":
             if isinstance(e["durationMs"], int) and e["durationMs"] >= 0:
                 page_durations[page].append(e["durationMs"])
@@ -200,6 +218,18 @@ def transform(events, feedback=None, issues=None, popular=None):
     issues_list = list(issues or [])
     popular_list = list(popular or [])
 
+    daily_activity = [
+        {"day": d, "events": daily_events[d], "sessions": len(daily_sessions[d])}
+        for d in sorted(daily_events.keys())[-30:]
+    ]
+    total_dev = sum(device_counts.values())
+    devices = {
+        "total": total_dev,
+        "desktop": device_counts.get("desktop", 0),
+        "tablet": device_counts.get("tablet", 0),
+        "mobile": device_counts.get("mobile", 0),
+    }
+
     return {
         "totals": {
             "events": len(events),
@@ -210,6 +240,8 @@ def transform(events, feedback=None, issues=None, popular=None):
             "issues": len(issues_list),
         },
         "eventsByType": dict(by_type.most_common()),
+        "dailyActivity": daily_activity,
+        "devices": devices,
         "topPages": top_pages,
         "popularPages": popular_list,
         "topSearches": [{"query": q, "count": c} for q, c in all_searches.most_common(15)],
@@ -256,6 +288,29 @@ def render_markdown(report):
         lines.extend(["", "## Events by Type", ""])
         for et, count in report["eventsByType"].items():
             lines.append(f"- `{et}`: {count}")
+
+    if report.get("dailyActivity"):
+        lines.extend([
+            "",
+            "## Daily Activity",
+            "",
+            "| Day | Events | Anonymous sessions |",
+            "| :--- | ---: | ---: |",
+        ])
+        for row in report["dailyActivity"]:
+            lines.append(f"| {row['day']} | {row['events']} | {row['sessions']} |")
+
+    dev = report.get("devices") or {}
+    if dev.get("total", 0) > 0:
+        tot = dev["total"]
+        lines.extend([
+            "",
+            "## Devices (Page Views)",
+            "",
+            f"- **Desktop:** {dev['desktop']} ({round(100 * dev['desktop'] / tot)}%)",
+            f"- **Mobile:** {dev['mobile']} ({round(100 * dev['mobile'] / tot)}%)",
+            f"- **Tablet:** {dev['tablet']} ({round(100 * dev['tablet'] / tot)}%)",
+        ])
 
     lines.extend([
         "",
