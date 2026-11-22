@@ -86,6 +86,20 @@
 .sidebar-part {
   margin-top: 0.75rem;
 }
+
+/* ── Expand lesson content when right TOC is hidden on desktop ── */
+@media (min-width: 997px) {
+  html[data-toc-hidden='true'] .row > .col.col--3 {
+    flex: 0 0 0%;
+    max-width: 0;
+    padding: 0;
+    overflow: visible;
+  }
+  html[data-toc-hidden='true'] .row > .col[class*='docItemCol'] {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+}
 .sidebar-part > .menu__list-item-collapsible > .menu__link,
 .sidebar-part > .menu__link {
   font-size: 0.72rem;
