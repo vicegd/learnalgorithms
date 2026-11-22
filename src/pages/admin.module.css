@@ -448,3 +448,15 @@
   color: #b91c1c;
   font-weight: 600;
 }
+
+.endpointTag {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.14rem 0.45rem;
+  margin-left: 0.35rem;
+  border-radius: 6px;
+  vertical-align: middle;
+  background: var(--ifm-color-emphasis-100);
+  border: 1px solid var(--ifm-color-emphasis-200);
+  color: var(--ifm-color-emphasis-700);
+}
