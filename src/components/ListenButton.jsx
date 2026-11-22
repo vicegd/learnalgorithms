@@ -97,15 +97,38 @@ function extractReadableText() {
   return verbalizeUnicodeMath(clone.textContent || '');
 }
 
+function splitIntoChunks(text) {
+  if (!text) return [];
+  // Split on sentence boundaries while keeping chunks reasonably sized (~140-260 chars)
+  const raw = text.split(/(?<=[.!?])\s+/).filter(Boolean);
+  const chunks = [];
+  let buf = '';
+  for (const s of raw) {
+    if (buf && buf.length + s.length > 220) {
+      chunks.push(buf.trim());
+      buf = s;
+    } else {
+      buf = buf ? `${buf} ${s}` : s;
+    }
+  }
+  if (buf.trim()) chunks.push(buf.trim());
+  return chunks;
+}
+
 export default function ListenButton() {
   const [supported, setSupported] = useState(false);
   const [status, setStatus] = useState('idle'); // idle | playing | paused
   const [rateIdx, setRateIdx] = useState(0);
-  const textRef = useRef('');
+  const [chunkIdx, setChunkIdx] = useState(0);
+  const [totalChunks, setTotalChunks] = useState(0);
+  const chunksRef = useRef([]);
+  const rateRef = useRef(RATES[0]);
+  const seqRef = useRef(0);
 
   useEffect(() => {
     setSupported(typeof window !== 'undefined' && 'speechSynthesis' in window);
     return () => {
+      seqRef.current += 1;
       if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
         window.speechSynthesis.cancel();
       }
@@ -114,25 +137,43 @@ export default function ListenButton() {
 
   if (!supported) return null;
 
-  function speakFromStart(rate) {
+  function speakAt(idx, rate) {
+    const chunks = chunksRef.current;
+    if (!chunks.length) return;
+    const clamped = Math.max(0, Math.min(chunks.length - 1, idx));
     const synth = window.speechSynthesis;
+    const mySeq = ++seqRef.current;
     synth.cancel();
-    const text = extractReadableText();
-    if (!text) return;
-    textRef.current = text;
-    const utter = new SpeechSynthesisUtterance(text);
+    setChunkIdx(clamped);
+    setStatus('playing');
+
+    const utter = new SpeechSynthesisUtterance(chunks[clamped]);
     utter.lang = 'en-US';
     utter.rate = rate;
-    utter.onend = () => setStatus('idle');
-    utter.onerror = () => setStatus('idle');
-    setStatus('playing');
+    utter.onend = () => {
+      if (seqRef.current !== mySeq) return;
+      if (clamped + 1 < chunks.length) {
+        speakAt(clamped + 1, rateRef.current);
+      } else {
+        setStatus('idle');
+        setChunkIdx(0);
+      }
+    };
+    utter.onerror = () => {
+      if (seqRef.current !== mySeq) return;
+      setStatus('idle');
+    };
     synth.speak(utter);
   }
 
   function handleTogglePlay() {
     const synth = window.speechSynthesis;
     if (status === 'idle') {
-      speakFromStart(RATES[rateIdx]);
+      const chunks = splitIntoChunks(extractReadableText());
+      if (!chunks.length) return;
+      chunksRef.current = chunks;
+      setTotalChunks(chunks.length);
+      speakAt(0, rateRef.current);
     } else if (status === 'playing') {
       synth.pause();
       setStatus('paused');
@@ -143,15 +184,29 @@ export default function ListenButton() {
   }
 
   function handleStop() {
+    seqRef.current += 1;
     window.speechSynthesis.cancel();
     setStatus('idle');
+    setChunkIdx(0);
+  }
+
+  function handleStep(delta) {
+    if (!chunksRef.current.length) return;
+    speakAt(chunkIdx + delta, rateRef.current);
+  }
+
+  function handleScrub(e) {
+    const next = Number(e.target.value);
+    if (!chunksRef.current.length) return;
+    speakAt(next, rateRef.current);
   }
 
   function handleCycleRate() {
     const nextIdx = (rateIdx + 1) % RATES.length;
     setRateIdx(nextIdx);
+    rateRef.current = RATES[nextIdx];
     if (status !== 'idle') {
-      speakFromStart(RATES[nextIdx]);
+      speakAt(chunkIdx, RATES[nextIdx]);
     }
   }
 
@@ -162,15 +217,43 @@ export default function ListenButton() {
         className={styles.btn}
         onClick={handleTogglePlay}
         aria-pressed={status === 'playing'}>
-        {status === 'playing' ? '⏸ Pause audio' : status === 'paused' ? '▶ Resume audio' : '🔊 Listen to lesson'}
+        {status === 'playing' ? '⏸ Pause' : status === 'paused' ? '▶ Resume' : '🔊 Listen to lesson'}
       </button>
       {status !== 'idle' && (
         <>
+          <button
+            type="button"
+            className={styles.btnSecondary}
+            onClick={() => handleStep(-1)}
+            disabled={chunkIdx === 0}
+            title="Previous segment">
+            ⏮
+          </button>
+          <input
+            type="range"
+            className={styles.scrubber}
+            min={0}
+            max={Math.max(0, totalChunks - 1)}
+            value={chunkIdx}
+            onChange={handleScrub}
+            aria-label="Audio position"
+          />
+          <span className={styles.counter}>
+            {chunkIdx + 1}/{totalChunks}
+          </span>
+          <button
+            type="button"
+            className={styles.btnSecondary}
+            onClick={() => handleStep(1)}
+            disabled={chunkIdx + 1 >= totalChunks}
+            title="Next segment">
+            ⏭
+          </button>
           <button type="button" className={styles.btnSecondary} onClick={handleCycleRate} title="Playback speed">
             {RATES[rateIdx]}×
           </button>
-          <button type="button" className={styles.btnSecondary} onClick={handleStop}>
-            ⏹ Stop
+          <button type="button" className={styles.btnSecondary} onClick={handleStop} title="Stop">
+            ⏹
           </button>
         </>
       )}
