@@ -397,7 +397,7 @@ export default function AdminDashboardPage() {
                     <span
                       className={health.ok ? styles.healthOk : styles.healthFail}
                       title="Live status from GET /health">
-                      ● API {health.ok ? 'OK' : 'ERROR'} · {health.latencyMs} ms
+                      ● GET /health · {health.ok ? 'OK' : 'ERROR'} ({health.latencyMs} ms)
                     </span>
                   )}
                   <a href="/api-docs" className={styles.apiDocsLink}>
@@ -493,7 +493,9 @@ export default function AdminDashboardPage() {
                 </div>
 
                 <section className={styles.section}>
-                  <h2 className={styles.sectionTitle}>Events by type</h2>
+                  <h2 className={styles.sectionTitle}>
+                    Events by type <code className={styles.endpointTag}>GET /admin/stats</code>
+                  </h2>
                   {Object.keys(stats.eventsByType || {}).length === 0 ? (
                     <p className={styles.empty}>No events recorded in this period yet.</p>
                   ) : (
@@ -508,7 +510,9 @@ export default function AdminDashboardPage() {
                 </section>
 
                 <section className={styles.section}>
-                  <h2 className={styles.sectionTitle}>Top pages ({sortedTopPages.length})</h2>
+                  <h2 className={styles.sectionTitle}>
+                    Top pages ({sortedTopPages.length}) <code className={styles.endpointTag}>GET /admin/stats</code>
+                  </h2>
                   {sortedTopPages.length === 0 ? (
                     <p className={styles.empty}>No page views recorded yet.</p>
                   ) : (
@@ -548,7 +552,9 @@ export default function AdminDashboardPage() {
                 </section>
 
                 <section className={styles.section}>
-                  <h2 className={styles.sectionTitle}>Lesson completions ({sortedCompletions.length})</h2>
+                  <h2 className={styles.sectionTitle}>
+                    Lesson completions ({sortedCompletions.length}) <code className={styles.endpointTag}>GET /admin/stats</code>
+                  </h2>
                   {sortedCompletions.length === 0 ? (
                     <p className={styles.empty}>No lesson completions recorded yet.</p>
                   ) : (
@@ -586,7 +592,9 @@ export default function AdminDashboardPage() {
             )}
 
             <section className={styles.section}>
-              <h2 className={styles.sectionTitle}>Popular lessons — Matomo last 7 days (<code>GET /popular</code>)</h2>
+              <h2 className={styles.sectionTitle}>
+                Popular lessons — Matomo last 7 days <code className={styles.endpointTag}>GET /popular</code>
+              </h2>
               {popular.length === 0 ? (
                 <p className={styles.empty}>No popular pages returned by Matomo (or MATOMO_TOKEN is not configured).</p>
               ) : (
@@ -612,7 +620,9 @@ export default function AdminDashboardPage() {
             </section>
 
             <section className={styles.section}>
-              <h2 className={styles.sectionTitle}>Latest feedback ({sortedFeedback.length})</h2>
+              <h2 className={styles.sectionTitle}>
+                Latest feedback ({sortedFeedback.length}) <code className={styles.endpointTag}>GET /admin/feedback</code>
+              </h2>
               <form className={styles.summaryBar} onSubmit={handleFetchSummary}>
                 <label className={styles.summaryLabel} htmlFor="feedback-summary-page">
                   Live page summary (<code>GET /feedback/summary</code>):
@@ -678,7 +688,9 @@ export default function AdminDashboardPage() {
             </section>
 
             <section className={styles.section}>
-              <h2 className={styles.sectionTitle}>Latest GitHub issues ({sortedIssues.length})</h2>
+              <h2 className={styles.sectionTitle}>
+                Latest GitHub issues ({sortedIssues.length}) <code className={styles.endpointTag}>GET /admin/issues</code>
+              </h2>
               <p className={styles.sectionHint}>
                 Populated automatically via <code>POST /webhooks/github</code> when an issue is actually submitted on GitHub (not just when clicking the link), provided the repository webhook is configured in GitHub Settings → Webhooks.
               </p>
@@ -721,7 +733,9 @@ export default function AdminDashboardPage() {
             </section>
 
             <section className={styles.section}>
-              <h2 className={styles.sectionTitle}>Raw events ({eventsTotal})</h2>
+              <h2 className={styles.sectionTitle}>
+                Raw events ({eventsTotal}) <code className={styles.endpointTag}>GET /admin/events</code>
+              </h2>
               {sortedEvents.length === 0 ? (
                 <p className={styles.empty}>No raw events recorded in this period.</p>
               ) : (
@@ -766,7 +780,9 @@ export default function AdminDashboardPage() {
 
             <section className={styles.section}>
               <div className={styles.reportHeader}>
-                <h2 className={styles.sectionTitle}>Teaching Report (ETL) &amp; Core Web Vitals</h2>
+                <h2 className={styles.sectionTitle}>
+                  Teaching Report (ETL) &amp; Core Web Vitals <code className={styles.endpointTag}>GET /admin/report</code>
+                </h2>
                 {etlMarkdown && (
                   <div className={styles.reportActions}>
                     <button type="button" className={styles.secondaryBtn} onClick={handleCopyReport}>
