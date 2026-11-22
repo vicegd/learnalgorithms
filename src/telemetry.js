@@ -118,6 +118,34 @@ function attachGlobalListeners() {
       enteredAt = Date.now();
     }
   });
+
+  // Track opening of <details> checkpoints / exercise solutions inside lessons
+  document.addEventListener(
+    'toggle',
+    (e) => {
+      const el = e.target;
+      if (!el || el.tagName !== 'DETAILS' || !el.open) return;
+      if (!el.closest('main') || currentPage === '/api-docs') return;
+      const summaryEl = el.querySelector('summary');
+      const summary = summaryEl ? summaryEl.textContent.replace(/\s+/g, ' ').trim().slice(0, 100) : '';
+      if (summary) {
+        trackEvent('details_open', {summary});
+      }
+    },
+    true,
+  );
+
+  // Track clicks on Java companion code links and formal proof links
+  document.addEventListener('click', (e) => {
+    const link = e.target && e.target.closest ? e.target.closest('a[href]') : null;
+    if (!link || !link.closest('main')) return;
+    const href = link.getAttribute('href') || '';
+    if (href.includes('github.com/vicegd/algorithms')) {
+      trackEvent('resource_click', {kind: 'java_code', target: href.slice(0, 120)});
+    } else if (/\/proofs(#|$)/.test(href)) {
+      trackEvent('resource_click', {kind: 'proof', target: href.slice(0, 120)});
+    }
+  });
 }
 
 export function onRouteDidUpdate({location, previousLocation}) {

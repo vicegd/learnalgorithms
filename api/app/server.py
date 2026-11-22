@@ -82,6 +82,8 @@ ALLOWED_EVENT_TYPES = frozenset({
     "cheat_sheet_compare",
     "visualizer_interact",
     "search",
+    "details_open",
+    "resource_click",
 })
 CONTROL_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
 CLIENT_RE = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")
@@ -174,6 +176,24 @@ class Store:
                 (delivery, action, number, title, url, dt.datetime.now(dt.timezone.utc).isoformat()),
             )
             self.db.commit()
+
+    def latest_issues(self, limit=200):
+        with self.lock:
+            rows = self.db.execute(
+                "SELECT delivery, action, number, title, url, received FROM github_issues ORDER BY received DESC LIMIT ?",
+                (limit,),
+            ).fetchall()
+        return [
+            {
+                "delivery": d,
+                "action": a,
+                "number": n,
+                "title": t,
+                "url": u,
+                "received": r,
+            }
+            for d, a, n, t, u, r in rows
+        ]
 
     def add_events(self, events):
         now_dt = dt.datetime.now(dt.timezone.utc)
@@ -606,6 +626,11 @@ def make_handler(app):
                 if not ADMIN_TOKEN or not hmac.compare_digest(auth, "Bearer " + ADMIN_TOKEN):
                     return self.send_json(401, {"error": "unauthorized"}, {"WWW-Authenticate": "Bearer"})
                 return self.send_json(200, {"feedback": app.store.latest()}, {"Cache-Control": "no-store"})
+            if url.path == "/admin/issues":
+                auth = self.headers.get("Authorization", "")
+                if not ADMIN_TOKEN or not hmac.compare_digest(auth, "Bearer " + ADMIN_TOKEN):
+                    return self.send_json(401, {"error": "unauthorized"}, {"WWW-Authenticate": "Bearer"})
+                return self.send_json(200, {"issues": app.store.latest_issues()}, {"Cache-Control": "no-store"})
             if url.path == "/admin/stats":
                 auth = self.headers.get("Authorization", "")
                 if not ADMIN_TOKEN or not hmac.compare_digest(auth, "Bearer " + ADMIN_TOKEN):

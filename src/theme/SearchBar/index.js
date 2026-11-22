@@ -1,6 +1,7 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {useHistory} from '@docusaurus/router';
 import useBaseUrl from '@docusaurus/useBaseUrl';
+import {trackEvent} from '@site/src/telemetry';
 import styles from './styles.module.css';
 
 /**
@@ -122,7 +123,25 @@ export default function SearchBar() {
   const results = index && query.trim().length > 1 ? search(index, query) : [];
   const urlOf = (r) => (r.sec.a ? `${r.page.u}#${r.sec.a}` : r.page.u);
 
+  // Record zero-result searches (debounced) to spot missing topics in the course
+  useEffect(() => {
+    const q = query.trim();
+    if (!open || !index || q.length < 3 || results.length > 0) return undefined;
+    const timer = setTimeout(() => {
+      trackEvent('search', {query: q.slice(0, 80), results: 0});
+    }, 900);
+    return () => clearTimeout(timer);
+  }, [open, index, query, results.length]);
+
   const go = (r) => {
+    const q = query.trim();
+    if (q) {
+      trackEvent('search', {
+        query: q.slice(0, 80),
+        results: results.length,
+        picked: urlOf(r).slice(0, 120),
+      });
+    }
     setOpen(false);
     setQuery('');
     inputRef.current?.blur();
