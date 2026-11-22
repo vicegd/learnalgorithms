@@ -12,6 +12,7 @@
 import fs from 'fs';
 import path from 'path';
 import CONCEPT_LINKS from './concept-links.js';
+import {buildTfIdfSimilarity, computeReadability, stripMdxToProse} from '../utils/nlp.js';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -165,18 +166,34 @@ export default function pluginSiteData(context, options = {}) {
               ? `/concepts/${categorySlug}/${slug}`
               : `/concepts/${slug}`;
 
+            const prose = stripMdxToProse(content);
             concepts.push({
               title: extractTitle(content, slug),
               category: category || 'Other',
               url,
               comingSoon: isComingSoon(content),
               prerequisites: extractPrerequisites(content),
+              readability: computeReadability(prose),
+              _prose: prose,
             });
           }
         }
       }
 
       if (fs.existsSync(conDir)) scanConcepts(conDir, null);
+
+      // ── NLP: TF-IDF + Cosine Similarity across core lessons ───────────────
+      const isCoreLesson = (u) => !/\/(exercises|proofs|references|summary)$/.test(u);
+      const coreDocs = concepts
+        .filter((c) => isCoreLesson(c.url))
+        .map((c) => ({url: c.url, title: c.title, prose: c._prose}));
+      const tfidfMap = buildTfIdfSimilarity(coreDocs, 3);
+      for (const c of concepts) {
+        const entry = tfidfMap.get(c.url);
+        c.keywords = entry ? entry.keywords : [];
+        c.relatedLessons = entry ? entry.related : [];
+        delete c._prose;
+      }
 
       // ── Cross-reference ────────────────────────────────────────────────────
       const crossRef = buildCrossRef(algorithmEntries);
