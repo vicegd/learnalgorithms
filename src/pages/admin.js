@@ -322,13 +322,13 @@ export default function AdminDashboardPage() {
     URL.revokeObjectURL(url);
   }
 
-  async function handleInterpretReport() {
+  async function handleInterpretReport(detail = 'brief') {
     if (!token) return;
     setAiLoading(true);
     setAiError('');
     try {
       const res = await fetch(
-        `${API_BASE}/admin/report/interpret?days=${days}&lang=${aiLang}`,
+        `${API_BASE}/admin/report/interpret?days=${days}&lang=${aiLang}&detail=${detail}`,
         {
           method: 'POST',
           headers: {Authorization: `Bearer ${token}`},
@@ -841,9 +841,17 @@ export default function AdminDashboardPage() {
                       type="button"
                       className={styles.primaryBtn}
                       disabled={aiLoading}
-                      onClick={handleInterpretReport}
-                      title="POST /admin/report/interpret — analyze this anonymized ETL report with an LLM">
-                      {aiLoading ? 'Analyzing…' : '✨ Interpret with AI'}
+                      onClick={() => handleInterpretReport('brief')}
+                      title="POST /admin/report/interpret?detail=brief — concise 5-section summary">
+                      {aiLoading ? 'Analyzing…' : '✨ AI Summary'}
+                    </button>
+                    <button
+                      type="button"
+                      className={styles.primaryBtn}
+                      disabled={aiLoading}
+                      onClick={() => handleInterpretReport('detailed')}
+                      title="POST /admin/report/interpret?detail=detailed — full 7-section report for annual teaching memories">
+                      {aiLoading ? 'Analyzing…' : '📄 Detailed AI Report'}
                     </button>
                     <button type="button" className={styles.secondaryBtn} onClick={handleCopyReport}>
                       {reportCopied ? 'Copied!' : 'Copy Markdown'}

@@ -25,7 +25,10 @@ class ApiTest(unittest.TestCase):
         cls.app = server.App(
             server.Store(os.path.join(cls.tmp.name, "t.db")),
             popular_fetch=lambda: [{"page": "/concepts/sorting/quicksort", "visits": 42}],
-            llm_interpret=lambda md, lang="es": {"analysis": f"[{lang}] Summary of {len(md)} chars", "model": "mock-llm"},
+            llm_interpret=lambda md, lang="en", detail="brief": {
+                "analysis": f"[{lang}/{detail}] Summary of {len(md)} chars",
+                "model": "mock-llm",
+            },
         )
         cls.httpd = ThreadingHTTPServer(("127.0.0.1", 0), server.make_handler(cls.app))
         cls.base = f"http://127.0.0.1:{cls.httpd.server_address[1]}"
@@ -297,13 +300,14 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(s, 401)
         s, ai_res, _ = self.req(
             "POST",
-            "/admin/report/interpret?days=0&lang=es",
+            "/admin/report/interpret?days=0&lang=es&detail=detailed",
             headers={"Authorization": "Bearer admintoken"},
         )
         self.assertEqual(s, 200)
         self.assertEqual(ai_res["model"], "mock-llm")
         self.assertEqual(ai_res["lang"], "es")
-        self.assertIn("[es] Summary of", ai_res["analysis"])
+        self.assertEqual(ai_res["detail"], "detailed")
+        self.assertIn("[es/detailed] Summary of", ai_res["analysis"])
 
 
 if __name__ == "__main__":
