@@ -99,6 +99,9 @@ export default function AdminDashboardPage() {
   const [events, setEvents] = useState([]);
   const [eventsTotal, setEventsTotal] = useState(0);
   const [eventsPage, setEventsPage] = useState(0);
+  const [etlReport, setEtlReport] = useState(null);
+  const [etlMarkdown, setEtlMarkdown] = useState('');
+  const [reportCopied, setReportCopied] = useState(false);
   const [topPagesPage, setTopPagesPage] = useState(0);
   const [completionsPage, setCompletionsPage] = useState(0);
   const [feedbackPage, setFeedbackPage] = useState(0);
@@ -158,7 +161,7 @@ export default function AdminDashboardPage() {
     const headers = {Authorization: `Bearer ${authToken}`};
 
     try {
-      const [statsRes, fbRes, issuesRes, eventsRes] = await Promise.all([
+      const [statsRes, fbRes, issuesRes, eventsRes, reportRes] = await Promise.all([
         fetch(`${API_BASE}/admin/stats?days=${periodDays}`, {headers, mode: 'cors'}),
         fetch(`${API_BASE}/admin/feedback`, {headers, mode: 'cors'}),
         fetch(`${API_BASE}/admin/issues`, {headers, mode: 'cors'}),
@@ -166,6 +169,7 @@ export default function AdminDashboardPage() {
           headers,
           mode: 'cors',
         }),
+        fetch(`${API_BASE}/admin/report?days=${periodDays}`, {headers, mode: 'cors'}).catch(() => null),
       ]);
 
       if (statsRes.status === 401 || fbRes.status === 401) {
@@ -187,11 +191,14 @@ export default function AdminDashboardPage() {
       const fbJson = fbRes.ok ? await fbRes.json() : {feedback: []};
       const issuesJson = issuesRes.ok ? await issuesRes.json() : {issues: []};
       const eventsJson = eventsRes.ok ? await eventsRes.json() : {events: [], total: 0};
+      const reportJson = reportRes && reportRes.ok ? await reportRes.json() : null;
 
       setStats(statsJson);
       setFeedback(fbJson.feedback || []);
       setIssues(issuesJson.issues || []);
       setEvents(eventsJson.events || []);
+      setEtlReport(reportJson?.report || null);
+      setEtlMarkdown(reportJson?.markdown || '');
       setEventsTotal(
         typeof eventsJson.total === 'number' ? eventsJson.total : (eventsJson.events || []).length,
       );
@@ -232,6 +239,8 @@ export default function AdminDashboardPage() {
     setFeedback([]);
     setIssues([]);
     setEvents([]);
+    setEtlReport(null);
+    setEtlMarkdown('');
     setError('');
     try {
       window.sessionStorage.removeItem(TOKEN_KEY);
@@ -260,6 +269,32 @@ export default function AdminDashboardPage() {
     } catch (err) {
       setError(`CSV download failed: ${err.message}`);
     }
+  }
+
+  async function handleCopyReport() {
+    if (!etlMarkdown) return;
+    try {
+      await navigator.clipboard.writeText(etlMarkdown);
+      setReportCopied(true);
+      setTimeout(() => setReportCopied(false), 2000);
+    } catch {
+      // Ignore clipboard permission errors
+    }
+  }
+
+  function handleDownloadReportFile(ext) {
+    const content = ext === 'md' ? etlMarkdown : JSON.stringify(etlReport, null, 2);
+    if (!content) return;
+    const mime = ext === 'md' ? 'text/markdown;charset=utf-8' : 'application/json;charset=utf-8';
+    const blob = new Blob([content], {type: mime});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `learnalgorithms-report-${days === 0 ? 'all' : `${days}d`}.${ext}`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
   }
 
   return (
@@ -559,6 +594,62 @@ export default function AdminDashboardPage() {
                 pageSize={PAGE_SIZE}
                 onPageChange={setIssuesPage}
               />
+            </section>
+
+            <section className={styles.section}>
+              <div className={styles.reportHeader}>
+                <h2 className={styles.sectionTitle}>Teaching Report (ETL) &amp; Core Web Vitals</h2>
+                {etlMarkdown && (
+                  <div className={styles.reportActions}>
+                    <button type="button" className={styles.secondaryBtn} onClick={handleCopyReport}>
+                      {reportCopied ? 'Copied!' : 'Copy Markdown'}
+                    </button>
+                    <button type="button" className={styles.secondaryBtn} onClick={() => handleDownloadReportFile('md')}>
+                      Download .md
+                    </button>
+                    <button type="button" className={styles.secondaryBtn} onClick={() => handleDownloadReportFile('json')}>
+                      Download .json
+                    </button>
+                  </div>
+                )}
+              </div>
+              {!etlReport ? (
+                <p className={styles.empty}>
+                  ETL report endpoint (<code>GET /admin/report</code>) not available yet on the API server. Rebuild the API container on the VPS to enable it.
+                </p>
+              ) : (
+                <>
+                  <div className={styles.vitalsGrid}>
+                    <div className={styles.vitalCard}>
+                      <div className={styles.vitalLabel}>Web Vitals samples</div>
+                      <div className={styles.vitalValue}>{etlReport.webVitals?.samples ?? 0}</div>
+                    </div>
+                    <div className={styles.vitalCard}>
+                      <div className={styles.vitalLabel}>TTFB (p50 / p95)</div>
+                      <div className={styles.vitalValue}>
+                        {etlReport.webVitals?.ttfbP50Ms != null
+                          ? `${etlReport.webVitals.ttfbP50Ms} / ${etlReport.webVitals.ttfbP95Ms} ms`
+                          : '—'}
+                      </div>
+                    </div>
+                    <div className={styles.vitalCard}>
+                      <div className={styles.vitalLabel}>LCP (p50 / p95)</div>
+                      <div className={styles.vitalValue}>
+                        {etlReport.webVitals?.lcpP50Ms != null
+                          ? `${etlReport.webVitals.lcpP50Ms} / ${etlReport.webVitals.lcpP95Ms} ms`
+                          : '—'}
+                      </div>
+                    </div>
+                    <div className={styles.vitalCard}>
+                      <div className={styles.vitalLabel}>CLS (p95)</div>
+                      <div className={styles.vitalValue}>
+                        {etlReport.webVitals?.clsP95 != null ? etlReport.webVitals.clsP95 : '—'}
+                      </div>
+                    </div>
+                  </div>
+                  <pre className={styles.reportPre}>{etlMarkdown}</pre>
+                </>
+              )}
             </section>
 
             <section className={styles.section}>

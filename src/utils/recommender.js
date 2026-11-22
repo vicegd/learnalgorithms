@@ -35,14 +35,26 @@ export function recommendNextLessons(concepts, completedSet, limit = 3) {
     .filter((l) => l.prerequisites.every((pre) => !byUrl.has(pre) || completedSet.has(pre)))
     .map((l) => {
       const unlocks = unlocksCount.get(l.url) || 0;
+      const unlockText = `unlocks ${unlocks} ${unlocks === 1 ? 'topic' : 'topics'}`;
+      let prereqText;
+      if (l.prerequisites.length === 0) {
+        prereqText = 'Foundational lesson';
+      } else if (l.prerequisites.length === 1) {
+        const preLesson = byUrl.get(l.prerequisites[0]);
+        prereqText = preLesson?.title
+          ? `Prerequisite completed (${preLesson.title})`
+          : 'Prerequisite completed';
+      } else {
+        prereqText = `All ${l.prerequisites.length} prerequisites completed`;
+      }
       const reason =
         l.prerequisites.length === 0
           ? unlocks > 0
-            ? `Foundational lesson · unlocks ${unlocks} ${unlocks === 1 ? 'topic' : 'topics'}`
-            : 'Foundational lesson · no prerequisites required'
+            ? `${prereqText} · ${unlockText}`
+            : `${prereqText} · no prerequisites required`
           : unlocks > 0
-            ? `All ${l.prerequisites.length} prerequisites completed · unlocks ${unlocks} ${unlocks === 1 ? 'topic' : 'topics'}`
-            : `All ${l.prerequisites.length} prerequisites completed`;
+            ? `${prereqText} · ${unlockText}`
+            : prereqText;
       return {
         ...l,
         unlocks,

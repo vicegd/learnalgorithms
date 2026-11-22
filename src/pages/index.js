@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import clsx from 'clsx';
 import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
@@ -8,7 +8,7 @@ import styles from './index.module.css';
 import Icon from '@site/src/components/Icon';
 import {normalizePermalink, useStudyProgress} from '@site/src/utils/studyProgress';
 import {recommendNextLessons} from '@site/src/utils/recommender';
-import {createProgressBadge} from '@site/src/utils/progressBadge';
+import {createProgressBadge, renderBadgeSvg, verifyProgressBadge} from '@site/src/utils/progressBadge';
 
 const CHAPTERS = [
   {
@@ -252,8 +252,8 @@ function Intro({
                 type="button"
                 onClick={onExportBadge}
                 className={styles.exportBadgeBtn}
-                title="Download anonymous progress JSON with SHA-256 integrity hash">
-                Export SHA-256 badge
+                title="View and download your visual progress badge and verifiable JSON proof">
+                Export progress
               </button>
               <button
                 type="button"
@@ -385,6 +385,34 @@ export default function Home() {
   ).length;
   const recommendations = recommendNextLessons(concepts, completed, 3);
 
+  const [badgeModal, setBadgeModal] = useState(null);
+  const [verifyResult, setVerifyResult] = useState(null);
+  const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    if (!badgeModal) return undefined;
+    function onKeyDown(e) {
+      if (e.key === 'Escape') {
+        setBadgeModal(null);
+        setVerifyResult(null);
+      }
+    }
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [badgeModal]);
+
+  function triggerDownload(content, filename, mime) {
+    const blob = new Blob([content], { type: mime });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
   async function handleExportBadge() {
     try {
       const badge = await createProgressBadge({
@@ -393,17 +421,35 @@ export default function Home() {
         masteredChapters,
         streakDays: streak,
       });
-      const blob = new Blob([JSON.stringify(badge, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'learnalgorithms-progress-badge.json';
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
+      const svg = renderBadgeSvg(badge);
+      setVerifyResult(null);
+      setBadgeModal({ badge, svg });
     } catch {
       // Ignore Web Crypto errors in unsupported environments
+    }
+  }
+
+  async function handleVerifyFile(e) {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const parsed = JSON.parse(text);
+      const ok = await verifyProgressBadge(parsed);
+      setVerifyResult(
+        ok
+          ? {
+              ok: true,
+              message: `Valid badge (${parsed.payload.completedCount}/${parsed.payload.totalLessons} lessons, issued ${(parsed.payload.issuedAt || '').slice(0, 10)}) — SHA-256 integrity verified.`,
+            }
+          : {
+              ok: false,
+              message: 'Invalid badge — SHA-256 digest does not match (file was modified or malformed).',
+            },
+      );
+    } catch {
+      setVerifyResult({ ok: false, message: 'Could not read JSON badge file.' });
     }
   }
 
@@ -419,6 +465,93 @@ export default function Home() {
           onResetProgress={resetProgress}
           onExportBadge={handleExportBadge}
         />
+        {badgeModal && (
+          <div
+            className={styles.modalBackdrop}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Study Progress Badge"
+            onClick={() => {
+              setBadgeModal(null);
+              setVerifyResult(null);
+            }}>
+            <div className={styles.modalCard} onClick={(e) => e.stopPropagation()}>
+              <div className={styles.modalHeader}>
+                <h2 className={styles.modalTitle}>Study Progress Badge</h2>
+                <button
+                  type="button"
+                  className={styles.modalClose}
+                  aria-label="Close"
+                  onClick={() => {
+                    setBadgeModal(null);
+                    setVerifyResult(null);
+                  }}>
+                  ×
+                </button>
+              </div>
+              <div className={styles.badgePreview}>
+                <img
+                  src={`data:image/svg+xml;charset=utf-8,${encodeURIComponent(badgeModal.svg)}`}
+                  alt="Learn Algorithms Study Progress Badge"
+                  className={styles.badgeImg}
+                />
+              </div>
+              <p className={styles.modalHint}>
+                Anonymous snapshot generated locally in your browser with a <code>SHA-256</code> integrity hash. Download the visual SVG badge or the verifiable JSON proof.
+              </p>
+              <div className={styles.modalActions}>
+                <button
+                  type="button"
+                  className={clsx('button', styles.btnPrimary)}
+                  onClick={() =>
+                    triggerDownload(
+                      badgeModal.svg,
+                      'learnalgorithms-progress-badge.svg',
+                      'image/svg+xml;charset=utf-8',
+                    )
+                  }>
+                  Download SVG badge
+                </button>
+                <button
+                  type="button"
+                  className={clsx('button', styles.btnGhost)}
+                  onClick={() =>
+                    triggerDownload(
+                      JSON.stringify(badgeModal.badge, null, 2),
+                      'learnalgorithms-progress-badge.json',
+                      'application/json;charset=utf-8',
+                    )
+                  }>
+                  Download JSON proof
+                </button>
+                <button
+                  type="button"
+                  className={clsx('button', styles.btnGhost)}
+                  onClick={() => fileInputRef.current?.click()}>
+                  Verify JSON file
+                </button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".json,application/json"
+                  onChange={handleVerifyFile}
+                  style={{ display: 'none' }}
+                />
+              </div>
+              {verifyResult && (
+                <div
+                  className={clsx(
+                    styles.verifyBox,
+                    verifyResult.ok ? styles.verifyOk : styles.verifyFail,
+                  )}
+                  role="status">
+                  {verifyResult.ok ? '✅ ' : '❌ '}
+                  {verifyResult.message}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
         <div className={styles.grid}>
           {chapterProgressList.map(({ chapter, completed, total }) => (
             <SectionCard
