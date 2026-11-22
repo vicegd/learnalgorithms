@@ -840,9 +840,9 @@ def make_handler(app):
             url = urllib.parse.urlparse(self.path)
             qs = urllib.parse.parse_qs(url.query)
             raw_days = qs.get("days", ["30"])[0]
-            lang = qs.get("lang", ["es"])[0]
+            lang = qs.get("lang", ["en"])[0]
             if lang not in ("es", "en"):
-                lang = "es"
+                lang = "en"
             try:
                 days = 0 if raw_days == "all" else max(0, min(3650, int(raw_days)))
             except ValueError:

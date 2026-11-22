@@ -102,7 +102,7 @@ export default function AdminDashboardPage() {
   const [etlReport, setEtlReport] = useState(null);
   const [etlMarkdown, setEtlMarkdown] = useState('');
   const [reportCopied, setReportCopied] = useState(false);
-  const [aiLang, setAiLang] = useState('es');
+  const [aiLang, setAiLang] = useState('en');
   const [aiLoading, setAiLoading] = useState(false);
   const [aiAnalysis, setAiAnalysis] = useState(null);
   const [aiError, setAiError] = useState('');
@@ -834,8 +834,8 @@ export default function AdminDashboardPage() {
                       value={aiLang}
                       onChange={(e) => setAiLang(e.target.value)}
                       aria-label="AI interpretation language">
-                      <option value="es">AI: Español</option>
                       <option value="en">AI: English</option>
+                      <option value="es">AI: Español</option>
                     </select>
                     <button
                       type="button"
