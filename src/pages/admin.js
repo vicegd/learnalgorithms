@@ -747,6 +747,7 @@ export default function AdminDashboardPage() {
                     <div className={styles.vitalCard}>
                       <div className={styles.vitalLabel}>Web Vitals samples</div>
                       <div className={styles.vitalValue}>{etlReport.webVitals?.samples ?? 0}</div>
+                      <div className={styles.vitalHint}>Real visits that reported browser speed metrics.</div>
                     </div>
                     <div className={styles.vitalCard}>
                       <div className={styles.vitalLabel}>TTFB (p50 / p95)</div>
@@ -755,6 +756,7 @@ export default function AdminDashboardPage() {
                           ? `${etlReport.webVitals.ttfbP50Ms} / ${etlReport.webVitals.ttfbP95Ms} ms`
                           : '—'}
                       </div>
+                      <div className={styles.vitalHint}>Time to First Byte (server response). Good: &lt; 800 ms.</div>
                     </div>
                     <div className={styles.vitalCard}>
                       <div className={styles.vitalLabel}>LCP (p50 / p95)</div>
@@ -763,14 +765,19 @@ export default function AdminDashboardPage() {
                           ? `${etlReport.webVitals.lcpP50Ms} / ${etlReport.webVitals.lcpP95Ms} ms`
                           : '—'}
                       </div>
+                      <div className={styles.vitalHint}>Largest Contentful Paint (main lesson visible). Good: &lt; 2500 ms.</div>
                     </div>
                     <div className={styles.vitalCard}>
                       <div className={styles.vitalLabel}>CLS (p95)</div>
                       <div className={styles.vitalValue}>
                         {etlReport.webVitals?.clsP95 != null ? etlReport.webVitals.clsP95 : '—'}
                       </div>
+                      <div className={styles.vitalHint}>Cumulative Layout Shift (page jumping on load). Good: &lt; 0.1.</div>
                     </div>
                   </div>
+                  <p className={styles.sectionHint}>
+                    <strong>How to read the ETL report:</strong> <code>p50</code> is the median (typical visit) and <code>p95</code> is the 95th percentile (slowest 5% of visits). <strong>Top Pages</strong> shows views, median active reading time (s), average scroll depth (%), and completions. <strong>Zero-Result Searches</strong> lists queries with 0 matches (missing topics). <strong>Most Opened Checkpoints</strong> counts which <code>&lt;details&gt;</code> solutions students expand most.
+                  </p>
                   <pre className={styles.reportPre}>{etlMarkdown}</pre>
                 </>
               )}
