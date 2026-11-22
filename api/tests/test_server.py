@@ -222,13 +222,14 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(qs["avgDurationMs"], 45000)
         self.assertEqual(qs["avgScrollPct"], 85)
 
-        # Admin events CSV export
+        # Admin events CSV export with CORS header for /admin dashboard
         req = urllib.request.Request(
             self.base + "/admin/events?days=7&format=csv",
-            headers={"Authorization": "Bearer admintoken"},
+            headers={"Authorization": "Bearer admintoken", "Origin": ORIGIN},
         )
         with urllib.request.urlopen(req) as resp:
             self.assertEqual(resp.status, 200)
+            self.assertEqual(resp.headers.get("Access-Control-Allow-Origin"), ORIGIN)
             self.assertIn("text/csv", resp.headers.get("Content-Type", ""))
             csv_text = resp.read().decode("utf-8")
             self.assertIn("ts,day,sessionId,eventType,page,durationMs,scrollPct,meta", csv_text)

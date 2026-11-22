@@ -1,0 +1,229 @@
+.container {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 4rem;
+}
+
+.loginBox {
+  max-width: 440px;
+  margin: 3rem auto;
+  padding: 2rem;
+  border-radius: 12px;
+  border: 1px solid var(--ifm-color-emphasis-200);
+  background: var(--ifm-background-surface-color);
+}
+
+.eyebrow {
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ifm-color-primary);
+  margin: 0 0 0.45rem;
+}
+
+.title {
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 800;
+  margin: 0 0 0.5rem;
+}
+
+.subtitle {
+  font-size: 0.92rem;
+  color: var(--ifm-color-emphasis-700);
+  margin: 0 0 1.25rem;
+}
+
+.loginForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.input {
+  width: 100%;
+  padding: 0.6rem 0.85rem;
+  border-radius: 8px;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  background: var(--ifm-background-surface-color);
+  color: var(--ifm-font-color-base);
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.9rem;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--ifm-color-primary);
+  box-shadow: 0 0 0 3px rgba(46, 133, 85, 0.15);
+}
+
+.primaryBtn {
+  padding: 0.55rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--ifm-color-primary);
+  background: var(--ifm-color-primary);
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.primaryBtn:hover:not(:disabled) {
+  background: var(--ifm-color-primary-dark);
+}
+
+.primaryBtn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.secondaryBtn {
+  padding: 0.45rem 0.85rem;
+  border-radius: 8px;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  background: var(--ifm-background-surface-color);
+  color: var(--ifm-font-color-base);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.secondaryBtn:hover:not(:disabled) {
+  border-color: var(--ifm-color-primary);
+  color: var(--ifm-color-primary-darkest);
+}
+
+.topBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.select {
+  padding: 0.45rem 0.7rem;
+  border-radius: 8px;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  background: var(--ifm-background-surface-color);
+  color: var(--ifm-font-color-base);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.error {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba(220, 38, 38, 0.3);
+  background: rgba(220, 38, 38, 0.08);
+  color: #991b1b;
+  font-size: 0.88rem;
+  margin-bottom: 1rem;
+}
+
+.kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.9rem;
+  margin-bottom: 1.75rem;
+}
+
+.kpiCard {
+  padding: 1rem 1.15rem;
+  border-radius: 10px;
+  border: 1px solid var(--ifm-color-emphasis-200);
+  background: var(--ifm-background-surface-color);
+}
+
+.kpiValue {
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: var(--ifm-color-primary);
+  line-height: 1.1;
+}
+
+.kpiLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--ifm-color-emphasis-600);
+  margin-top: 0.25rem;
+}
+
+.section {
+  margin-top: 2rem;
+}
+
+.sectionTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+}
+
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.pill {
+  padding: 0.32rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid var(--ifm-color-emphasis-200);
+  background: var(--ifm-color-emphasis-100);
+  font-size: 0.82rem;
+  font-family: var(--ifm-font-family-monospace);
+}
+
+.tableWrap {
+  overflow-x: auto;
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: 10px;
+  background: var(--ifm-background-surface-color);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0;
+  font-size: 0.86rem;
+}
+
+.table th,
+.table td {
+  padding: 0.6rem 0.8rem;
+  text-align: left;
+  border-bottom: 1px solid var(--ifm-color-emphasis-200);
+  vertical-align: top;
+}
+
+.table th {
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ifm-color-emphasis-700);
+  background: var(--ifm-color-emphasis-100);
+  white-space: nowrap;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.mono {
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.8rem;
+}
+
+.empty {
+  color: var(--ifm-color-emphasis-600);
+  font-size: 0.88rem;
+  margin: 0;
+}

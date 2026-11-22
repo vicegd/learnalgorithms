@@ -599,7 +599,7 @@ def make_handler(app):
                 return self.send_json(403, {"error": "origin not allowed"})
             self.send_json(204, None, {
                 "Access-Control-Allow-Methods": "GET, POST",
-                "Access-Control-Allow-Headers": "Content-Type",
+                "Access-Control-Allow-Headers": "Content-Type, Authorization",
                 "Access-Control-Max-Age": "86400",
             })
 
@@ -657,6 +657,9 @@ def make_handler(app):
                     self.send_response(200)
                     for k, v in SECURITY_HEADERS.items():
                         self.send_header(k, v)
+                    if self.headers.get("Origin") == ALLOWED_ORIGIN:
+                        self.send_header("Access-Control-Allow-Origin", ALLOWED_ORIGIN)
+                        self.send_header("Vary", "Origin")
                     self.send_header("Cache-Control", "no-store")
                     self.send_header("Content-Type", "text/csv; charset=utf-8")
                     self.send_header("Content-Disposition", 'attachment; filename="learnalgorithms-events.csv"')
