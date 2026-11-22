@@ -5,6 +5,8 @@ import styles from './admin.module.css';
 
 const API_BASE = 'https://api.learnalgorithms.dev';
 const TOKEN_KEY = 'learnalgorithms:admin-token:v1';
+const PAGE_SIZE = 15;
+const EVENTS_PAGE_SIZE = 50;
 
 function formatDuration(ms) {
   if (ms === null || ms === undefined) return '—';
@@ -15,16 +17,53 @@ function formatDuration(ms) {
   return `${m}m ${s}s`;
 }
 
+function Pagination({page, totalItems, pageSize, onPageChange, loading = false}) {
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+  if (totalPages <= 1) return null;
+  const start = page * pageSize + 1;
+  const end = Math.min(totalItems, (page + 1) * pageSize);
+  return (
+    <div className={styles.pagination}>
+      <span>
+        Showing <strong>{start}–{end}</strong> of <strong>{totalItems}</strong> (page {page + 1} of {totalPages})
+      </span>
+      <div className={styles.paginationBtns}>
+        <button
+          type="button"
+          className={styles.secondaryBtn}
+          disabled={loading || page === 0}
+          onClick={() => onPageChange(page - 1)}>
+          ← Previous
+        </button>
+        <button
+          type="button"
+          className={styles.secondaryBtn}
+          disabled={loading || page + 1 >= totalPages}
+          onClick={() => onPageChange(page + 1)}>
+          Next →
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function AdminDashboardPage() {
   const [token, setToken] = useState('');
   const [tokenInput, setTokenInput] = useState('');
   const [days, setDays] = useState(30);
   const [loading, setLoading] = useState(false);
+  const [eventsLoading, setEventsLoading] = useState(false);
   const [error, setError] = useState('');
   const [stats, setStats] = useState(null);
   const [feedback, setFeedback] = useState([]);
   const [issues, setIssues] = useState([]);
   const [events, setEvents] = useState([]);
+  const [eventsTotal, setEventsTotal] = useState(0);
+  const [eventsPage, setEventsPage] = useState(0);
+  const [topPagesPage, setTopPagesPage] = useState(0);
+  const [completionsPage, setCompletionsPage] = useState(0);
+  const [feedbackPage, setFeedbackPage] = useState(0);
+  const [issuesPage, setIssuesPage] = useState(0);
 
   useEffect(() => {
     try {
@@ -32,6 +71,27 @@ export default function AdminDashboardPage() {
       if (saved) setToken(saved);
     } catch {
       // Ignore storage errors
+    }
+  }, []);
+
+  const fetchEventsPage = useCallback(async (authToken, periodDays, pageIdx) => {
+    if (!authToken) return;
+    setEventsLoading(true);
+    try {
+      const offset = pageIdx * EVENTS_PAGE_SIZE;
+      const res = await fetch(
+        `${API_BASE}/admin/events?days=${periodDays}&limit=${EVENTS_PAGE_SIZE}&offset=${offset}`,
+        {headers: {Authorization: `Bearer ${authToken}`}, mode: 'cors'},
+      );
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      setEvents(json.events || []);
+      setEventsTotal(typeof json.total === 'number' ? json.total : (json.events || []).length);
+      setEventsPage(pageIdx);
+    } catch (err) {
+      setError(`Could not load events page: ${err.message}`);
+    } finally {
+      setEventsLoading(false);
     }
   }, []);
 
@@ -46,7 +106,10 @@ export default function AdminDashboardPage() {
         fetch(`${API_BASE}/admin/stats?days=${periodDays}`, {headers, mode: 'cors'}),
         fetch(`${API_BASE}/admin/feedback`, {headers, mode: 'cors'}),
         fetch(`${API_BASE}/admin/issues`, {headers, mode: 'cors'}),
-        fetch(`${API_BASE}/admin/events?days=${periodDays}&limit=50`, {headers, mode: 'cors'}),
+        fetch(`${API_BASE}/admin/events?days=${periodDays}&limit=${EVENTS_PAGE_SIZE}&offset=0`, {
+          headers,
+          mode: 'cors',
+        }),
       ]);
 
       if (statsRes.status === 401 || fbRes.status === 401) {
@@ -67,12 +130,20 @@ export default function AdminDashboardPage() {
       const statsJson = await statsRes.json();
       const fbJson = fbRes.ok ? await fbRes.json() : {feedback: []};
       const issuesJson = issuesRes.ok ? await issuesRes.json() : {issues: []};
-      const eventsJson = eventsRes.ok ? await eventsRes.json() : {events: []};
+      const eventsJson = eventsRes.ok ? await eventsRes.json() : {events: [], total: 0};
 
       setStats(statsJson);
       setFeedback(fbJson.feedback || []);
       setIssues(issuesJson.issues || []);
       setEvents(eventsJson.events || []);
+      setEventsTotal(
+        typeof eventsJson.total === 'number' ? eventsJson.total : (eventsJson.events || []).length,
+      );
+      setEventsPage(0);
+      setTopPagesPage(0);
+      setCompletionsPage(0);
+      setFeedbackPage(0);
+      setIssuesPage(0);
     } catch (err) {
       setError(`Could not load admin data: ${err.message}`);
     } finally {
@@ -116,7 +187,7 @@ export default function AdminDashboardPage() {
   async function handleDownloadCsv() {
     if (!token) return;
     try {
-      const resp = await fetch(`${API_BASE}/admin/events?days=${days}&limit=5000&format=csv`, {
+      const resp = await fetch(`${API_BASE}/admin/events?days=${days}&limit=50000&format=csv`, {
         headers: {Authorization: `Bearer ${token}`},
         mode: 'cors',
       });
@@ -125,7 +196,7 @@ export default function AdminDashboardPage() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `learnalgorithms-events-${days}d.csv`;
+      a.download = `learnalgorithms-events-${days === 0 ? 'all' : `${days}d`}.csv`;
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -183,6 +254,7 @@ export default function AdminDashboardPage() {
                   <option value={30}>Last 30 days</option>
                   <option value={90}>Last 90 days</option>
                   <option value={365}>Last 365 days</option>
+                  <option value={0}>All time</option>
                 </select>
                 <button
                   type="button"
@@ -290,7 +362,9 @@ export default function AdminDashboardPage() {
                           </tr>
                         </thead>
                         <tbody>
-                          {stats.topPages.map((p) => (
+                          {stats.topPages
+                            .slice(topPagesPage * PAGE_SIZE, (topPagesPage + 1) * PAGE_SIZE)
+                            .map((p) => (
                             <tr key={p.page}>
                               <td className={styles.mono}>{p.page}</td>
                               <td>{p.views}</td>
@@ -303,10 +377,16 @@ export default function AdminDashboardPage() {
                       </table>
                     </div>
                   )}
+                  <Pagination
+                    page={topPagesPage}
+                    totalItems={stats.topPages.length}
+                    pageSize={PAGE_SIZE}
+                    onPageChange={setTopPagesPage}
+                  />
                 </section>
 
                 <section className={styles.section}>
-                  <h2 className={styles.sectionTitle}>Lesson completions</h2>
+                  <h2 className={styles.sectionTitle}>Lesson completions ({stats.lessonCompletions.length})</h2>
                   {stats.lessonCompletions.length === 0 ? (
                     <p className={styles.empty}>No lesson completions recorded yet.</p>
                   ) : (
@@ -320,7 +400,9 @@ export default function AdminDashboardPage() {
                           </tr>
                         </thead>
                         <tbody>
-                          {stats.lessonCompletions.map((c) => (
+                          {stats.lessonCompletions
+                            .slice(completionsPage * PAGE_SIZE, (completionsPage + 1) * PAGE_SIZE)
+                            .map((c) => (
                             <tr key={c.page}>
                               <td className={styles.mono}>{c.page}</td>
                               <td>{c.completed}</td>
@@ -331,6 +413,12 @@ export default function AdminDashboardPage() {
                       </table>
                     </div>
                   )}
+                  <Pagination
+                    page={completionsPage}
+                    totalItems={stats.lessonCompletions.length}
+                    pageSize={PAGE_SIZE}
+                    onPageChange={setCompletionsPage}
+                  />
                 </section>
               </>
             )}
@@ -351,7 +439,9 @@ export default function AdminDashboardPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {feedback.map((f, idx) => (
+                      {feedback
+                        .slice(feedbackPage * PAGE_SIZE, (feedbackPage + 1) * PAGE_SIZE)
+                        .map((f, idx) => (
                         <tr key={`${f.day}-${f.page}-${idx}`}>
                           <td className={styles.mono}>{f.day}</td>
                           <td className={styles.mono}>{f.page}</td>
@@ -363,6 +453,12 @@ export default function AdminDashboardPage() {
                   </table>
                 </div>
               )}
+              <Pagination
+                page={feedbackPage}
+                totalItems={feedback.length}
+                pageSize={PAGE_SIZE}
+                onPageChange={setFeedbackPage}
+              />
             </section>
 
             <section className={styles.section}>
@@ -383,7 +479,9 @@ export default function AdminDashboardPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {issues.map((it) => (
+                      {issues
+                        .slice(issuesPage * PAGE_SIZE, (issuesPage + 1) * PAGE_SIZE)
+                        .map((it) => (
                         <tr key={it.delivery}>
                           <td className={styles.mono}>{it.received.slice(0, 19).replace('T', ' ')}</td>
                           <td>{it.action}</td>
@@ -398,10 +496,16 @@ export default function AdminDashboardPage() {
                   </table>
                 </div>
               )}
+              <Pagination
+                page={issuesPage}
+                totalItems={issues.length}
+                pageSize={PAGE_SIZE}
+                onPageChange={setIssuesPage}
+              />
             </section>
 
             <section className={styles.section}>
-              <h2 className={styles.sectionTitle}>Latest raw events (up to 50)</h2>
+              <h2 className={styles.sectionTitle}>Raw events ({eventsTotal})</h2>
               {events.length === 0 ? (
                 <p className={styles.empty}>No raw events recorded in this period.</p>
               ) : (
@@ -435,6 +539,13 @@ export default function AdminDashboardPage() {
                   </table>
                 </div>
               )}
+              <Pagination
+                page={eventsPage}
+                totalItems={eventsTotal}
+                pageSize={EVENTS_PAGE_SIZE}
+                loading={eventsLoading}
+                onPageChange={(nextPage) => fetchEventsPage(token, days, nextPage)}
+              />
             </section>
           </>
         )}

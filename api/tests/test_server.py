@@ -222,6 +222,22 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(qs["avgDurationMs"], 45000)
         self.assertEqual(qs["avgScrollPct"], 85)
 
+        # All-time stats (days=0) and paginated events (limit + offset + total)
+        s, all_stats, _ = self.req("GET", "/admin/stats?days=0", headers={"Authorization": "Bearer admintoken"})
+        self.assertEqual(s, 200)
+        self.assertIsNone(all_stats["since"])
+        self.assertGreaterEqual(all_stats["totals"]["events"], 6)
+
+        s, page1, _ = self.req("GET", "/admin/events?days=0&limit=2&offset=0", headers={"Authorization": "Bearer admintoken"})
+        self.assertEqual(s, 200)
+        self.assertEqual(len(page1["events"]), 2)
+        self.assertGreaterEqual(page1["total"], 6)
+
+        s, page2, _ = self.req("GET", "/admin/events?days=0&limit=2&offset=2", headers={"Authorization": "Bearer admintoken"})
+        self.assertEqual(s, 200)
+        self.assertEqual(len(page2["events"]), 2)
+        self.assertEqual(page2["offset"], 2)
+
         # Admin events CSV export with CORS header for /admin dashboard
         req = urllib.request.Request(
             self.base + "/admin/events?days=7&format=csv",
