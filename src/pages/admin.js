@@ -103,10 +103,11 @@ export default function AdminDashboardPage() {
   const [etlMarkdown, setEtlMarkdown] = useState('');
   const [reportCopied, setReportCopied] = useState(false);
   const [aiLang, setAiLang] = useState('en');
-  const [aiLoading, setAiLoading] = useState(false);
+  const [aiLoadingMode, setAiLoadingMode] = useState(null);
   const [aiAnalysis, setAiAnalysis] = useState(null);
   const [aiError, setAiError] = useState('');
   const [aiCopied, setAiCopied] = useState(false);
+  const [metricsText, setMetricsText] = useState('');
   const [health, setHealth] = useState(null);
   const [popular, setPopular] = useState([]);
   const [summaryPage, setSummaryPage] = useState('');
@@ -173,7 +174,7 @@ export default function AdminDashboardPage() {
 
     try {
       const healthStart = performance.now();
-      const [healthRes, popularRes, statsRes, fbRes, issuesRes, eventsRes, reportRes] = await Promise.all([
+      const [healthRes, popularRes, statsRes, fbRes, issuesRes, eventsRes, reportRes, metricsRes] = await Promise.all([
         fetch(`${API_BASE}/health`, {mode: 'cors'}).catch(() => null),
         fetch(`${API_BASE}/popular`, {mode: 'cors'}).catch(() => null),
         fetch(`${API_BASE}/admin/stats?days=${periodDays}`, {headers, mode: 'cors'}),
@@ -184,6 +185,7 @@ export default function AdminDashboardPage() {
           mode: 'cors',
         }),
         fetch(`${API_BASE}/admin/report?days=${periodDays}`, {headers, mode: 'cors'}).catch(() => null),
+        fetch(`${API_BASE}/admin/metrics`, {headers, mode: 'cors'}).catch(() => null),
       ]);
       const healthMs = Math.round(performance.now() - healthStart);
 
@@ -209,6 +211,7 @@ export default function AdminDashboardPage() {
       const issuesJson = issuesRes.ok ? await issuesRes.json() : {issues: []};
       const eventsJson = eventsRes.ok ? await eventsRes.json() : {events: [], total: 0};
       const reportJson = reportRes && reportRes.ok ? await reportRes.json() : null;
+      const promText = metricsRes && metricsRes.ok ? await metricsRes.text() : '';
 
       setHealth(healthJson ? {ok: healthJson.status === 'ok', status: healthJson.status, latencyMs: healthMs} : {ok: false, status: 'error', latencyMs: healthMs});
       setPopular(popularJson.pages || []);
@@ -218,6 +221,7 @@ export default function AdminDashboardPage() {
       setEvents(eventsJson.events || []);
       setEtlReport(reportJson?.report || null);
       setEtlMarkdown(reportJson?.markdown || '');
+      setMetricsText(promText);
       setEventsTotal(
         typeof eventsJson.total === 'number' ? eventsJson.total : (eventsJson.events || []).length,
       );
@@ -262,6 +266,7 @@ export default function AdminDashboardPage() {
     setEtlMarkdown('');
     setAiAnalysis(null);
     setAiError('');
+    setMetricsText('');
     setHealth(null);
     setPopular([]);
     setSummaryData(null);
@@ -323,8 +328,8 @@ export default function AdminDashboardPage() {
   }
 
   async function handleInterpretReport(detail = 'brief') {
-    if (!token) return;
-    setAiLoading(true);
+    if (!token || aiLoadingMode) return;
+    setAiLoadingMode(detail);
     setAiError('');
     try {
       const res = await fetch(
@@ -344,7 +349,7 @@ export default function AdminDashboardPage() {
     } catch (err) {
       setAiError(`AI interpretation failed: ${err.message}`);
     } finally {
-      setAiLoading(false);
+      setAiLoadingMode(null);
     }
   }
 
@@ -840,18 +845,18 @@ export default function AdminDashboardPage() {
                     <button
                       type="button"
                       className={styles.primaryBtn}
-                      disabled={aiLoading}
+                      disabled={Boolean(aiLoadingMode)}
                       onClick={() => handleInterpretReport('brief')}
                       title="POST /admin/report/interpret?detail=brief — concise 5-section summary">
-                      {aiLoading ? 'Analyzing…' : '✨ AI Summary'}
+                      {aiLoadingMode === 'brief' ? 'Analyzing…' : '✨ AI Summary'}
                     </button>
                     <button
                       type="button"
                       className={styles.primaryBtn}
-                      disabled={aiLoading}
+                      disabled={Boolean(aiLoadingMode)}
                       onClick={() => handleInterpretReport('detailed')}
                       title="POST /admin/report/interpret?detail=detailed — full 7-section report for annual teaching memories">
-                      {aiLoading ? 'Analyzing…' : '📄 Detailed AI Report'}
+                      {aiLoadingMode === 'detailed' ? 'Analyzing…' : '📄 Detailed AI Report'}
                     </button>
                     <button type="button" className={styles.secondaryBtn} onClick={handleCopyReport}>
                       {reportCopied ? 'Copied!' : 'Copy Markdown'}
@@ -915,7 +920,9 @@ export default function AdminDashboardPage() {
                     <div className={styles.aiBox}>
                       <div className={styles.aiHeader}>
                         <div>
-                          <strong>✨ AI Pedagogical Interpretation</strong>{' '}
+                          <strong>
+                            {aiAnalysis.detail === 'detailed' ? '📄 Detailed AI Teaching Report' : '✨ AI Teaching Summary'}
+                          </strong>{' '}
                           <code className={styles.endpointTag}>POST /admin/report/interpret</code>{' '}
                           <code className={styles.endpointTag}>{aiAnalysis.model}</code>
                         </div>
@@ -931,6 +938,19 @@ export default function AdminDashboardPage() {
                   )}
                   <pre className={styles.reportPre}>{etlMarkdown}</pre>
                 </>
+              )}
+            </section>
+
+            <section className={styles.section}>
+              <h2 className={styles.sectionTitle}>
+                Observability — Prometheus metrics <code className={styles.endpointTag}>GET /admin/metrics</code>
+              </h2>
+              {!metricsText ? (
+                <p className={styles.empty}>
+                  Prometheus metrics endpoint not available yet on the API server. Rebuild the API container on the VPS to enable it.
+                </p>
+              ) : (
+                <pre className={styles.reportPre}>{metricsText}</pre>
               )}
             </section>
           </>

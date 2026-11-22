@@ -13,10 +13,75 @@ Standard library only (no third-party packages).
 import argparse
 import csv
 import json
+import re
 import sqlite3
 import statistics
 from collections import Counter, defaultdict
 from pathlib import Path
+
+STOPWORDS = frozenset({
+    # English
+    "the", "and", "for", "that", "this", "with", "from", "have", "was", "were", "are", "but",
+    "not", "you", "your", "very", "more", "some", "into", "about", "just", "like", "what",
+    "when", "where", "which", "how", "can", "could", "would", "should", "there", "their",
+    "been", "being", "than", "then", "also", "only", "page", "lesson",
+    # Spanish
+    "los", "las", "una", "uno", "unos", "unas", "para", "por", "con", "sin", "sobre", "entre",
+    "como", "pero", "mas", "muy", "este", "esta", "estos", "estas", "eso", "esa", "todo",
+    "toda", "todos", "que", "del", "hay", "ser", "esta", "son", "fue", "tiene", "bien",
+})
+TOKEN_RE = re.compile(r"[a-zA-ZáéíóúüñÁÉÍÓÚÜÑ]{3,}")
+
+INTENT_LEXICON = {
+    "bug_typo": ("typo", "error", "broken", "bug", "wrong", "errata", "fallo", "roto", "mal", "incorrect"),
+    "confusion": ("confus", "unclear", "hard", "difficult", "understand", "duda", "entiendo", "difícil", "dificil", "claro", "explic"),
+    "suggestion": ("add", "more", "example", "diagram", "visual", "improve", "añadir", "ejemplo", "mejorar", "falt", "suggest", "would be"),
+    "positive": ("great", "clear", "helpful", "good", "nice", "excellent", "thanks", "genial", "claro", "útil", "util", "buen", "gracias", "excelente"),
+}
+
+
+def classify_comment_intent(text, helpful=None):
+    low = (text or "").lower()
+    for intent in ("bug_typo", "confusion", "suggestion", "positive"):
+        if any(kw in low for kw in INTENT_LEXICON[intent]):
+            return intent
+    if helpful is True:
+        return "positive"
+    if helpful is False:
+        return "confusion"
+    return "neutral"
+
+
+def analyze_nlp(feedback_list, all_searches):
+    term_counts = Counter()
+    intents = Counter()
+    classified_comments = []
+
+    for q, count in all_searches.items():
+        for tok in TOKEN_RE.findall(q.lower()):
+            if tok not in STOPWORDS:
+                term_counts[tok] += count
+
+    for f in feedback_list:
+        comment = (f.get("comment") or "").strip()
+        if not comment:
+            continue
+        intent = classify_comment_intent(comment, f.get("helpful"))
+        intents[intent] += 1
+        classified_comments.append({
+            "page": f.get("page", ""),
+            "intent": intent,
+            "comment": comment,
+        })
+        for tok in TOKEN_RE.findall(comment.lower()):
+            if tok not in STOPWORDS:
+                term_counts[tok] += 1
+
+    return {
+        "analyzedComments": len(classified_comments),
+        "intentBreakdown": dict(intents.most_common()),
+        "topTerms": [{"term": t, "count": c} for t, c in term_counts.most_common(15)],
+    }
 
 
 def extract_from_sqlite(db_path):
@@ -217,6 +282,7 @@ def transform(events, feedback=None, issues=None, popular=None):
 
     issues_list = list(issues or [])
     popular_list = list(popular or [])
+    nlp = analyze_nlp(fb_list, all_searches)
 
     daily_activity = [
         {"day": d, "events": daily_events[d], "sessions": len(daily_sessions[d])}
@@ -259,6 +325,7 @@ def transform(events, feedback=None, issues=None, popular=None):
             "byPage": fb_by_page,
             "recentComments": fb_comments[:25],
         },
+        "nlp": nlp,
         "issues": issues_list[:20],
         "webVitals": {
             "samples": max(len(ttfb_vals), len(lcp_vals), len(cls_vals)),
@@ -372,6 +439,16 @@ def render_markdown(report):
             for c in fb["recentComments"]:
                 tag = "Helpful" if c["helpful"] else "Not helpful"
                 lines.append(f"- [{c['day']}] `{c['page']}` ({tag}): {c['comment']}")
+
+    nlp = report.get("nlp") or {}
+    if nlp.get("analyzedComments", 0) > 0 or nlp.get("topTerms"):
+        lines.extend(["", "## NLP Analysis (Feedback & Search Terms)", ""])
+        if nlp.get("intentBreakdown"):
+            intents_str = ", ".join(f"`{k}`: {v}" for k, v in nlp["intentBreakdown"].items())
+            lines.append(f"- **Comment intent classification ({nlp['analyzedComments']} comments):** {intents_str}")
+        if nlp.get("topTerms"):
+            terms_str = ", ".join(f"`{t['term']}` ({t['count']})" for t in nlp["topTerms"])
+            lines.append(f"- **Top extracted terms:** {terms_str}")
 
     issues = report.get("issues") or []
     if issues:
