@@ -607,18 +607,19 @@ def interpret_report_with_llm(markdown_report, lang="en", detail="brief"):
         if is_detailed:
             system_prompt = (
                 "Eres un asesor experto en innovación docente universitaria y analítica de aprendizaje para el curso de "
-                "Diseño y Análisis de Algoritmos (learnalgorithms.dev). Redacta un INFORME EXTENSO Y EXHAUSTIVO (mínimo "
-                "700–1000 palabras, varios párrafos detallados por sección, NO un resumen breve) en español listo para "
-                "incluir en una memoria anual oficial de innovación docente, usando ÚNICAMENTE los datos cuantitativos y "
-                f"comentarios anonimizados del informe ETL proporcionado. No inventes cifras. {thresholds} {security_clause}\n"
-                "Desarrolla en profundidad estas 7 secciones en Markdown:\n"
-                "1. Resumen ejecutivo y contexto de uso (volumen, sesiones, días activos, tendencia diaria y dispositivos móvil/escritorio)\n"
-                "2. Análisis detallado de participación por lección (vistas, mediana de tiempo, profundidad de scroll, tasas de completado y cruce con Matomo)\n"
-                "3. Señales de dificultad y comportamiento de estudio (checkpoints más abiertos, clics a código/demostraciones y uso del Cheat Sheet)\n"
-                "4. Lagunas de contenido, análisis NLP y retroalimentación cualitativa (búsquedas, términos clave, intención del feedback y comentarios)\n"
-                "5. Diagnóstico de rendimiento técnico y UX (evaluación rigurosa de TTFB, LCP y CLS según umbrales oficiales)\n"
-                "6. Limitaciones metodológicas y tamaño muestral actual\n"
-                "7. Plan de acción priorizado para el próximo ciclo docente (5–7 acciones concretas con prioridad Alta/Media y KPI verificable)"
+                "Diseño y Análisis de Algoritmos (learnalgorithms.dev). Redacta un INFORME ACADÉMICO EXTENSO Y EXHAUSTIVO "
+                "(objetivo: 1200–1800 palabras; escribe 2–3 párrafos analíticos profundos en cada sección, SIN resumir ni "
+                "recortar incluso si la muestra actual es pequeña: explica a fondo los datos disponibles y qué patrones "
+                "habrá que vigilar al crecer la muestra). Usa ÚNICAMENTE los datos cuantitativos y comentarios "
+                f"anonimizados del informe ETL proporcionado. No inventes cifras. {thresholds} {security_clause}\n"
+                "Desarrolla en profundidad estas 7 secciones en Markdown, incluyendo OBLIGATORIAMENTE las 3 tablas indicadas:\n"
+                "1. **Resumen ejecutivo y contexto de uso:** volumen total, sesiones, días activos, tendencia diaria (`Daily Activity`), reparto de dispositivos (escritorio/móvil/tablet) y lectura estratégica para la memoria anual.\n"
+                "2. **Análisis detallado por lección:** incluye una tabla Markdown `| Lección | Vistas | Tiempo mediano | Scroll | Completados | Diagnóstico pedagógico |` cubriendo todas las lecciones relevantes de `Top Pages`, más un análisis narrativo comparando tiempo vs. profundidad de lectura y el cruce con Matomo.\n"
+                "3. **Comportamiento de estudio y señales de dificultad:** análisis de checkpoints/soluciones más abiertos, clics a código Java/demostraciones, uso del Cheat Sheet y relación entre interactividad y retención.\n"
+                "4. **Lagunas de contenido, análisis NLP y feedback cualitativo:** análisis detallado de búsquedas, búsquedas sin resultado, términos clave y bigramas NLP, idioma, polaridad media, intención del feedback y lectura crítica de los comentarios literales.\n"
+                "5. **Auditoría técnica de rendimiento y UX (Core Web Vitals):** incluye una tabla Markdown `| Métrica | Valor p50 / p95 | Umbral oficial Google | Estado | Acción recomendada |` para TTFB, LCP y CLS, más análisis del impacto en la experiencia móvil/escritorio.\n"
+                "6. **Validez estadística y limitaciones metodológicas:** evaluación honesta del tamaño muestral, sesgos de sesiones anónimas basadas en `sessionStorage` y recomendaciones de recogida de datos.\n"
+                "7. **Plan de acción priorizado para el próximo ciclo docente:** incluye una matriz Markdown `| # | Acción concreta | Prioridad | Esfuerzo | KPI verificable | Fuente de verificación |` con 6–8 acciones accionables."
             )
         else:
             system_prompt = (
@@ -640,18 +641,19 @@ def interpret_report_with_llm(markdown_report, lang="en", detail="brief"):
         if is_detailed:
             system_prompt = (
                 "You are an expert university teaching-innovation advisor and learning-analytics specialist for an "
-                "Algorithms course (learnalgorithms.dev). Write a LONG, COMPREHENSIVE, THOROUGH report (at least "
-                "700–1000 words, multiple analytical paragraphs per section — NOT a brief summary) in English suitable "
-                "for an official annual teaching-innovation report, grounded EXCLUSIVELY in the anonymized metrics and "
+                "Algorithms course (learnalgorithms.dev). Write a LONG, COMPREHENSIVE, ACADEMIC REPORT (target: "
+                "1200–1800 words; write 2–3 thorough analytical paragraphs per section — DO NOT abbreviate or summarize "
+                "even if the current sample size is small: deeply analyze every available metric and explain what "
+                "patterns to monitor as usage scales). Ground every claim EXCLUSIVELY in the anonymized metrics and "
                 f"feedback comments in the provided ETL report. Never invent numbers. {thresholds} {security_clause}\n"
-                "Develop these 7 Markdown sections in depth:\n"
-                "1. Executive Summary & Usage Context (volume, sessions, active days, daily trend, and desktop/mobile split)\n"
-                "2. Lesson-by-Lesson Engagement Analysis (views, median reading time, scroll depth, completion rates, and Matomo comparison)\n"
-                "3. Difficulty Signals & Study Behavior (most opened checkpoints, Java/proof resource clicks, and Cheat Sheet usage)\n"
-                "4. Content Gaps, NLP Terms & Qualitative Feedback (top searches, zero-result searches, comment intents, and comments)\n"
-                "5. Technical Performance & UX Diagnosis (accurate assessment of TTFB, LCP, and CLS against official thresholds)\n"
-                "6. Methodological Limitations & Sample Size Caveats\n"
-                "7. Prioritized Action Plan for Next Term (5–7 concrete actions with High/Medium priority and measurable KPI)"
+                "Develop these 7 Markdown sections in depth, MANDATORILY including the 3 structured tables:\n"
+                "1. **Executive Summary & Usage Context:** total volume, sessions, active days, daily trend (`Daily Activity`), desktop/mobile/tablet split, and strategic takeaway for the annual teaching report.\n"
+                "2. **Lesson-by-Lesson Engagement Analysis:** include a Markdown table `| Lesson | Views | Median Time | Avg Scroll | Completions | Pedagogical Interpretation |` covering all relevant entries in `Top Pages`, plus narrative analysis of reading depth vs. time and comparison with Matomo.\n"
+                "3. **Study Behavior & Difficulty Signals:** analysis of most opened checkpoints/solutions, Java/proof resource clicks, Cheat Sheet usage, and how interactive elements support learning.\n"
+                "4. **Content Gaps, NLP Insights & Qualitative Feedback:** thorough review of searches, zero-result searches, NLP top terms & bigrams, detected languages, sentiment polarity, comment intents, and literal feedback comments.\n"
+                "5. **Technical Performance & UX Audit (Core Web Vitals):** include a Markdown table `| Metric | Observed p50 / p95 | Official Google Threshold | Status | Recommended Action |` for TTFB, LCP, and CLS, plus UX impact analysis.\n"
+                "6. **Statistical Validity & Methodological Limitations:** honest assessment of sample size, `sessionStorage` anonymous-session caveats, and data-collection guidance.\n"
+                "7. **Prioritized Action Plan for Next Term:** include a Markdown matrix `| # | Concrete Action | Priority | Effort | Measurable KPI | Verification Source |` with 6–8 actionable items."
             )
         else:
             system_prompt = (
@@ -667,8 +669,8 @@ def interpret_report_with_llm(markdown_report, lang="en", detail="brief"):
             )
     body = json.dumps({
         "model": LLM_MODEL,
-        "temperature": 0.3,
-        "max_tokens": 2500 if is_detailed else 900,
+        "temperature": 0.35 if is_detailed else 0.3,
+        "max_tokens": 3500 if is_detailed else 900,
         "messages": [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": f"<untrusted_data>\n{safe_report}\n</untrusted_data>"},
