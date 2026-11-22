@@ -7,6 +7,8 @@ import {fileURLToPath} from 'node:url';
 import CONCEPT_LINKS from '../src/plugins/concept-links.js';
 import pluginSiteData from '../src/plugins/docusaurus-plugin-site-data.js';
 import {computeStreak, normalizePermalink} from '../src/utils/studyProgress.js';
+import {recommendNextLessons} from '../src/utils/recommender.js';
+import {createProgressBadge, verifyProgressBadge} from '../src/utils/progressBadge.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -37,6 +39,31 @@ test('computeStreak counts consecutive active days up to today or yesterday', ()
   assert.equal(computeStreak(['2026-11-20', '2026-11-21', '2026-11-22'], '2026-11-22'), 3);
   assert.equal(computeStreak(['2026-11-20', '2026-11-21'], '2026-11-22'), 2);
   assert.equal(computeStreak(['2026-11-18', '2026-11-19'], '2026-11-22'), 0);
+});
+
+test('recommendNextLessons suggests unlocked lessons ranked by downstream impact', () => {
+  const concepts = [
+    {title: 'A', url: '/concepts/ch1/a', prerequisites: []},
+    {title: 'B', url: '/concepts/ch1/b', prerequisites: ['/concepts/ch1/a']},
+    {title: 'C', url: '/concepts/ch1/c', prerequisites: ['/concepts/ch1/b']},
+    {title: 'D', url: '/concepts/ch1/d', prerequisites: ['/concepts/ch1/a']},
+  ];
+  const recs = recommendNextLessons(concepts, new Set(['/concepts/ch1/a']), 3);
+  assert.equal(recs.length, 2);
+  assert.equal(recs[0].url, '/concepts/ch1/b'); // unlocks C
+  assert.match(recs[0].reason, /unlocks 1 topic/);
+});
+
+test('createProgressBadge and verifyProgressBadge detect tampering via SHA-256', async () => {
+  const badge = await createProgressBadge({
+    completedLessons: ['/concepts/sorting/quicksort'],
+    totalLessons: 36,
+    masteredChapters: 0,
+    streakDays: 2,
+  });
+  assert.equal(await verifyProgressBadge(badge), true);
+  const tampered = {...badge, payload: {...badge.payload, completedCount: 36}};
+  assert.equal(await verifyProgressBadge(tampered), false);
 });
 
 test('docusaurus-plugin-site-data scans concepts without coming-soon placeholders', async () => {

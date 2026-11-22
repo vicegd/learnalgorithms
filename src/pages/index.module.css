@@ -395,3 +395,53 @@
   justify-content: space-between;
   gap: 0.5rem;
 }
+
+.progressActions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.exportBadgeBtn {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--ifm-color-primary-darkest);
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.recBox {
+  margin-top: 0.75rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid var(--ifm-color-emphasis-200);
+}
+
+.recTitle {
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ifm-color-emphasis-600);
+  margin-bottom: 0.35rem;
+}
+
+.recList {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.83rem;
+}
+
+.recList li {
+  margin-bottom: 0.2rem;
+}
+
+.recLink {
+  font-weight: 600;
+}
+
+.recReason {
+  color: var(--ifm-color-emphasis-600);
+}
