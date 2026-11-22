@@ -136,6 +136,11 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(self.req("POST", "/webhooks/github", raw=body, headers=h)[0], 401)
         self.assertEqual(self.req("POST", "/webhooks/github", raw=body,
                                   headers={**h, "X-Hub-Signature-256": sig})[0], 204)
+        self.assertEqual(self.req("GET", "/admin/issues")[0], 401)
+        s, issues_data, _ = self.req("GET", "/admin/issues", headers={"Authorization": "Bearer admintoken"})
+        self.assertEqual(s, 200)
+        self.assertEqual(issues_data["issues"][0]["number"], 7)
+        self.assertEqual(issues_data["issues"][0]["title"], "Typo")
 
     def test_unknown_route(self):
         self.assertEqual(self.req("GET", "/../../etc/passwd")[0], 404)
@@ -180,10 +185,28 @@ class ApiTest(unittest.TestCase):
                     "eventType": "lesson_complete",
                     "page": "/concepts/sorting/quicksort",
                 },
+                {
+                    "sessionId": sid,
+                    "eventType": "search",
+                    "page": "/",
+                    "meta": {"query": "knapsack", "results": 4},
+                },
+                {
+                    "sessionId": sid,
+                    "eventType": "details_open",
+                    "page": "/concepts/sorting/quicksort",
+                    "meta": {"summary": "Checkpoint: Pivot choice"},
+                },
+                {
+                    "sessionId": sid,
+                    "eventType": "resource_click",
+                    "page": "/concepts/sorting/quicksort",
+                    "meta": {"kind": "java_code"},
+                },
             ]
         })
         self.assertEqual(s, 201)
-        self.assertEqual(data["count"], 3)
+        self.assertEqual(data["count"], 6)
 
         # Admin endpoints require token
         self.assertEqual(self.req("GET", "/admin/stats")[0], 401)

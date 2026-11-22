@@ -72,7 +72,7 @@ const GROUPS = [
         summary: 'Record anonymous student/usage telemetry events',
         auth: 'Origin: learnalgorithms.dev',
         details:
-          'Accepts a single event or a batch (max 20 events, 4 KB body). Allowed eventType values: page_view, page_leave, lesson_complete, lesson_uncomplete, cheat_sheet_filter, cheat_sheet_compare, visualizer_interact, search.',
+          'Accepts a single event or a batch (max 20 events, 4 KB body). Allowed eventType values: page_view, page_leave, lesson_complete, lesson_uncomplete, cheat_sheet_filter, cheat_sheet_compare, visualizer_interact, search, details_open, resource_click.',
         payload: `{
   "events": [
     {
@@ -133,6 +133,15 @@ const GROUPS = [
         details: 'Returns the latest 200 feedback entries stored in SQLite with Cache-Control: no-store.',
         responses: ['200 OK — {"feedback":[...]}', '401 Unauthorized'],
         example: `curl -H "Authorization: Bearer <ADMIN_TOKEN>" "${API_BASE}/admin/feedback"`,
+      },
+      {
+        method: 'GET',
+        path: '/admin/issues',
+        summary: 'Latest GitHub issue webhook events',
+        auth: 'Bearer Token',
+        details: 'Returns the latest 200 GitHub issue events recorded via POST /webhooks/github.',
+        responses: ['200 OK — {"issues":[...]}', '401 Unauthorized'],
+        example: `curl -H "Authorization: Bearer <ADMIN_TOKEN>" "${API_BASE}/admin/issues"`,
       },
     ],
   },

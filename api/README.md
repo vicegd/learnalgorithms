@@ -11,6 +11,7 @@ Backend of [learnalgorithms.dev](https://learnalgorithms.dev), served at `api.le
 | `POST /events` | Anonymous student/usage telemetry events (page views, time on page, scroll depth, completions, cheat-sheet filters) |
 | `POST /webhooks/github` | GitHub `issues` events, verified with HMAC-SHA256 |
 | `GET /admin/feedback` | Latest votes and comments (bearer token) |
+| `GET /admin/issues` | Latest GitHub issue webhook events (bearer token) |
 | `GET /admin/stats?days=30` | Aggregated student/usage statistics for teaching innovation (bearer token) |
 | `GET /admin/events?days=30&format=csv` | Raw anonymized telemetry events in JSON or CSV (bearer token) |
 

@@ -69,6 +69,8 @@ components:
             - cheat_sheet_compare
             - visualizer_interact
             - search
+            - details_open
+            - resource_click
         page:
           type: string
           example: /concepts/sorting/quicksort
@@ -257,6 +259,17 @@ paths:
       responses:
         '200':
           description: Latest feedback entries
+        '401':
+          description: Unauthorized
+
+  /admin/issues:
+    get:
+      summary: Latest GitHub issue webhook events
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Latest recorded GitHub issue events
         '401':
           description: Unauthorized
 
