@@ -1,0 +1,82 @@
+---
+# Declarative Ansible playbook (IaC) to provision the learnalgorithms.dev API VPS.
+# Usage:
+#   ansible-playbook -i "46.202.173.147," -u root api/deploy/provision.yml
+- name: Provision learnalgorithms.dev API host
+  hosts: all
+  become: true
+  vars:
+    repo_url: "https://github.com/vicegd/learnalgorithms.git"
+    repo_dir: "/opt/learnalgorithms"
+    api_domain: "api.learnalgorithms.dev"
+    api_host_port: "8081"
+
+  tasks:
+    - name: Install required packages (Docker, Compose v2, nginx, Certbot, git)
+      ansible.builtin.apt:
+        name:
+          - docker.io
+          - docker-compose-v2
+          - nginx
+          - certbot
+          - python3-certbot-nginx
+          - git
+        state: present
+        update_cache: true
+
+    - name: Ensure Docker and nginx services are enabled and running
+      ansible.builtin.service:
+        name: "{{ item }}"
+        state: started
+        enabled: true
+      loop:
+        - docker
+        - nginx
+
+    - name: Clone or update learnalgorithms repository
+      ansible.builtin.git:
+        repo: "{{ repo_url }}"
+        dest: "{{ repo_dir }}"
+        version: main
+        update: true
+
+    - name: Ensure .env file exists with mode 0600
+      ansible.builtin.copy:
+        src: "{{ repo_dir }}/api/.env.example"
+        dest: "{{ repo_dir }}/api/.env"
+        remote_src: true
+        force: false
+        mode: "0600"
+
+    - name: Configure API_HOST_PORT in .env
+      ansible.builtin.lineinfile:
+        path: "{{ repo_dir }}/api/.env"
+        regexp: "^API_HOST_PORT="
+        line: "API_HOST_PORT={{ api_host_port }}"
+
+    - name: Build and start API container via Docker Compose
+      ansible.builtin.command:
+        cmd: docker compose up -d --build
+        chdir: "{{ repo_dir }}/api"
+      changed_when: true
+
+    - name: Install nginx reverse-proxy site configuration
+      ansible.builtin.copy:
+        src: "{{ repo_dir }}/api/deploy/nginx-api.conf"
+        dest: "/etc/nginx/sites-available/{{ api_domain }}"
+        remote_src: true
+        force: false
+        mode: "0644"
+
+    - name: Enable nginx site
+      ansible.builtin.file:
+        src: "/etc/nginx/sites-available/{{ api_domain }}"
+        dest: "/etc/nginx/sites-enabled/{{ api_domain }}"
+        state: link
+
+    - name: Schedule daily encrypted/verified SQLite backup at 03:00 UTC
+      ansible.builtin.cron:
+        name: "learnalgorithms SQLite hot backup"
+        minute: "0"
+        hour: "3"
+        job: "{{ repo_dir }}/api/deploy/backup-sqlite.sh >/var/log/learnalgorithms-backup.log 2>&1"

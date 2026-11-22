@@ -7,6 +7,8 @@ import Layout from '@theme/Layout';
 import styles from './index.module.css';
 import Icon from '@site/src/components/Icon';
 import {normalizePermalink, useStudyProgress} from '@site/src/utils/studyProgress';
+import {recommendNextLessons} from '@site/src/utils/recommender';
+import {createProgressBadge} from '@site/src/utils/progressBadge';
 
 const CHAPTERS = [
   {
@@ -206,7 +208,15 @@ const ALGORITHMS_SECTION = {
   to: '/algorithms/',
 };
 
-function Intro({ totalCompleted, totalLessons, streak, masteredChapters, onResetProgress }) {
+function Intro({
+  totalCompleted,
+  totalLessons,
+  streak,
+  masteredChapters,
+  recommendations,
+  onResetProgress,
+  onExportBadge,
+}) {
   const pct = totalLessons > 0 ? Math.round((totalCompleted / totalLessons) * 100) : 0;
   return (
     <header className={styles.intro}>
@@ -237,12 +247,21 @@ function Intro({ totalCompleted, totalLessons, streak, masteredChapters, onReset
             <span>
               Study progress: <strong>{totalCompleted}</strong> / {totalLessons} lessons ({pct}%)
             </span>
-            <button
-              type="button"
-              onClick={onResetProgress}
-              className={styles.resetProgressBtn}>
-              Reset
-            </button>
+            <div className={styles.progressActions}>
+              <button
+                type="button"
+                onClick={onExportBadge}
+                className={styles.exportBadgeBtn}
+                title="Download anonymous progress JSON with SHA-256 integrity hash">
+                Export SHA-256 badge
+              </button>
+              <button
+                type="button"
+                onClick={onResetProgress}
+                className={styles.resetProgressBtn}>
+                Reset
+              </button>
+            </div>
           </div>
           <div className={styles.progressTrack} aria-hidden="true">
             <div className={styles.progressFill} style={{ width: `${pct}%` }} />
@@ -259,6 +278,19 @@ function Intro({ totalCompleted, totalLessons, streak, masteredChapters, onReset
                   🏆 {masteredChapters} {masteredChapters === 1 ? 'chapter' : 'chapters'} mastered
                 </span>
               )}
+            </div>
+          )}
+          {recommendations.length > 0 && (
+            <div className={styles.recBox}>
+              <div className={styles.recTitle}>Recommended next for you:</div>
+              <ul className={styles.recList}>
+                {recommendations.map((rec) => (
+                  <li key={rec.url}>
+                    <Link to={rec.url} className={styles.recLink}>{rec.title}</Link>
+                    <span className={styles.recReason}> — {rec.reason}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
         </div>
@@ -338,7 +370,7 @@ export default function Home() {
   const { siteConfig } = useDocusaurusContext();
   const siteData = usePluginData('docusaurus-plugin-site-data');
   const concepts = siteData?.concepts || [];
-  const { streak, isCompleted, resetProgress } = useStudyProgress();
+  const { completed, streak, isCompleted, resetProgress } = useStudyProgress();
   const showAlgorithms = siteConfig.customFields?.showAlgorithms !== false;
 
   const totalLessons = concepts.length;
@@ -351,6 +383,29 @@ export default function Home() {
   const masteredChapters = chapterProgressList.filter(
     (item) => item.total > 0 && item.completed >= item.total,
   ).length;
+  const recommendations = recommendNextLessons(concepts, completed, 3);
+
+  async function handleExportBadge() {
+    try {
+      const badge = await createProgressBadge({
+        completedLessons: [...completed],
+        totalLessons,
+        masteredChapters,
+        streakDays: streak,
+      });
+      const blob = new Blob([JSON.stringify(badge, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'learnalgorithms-progress-badge.json';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch {
+      // Ignore Web Crypto errors in unsupported environments
+    }
+  }
 
   return (
     <Layout title="Home" description={siteConfig.tagline}>
@@ -360,7 +415,9 @@ export default function Home() {
           totalLessons={totalLessons}
           streak={streak}
           masteredChapters={masteredChapters}
+          recommendations={recommendations}
           onResetProgress={resetProgress}
+          onExportBadge={handleExportBadge}
         />
         <div className={styles.grid}>
           {chapterProgressList.map(({ chapter, completed, total }) => (
