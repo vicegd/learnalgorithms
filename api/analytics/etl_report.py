@@ -226,6 +226,7 @@ def transform(events, feedback=None, issues=None, popular=None):
     daily_sessions = defaultdict(set)
     device_counts = Counter()
     ttfb_vals, lcp_vals, cls_vals = [], [], []
+    transfer_kb_vals, co2_mg_vals = [], []
 
     for e in events:
         if e["sessionId"]:
@@ -286,6 +287,10 @@ def transform(events, feedback=None, issues=None, popular=None):
                 lcp_vals.append(meta["lcpMs"])
             if isinstance(meta.get("cls"), (int, float)):
                 cls_vals.append(meta["cls"])
+            if isinstance(meta.get("transferKB"), (int, float)):
+                transfer_kb_vals.append(meta["transferKB"])
+            if isinstance(meta.get("co2Mg"), (int, float)):
+                co2_mg_vals.append(meta["co2Mg"])
 
     top_pages = []
     for pg, views in page_views.most_common(25):
@@ -377,6 +382,19 @@ def transform(events, feedback=None, issues=None, popular=None):
             "lcpP50Ms": percentile(lcp_vals, 50),
             "lcpP95Ms": percentile(lcp_vals, 95),
             "clsP95": percentile(cls_vals, 95),
+        },
+        "greenSoftware": {
+            "samples": len(co2_mg_vals),
+            "avgTransferKB": round(statistics.mean(transfer_kb_vals), 1) if transfer_kb_vals else None,
+            "p95TransferKB": percentile(transfer_kb_vals, 95),
+            "avgCo2Mg": round(statistics.mean(co2_mg_vals), 1) if co2_mg_vals else None,
+            "totalCo2Grams": round(sum(co2_mg_vals) / 1000.0, 4) if co2_mg_vals else None,
+            "rating": (
+                "A+" if co2_mg_vals and statistics.mean(co2_mg_vals) < 95 else
+                "A" if co2_mg_vals and statistics.mean(co2_mg_vals) < 186 else
+                "B" if co2_mg_vals and statistics.mean(co2_mg_vals) < 341 else
+                "C" if co2_mg_vals else None
+            ),
         },
     }
 
@@ -517,6 +535,18 @@ def render_markdown(report):
             f"- TTFB p50 / p95: {wv['ttfbP50Ms']} ms / {wv['ttfbP95Ms']} ms",
             f"- LCP p50 / p95: {wv['lcpP50Ms']} ms / {wv['lcpP95Ms']} ms",
             f"- CLS p95: {wv['clsP95']}",
+        ])
+
+    gs = report.get("greenSoftware") or {}
+    if gs.get("samples", 0) > 0:
+        lines.extend([
+            "",
+            "## Green Software (Carbon Footprint · SWDM)",
+            "",
+            f"- Samples: {gs['samples']}",
+            f"- Avg / p95 transfer per load: {gs['avgTransferKB']} KB / {gs['p95TransferKB']} KB",
+            f"- Avg CO2 per visit: {gs['avgCo2Mg']} mg (rating **{gs['rating']}**)",
+            f"- Total estimated CO2 (period): {gs['totalCo2Grams']} g",
         ])
 
     return "\n".join(lines) + "\n"
