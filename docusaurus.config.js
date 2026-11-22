@@ -85,6 +85,11 @@ const config = {
         defaultMode: 'light',
         disableSwitch: true,
       },
+      docs: {
+        sidebar: {
+          hideable: true,
+        },
+      },
       navbar: {
         title: 'learnalgorithms.dev',
         logo: {
