@@ -4,6 +4,7 @@ import {useDoc} from '@docusaurus/plugin-content-docs/client';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import {normalizePermalink, useStudyProgress} from '@site/src/utils/studyProgress';
 import {trackEvent} from '@site/src/telemetry';
+import PageFeedback from '@site/src/components/PageFeedback';
 import styles from './styles.module.css';
 
 const REPO = 'https://github.com/vicegd/learnalgorithms';
@@ -59,6 +60,7 @@ export default function FooterWrapper(props) {
           </span>
         </div>
       )}
+      {trackable && <PageFeedback permalink={metadata.permalink} />}
       <div className={styles.feedback}>
         <span className={styles.label}>Feedback on this page:</span>
         <a href={issueUrl('1-report-error.yml', '[Error]', title, pageUrl)}

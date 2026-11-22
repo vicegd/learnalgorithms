@@ -14,7 +14,7 @@ Backend of [learnalgorithms.dev](https://learnalgorithms.dev), served at `api.le
 | `GET /admin/stats?days=30` | Aggregated student/usage statistics for teaching innovation (bearer token) |
 | `GET /admin/events?days=30&format=csv` | Raw anonymized telemetry events in JSON or CSV (bearer token) |
 
-It is written with the Python standard library only, runs in a hardened Docker container behind a reverse proxy with HTTPS, and stores its data in SQLite. See [THREAT-MODEL.md](THREAT-MODEL.md) for the security design.
+It is written with the Python standard library only, runs in a hardened Docker container behind a reverse proxy with HTTPS, and stores its data in SQLite. See [THREAT-MODEL.md](THREAT-MODEL.md) for the security design and [openapi.yaml](openapi.yaml) for the OpenAPI 3.1 contract.
 
 ## Run the tests
 

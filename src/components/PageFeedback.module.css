@@ -1,0 +1,133 @@
+.box {
+  margin-top: 1rem;
+  padding: 0.9rem 1rem;
+  border-radius: 10px;
+  border: 1px solid var(--ifm-color-emphasis-200);
+  background: var(--ifm-background-surface-color);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.prompt {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--ifm-font-color-base);
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.voteBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.38rem 0.85rem;
+  border-radius: 8px;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  background: var(--ifm-background-surface-color);
+  color: var(--ifm-font-color-base);
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+
+.voteBtn:hover {
+  border-color: var(--ifm-color-primary);
+  color: var(--ifm-color-primary-darkest);
+}
+
+.voteBtnActive {
+  border-color: var(--ifm-color-primary);
+  background: rgba(46, 133, 85, 0.1);
+  color: var(--ifm-color-primary-darkest);
+}
+
+.form {
+  margin-top: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.textarea {
+  width: 100%;
+  min-height: 70px;
+  padding: 0.55rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  background: var(--ifm-background-surface-color);
+  color: var(--ifm-font-color-base);
+  font: inherit;
+  font-size: 0.88rem;
+  resize: vertical;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: var(--ifm-color-primary);
+  box-shadow: 0 0 0 3px rgba(46, 133, 85, 0.15);
+}
+
+.formFooter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.charCount {
+  font-size: 0.78rem;
+  color: var(--ifm-color-emphasis-600);
+}
+
+.submitBtn {
+  padding: 0.42rem 0.95rem;
+  border-radius: 8px;
+  border: 1px solid var(--ifm-color-primary);
+  background: var(--ifm-color-primary);
+  color: #ffffff;
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.submitBtn:hover:not(:disabled) {
+  background: var(--ifm-color-primary-dark);
+}
+
+.submitBtn:disabled {
+  opacity: 0.65;
+  cursor: default;
+}
+
+.status {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--ifm-color-primary-darkest);
+}
+
+.error {
+  margin: 0;
+  font-size: 0.84rem;
+  color: var(--ifm-color-danger);
+}
+
+.honeypot {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
