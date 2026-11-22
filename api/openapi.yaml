@@ -71,6 +71,7 @@ components:
             - search
             - details_open
             - resource_click
+            - web_vitals
         page:
           type: string
           example: /concepts/sorting/quicksort

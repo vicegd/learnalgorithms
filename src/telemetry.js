@@ -7,6 +7,9 @@ let accumulatedMs = 0;
 let hasFlushedLeave = false;
 let maxScrollPct = 0;
 let listenersAttached = false;
+let lcpMs = null;
+let clsScore = 0;
+let vitalsFlushed = false;
 
 function isProductionHost() {
   if (typeof window === 'undefined') return false;
@@ -120,12 +123,65 @@ function flushPageLeave() {
   ]);
 }
 
+function observeWebVitals() {
+  if (typeof window === 'undefined' || typeof PerformanceObserver === 'undefined') return;
+  try {
+    const lcpObserver = new PerformanceObserver((list) => {
+      const entries = list.getEntries();
+      const last = entries[entries.length - 1];
+      if (last && typeof last.startTime === 'number') {
+        lcpMs = Math.round(last.startTime);
+      }
+    });
+    lcpObserver.observe({type: 'largest-contentful-paint', buffered: true});
+  } catch {
+    // Unsupported browser
+  }
+  try {
+    const clsObserver = new PerformanceObserver((list) => {
+      for (const entry of list.getEntries()) {
+        if (!entry.hadRecentInput && typeof entry.value === 'number') {
+          clsScore += entry.value;
+        }
+      }
+    });
+    clsObserver.observe({type: 'layout-shift', buffered: true});
+  } catch {
+    // Unsupported browser
+  }
+}
+
+function flushWebVitals() {
+  if (vitalsFlushed || !currentPage || typeof performance === 'undefined') return;
+  vitalsFlushed = true;
+  let ttfbMs = null;
+  try {
+    const nav = performance.getEntriesByType('navigation')[0];
+    if (nav && typeof nav.responseStart === 'number') {
+      ttfbMs = Math.round(nav.responseStart);
+    }
+  } catch {
+    // Ignore
+  }
+  const meta = {};
+  if (ttfbMs !== null) meta.ttfbMs = ttfbMs;
+  if (lcpMs !== null) meta.lcpMs = lcpMs;
+  meta.cls = Math.round(clsScore * 1000) / 1000;
+  if (Object.keys(meta).length > 0) {
+    trackEvent('web_vitals', meta, currentPage);
+  }
+}
+
 function attachGlobalListeners() {
   if (listenersAttached || typeof window === 'undefined') return;
   listenersAttached = true;
 
+  observeWebVitals();
   window.addEventListener('scroll', updateScrollDepth, {passive: true});
-  window.addEventListener('pagehide', flushPageLeave);
+  window.addEventListener('pagehide', () => {
+    flushPageLeave();
+    flushWebVitals();
+  });
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden') {
       pauseTimer();

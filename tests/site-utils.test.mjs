@@ -6,7 +6,7 @@ import {fileURLToPath} from 'node:url';
 
 import CONCEPT_LINKS from '../src/plugins/concept-links.js';
 import pluginSiteData from '../src/plugins/docusaurus-plugin-site-data.js';
-import {normalizePermalink} from '../src/utils/studyProgress.js';
+import {computeStreak, normalizePermalink} from '../src/utils/studyProgress.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -30,6 +30,13 @@ test('normalizePermalink strips hashes and trailing slashes', () => {
   assert.equal(normalizePermalink('/'), '/');
   assert.equal(normalizePermalink(''), '');
   assert.equal(normalizePermalink(null), '');
+});
+
+test('computeStreak counts consecutive active days up to today or yesterday', () => {
+  assert.equal(computeStreak([], '2026-11-22'), 0);
+  assert.equal(computeStreak(['2026-11-20', '2026-11-21', '2026-11-22'], '2026-11-22'), 3);
+  assert.equal(computeStreak(['2026-11-20', '2026-11-21'], '2026-11-22'), 2);
+  assert.equal(computeStreak(['2026-11-18', '2026-11-19'], '2026-11-22'), 0);
 });
 
 test('docusaurus-plugin-site-data scans concepts without coming-soon placeholders', async () => {

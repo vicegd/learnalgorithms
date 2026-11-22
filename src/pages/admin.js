@@ -355,6 +355,7 @@ export default function AdminDashboardPage() {
                       <li><code>details_open</code> — student opened a <code>&lt;details&gt;</code> checkpoint or exercise solution.</li>
                       <li><code>resource_click</code> — click to Java code (<code>java_code</code>) or formal proofs (<code>proof</code>).</li>
                       <li><code>cheat_sheet_filter</code> / <code>cheat_sheet_compare</code> — paradigm/property filters and algorithm comparisons in <code>/cheat-sheet</code>.</li>
+                      <li><code>web_vitals</code> — Core Web Vitals performance snapshot (<code>ttfbMs</code>, <code>lcpMs</code>, <code>cls</code>) captured via native <code>PerformanceObserver</code>.</li>
                     </ul>
                   </div>
                 </div>

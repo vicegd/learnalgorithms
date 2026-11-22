@@ -203,10 +203,16 @@ class ApiTest(unittest.TestCase):
                     "page": "/concepts/sorting/quicksort",
                     "meta": {"kind": "java_code"},
                 },
+                {
+                    "sessionId": sid,
+                    "eventType": "web_vitals",
+                    "page": "/knowledge-graph",
+                    "meta": {"ttfbMs": 45, "lcpMs": 420, "cls": 0.01},
+                },
             ]
         })
         self.assertEqual(s, 201)
-        self.assertEqual(data["count"], 6)
+        self.assertEqual(data["count"], 7)
 
         # Admin endpoints require token
         self.assertEqual(self.req("GET", "/admin/stats")[0], 401)

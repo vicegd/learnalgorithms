@@ -206,7 +206,7 @@ const ALGORITHMS_SECTION = {
   to: '/algorithms/',
 };
 
-function Intro({ totalCompleted, totalLessons, onResetProgress }) {
+function Intro({ totalCompleted, totalLessons, streak, masteredChapters, onResetProgress }) {
   const pct = totalLessons > 0 ? Math.round((totalCompleted / totalLessons) * 100) : 0;
   return (
     <header className={styles.intro}>
@@ -223,6 +223,9 @@ function Intro({ totalCompleted, totalLessons, onResetProgress }) {
         </Link>
         <Link className={clsx('button button--lg', styles.btnGhost)} to="/cheat-sheet">
           Big-O Cheat Sheet
+        </Link>
+        <Link className={clsx('button button--lg', styles.btnGhost)} to="/knowledge-graph">
+          Knowledge Graph
         </Link>
         <Link className={clsx('button button--lg', styles.btnGhost)} to="/concepts/glossary">
           Glossary
@@ -244,6 +247,20 @@ function Intro({ totalCompleted, totalLessons, onResetProgress }) {
           <div className={styles.progressTrack} aria-hidden="true">
             <div className={styles.progressFill} style={{ width: `${pct}%` }} />
           </div>
+          {(streak > 0 || masteredChapters > 0) && (
+            <div className={styles.gamificationRow}>
+              {streak > 0 && (
+                <span className={styles.streakBadge}>
+                  🔥 {streak}-day study streak
+                </span>
+              )}
+              {masteredChapters > 0 && (
+                <span className={styles.masteryBadge}>
+                  🏆 {masteredChapters} {masteredChapters === 1 ? 'chapter' : 'chapters'} mastered
+                </span>
+              )}
+            </div>
+          )}
         </div>
       )}
     </header>
@@ -252,10 +269,18 @@ function Intro({ totalCompleted, totalLessons, onResetProgress }) {
 
 function SectionCard({ accentClass, icon, eyebrow, title, description, topics, cta, to, progress }) {
   const hasProgress = progress && progress.completed > 0 && progress.total > 0;
+  const isMastered = hasProgress && progress.completed >= progress.total;
   const pct = hasProgress ? Math.round((progress.completed / progress.total) * 100) : 0;
   return (
     <article className={clsx(styles.card, accentClass)}>
-      {icon && <div className={styles.cardIcon}>{icon}</div>}
+      <div className={styles.cardTopRow}>
+        {icon && <div className={styles.cardIcon}>{icon}</div>}
+        {isMastered && (
+          <span className={styles.cardMasteredBadge} title="All lessons in this chapter completed">
+            🏆 Mastered
+          </span>
+        )}
+      </div>
       <p className={styles.cardEyebrow}>{eyebrow}</p>
       <h2 className={styles.cardTitle}>
         {to ? <Link className={styles.cardTitleLink} to={to}>{title}</Link> : title}
@@ -313,11 +338,19 @@ export default function Home() {
   const { siteConfig } = useDocusaurusContext();
   const siteData = usePluginData('docusaurus-plugin-site-data');
   const concepts = siteData?.concepts || [];
-  const { isCompleted, resetProgress } = useStudyProgress();
+  const { streak, isCompleted, resetProgress } = useStudyProgress();
   const showAlgorithms = siteConfig.customFields?.showAlgorithms !== false;
 
   const totalLessons = concepts.length;
   const totalCompleted = concepts.filter((c) => isCompleted(c.url)).length;
+  const chapterProgressList = CHAPTERS.map((s) => {
+    const lessons = getChapterLessons(s.to, concepts);
+    const completedCount = lessons.filter((c) => isCompleted(c.url)).length;
+    return { chapter: s, completed: completedCount, total: lessons.length };
+  });
+  const masteredChapters = chapterProgressList.filter(
+    (item) => item.total > 0 && item.completed >= item.total,
+  ).length;
 
   return (
     <Layout title="Home" description={siteConfig.tagline}>
@@ -325,20 +358,18 @@ export default function Home() {
         <Intro
           totalCompleted={totalCompleted}
           totalLessons={totalLessons}
+          streak={streak}
+          masteredChapters={masteredChapters}
           onResetProgress={resetProgress}
         />
         <div className={styles.grid}>
-          {CHAPTERS.map((s) => {
-            const lessons = getChapterLessons(s.to, concepts);
-            const completedCount = lessons.filter((c) => isCompleted(c.url)).length;
-            return (
-              <SectionCard
-                key={s.title}
-                {...s}
-                progress={{ completed: completedCount, total: lessons.length }}
-              />
-            );
-          })}
+          {chapterProgressList.map(({ chapter, completed, total }) => (
+            <SectionCard
+              key={chapter.title}
+              {...chapter}
+              progress={{ completed, total }}
+            />
+          ))}
         </div>
         {showAlgorithms && (
           <section className={styles.part}>
