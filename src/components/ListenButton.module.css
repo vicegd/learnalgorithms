@@ -1,5 +1,6 @@
 .bar {
-  display: inline-flex;
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 0.4rem;
   margin-bottom: 0.9rem;
@@ -37,4 +38,23 @@
 
 .btnSecondary:hover {
   border-color: var(--ifm-color-emphasis-400);
+}
+
+.btnSecondary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.scrubber {
+  width: 120px;
+  accent-color: var(--ifm-color-primary);
+  cursor: pointer;
+}
+
+.counter {
+  font-size: 0.74rem;
+  font-family: var(--ifm-font-family-monospace);
+  color: var(--ifm-color-emphasis-600);
+  min-width: 2.8rem;
+  text-align: center;
 }
