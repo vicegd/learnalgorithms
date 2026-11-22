@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import clsx from 'clsx';
+import Head from '@docusaurus/Head';
 import Layout from '@theme/Layout';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import styles from './api-docs.module.css';
@@ -234,6 +235,9 @@ export default function ApiDocsPage() {
     <Layout
       title="API Reference"
       description="Interactive OpenAPI 3.1 reference for api.learnalgorithms.dev">
+      <Head>
+        <meta name="robots" content="noindex, nofollow" />
+      </Head>
       <main className={styles.container}>
         <header className={styles.header}>
           <p className={styles.eyebrow}>OpenAPI 3.1 Reference</p>
