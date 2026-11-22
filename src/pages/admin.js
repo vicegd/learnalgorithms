@@ -6,7 +6,7 @@ import styles from './admin.module.css';
 const API_BASE = 'https://api.learnalgorithms.dev';
 const TOKEN_KEY = 'learnalgorithms:admin-token:v1';
 const PAGE_SIZE = 15;
-const EVENTS_PAGE_SIZE = 50;
+const EVENTS_PAGE_SIZE = 15;
 
 function formatDuration(ms) {
   if (ms === null || ms === undefined) return '—';
@@ -57,8 +57,8 @@ function SortTh({label, sortKey, sortState, onSort}) {
 }
 
 function Pagination({page, totalItems, pageSize, onPageChange, loading = false}) {
+  if (!totalItems) return null;
   const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
-  if (totalPages <= 1) return null;
   const start = page * pageSize + 1;
   const end = Math.min(totalItems, (page + 1) * pageSize);
   return (
