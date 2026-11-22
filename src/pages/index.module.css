@@ -1,48 +1,11 @@
-/* ── Hero ──────────────────────────────────────────────── */
-.hero {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4rem;
-  padding: 6rem 3rem 5rem;
-  background: linear-gradient(135deg, #0d1f14 0%, #0f172a 55%, #12263a 100%);
-  min-height: 62vh;
-  overflow: hidden;
-}
-
-.heroContent {
-  flex: 1;
-  max-width: 560px;
-}
-
+/* ── Intro buttons & eyebrow ────────────────────────────── */
 .heroEyebrow {
   font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: #3cad6e;
+  color: #205d3b;
   margin-bottom: 1.1rem;
-}
-
-.heroTitle {
-  font-size: clamp(2.4rem, 5vw, 3.6rem);
-  font-weight: 800;
-  line-height: 1.1;
-  color: #f1f5f9;
-  margin-bottom: 1.25rem;
-  letter-spacing: -0.02em;
-}
-
-.heroAccent {
-  color: #3cad6e;
-}
-
-.heroSubtitle {
-  font-size: 1.05rem;
-  line-height: 1.75;
-  color: #94a3b8;
-  margin-bottom: 2.25rem;
-  max-width: 480px;
 }
 
 .heroButtons {
@@ -60,87 +23,28 @@
 }
 
 .btnPrimary:hover {
-  background: #3cad6e !important;
-  border-color: #3cad6e !important;
+  background: #205d3b !important;
+  border-color: #205d3b !important;
   color: #fff !important;
 }
 
 .btnGhost {
   background: transparent !important;
-  border-color: rgba(255, 255, 255, 0.2) !important;
-  color: #cbd5e1 !important;
-  font-weight: 500;
-  transition: border-color 0.2s, color 0.2s;
+  border-color: var(--ifm-color-emphasis-400) !important;
+  color: var(--ifm-font-color-base) !important;
+  font-weight: 600;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
 }
 
 .btnGhost:hover {
-  border-color: rgba(255, 255, 255, 0.5) !important;
-  color: #f1f5f9 !important;
-}
-
-/* ── Hero code card ── */
-.heroVisual {
-  flex-shrink: 0;
-}
-
-.codeCard {
-  background: #0f1e14;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  overflow: hidden;
-  width: 340px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-}
-
-.codeCardDots {
-  display: flex;
-  gap: 6px;
-  padding: 10px 14px;
-  background: rgba(255, 255, 255, 0.04);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.codeCardDots span {
-  display: block;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.12);
-}
-
-.codeCardPre {
-  margin: 0 !important;
-  padding: 1.25rem 1.5rem !important;
-  background: transparent !important;
-  color: #6bba8c !important;
-  font-size: 0.82rem !important;
-  line-height: 1.75 !important;
-  font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace !important;
-  white-space: pre !important;
-  border: none !important;
-  box-shadow: none !important;
+  border-color: var(--ifm-color-primary) !important;
+  color: var(--ifm-color-primary-darkest) !important;
+  background: rgba(46, 133, 85, 0.06) !important;
 }
 
 @media (max-width: 900px) {
-  .hero {
-    flex-direction: column;
-    text-align: center;
-    padding: 4rem 1.5rem;
-    gap: 2.5rem;
-  }
-
-  .heroSubtitle {
-    margin-left: auto;
-    margin-right: auto;
-  }
-
   .heroButtons {
     justify-content: center;
-  }
-
-  .codeCard {
-    width: 100%;
-    max-width: 380px;
   }
 }
 

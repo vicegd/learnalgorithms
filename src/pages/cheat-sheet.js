@@ -891,6 +891,11 @@ export default function CheatSheetPage() {
     return sortBy.dir === 'asc' ? '↑' : '↓';
   }
 
+  function ariaSort(key) {
+    if (sortBy.key !== key) return 'none';
+    return sortBy.dir === 'asc' ? 'ascending' : 'descending';
+  }
+
   return (
     <Layout
       title="Big-O Cheat Sheet"
@@ -915,7 +920,7 @@ export default function CheatSheetPage() {
               onChange={(e) => setQuery(e.target.value)}
               aria-label="Search algorithms"
             />
-            <span className={styles.resultCount}>
+            <span className={styles.resultCount} aria-live="polite">
               Showing <strong>{filtered.length}</strong> of {ALGORITHMS.length} algorithms
             </span>
           </div>
@@ -1002,34 +1007,34 @@ export default function CheatSheetPage() {
           <table className={styles.table}>
             <thead>
               <tr>
-                <th>Compare</th>
-                <th>
+                <th scope="col">Compare</th>
+                <th scope="col" aria-sort={ariaSort('name')}>
                   <button type="button" className={styles.sortBtn} onClick={() => cycleSort('name')}>
-                    Algorithm <span>{sortIndicator('name')}</span>
+                    Algorithm <span aria-hidden="true">{sortIndicator('name')}</span>
                   </button>
                 </th>
-                <th>Paradigm</th>
-                <th>
+                <th scope="col">Paradigm</th>
+                <th scope="col" aria-sort={ariaSort('best')}>
                   <button type="button" className={styles.sortBtn} onClick={() => cycleSort('best')}>
-                    Best <span>{sortIndicator('best')}</span>
+                    Best <span aria-hidden="true">{sortIndicator('best')}</span>
                   </button>
                 </th>
-                <th>
+                <th scope="col" aria-sort={ariaSort('average')}>
                   <button type="button" className={styles.sortBtn} onClick={() => cycleSort('average')}>
-                    Average <span>{sortIndicator('average')}</span>
+                    Average <span aria-hidden="true">{sortIndicator('average')}</span>
                   </button>
                 </th>
-                <th>
+                <th scope="col" aria-sort={ariaSort('worst')}>
                   <button type="button" className={styles.sortBtn} onClick={() => cycleSort('worst')}>
-                    Worst <span>{sortIndicator('worst')}</span>
+                    Worst <span aria-hidden="true">{sortIndicator('worst')}</span>
                   </button>
                 </th>
-                <th>
+                <th scope="col" aria-sort={ariaSort('space')}>
                   <button type="button" className={styles.sortBtn} onClick={() => cycleSort('space')}>
-                    Space <span>{sortIndicator('space')}</span>
+                    Space <span aria-hidden="true">{sortIndicator('space')}</span>
                   </button>
                 </th>
-                <th>Resources</th>
+                <th scope="col">Resources</th>
               </tr>
             </thead>
             <tbody>
