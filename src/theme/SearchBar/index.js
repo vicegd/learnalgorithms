@@ -2,6 +2,7 @@ import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {useHistory} from '@docusaurus/router';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import {trackEvent} from '@site/src/telemetry';
+import {levenshtein} from '@site/src/utils/nlp';
 import styles from './styles.module.css';
 
 /**
@@ -14,6 +15,23 @@ const MAX_RESULTS = 8;
 
 const normalize = (s) =>
   s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+
+function fuzzyMatchWord(haystackWords, term) {
+  const maxDist = term.length >= 6 ? 2 : term.length >= 4 ? 1 : 0;
+  if (maxDist === 0) return null;
+  let best = null;
+  let bestDist = maxDist + 1;
+  for (const w of haystackWords) {
+    if (Math.abs(w.length - term.length) > maxDist) continue;
+    const d = levenshtein(term, w);
+    if (d > 0 && d < bestDist) {
+      bestDist = d;
+      best = w;
+      if (d === 1) break;
+    }
+  }
+  return best;
+}
 
 function search(index, query) {
   const terms = normalize(query).split(/\s+/).filter((t) => t.length > 1);
@@ -37,6 +55,31 @@ function search(index, query) {
         score += (inTitle ? 8 : 0) + (inHeading ? 12 : 0) + Math.min(count, 5);
       }
       if (all) results.push({page, sec, score, terms});
+    }
+  }
+  // Typo-tolerant fallback using Levenshtein edit distance when exact match returns nothing
+  if (results.length === 0 && terms.some((t) => t.length >= 4)) {
+    for (const page of index) {
+      const titleWords = normalize(page.t).match(/[a-z0-9]{3,}/g) || [];
+      for (const sec of page.s) {
+        const headingWords = normalize(sec.h).match(/[a-z0-9]{3,}/g) || [];
+        const textWords = normalize(sec.x).match(/[a-z0-9]{4,}/g) || [];
+        const matchedTerms = [];
+        let score = 0;
+        let all = true;
+        for (const t of terms) {
+          const hitTitle = titleWords.includes(t) ? t : fuzzyMatchWord(titleWords, t);
+          const hitHeading = headingWords.includes(t) ? t : fuzzyMatchWord(headingWords, t);
+          const hitText = hitTitle || hitHeading ? null : fuzzyMatchWord(textWords, t);
+          if (!hitTitle && !hitHeading && !hitText) {
+            all = false;
+            break;
+          }
+          matchedTerms.push(hitHeading || hitTitle || hitText);
+          score += (hitHeading ? 10 : 0) + (hitTitle ? 7 : 0) + (hitText ? 2 : 0);
+        }
+        if (all) results.push({page, sec, score, terms: matchedTerms, fuzzy: true});
+      }
     }
   }
   results.sort((a, b) => b.score - a.score);

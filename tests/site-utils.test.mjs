@@ -9,6 +9,7 @@ import pluginSiteData from '../src/plugins/docusaurus-plugin-site-data.js';
 import {computeStreak, normalizePermalink} from '../src/utils/studyProgress.js';
 import {recommendNextLessons} from '../src/utils/recommender.js';
 import {createProgressBadge, renderBadgeSvg, verifyProgressBadge} from '../src/utils/progressBadge.js';
+import {buildTfIdfSimilarity, computeReadability, levenshtein} from '../src/utils/nlp.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -69,6 +70,27 @@ test('createProgressBadge, verifyProgressBadge, and renderBadgeSvg work end-to-e
   assert.match(svg, /SHA-256:/);
   const tampered = {...badge, payload: {...badge.payload, completedCount: 36}};
   assert.equal(await verifyProgressBadge(tampered), false);
+});
+
+test('NLP utilities compute Levenshtein distance, readability, and TF-IDF cosine similarity', () => {
+  assert.equal(levenshtein('dijkstra', 'dijktra'), 1);
+  assert.equal(levenshtein('quicksort', 'quiksort'), 1);
+  assert.equal(levenshtein('knapsack', 'knapsak'), 1);
+
+  const rd = computeReadability(
+    'Dynamic programming solves optimization problems by breaking them into overlapping subproblems. Memoization stores intermediate results.',
+  );
+  assert.ok(rd.words >= 15);
+  assert.equal(rd.sentences, 2);
+  assert.ok(rd.ttr > 0 && rd.ttr <= 1);
+
+  const sim = buildTfIdfSimilarity([
+    {url: '/a', title: 'Quicksort', prose: 'quicksort partition pivot divide conquer recursion array'},
+    {url: '/b', title: 'Mergesort', prose: 'mergesort divide conquer recursion array sorting'},
+    {url: '/c', title: 'Dijkstra', prose: 'dijkstra shortest path priority queue graph edges'},
+  ]);
+  assert.equal(sim.get('/a').related[0].url, '/b');
+  assert.ok(sim.get('/a').keywords.length > 0);
 });
 
 test('docusaurus-plugin-site-data scans concepts without coming-soon placeholders', async () => {

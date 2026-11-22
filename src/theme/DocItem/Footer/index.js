@@ -1,7 +1,9 @@
 import React from 'react';
+import Link from '@docusaurus/Link';
 import Footer from '@theme-original/DocItem/Footer';
 import {useDoc} from '@docusaurus/plugin-content-docs/client';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
+import {usePluginData} from '@docusaurus/useGlobalData';
 import {normalizePermalink, useStudyProgress} from '@site/src/utils/studyProgress';
 import {trackEvent} from '@site/src/telemetry';
 import PageFeedback from '@site/src/components/PageFeedback';
@@ -28,11 +30,17 @@ function isTrackableLesson(permalink) {
 export default function FooterWrapper(props) {
   const {metadata} = useDoc();
   const {siteConfig} = useDocusaurusContext();
+  const siteData = usePluginData('docusaurus-plugin-site-data');
   const {isCompleted, toggleCompleted} = useStudyProgress();
   const pageUrl = `${siteConfig.url}${metadata.permalink}`;
   const title = metadata.title;
   const trackable = isTrackableLesson(metadata.permalink);
   const completed = trackable && isCompleted(metadata.permalink);
+  const currentNorm = normalizePermalink(metadata.permalink);
+  const conceptMeta = (siteData?.concepts || []).find(
+    (c) => normalizePermalink(c.url) === currentNorm,
+  );
+  const relatedLessons = conceptMeta?.relatedLessons || [];
 
   return (
     <>
@@ -59,6 +67,19 @@ export default function FooterWrapper(props) {
             Saved locally in your browser
           </span>
         </div>
+      )}
+      {relatedLessons.length > 0 && (
+        <aside className={styles.relatedBox} aria-label="Related lessons by content similarity">
+          <div className={styles.relatedTitle}>Related lessons (content similarity · TF-IDF)</div>
+          <div className={styles.relatedList}>
+            {relatedLessons.map((rel) => (
+              <Link key={rel.url} to={rel.url} className={styles.relatedPill}>
+                <span>{rel.title}</span>
+                <span className={styles.relatedScore}>{Math.round(rel.score * 100)}%</span>
+              </Link>
+            ))}
+          </div>
+        </aside>
       )}
       {trackable && <PageFeedback permalink={metadata.permalink} />}
       <div className={styles.feedback}>

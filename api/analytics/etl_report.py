@@ -52,35 +52,78 @@ def classify_comment_intent(text, helpful=None):
     return "neutral"
 
 
+ES_MARKERS = frozenset({
+    "que", "los", "las", "una", "para", "por", "con", "muy", "más", "mas", "bien",
+    "pero", "este", "esta", "esto", "gracias", "genial", "claro", "ejemplo", "duda", "error", "entiendo",
+})
+
+
+def detect_language(text):
+    low = (text or "").lower()
+    if any(ch in low for ch in "áéíóúüñ¿¡"):
+        return "es"
+    words = TOKEN_RE.findall(low)
+    es_hits = sum(1 for w in words if w in ES_MARKERS)
+    return "es" if es_hits >= 1 else "en"
+
+
+def polarity_score(text, helpful=None):
+    low = (text or "").lower()
+    pos = sum(1 for kw in INTENT_LEXICON["positive"] if kw in low)
+    neg = sum(1 for kw in INTENT_LEXICON["bug_typo"] + INTENT_LEXICON["confusion"] if kw in low)
+    if pos == 0 and neg == 0:
+        if helpful is True:
+            return 0.5
+        if helpful is False:
+            return -0.5
+        return 0.0
+    return round((pos - neg) / (pos + neg), 2)
+
+
 def analyze_nlp(feedback_list, all_searches):
     term_counts = Counter()
+    bigram_counts = Counter()
     intents = Counter()
+    languages = Counter()
+    polarities = []
     classified_comments = []
 
+    def add_text_ngrams(text, weight=1):
+        toks = [t for t in TOKEN_RE.findall((text or "").lower()) if t not in STOPWORDS]
+        for t in toks:
+            term_counts[t] += weight
+        for a, b in zip(toks, toks[1:]):
+            bigram_counts[f"{a} {b}"] += weight
+
     for q, count in all_searches.items():
-        for tok in TOKEN_RE.findall(q.lower()):
-            if tok not in STOPWORDS:
-                term_counts[tok] += count
+        add_text_ngrams(q, count)
 
     for f in feedback_list:
         comment = (f.get("comment") or "").strip()
         if not comment:
             continue
         intent = classify_comment_intent(comment, f.get("helpful"))
+        lang = detect_language(comment)
+        pol = polarity_score(comment, f.get("helpful"))
         intents[intent] += 1
+        languages[lang] += 1
+        polarities.append(pol)
         classified_comments.append({
             "page": f.get("page", ""),
             "intent": intent,
+            "lang": lang,
+            "polarity": pol,
             "comment": comment,
         })
-        for tok in TOKEN_RE.findall(comment.lower()):
-            if tok not in STOPWORDS:
-                term_counts[tok] += 1
+        add_text_ngrams(comment, 1)
 
     return {
         "analyzedComments": len(classified_comments),
+        "avgPolarity": round(statistics.mean(polarities), 2) if polarities else None,
+        "languages": dict(languages.most_common()),
         "intentBreakdown": dict(intents.most_common()),
         "topTerms": [{"term": t, "count": c} for t, c in term_counts.most_common(15)],
+        "topBigrams": [{"bigram": bg, "count": c} for bg, c in bigram_counts.most_common(10)],
     }
 
 
@@ -446,9 +489,17 @@ def render_markdown(report):
         if nlp.get("intentBreakdown"):
             intents_str = ", ".join(f"`{k}`: {v}" for k, v in nlp["intentBreakdown"].items())
             lines.append(f"- **Comment intent classification ({nlp['analyzedComments']} comments):** {intents_str}")
+        if nlp.get("avgPolarity") is not None:
+            lines.append(f"- **Average sentiment polarity (-1 to +1):** {nlp['avgPolarity']}")
+        if nlp.get("languages"):
+            lang_str = ", ".join(f"`{k}`: {v}" for k, v in nlp["languages"].items())
+            lines.append(f"- **Detected comment languages:** {lang_str}")
         if nlp.get("topTerms"):
             terms_str = ", ".join(f"`{t['term']}` ({t['count']})" for t in nlp["topTerms"])
             lines.append(f"- **Top extracted terms:** {terms_str}")
+        if nlp.get("topBigrams"):
+            bg_str = ", ".join(f"`{b['bigram']}` ({b['count']})" for b in nlp["topBigrams"])
+            lines.append(f"- **Top bigrams:** {bg_str}")
 
     issues = report.get("issues") or []
     if issues:
