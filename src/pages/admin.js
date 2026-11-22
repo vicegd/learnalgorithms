@@ -108,6 +108,8 @@ export default function AdminDashboardPage() {
   const [aiError, setAiError] = useState('');
   const [aiCopied, setAiCopied] = useState(false);
   const [metricsText, setMetricsText] = useState('');
+  const [metricsUpdatedAt, setMetricsUpdatedAt] = useState(null);
+  const [metricsAutoRefresh, setMetricsAutoRefresh] = useState(true);
   const [health, setHealth] = useState(null);
   const [popular, setPopular] = useState([]);
   const [summaryPage, setSummaryPage] = useState('');
@@ -222,6 +224,7 @@ export default function AdminDashboardPage() {
       setEtlReport(reportJson?.report || null);
       setEtlMarkdown(reportJson?.markdown || '');
       setMetricsText(promText);
+      if (promText) setMetricsUpdatedAt(new Date());
       setEventsTotal(
         typeof eventsJson.total === 'number' ? eventsJson.total : (eventsJson.events || []).length,
       );
@@ -236,6 +239,30 @@ export default function AdminDashboardPage() {
       setLoading(false);
     }
   }, []);
+
+  const fetchMetricsOnly = useCallback(async (authToken) => {
+    if (!authToken) return;
+    try {
+      const res = await fetch(`${API_BASE}/admin/metrics`, {
+        headers: {Authorization: `Bearer ${authToken}`},
+        mode: 'cors',
+      });
+      if (res.ok) {
+        setMetricsText(await res.text());
+        setMetricsUpdatedAt(new Date());
+      }
+    } catch {
+      // Ignore transient network errors during background scrape
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!token || !metricsAutoRefresh) return undefined;
+    const id = window.setInterval(() => {
+      fetchMetricsOnly(token);
+    }, 30000);
+    return () => window.clearInterval(id);
+  }, [token, metricsAutoRefresh, fetchMetricsOnly]);
 
   useEffect(() => {
     if (token) {
@@ -267,6 +294,7 @@ export default function AdminDashboardPage() {
     setAiAnalysis(null);
     setAiError('');
     setMetricsText('');
+    setMetricsUpdatedAt(null);
     setHealth(null);
     setPopular([]);
     setSummaryData(null);
@@ -942,9 +970,42 @@ export default function AdminDashboardPage() {
             </section>
 
             <section className={styles.section}>
-              <h2 className={styles.sectionTitle}>
-                Observability — Prometheus metrics <code className={styles.endpointTag}>GET /admin/metrics</code>
-              </h2>
+              <div className={styles.reportHeader}>
+                <h2 className={styles.sectionTitle}>
+                  Observability — Prometheus metrics <code className={styles.endpointTag}>GET /admin/metrics</code>
+                </h2>
+                {metricsText && (
+                  <div className={styles.reportActions}>
+                    <label className={styles.summaryLabel}>
+                      <input
+                        type="checkbox"
+                        checked={metricsAutoRefresh}
+                        onChange={(e) => setMetricsAutoRefresh(e.target.checked)}
+                      />{' '}
+                      Auto-refresh (30s)
+                    </label>
+                    <button
+                      type="button"
+                      className={styles.secondaryBtn}
+                      onClick={() => fetchMetricsOnly(token)}>
+                      Scrape now
+                    </button>
+                  </div>
+                )}
+              </div>
+              {metricsUpdatedAt && (
+                <p className={styles.sectionHint}>
+                  Computed live on every request (no server cache).{' '}
+                  <strong>Last scrape:</strong> {metricsUpdatedAt.toLocaleString()}
+                  {metricsAutoRefresh && (
+                    <>
+                      {' · '}
+                      <strong>Next auto-scrape:</strong>{' '}
+                      {new Date(metricsUpdatedAt.getTime() + 30000).toLocaleTimeString()}
+                    </>
+                  )}
+                </p>
+              )}
               {!metricsText ? (
                 <p className={styles.empty}>
                   Prometheus metrics endpoint not available yet on the API server. Rebuild the API container on the VPS to enable it.
