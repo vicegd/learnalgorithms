@@ -13,11 +13,18 @@ export function latexToSpeech(tex) {
   s = s
     .replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '$1 over $2')
     .replace(/\\sqrt\{([^}]+)\}/g, 'square root of $1')
+    .replace(/([a-zA-Z0-9)])!/g, '$1 factorial')
+    .replace(/\\log_2\s*\(([^)]+)\)/g, 'log base 2 of $1')
     .replace(/\\log_2/g, 'log base 2')
+    .replace(/\\log\s*\(([^)]+)\)/g, 'log of $1')
     .replace(/\\log/g, 'log')
+    .replace(/\\ln\s*\(([^)]+)\)/g, 'natural log of $1')
     .replace(/\\ln/g, 'natural log')
+    .replace(/\\Theta\s*\(([^)]+)\)/g, 'theta of $1')
     .replace(/\\Theta/g, 'theta')
+    .replace(/\\Omega\s*\(([^)]+)\)/g, 'omega of $1')
     .replace(/\\Omega/g, 'omega')
+    .replace(/\bO\s*\(([^)]+)\)/g, 'big O of $1')
     .replace(/\\alpha/g, 'alpha')
     .replace(/\\beta/g, 'beta')
     .replace(/\\varepsilon|\\epsilon/g, 'epsilon')
@@ -31,22 +38,45 @@ export function latexToSpeech(tex) {
     .replace(/\\equiv/g, ' equivalent to ')
     .replace(/\\to|\\rightarrow/g, ' to ')
     .replace(/\\cdot|\\times/g, ' times ')
-    .replace(/\\in\b/g, ' in ')
-    .replace(/\\subset/g, ' subset of ')
+    .replace(/\\in\b/g, ' is in ')
+    .replace(/\\subset/g, ' is a subset of ')
     .replace(/\\lfloor([^\\]+)\\rfloor/g, 'floor of $1')
     .replace(/\\lceil([^\\]+)\\rceil/g, 'ceiling of $1')
-    .replace(/\bO\s*\(/g, 'big O of (')
     .replace(/\^2\b|\^\{2\}/g, ' squared')
     .replace(/\^3\b|\^\{3\}/g, ' cubed')
     .replace(/\^\{([^}]+)\}/g, ' to the power of $1')
     .replace(/\^([a-zA-Z0-9])/g, ' to the power of $1')
     .replace(/_\{([^}]+)\}/g, ' sub $1')
     .replace(/_([a-zA-Z0-9])/g, ' sub $1')
+    .replace(/=/g, ' equals ')
     .replace(/\\[a-zA-Z]+/g, ' ')
-    .replace(/[{}]/g, ' ')
+    .replace(/[{}()]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
   return s;
+}
+
+function verbalizeUnicodeMath(text) {
+  return String(text || '')
+    .replace(/([a-zA-Z0-9)])!/g, '$1 factorial')
+    .replace(/∈/g, ' is in ')
+    .replace(/Θ\s*\(([^)]+)\)/g, 'theta of $1')
+    .replace(/Θ/g, 'theta')
+    .replace(/Ω\s*\(([^)]+)\)/g, 'omega of $1')
+    .replace(/Ω/g, 'omega')
+    .replace(/≤/g, ' less than or equal to ')
+    .replace(/≥/g, ' greater than or equal to ')
+    .replace(/≠/g, ' not equal to ')
+    .replace(/≈/g, ' approximately ')
+    .replace(/×|·/g, ' times ')
+    .replace(/∞/g, ' infinity ')
+    .replace(/→/g, ' to ')
+    .replace(/²/g, ' squared')
+    .replace(/³/g, ' cubed')
+    .replace(/\blog\s*\(([^)]+)\)/g, 'log of $1')
+    .replace(/\bO\s*\(([^)]+)\)/g, 'big O of $1')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 function extractReadableText() {
@@ -64,7 +94,7 @@ function extractReadableText() {
   });
   // Skip multi-line code blocks, diagrams, buttons, and collapsed solutions (keep inline <code>)
   clone.querySelectorAll('pre, svg, button, details').forEach((el) => el.remove());
-  return (clone.textContent || '').replace(/\s+/g, ' ').trim();
+  return verbalizeUnicodeMath(clone.textContent || '');
 }
 
 export default function ListenButton() {
