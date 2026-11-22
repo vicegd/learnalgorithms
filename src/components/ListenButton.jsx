@@ -3,13 +3,67 @@ import styles from './ListenButton.module.css';
 
 const RATES = [1, 1.25, 1.5];
 
+/**
+ * Convert common LaTeX math expressions from KaTeX annotations into natural spoken English
+ * so audio narration reads asymptotic bounds and formulas smoothly instead of skipping them.
+ */
+export function latexToSpeech(tex) {
+  let s = String(tex || '').trim();
+  if (!s) return '';
+  s = s
+    .replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '$1 over $2')
+    .replace(/\\sqrt\{([^}]+)\}/g, 'square root of $1')
+    .replace(/\\log_2/g, 'log base 2')
+    .replace(/\\log/g, 'log')
+    .replace(/\\ln/g, 'natural log')
+    .replace(/\\Theta/g, 'theta')
+    .replace(/\\Omega/g, 'omega')
+    .replace(/\\alpha/g, 'alpha')
+    .replace(/\\beta/g, 'beta')
+    .replace(/\\varepsilon|\\epsilon/g, 'epsilon')
+    .replace(/\\infty/g, 'infinity')
+    .replace(/\\sum/g, 'sum')
+    .replace(/\\prod/g, 'product')
+    .replace(/\\leq|\\le/g, ' less than or equal to ')
+    .replace(/\\geq|\\ge/g, ' greater than or equal to ')
+    .replace(/\\neq|\\ne/g, ' not equal to ')
+    .replace(/\\approx/g, ' approximately ')
+    .replace(/\\equiv/g, ' equivalent to ')
+    .replace(/\\to|\\rightarrow/g, ' to ')
+    .replace(/\\cdot|\\times/g, ' times ')
+    .replace(/\\in\b/g, ' in ')
+    .replace(/\\subset/g, ' subset of ')
+    .replace(/\\lfloor([^\\]+)\\rfloor/g, 'floor of $1')
+    .replace(/\\lceil([^\\]+)\\rceil/g, 'ceiling of $1')
+    .replace(/\bO\s*\(/g, 'big O of (')
+    .replace(/\^2\b|\^\{2\}/g, ' squared')
+    .replace(/\^3\b|\^\{3\}/g, ' cubed')
+    .replace(/\^\{([^}]+)\}/g, ' to the power of $1')
+    .replace(/\^([a-zA-Z0-9])/g, ' to the power of $1')
+    .replace(/_\{([^}]+)\}/g, ' sub $1')
+    .replace(/_([a-zA-Z0-9])/g, ' sub $1')
+    .replace(/\\[a-zA-Z]+/g, ' ')
+    .replace(/[{}]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return s;
+}
+
 function extractReadableText() {
   if (typeof document === 'undefined') return '';
   const article = document.querySelector('article .markdown') || document.querySelector('article');
   if (!article) return '';
   const clone = article.cloneNode(true);
-  // Skip code blocks, math markup noise, nav buttons, and collapsed solutions
-  clone.querySelectorAll('pre, code, .katex-mathml, .katex-html, svg, button, details').forEach((el) => el.remove());
+  // Verbalize KaTeX formulas from their LaTeX <annotation> before stripping KaTeX markup
+  clone.querySelectorAll('.katex').forEach((el) => {
+    const ann = el.querySelector('annotation[encoding="application/x-tex"]');
+    const spoken = ann ? latexToSpeech(ann.textContent) : '';
+    const span = document.createElement('span');
+    span.textContent = spoken ? ` ${spoken} ` : ' ';
+    el.replaceWith(span);
+  });
+  // Skip multi-line code blocks, diagrams, buttons, and collapsed solutions (keep inline <code>)
+  clone.querySelectorAll('pre, svg, button, details').forEach((el) => el.remove());
   return (clone.textContent || '').replace(/\s+/g, ' ').trim();
 }
 
