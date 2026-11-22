@@ -43,6 +43,7 @@ import sqlite3
 import sys
 import threading
 import time
+import urllib.error
 import urllib.parse
 import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -66,9 +67,9 @@ MATOMO_SITE_ID = os.environ.get("MATOMO_SITE_ID", "7")
 MATOMO_TOKEN = os.environ.get("MATOMO_TOKEN", "")
 GITHUB_WEBHOOK_SECRET = os.environ.get("GITHUB_WEBHOOK_SECRET", "")
 ADMIN_TOKEN = os.environ.get("ADMIN_TOKEN", "")
-LLM_API_KEY = os.environ.get("LLM_API_KEY", "")
-LLM_API_URL = os.environ.get("LLM_API_URL", "https://api.openai.com/v1/chat/completions")
-LLM_MODEL = os.environ.get("LLM_MODEL", "gpt-4o-mini")
+LLM_API_KEY = os.environ.get("LLM_API_KEY", "").strip().strip('"').strip("'")
+LLM_API_URL = os.environ.get("LLM_API_URL", "https://api.openai.com/v1/chat/completions").strip().strip('"').strip("'")
+LLM_MODEL = os.environ.get("LLM_MODEL", "gpt-4o-mini").strip().strip('"').strip("'")
 TRUST_PROXY = os.environ.get("TRUST_PROXY", "1") == "1"
 PORT = int(os.environ.get("PORT", "8080"))
 
@@ -852,6 +853,15 @@ def make_handler(app):
                 result = app.llm_interpret(markdown, lang=lang)
             except RuntimeError as e:
                 return self.send_json(503, {"error": str(e)}, {"Cache-Control": "no-store"})
+            except urllib.error.HTTPError as e:
+                detail = ""
+                try:
+                    detail = e.read(300).decode("utf-8", errors="replace").strip()
+                except Exception:
+                    pass
+                log.warning("llm interpret HTTP %s: %s", e.code, detail)
+                msg = f"LLM request failed: HTTP {e.code}" + (f" — {detail}" if detail else "")
+                return self.send_json(502, {"error": msg}, {"Cache-Control": "no-store"})
             except Exception as e:
                 log.exception("llm interpret failed")
                 return self.send_json(502, {"error": f"LLM request failed: {e}"}, {"Cache-Control": "no-store"})
