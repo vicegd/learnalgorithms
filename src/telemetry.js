@@ -2,7 +2,9 @@ const API_ENDPOINT = 'https://api.learnalgorithms.dev/events';
 const SESSION_KEY = 'learnalgorithms:telemetry-session:v1';
 
 let currentPage = null;
-let enteredAt = 0;
+let activeSince = 0;
+let accumulatedMs = 0;
+let hasFlushedLeave = false;
 let maxScrollPct = 0;
 let listenersAttached = false;
 
@@ -89,20 +91,33 @@ export function trackEvent(eventType, meta = null, pageOverride = null) {
   sendEvents([payload]);
 }
 
+function pauseTimer() {
+  if (activeSince) {
+    accumulatedMs += Math.max(0, Date.now() - activeSince);
+    activeSince = 0;
+  }
+}
+
+function resumeTimer() {
+  if (!activeSince && currentPage && !hasFlushedLeave) {
+    activeSince = Date.now();
+  }
+}
+
 function flushPageLeave() {
-  if (!currentPage || !enteredAt) return;
+  if (!currentPage || hasFlushedLeave) return;
+  hasFlushedLeave = true;
+  pauseTimer();
   updateScrollDepth();
-  const durationMs = Math.max(0, Math.round(Date.now() - enteredAt));
   sendEvents([
     {
       sessionId: getSessionId(),
       eventType: 'page_leave',
       page: currentPage,
-      durationMs,
+      durationMs: Math.round(accumulatedMs),
       scrollPct: maxScrollPct,
     },
   ]);
-  enteredAt = 0;
 }
 
 function attachGlobalListeners() {
@@ -113,9 +128,9 @@ function attachGlobalListeners() {
   window.addEventListener('pagehide', flushPageLeave);
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden') {
-      flushPageLeave();
-    } else if (document.visibilityState === 'visible' && currentPage && !enteredAt) {
-      enteredAt = Date.now();
+      pauseTimer();
+    } else if (document.visibilityState === 'visible') {
+      resumeTimer();
     }
   });
 
@@ -152,12 +167,19 @@ export function onRouteDidUpdate({location, previousLocation}) {
   if (typeof window === 'undefined') return;
   attachGlobalListeners();
 
+  const nextPage = normalizePath(location.pathname);
+  if (previousLocation && normalizePath(previousLocation.pathname) === nextPage) {
+    return;
+  }
+
   if (previousLocation && currentPage) {
     flushPageLeave();
   }
 
-  currentPage = normalizePath(location.pathname);
-  enteredAt = Date.now();
+  currentPage = nextPage;
+  accumulatedMs = 0;
+  hasFlushedLeave = false;
+  activeSince = document.visibilityState === 'hidden' ? 0 : Date.now();
   maxScrollPct = 0;
   updateScrollDepth();
 
