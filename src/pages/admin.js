@@ -202,6 +202,37 @@ export default function AdminDashboardPage() {
 
             {error && <div className={styles.error} role="alert">{error}</div>}
 
+            <details className={styles.guide}>
+              <summary className={styles.guideSummary}>
+                ℹ️ How to read these metrics (glossary of terms &amp; event types)
+              </summary>
+              <div className={styles.guideBody}>
+                <div className={styles.guideGrid}>
+                  <div>
+                    <strong>Core concepts</strong>
+                    <ul className={styles.guideList}>
+                      <li><strong>Anonymous session:</strong> one browser tab visit, identified by a random UUID in <code>sessionStorage</code> (resets when the tab closes; no IPs or personal data are stored).</li>
+                      <li><strong>Views (<code>page_view</code>):</strong> total times a page or lesson was opened (including internal SPA navigation).</li>
+                      <li><strong>Avg time (<code>durationMs</code>):</strong> average active time spent on a page before navigating away or hiding the tab (capped at 1 hour).</li>
+                      <li><strong>Avg scroll (<code>scrollPct</code>):</strong> average maximum scroll depth reached (0–100%), useful to distinguish quick bounces from full readings.</li>
+                      <li><strong>Meta (<code>meta</code>):</strong> extra structured JSON context for each event (e.g. screen size <code>viewport</code>, previous page <code>from</code>, search <code>query</code>/<code>results</code>, opened checkpoint <code>summary</code>, or clicked resource <code>kind</code>).</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <strong>Event types recorded</strong>
+                    <ul className={styles.guideList}>
+                      <li><code>page_view</code> / <code>page_leave</code> — page opened and left (with time &amp; scroll depth).</li>
+                      <li><code>lesson_complete</code> / <code>lesson_uncomplete</code> — student toggled the completion button at the bottom of a lesson.</li>
+                      <li><code>search</code> — local search query selected, or a query returning <code>results: 0</code> (missing-topic signal).</li>
+                      <li><code>details_open</code> — student opened a <code>&lt;details&gt;</code> checkpoint or exercise solution.</li>
+                      <li><code>resource_click</code> — click to Java code (<code>java_code</code>) or formal proofs (<code>proof</code>).</li>
+                      <li><code>cheat_sheet_filter</code> / <code>cheat_sheet_compare</code> — paradigm/property filters and algorithm comparisons in <code>/cheat-sheet</code>.</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </details>
+
             {stats && (
               <>
                 <div className={styles.kpiGrid}>
@@ -336,6 +367,9 @@ export default function AdminDashboardPage() {
 
             <section className={styles.section}>
               <h2 className={styles.sectionTitle}>Latest GitHub issues ({issues.length})</h2>
+              <p className={styles.sectionHint}>
+                Populated automatically via <code>POST /webhooks/github</code> when an issue is actually submitted on GitHub (not just when clicking the link), provided the repository webhook is configured in GitHub Settings → Webhooks.
+              </p>
               {issues.length === 0 ? (
                 <p className={styles.empty}>No webhook issue events recorded yet.</p>
               ) : (
