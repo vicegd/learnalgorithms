@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import styles from './ListenButton.module.css';
 
-const RATES = [1, 1.25, 1.5];
+const RATES = [0.75, 1, 1.25, 1.5];
 
 /**
  * Convert common LaTeX math expressions from KaTeX annotations into natural spoken English
@@ -118,11 +118,11 @@ function splitIntoChunks(text) {
 export default function ListenButton() {
   const [supported, setSupported] = useState(false);
   const [status, setStatus] = useState('idle'); // idle | playing | paused
-  const [rateIdx, setRateIdx] = useState(0);
+  const [rateIdx, setRateIdx] = useState(1);
   const [chunkIdx, setChunkIdx] = useState(0);
   const [totalChunks, setTotalChunks] = useState(0);
   const chunksRef = useRef([]);
-  const rateRef = useRef(RATES[0]);
+  const rateRef = useRef(RATES[1]);
   const seqRef = useRef(0);
 
   useEffect(() => {
