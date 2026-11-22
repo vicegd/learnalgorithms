@@ -49,6 +49,17 @@ function isComingSoon(content) {
   return /\*Coming soon\.\*/i.test(content);
 }
 
+function extractPrerequisites(content) {
+  const fmMatch = content.match(/^---[\s\S]*?^---/m);
+  if (!fmMatch) return [];
+  const block = fmMatch[0].match(/^prerequisites:\s*\r?\n((?:\s+-\s+.+\r?\n?)*)/m);
+  if (!block) return [];
+  return block[1]
+    .split(/\r?\n/)
+    .map((line) => line.replace(/^\s*-\s*/, '').trim().replace(/^['"]|['"]$/g, '').replace(/\/+$/, ''))
+    .filter((u) => u.startsWith('/concepts/'));
+}
+
 function hasVisualizer(content) {
   return /<\w*[Vv]isualizer/.test(content);
 }
@@ -159,6 +170,7 @@ export default function pluginSiteData(context, options = {}) {
               category: category || 'Other',
               url,
               comingSoon: isComingSoon(content),
+              prerequisites: extractPrerequisites(content),
             });
           }
         }

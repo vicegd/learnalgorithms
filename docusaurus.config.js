@@ -137,6 +137,11 @@ const config = {
             position: 'left',
           },
           {
+            to: '/knowledge-graph',
+            label: 'Knowledge Graph',
+            position: 'left',
+          },
+          {
             href: 'https://github.com/vicegd/learnalgorithms',
             label: 'GitHub',
             position: 'right',
@@ -161,9 +166,17 @@ const config = {
       },
     }),
 
-  clientModules: ['./src/matomo.js', './src/telemetry.js'],
+  clientModules: ['./src/matomo.js', './src/telemetry.js', './src/pwa.js'],
 
   headTags: [
+    {
+      tagName: 'link',
+      attributes: {rel: 'manifest', href: '/manifest.json'},
+    },
+    {
+      tagName: 'meta',
+      attributes: {name: 'theme-color', content: '#2e8555'},
+    },
     // Security: Content Security Policy. GitHub Pages cannot send HTTP headers,
     // so the policy goes in a <meta> tag (frame-ancestors and report-uri are
     // not available this way). 'unsafe-inline' is needed by the inline scripts

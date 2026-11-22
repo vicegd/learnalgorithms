@@ -356,3 +356,42 @@
   background: #2e8555;
   transition: width 0.25s ease;
 }
+
+.gamificationRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+}
+
+.streakBadge,
+.masteryBadge,
+.cardMasteredBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+}
+
+.streakBadge {
+  background: #fff7ed;
+  border: 1px solid rgba(234, 88, 12, 0.3);
+  color: #9a3412;
+}
+
+.masteryBadge,
+.cardMasteredBadge {
+  background: #dcfce7;
+  border: 1px solid rgba(22, 163, 74, 0.3);
+  color: #166534;
+}
+
+.cardTopRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
