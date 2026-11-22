@@ -155,10 +155,22 @@ function flushWebVitals() {
   if (vitalsFlushed || !currentPage || typeof performance === 'undefined') return;
   vitalsFlushed = true;
   let ttfbMs = null;
+  let transferBytes = 0;
   try {
     const nav = performance.getEntriesByType('navigation')[0];
-    if (nav && typeof nav.responseStart === 'number') {
-      ttfbMs = Math.round(nav.responseStart);
+    if (nav) {
+      if (typeof nav.responseStart === 'number') {
+        ttfbMs = Math.round(nav.responseStart);
+      }
+      if (typeof nav.transferSize === 'number' && nav.transferSize >= 0) {
+        transferBytes += nav.transferSize;
+      }
+    }
+    const resources = performance.getEntriesByType('resource') || [];
+    for (const r of resources) {
+      if (typeof r.transferSize === 'number' && r.transferSize > 0) {
+        transferBytes += r.transferSize;
+      }
     }
   } catch {
     // Ignore
@@ -167,6 +179,10 @@ function flushWebVitals() {
   if (ttfbMs !== null) meta.ttfbMs = ttfbMs;
   if (lcpMs !== null) meta.lcpMs = lcpMs;
   meta.cls = Math.round(clsScore * 1000) / 1000;
+  // Sustainable Web Design Model (SWDM): ~0.81 kWh/GB * 442 gCO2/kWh ≈ 0.35 mg CO2 per KB
+  const transferKB = Math.round((transferBytes / 1024) * 10) / 10;
+  meta.transferKB = transferKB;
+  meta.co2Mg = Math.round(transferKB * 0.35 * 10) / 10;
   if (Object.keys(meta).length > 0) {
     trackEvent('web_vitals', meta, currentPage);
   }

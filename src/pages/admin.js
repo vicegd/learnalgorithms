@@ -935,6 +935,19 @@ export default function AdminDashboardPage() {
                       </div>
                       <div className={styles.vitalHint}>Cumulative Layout Shift (page jumping on load). Good: &lt; 0.1.</div>
                     </div>
+                    <div className={styles.vitalCard}>
+                      <div className={styles.vitalLabel}>Green Software (SWDM)</div>
+                      <div className={styles.vitalValue}>
+                        {etlReport.greenSoftware?.avgCo2Mg != null
+                          ? `${etlReport.greenSoftware.avgCo2Mg} mg CO₂ (${etlReport.greenSoftware.rating})`
+                          : '—'}
+                      </div>
+                      <div className={styles.vitalHint}>
+                        {etlReport.greenSoftware?.avgTransferKB != null
+                          ? `Avg ${etlReport.greenSoftware.avgTransferKB} KB/load (A+ < 95 mg).`
+                          : 'Avg transfer & CO₂ per load via PerformanceResourceTiming.'}
+                      </div>
+                    </div>
                   </div>
                   <p className={styles.sectionHint}>
                     <strong>How to read the ETL report:</strong> <code>p50</code> is the median (typical visit) and <code>p95</code> is the 95th percentile (slowest 5% of visits). <strong>Top Pages</strong> shows views, median active reading time (s), average scroll depth (%), and completions. <strong>Zero-Result Searches</strong> lists queries with 0 matches (missing topics). <strong>Most Opened Checkpoints</strong> counts which <code>&lt;details&gt;</code> solutions students expand most. The report also aggregates Matomo popular lessons, resource clicks, Cheat Sheet usage, student feedback, and GitHub issues.
