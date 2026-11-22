@@ -1,73 +1,78 @@
 .tocWrapper {
+  position: sticky;
+  top: calc(var(--ifm-navbar-height) + 1rem);
   display: flex;
   flex-direction: column;
+  max-height: calc(100vh - var(--ifm-navbar-height) - 1rem);
 }
 
-.tocHeader {
+.tocBody {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+/* Override inner sticky positioning so the wrapper controls sticky + footer button cleanly */
+.tocBody > :global(.theme-doc-toc-desktop) {
+  position: static !important;
+  max-height: none !important;
+}
+
+/* Matches Docusaurus's native left collapseSidebarButton */
+.collapseButton {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  padding: 0.25rem 0 0.5rem;
-  margin-bottom: 0.35rem;
-  border-bottom: 1px solid var(--ifm-color-emphasis-200);
-}
-
-.tocTitle {
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--ifm-color-emphasis-600);
-}
-
-.hideBtn {
-  background: none;
-  border: 1px solid var(--ifm-color-emphasis-300);
-  border-radius: 6px;
-  padding: 0.15rem 0.5rem;
-  font-size: 0.74rem;
-  font-weight: 600;
-  color: var(--ifm-color-emphasis-700);
-  cursor: pointer;
-  transition: border-color 0.15s, color 0.15s, background 0.15s;
-}
-
-.hideBtn:hover {
-  border-color: var(--ifm-color-primary);
-  color: var(--ifm-color-primary-darkest);
-  background: rgba(46, 133, 85, 0.06);
-}
-
-.restoreBtn {
-  position: fixed;
-  top: calc(var(--ifm-navbar-height) + 0.9rem);
-  right: 1rem;
-  z-index: 20;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.35rem 0.7rem;
-  border-radius: 999px;
-  border: 1px solid var(--ifm-color-emphasis-300);
+  justify-content: center;
+  width: 100%;
+  height: 40px;
+  margin-top: 0.5rem;
+  padding: 0;
+  border-radius: 0;
+  border-color: var(--ifm-toc-border-color);
   background: var(--ifm-background-surface-color);
-  color: var(--ifm-font-color-base);
-  font-size: 0.78rem;
-  font-weight: 600;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  cursor: pointer;
-  transition: border-color 0.15s, color 0.15s, box-shadow 0.15s;
+  flex-shrink: 0;
 }
 
-.restoreBtn:hover {
-  border-color: var(--ifm-color-primary);
-  color: var(--ifm-color-primary-darkest);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+.collapseButton:hover,
+.collapseButton:focus-visible {
+  background: var(--ifm-color-emphasis-200);
+}
+
+/* Matches Docusaurus's native left expandButton strip, mirrored on the right edge */
+.expandStrip {
+  position: fixed;
+  top: var(--ifm-navbar-height);
+  right: 0;
+  bottom: 0;
+  width: 30px;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-left: 1px solid var(--ifm-toc-border-color);
+  background: var(--ifm-background-surface-color);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.expandStrip:hover,
+.expandStrip:focus-visible {
+  background: var(--ifm-color-emphasis-200);
+}
+
+.chevronLeft {
+  transform: rotate(0deg);
+}
+
+.chevronRight {
+  transform: rotate(180deg);
 }
 
 @media (max-width: 996px) {
-  .tocHeader,
-  .restoreBtn {
+  .collapseButton,
+  .expandStrip {
     display: none;
   }
 }
