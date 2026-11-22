@@ -122,25 +122,38 @@ export default function SearchBar() {
 
   const results = index && query.trim().length > 1 ? search(index, query) : [];
   const urlOf = (r) => (r.sec.a ? `${r.page.u}#${r.sec.a}` : r.page.u);
+  const lastTrackedQuery = useRef('');
 
-  // Record zero-result searches (debounced) to spot missing topics in the course
+  const safeSearchPage = () => {
+    if (typeof window === 'undefined') return '/';
+    const p = window.location.pathname;
+    return /^\/(?:(?:concepts|algorithms)(?:\/|$)|cheat-sheet|stats|$)/.test(p) ? p : '/';
+  };
+
+  // Record searches (debounced) including zero-result queries
   useEffect(() => {
     const q = query.trim();
-    if (!open || !index || q.length < 3 || results.length > 0) return undefined;
+    if (!open || !index || q.length < 2 || q === lastTrackedQuery.current) return undefined;
     const timer = setTimeout(() => {
-      trackEvent('search', {query: q.slice(0, 80), results: 0});
-    }, 900);
+      lastTrackedQuery.current = q;
+      trackEvent('search', {query: q.slice(0, 80), results: results.length}, safeSearchPage());
+    }, 700);
     return () => clearTimeout(timer);
   }, [open, index, query, results.length]);
 
   const go = (r) => {
     const q = query.trim();
     if (q) {
-      trackEvent('search', {
-        query: q.slice(0, 80),
-        results: results.length,
-        picked: urlOf(r).slice(0, 120),
-      });
+      lastTrackedQuery.current = q;
+      trackEvent(
+        'search',
+        {
+          query: q.slice(0, 80),
+          results: results.length,
+          picked: urlOf(r).slice(0, 120),
+        },
+        safeSearchPage(),
+      );
     }
     setOpen(false);
     setQuery('');

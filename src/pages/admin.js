@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import Head from '@docusaurus/Head';
 import Layout from '@theme/Layout';
 import styles from './admin.module.css';
@@ -15,6 +15,45 @@ function formatDuration(ms) {
   const m = Math.floor(secs / 60);
   const s = secs % 60;
   return `${m}m ${s}s`;
+}
+
+function sortRows(rows, sortState) {
+  if (!sortState.key) return rows;
+  return [...rows].sort((a, b) => {
+    const va = a[sortState.key];
+    const vb = b[sortState.key];
+    if (va === vb) return 0;
+    if (va === null || va === undefined) return 1;
+    if (vb === null || vb === undefined) return -1;
+    let cmp = 0;
+    if (typeof va === 'number' && typeof vb === 'number') {
+      cmp = va - vb;
+    } else if (typeof va === 'boolean' && typeof vb === 'boolean') {
+      cmp = Number(va) - Number(vb);
+    } else {
+      cmp = String(va).localeCompare(String(vb));
+    }
+    return sortState.dir === 'asc' ? cmp : -cmp;
+  });
+}
+
+function nextSort(prev, key) {
+  if (prev.key !== key) return {key, dir: 'desc'};
+  if (prev.dir === 'desc') return {key, dir: 'asc'};
+  return {key: null, dir: 'desc'};
+}
+
+function SortTh({label, sortKey, sortState, onSort}) {
+  const active = sortState.key === sortKey;
+  const indicator = !active ? '↕' : sortState.dir === 'asc' ? '↑' : '↓';
+  const ariaSort = !active ? 'none' : sortState.dir === 'asc' ? 'ascending' : 'descending';
+  return (
+    <th scope="col" aria-sort={ariaSort}>
+      <button type="button" className={styles.sortBtn} onClick={() => onSort(sortKey)}>
+        {label} <span aria-hidden="true">{indicator}</span>
+      </button>
+    </th>
+  );
 }
 
 function Pagination({page, totalItems, pageSize, onPageChange, loading = false}) {
@@ -64,6 +103,23 @@ export default function AdminDashboardPage() {
   const [completionsPage, setCompletionsPage] = useState(0);
   const [feedbackPage, setFeedbackPage] = useState(0);
   const [issuesPage, setIssuesPage] = useState(0);
+  const [topPagesSort, setTopPagesSort] = useState({key: null, dir: 'desc'});
+  const [completionsSort, setCompletionsSort] = useState({key: null, dir: 'desc'});
+  const [feedbackSort, setFeedbackSort] = useState({key: null, dir: 'desc'});
+  const [issuesSort, setIssuesSort] = useState({key: null, dir: 'desc'});
+  const [eventsSort, setEventsSort] = useState({key: null, dir: 'desc'});
+
+  const sortedTopPages = useMemo(
+    () => sortRows(stats?.topPages || [], topPagesSort),
+    [stats, topPagesSort],
+  );
+  const sortedCompletions = useMemo(
+    () => sortRows(stats?.lessonCompletions || [], completionsSort),
+    [stats, completionsSort],
+  );
+  const sortedFeedback = useMemo(() => sortRows(feedback, feedbackSort), [feedback, feedbackSort]);
+  const sortedIssues = useMemo(() => sortRows(issues, issuesSort), [issues, issuesSort]);
+  const sortedEvents = useMemo(() => sortRows(events, eventsSort), [events, eventsSort]);
 
   useEffect(() => {
     try {
@@ -346,23 +402,23 @@ export default function AdminDashboardPage() {
                 </section>
 
                 <section className={styles.section}>
-                  <h2 className={styles.sectionTitle}>Top pages</h2>
-                  {stats.topPages.length === 0 ? (
+                  <h2 className={styles.sectionTitle}>Top pages ({sortedTopPages.length})</h2>
+                  {sortedTopPages.length === 0 ? (
                     <p className={styles.empty}>No page views recorded yet.</p>
                   ) : (
                     <div className={styles.tableWrap}>
                       <table className={styles.table}>
                         <thead>
                           <tr>
-                            <th scope="col">Page</th>
-                            <th scope="col">Views</th>
-                            <th scope="col">Sessions</th>
-                            <th scope="col">Avg time</th>
-                            <th scope="col">Avg scroll</th>
+                            <SortTh label="Page" sortKey="page" sortState={topPagesSort} onSort={(k) => { setTopPagesSort((s) => nextSort(s, k)); setTopPagesPage(0); }} />
+                            <SortTh label="Views" sortKey="views" sortState={topPagesSort} onSort={(k) => { setTopPagesSort((s) => nextSort(s, k)); setTopPagesPage(0); }} />
+                            <SortTh label="Sessions" sortKey="sessions" sortState={topPagesSort} onSort={(k) => { setTopPagesSort((s) => nextSort(s, k)); setTopPagesPage(0); }} />
+                            <SortTh label="Avg time" sortKey="avgDurationMs" sortState={topPagesSort} onSort={(k) => { setTopPagesSort((s) => nextSort(s, k)); setTopPagesPage(0); }} />
+                            <SortTh label="Avg scroll" sortKey="avgScrollPct" sortState={topPagesSort} onSort={(k) => { setTopPagesSort((s) => nextSort(s, k)); setTopPagesPage(0); }} />
                           </tr>
                         </thead>
                         <tbody>
-                          {stats.topPages
+                          {sortedTopPages
                             .slice(topPagesPage * PAGE_SIZE, (topPagesPage + 1) * PAGE_SIZE)
                             .map((p) => (
                             <tr key={p.page}>
@@ -379,28 +435,28 @@ export default function AdminDashboardPage() {
                   )}
                   <Pagination
                     page={topPagesPage}
-                    totalItems={stats.topPages.length}
+                    totalItems={sortedTopPages.length}
                     pageSize={PAGE_SIZE}
                     onPageChange={setTopPagesPage}
                   />
                 </section>
 
                 <section className={styles.section}>
-                  <h2 className={styles.sectionTitle}>Lesson completions ({stats.lessonCompletions.length})</h2>
-                  {stats.lessonCompletions.length === 0 ? (
+                  <h2 className={styles.sectionTitle}>Lesson completions ({sortedCompletions.length})</h2>
+                  {sortedCompletions.length === 0 ? (
                     <p className={styles.empty}>No lesson completions recorded yet.</p>
                   ) : (
                     <div className={styles.tableWrap}>
                       <table className={styles.table}>
                         <thead>
                           <tr>
-                            <th scope="col">Lesson</th>
-                            <th scope="col">Completed</th>
-                            <th scope="col">Uncompleted</th>
+                            <SortTh label="Lesson" sortKey="page" sortState={completionsSort} onSort={(k) => { setCompletionsSort((s) => nextSort(s, k)); setCompletionsPage(0); }} />
+                            <SortTh label="Completed" sortKey="completed" sortState={completionsSort} onSort={(k) => { setCompletionsSort((s) => nextSort(s, k)); setCompletionsPage(0); }} />
+                            <SortTh label="Uncompleted" sortKey="uncompleted" sortState={completionsSort} onSort={(k) => { setCompletionsSort((s) => nextSort(s, k)); setCompletionsPage(0); }} />
                           </tr>
                         </thead>
                         <tbody>
-                          {stats.lessonCompletions
+                          {sortedCompletions
                             .slice(completionsPage * PAGE_SIZE, (completionsPage + 1) * PAGE_SIZE)
                             .map((c) => (
                             <tr key={c.page}>
@@ -415,7 +471,7 @@ export default function AdminDashboardPage() {
                   )}
                   <Pagination
                     page={completionsPage}
-                    totalItems={stats.lessonCompletions.length}
+                    totalItems={sortedCompletions.length}
                     pageSize={PAGE_SIZE}
                     onPageChange={setCompletionsPage}
                   />
@@ -424,22 +480,22 @@ export default function AdminDashboardPage() {
             )}
 
             <section className={styles.section}>
-              <h2 className={styles.sectionTitle}>Latest feedback ({feedback.length})</h2>
-              {feedback.length === 0 ? (
+              <h2 className={styles.sectionTitle}>Latest feedback ({sortedFeedback.length})</h2>
+              {sortedFeedback.length === 0 ? (
                 <p className={styles.empty}>No feedback votes recorded yet.</p>
               ) : (
                 <div className={styles.tableWrap}>
                   <table className={styles.table}>
                     <thead>
                       <tr>
-                        <th scope="col">Day</th>
-                        <th scope="col">Page</th>
-                        <th scope="col">Helpful</th>
-                        <th scope="col">Comment</th>
+                        <SortTh label="Day" sortKey="day" sortState={feedbackSort} onSort={(k) => { setFeedbackSort((s) => nextSort(s, k)); setFeedbackPage(0); }} />
+                        <SortTh label="Page" sortKey="page" sortState={feedbackSort} onSort={(k) => { setFeedbackSort((s) => nextSort(s, k)); setFeedbackPage(0); }} />
+                        <SortTh label="Helpful" sortKey="helpful" sortState={feedbackSort} onSort={(k) => { setFeedbackSort((s) => nextSort(s, k)); setFeedbackPage(0); }} />
+                        <SortTh label="Comment" sortKey="comment" sortState={feedbackSort} onSort={(k) => { setFeedbackSort((s) => nextSort(s, k)); setFeedbackPage(0); }} />
                       </tr>
                     </thead>
                     <tbody>
-                      {feedback
+                      {sortedFeedback
                         .slice(feedbackPage * PAGE_SIZE, (feedbackPage + 1) * PAGE_SIZE)
                         .map((f, idx) => (
                         <tr key={`${f.day}-${f.page}-${idx}`}>
@@ -455,31 +511,31 @@ export default function AdminDashboardPage() {
               )}
               <Pagination
                 page={feedbackPage}
-                totalItems={feedback.length}
+                totalItems={sortedFeedback.length}
                 pageSize={PAGE_SIZE}
                 onPageChange={setFeedbackPage}
               />
             </section>
 
             <section className={styles.section}>
-              <h2 className={styles.sectionTitle}>Latest GitHub issues ({issues.length})</h2>
+              <h2 className={styles.sectionTitle}>Latest GitHub issues ({sortedIssues.length})</h2>
               <p className={styles.sectionHint}>
                 Populated automatically via <code>POST /webhooks/github</code> when an issue is actually submitted on GitHub (not just when clicking the link), provided the repository webhook is configured in GitHub Settings → Webhooks.
               </p>
-              {issues.length === 0 ? (
+              {sortedIssues.length === 0 ? (
                 <p className={styles.empty}>No webhook issue events recorded yet.</p>
               ) : (
                 <div className={styles.tableWrap}>
                   <table className={styles.table}>
                     <thead>
                       <tr>
-                        <th scope="col">Received</th>
-                        <th scope="col">Action</th>
-                        <th scope="col">Issue</th>
+                        <SortTh label="Received" sortKey="received" sortState={issuesSort} onSort={(k) => { setIssuesSort((s) => nextSort(s, k)); setIssuesPage(0); }} />
+                        <SortTh label="Action" sortKey="action" sortState={issuesSort} onSort={(k) => { setIssuesSort((s) => nextSort(s, k)); setIssuesPage(0); }} />
+                        <SortTh label="Issue" sortKey="number" sortState={issuesSort} onSort={(k) => { setIssuesSort((s) => nextSort(s, k)); setIssuesPage(0); }} />
                       </tr>
                     </thead>
                     <tbody>
-                      {issues
+                      {sortedIssues
                         .slice(issuesPage * PAGE_SIZE, (issuesPage + 1) * PAGE_SIZE)
                         .map((it) => (
                         <tr key={it.delivery}>
@@ -498,7 +554,7 @@ export default function AdminDashboardPage() {
               )}
               <Pagination
                 page={issuesPage}
-                totalItems={issues.length}
+                totalItems={sortedIssues.length}
                 pageSize={PAGE_SIZE}
                 onPageChange={setIssuesPage}
               />
@@ -506,22 +562,22 @@ export default function AdminDashboardPage() {
 
             <section className={styles.section}>
               <h2 className={styles.sectionTitle}>Raw events ({eventsTotal})</h2>
-              {events.length === 0 ? (
+              {sortedEvents.length === 0 ? (
                 <p className={styles.empty}>No raw events recorded in this period.</p>
               ) : (
                 <div className={styles.tableWrap}>
                   <table className={styles.table}>
                     <thead>
                       <tr>
-                        <th scope="col">Timestamp (UTC)</th>
-                        <th scope="col">Type</th>
-                        <th scope="col">Page</th>
-                        <th scope="col">Time / Scroll</th>
+                        <SortTh label="Timestamp (UTC)" sortKey="ts" sortState={eventsSort} onSort={(k) => setEventsSort((s) => nextSort(s, k))} />
+                        <SortTh label="Type" sortKey="eventType" sortState={eventsSort} onSort={(k) => setEventsSort((s) => nextSort(s, k))} />
+                        <SortTh label="Page" sortKey="page" sortState={eventsSort} onSort={(k) => setEventsSort((s) => nextSort(s, k))} />
+                        <SortTh label="Time / Scroll" sortKey="durationMs" sortState={eventsSort} onSort={(k) => setEventsSort((s) => nextSort(s, k))} />
                         <th scope="col">Meta</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {events.map((ev, idx) => (
+                      {sortedEvents.map((ev, idx) => (
                         <tr key={`${ev.ts}-${idx}`}>
                           <td className={styles.mono}>{ev.ts.slice(0, 19).replace('T', ' ')}</td>
                           <td className={styles.mono}>{ev.eventType}</td>
