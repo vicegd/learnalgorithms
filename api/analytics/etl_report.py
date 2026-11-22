@@ -543,10 +543,12 @@ def render_markdown(report):
             "",
             "## Green Software (Carbon Footprint · SWDM)",
             "",
-            f"- Samples: {gs['samples']}",
-            f"- Avg / p95 transfer per load: {gs['avgTransferKB']} KB / {gs['p95TransferKB']} KB",
-            f"- Avg CO2 per visit: {gs['avgCo2Mg']} mg (rating **{gs['rating']}**)",
-            f"- Total estimated CO2 (period): {gs['totalCo2Grams']} g",
+            "_Estimated via the Sustainable Web Design Model (SWDM: ~0.35 mg CO2 per KB transferred over the network via `PerformanceResourceTiming`; cached PWA loads transfer ~0 KB). Ratings: **A+** < 95 mg, **A** < 186 mg, **B** < 341 mg, **C** >= 341 mg per visit._",
+            "",
+            f"- **Samples:** {gs['samples']} (real page loads reporting network transfer size)",
+            f"- **Avg / p95 transfer per load:** {gs['avgTransferKB']} KB / {gs['p95TransferKB']} KB (data downloaded per visit)",
+            f"- **Avg CO2 per visit:** {gs['avgCo2Mg']} mg (environmental rating **{gs['rating']}**)",
+            f"- **Total estimated CO2 (period):** {gs['totalCo2Grams']} g (cumulative across all measured loads)",
         ])
 
     return "\n".join(lines) + "\n"

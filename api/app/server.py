@@ -602,7 +602,9 @@ def interpret_report_with_llm(markdown_report, lang="en", detail="brief"):
     if is_es:
         thresholds = (
             "Umbrales oficiales de Core Web Vitals de Google: "
-            "TTFB < 800 ms es bueno, LCP < 2500 ms es bueno (y < 1000 ms es excelente), CLS < 0.1 es bueno (> 0.25 es pobre)."
+            "TTFB < 800 ms es bueno, LCP < 2500 ms es bueno (y < 1000 ms es excelente), CLS < 0.1 es bueno (> 0.25 es pobre). "
+            "Umbrales de Green Software (Sustainable Web Design Model, SWDM, ~0.35 mg CO2/KB transferido): "
+            "A+ < 95 mg CO2/visita, A < 186 mg, B < 341 mg, C >= 341 mg."
         )
         if is_detailed:
             system_prompt = (
@@ -617,7 +619,7 @@ def interpret_report_with_llm(markdown_report, lang="en", detail="brief"):
                 "2. **Análisis detallado por lección:** incluye una tabla Markdown `| Lección | Vistas | Tiempo mediano | Scroll | Completados | Diagnóstico pedagógico |` cubriendo todas las lecciones relevantes de `Top Pages`, más un análisis narrativo comparando tiempo vs. profundidad de lectura y el cruce con Matomo.\n"
                 "3. **Comportamiento de estudio y señales de dificultad:** análisis de checkpoints/soluciones más abiertos, clics a código Java/demostraciones, uso del Cheat Sheet y relación entre interactividad y retención.\n"
                 "4. **Lagunas de contenido, análisis NLP y feedback cualitativo:** análisis detallado de búsquedas, búsquedas sin resultado, términos clave y bigramas NLP, idioma, polaridad media, intención del feedback y lectura crítica de los comentarios literales.\n"
-                "5. **Auditoría técnica de rendimiento y UX (Core Web Vitals):** incluye una tabla Markdown `| Métrica | Valor p50 / p95 | Umbral oficial Google | Estado | Acción recomendada |` para TTFB, LCP y CLS, más análisis del impacto en la experiencia móvil/escritorio.\n"
+                "5. **Auditoría técnica de rendimiento, UX y sostenibilidad (Core Web Vitals & Green Software):** incluye una tabla Markdown `| Métrica | Valor p50 / p95 | Umbral oficial | Estado | Acción recomendada |` para TTFB, LCP, CLS y huella de carbono SWDM (KB transferidos y mg CO2/visita), explicando qué significa cada métrica y su impacto.\n"
                 "6. **Validez estadística y limitaciones metodológicas:** evaluación honesta del tamaño muestral, sesgos de sesiones anónimas basadas en `sessionStorage` y recomendaciones de recogida de datos.\n"
                 "7. **Plan de acción priorizado para el próximo ciclo docente:** incluye una matriz Markdown `| # | Acción concreta | Prioridad | Esfuerzo | KPI verificable | Fuente de verificación |` con 6–8 acciones accionables."
             )
@@ -636,7 +638,9 @@ def interpret_report_with_llm(markdown_report, lang="en", detail="brief"):
     else:
         thresholds = (
             "Official Google Core Web Vitals thresholds: "
-            "TTFB < 800 ms is good, LCP < 2500 ms is good (< 1000 ms is excellent), CLS < 0.1 is good (> 0.25 is poor)."
+            "TTFB < 800 ms is good, LCP < 2500 ms is good (< 1000 ms is excellent), CLS < 0.1 is good (> 0.25 is poor). "
+            "Green Software (Sustainable Web Design Model, SWDM, ~0.35 mg CO2/KB transferred) ratings: "
+            "A+ < 95 mg CO2/visit, A < 186 mg, B < 341 mg, C >= 341 mg."
         )
         if is_detailed:
             system_prompt = (
@@ -651,7 +655,7 @@ def interpret_report_with_llm(markdown_report, lang="en", detail="brief"):
                 "2. **Lesson-by-Lesson Engagement Analysis:** include a Markdown table `| Lesson | Views | Median Time | Avg Scroll | Completions | Pedagogical Interpretation |` covering all relevant entries in `Top Pages`, plus narrative analysis of reading depth vs. time and comparison with Matomo.\n"
                 "3. **Study Behavior & Difficulty Signals:** analysis of most opened checkpoints/solutions, Java/proof resource clicks, Cheat Sheet usage, and how interactive elements support learning.\n"
                 "4. **Content Gaps, NLP Insights & Qualitative Feedback:** thorough review of searches, zero-result searches, NLP top terms & bigrams, detected languages, sentiment polarity, comment intents, and literal feedback comments.\n"
-                "5. **Technical Performance & UX Audit (Core Web Vitals):** include a Markdown table `| Metric | Observed p50 / p95 | Official Google Threshold | Status | Recommended Action |` for TTFB, LCP, and CLS, plus UX impact analysis.\n"
+                "5. **Technical Performance, UX & Green Software Audit (Core Web Vitals & SWDM):** include a Markdown table `| Metric | Observed Value | Official Threshold | Status | Recommended Action |` for TTFB, LCP, CLS, and SWDM carbon footprint (KB transferred and mg CO2/visit), explaining clearly what each metric means.\n"
                 "6. **Statistical Validity & Methodological Limitations:** honest assessment of sample size, `sessionStorage` anonymous-session caveats, and data-collection guidance.\n"
                 "7. **Prioritized Action Plan for Next Term:** include a Markdown matrix `| # | Concrete Action | Priority | Effort | Measurable KPI | Verification Source |` with 6–8 actionable items."
             )
