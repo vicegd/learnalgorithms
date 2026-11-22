@@ -102,6 +102,11 @@ export default function AdminDashboardPage() {
   const [etlReport, setEtlReport] = useState(null);
   const [etlMarkdown, setEtlMarkdown] = useState('');
   const [reportCopied, setReportCopied] = useState(false);
+  const [aiLang, setAiLang] = useState('es');
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiAnalysis, setAiAnalysis] = useState(null);
+  const [aiError, setAiError] = useState('');
+  const [aiCopied, setAiCopied] = useState(false);
   const [health, setHealth] = useState(null);
   const [popular, setPopular] = useState([]);
   const [summaryPage, setSummaryPage] = useState('');
@@ -255,6 +260,8 @@ export default function AdminDashboardPage() {
     setEvents([]);
     setEtlReport(null);
     setEtlMarkdown('');
+    setAiAnalysis(null);
+    setAiError('');
     setHealth(null);
     setPopular([]);
     setSummaryData(null);
@@ -313,6 +320,43 @@ export default function AdminDashboardPage() {
     a.click();
     a.remove();
     URL.revokeObjectURL(url);
+  }
+
+  async function handleInterpretReport() {
+    if (!token) return;
+    setAiLoading(true);
+    setAiError('');
+    try {
+      const res = await fetch(
+        `${API_BASE}/admin/report/interpret?days=${days}&lang=${aiLang}`,
+        {
+          method: 'POST',
+          headers: {Authorization: `Bearer ${token}`},
+          mode: 'cors',
+        },
+      );
+      const json = await res.json();
+      if (!res.ok) {
+        setAiError(json.error || `HTTP ${res.status}`);
+      } else {
+        setAiAnalysis(json);
+      }
+    } catch (err) {
+      setAiError(`AI interpretation failed: ${err.message}`);
+    } finally {
+      setAiLoading(false);
+    }
+  }
+
+  async function handleCopyAiAnalysis() {
+    if (!aiAnalysis?.analysis) return;
+    try {
+      await navigator.clipboard.writeText(aiAnalysis.analysis);
+      setAiCopied(true);
+      setTimeout(() => setAiCopied(false), 2000);
+    } catch {
+      // Ignore clipboard errors
+    }
   }
 
   async function handleFetchSummary(e) {
@@ -785,6 +829,22 @@ export default function AdminDashboardPage() {
                 </h2>
                 {etlMarkdown && (
                   <div className={styles.reportActions}>
+                    <select
+                      className={styles.select}
+                      value={aiLang}
+                      onChange={(e) => setAiLang(e.target.value)}
+                      aria-label="AI interpretation language">
+                      <option value="es">AI: Español</option>
+                      <option value="en">AI: English</option>
+                    </select>
+                    <button
+                      type="button"
+                      className={styles.primaryBtn}
+                      disabled={aiLoading}
+                      onClick={handleInterpretReport}
+                      title="POST /admin/report/interpret — analyze this anonymized ETL report with an LLM">
+                      {aiLoading ? 'Analyzing…' : '✨ Interpret with AI'}
+                    </button>
                     <button type="button" className={styles.secondaryBtn} onClick={handleCopyReport}>
                       {reportCopied ? 'Copied!' : 'Copy Markdown'}
                     </button>
@@ -836,8 +896,31 @@ export default function AdminDashboardPage() {
                     </div>
                   </div>
                   <p className={styles.sectionHint}>
-                    <strong>How to read the ETL report:</strong> <code>p50</code> is the median (typical visit) and <code>p95</code> is the 95th percentile (slowest 5% of visits). <strong>Top Pages</strong> shows views, median active reading time (s), average scroll depth (%), and completions. <strong>Zero-Result Searches</strong> lists queries with 0 matches (missing topics). <strong>Most Opened Checkpoints</strong> counts which <code>&lt;details&gt;</code> solutions students expand most.
+                    <strong>How to read the ETL report:</strong> <code>p50</code> is the median (typical visit) and <code>p95</code> is the 95th percentile (slowest 5% of visits). <strong>Top Pages</strong> shows views, median active reading time (s), average scroll depth (%), and completions. <strong>Zero-Result Searches</strong> lists queries with 0 matches (missing topics). <strong>Most Opened Checkpoints</strong> counts which <code>&lt;details&gt;</code> solutions students expand most. The report also aggregates Matomo popular lessons, resource clicks, Cheat Sheet usage, student feedback, and GitHub issues.
                   </p>
+                  {aiError && (
+                    <div className={styles.error} role="alert">
+                      {aiError}
+                    </div>
+                  )}
+                  {aiAnalysis && (
+                    <div className={styles.aiBox}>
+                      <div className={styles.aiHeader}>
+                        <div>
+                          <strong>✨ AI Pedagogical Interpretation</strong>{' '}
+                          <code className={styles.endpointTag}>POST /admin/report/interpret</code>{' '}
+                          <code className={styles.endpointTag}>{aiAnalysis.model}</code>
+                        </div>
+                        <button type="button" className={styles.secondaryBtn} onClick={handleCopyAiAnalysis}>
+                          {aiCopied ? 'Copied!' : 'Copy AI summary'}
+                        </button>
+                      </div>
+                      <p className={styles.aiDisclaimer}>
+                        Generated exclusively from the anonymized ETL metrics below. Review before including in official teaching reports (human-in-the-loop).
+                      </p>
+                      <pre className={styles.reportPre}>{aiAnalysis.analysis}</pre>
+                    </div>
+                  )}
                   <pre className={styles.reportPre}>{etlMarkdown}</pre>
                 </>
               )}

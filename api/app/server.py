@@ -16,6 +16,7 @@ GET  /admin/feedback            Latest votes and comments (Bearer token).
 GET  /admin/stats               Aggregated telemetry for teaching innovation (Bearer token).
 GET  /admin/events              Raw anonymized telemetry events in JSON or CSV (Bearer token).
 GET  /admin/report              ETL teaching report & Core Web Vitals in JSON or Markdown (Bearer token).
+POST /admin/report/interpret    AI-assisted pedagogical interpretation of the ETL report (Bearer token).
 
 Security
 --------
@@ -65,6 +66,9 @@ MATOMO_SITE_ID = os.environ.get("MATOMO_SITE_ID", "7")
 MATOMO_TOKEN = os.environ.get("MATOMO_TOKEN", "")
 GITHUB_WEBHOOK_SECRET = os.environ.get("GITHUB_WEBHOOK_SECRET", "")
 ADMIN_TOKEN = os.environ.get("ADMIN_TOKEN", "")
+LLM_API_KEY = os.environ.get("LLM_API_KEY", "")
+LLM_API_URL = os.environ.get("LLM_API_URL", "https://api.openai.com/v1/chat/completions")
+LLM_MODEL = os.environ.get("LLM_MODEL", "gpt-4o-mini")
 TRUST_PROXY = os.environ.get("TRUST_PROXY", "1") == "1"
 PORT = int(os.environ.get("PORT", "8080"))
 
@@ -554,11 +558,78 @@ def fetch_popular_from_matomo(limit=5):
     return [{"page": p, "visits": v} for p, v in top]
 
 
+def interpret_report_with_llm(markdown_report, lang="es"):
+    """Call an OpenAI-compatible chat completions API (OpenAI, Gemini OpenAI-compat, Groq, etc.)
+    to synthesize an anonymized ETL teaching report into actionable teaching insights."""
+    if not LLM_API_KEY:
+        raise RuntimeError("LLM_API_KEY is not configured")
+    is_es = (lang or "es").lower().startswith("es")
+    system_prompt = (
+        "Eres un asesor experto en innovación docente universitaria para un curso de Diseño y Análisis de Algoritmos "
+        "(learnalgorithms.dev). Analiza ÚNICAMENTE los datos cuantitativos y comentarios anonimizados del informe ETL "
+        "que se te proporciona. No inventes cifras ni supongas datos ausentes. Responde en español claro y conciso, "
+        "listo para incluir en una memoria docente, con exactamente estas 5 secciones en Markdown:\n"
+        "1. Resumen ejecutivo\n"
+        "2. Lecciones con mayor interés y posibles puntos de dificultad\n"
+        "3. Lagunas detectadas (búsquedas sin resultado y feedback)\n"
+        "4. Rendimiento técnico percibido (Core Web Vitals)\n"
+        "5. Recomendaciones concretas para el próximo ciclo docente (3–5 puntos accionables)"
+        if is_es
+        else
+        "You are an expert university teaching-innovation advisor for an Algorithms course (learnalgorithms.dev). "
+        "Analyze ONLY the anonymized quantitative metrics and feedback comments in the provided ETL report. "
+        "Never invent numbers. Reply in clear, concise English ready for a teaching report with exactly these 5 "
+        "Markdown sections:\n"
+        "1. Executive Summary\n"
+        "2. High-Engagement & Potentially Difficult Lessons\n"
+        "3. Detected Content Gaps (Zero-Result Searches & Feedback)\n"
+        "4. Perceived Technical Performance (Core Web Vitals)\n"
+        "5. Concrete Recommendations for Next Term (3–5 actionable bullets)"
+    )
+    body = json.dumps({
+        "model": LLM_MODEL,
+        "temperature": 0.3,
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": markdown_report[:16000]},
+        ],
+    }).encode("utf-8")
+    req = urllib.request.Request(
+        LLM_API_URL,
+        data=body,
+        headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {LLM_API_KEY}",
+        },
+        method="POST",
+    )
+    with urllib.request.urlopen(req, timeout=45) as resp:
+        data = json.loads(resp.read(2_000_000))
+    choices = data.get("choices") or []
+    if not choices or not isinstance(choices[0], dict):
+        raise ValueError("unexpected LLM response format")
+    content = (choices[0].get("message") or {}).get("content") or ""
+    return {"analysis": content.strip(), "model": data.get("model") or LLM_MODEL}
+
+
+def build_full_report(app, days):
+    events, _ = app.store.latest_events(days=days, limit=50000, offset=0)
+    feedback = app.store.latest(limit=500)
+    issues = app.store.latest_issues(limit=200)
+    try:
+        popular = app.popular.get(app.popular_fetch)
+    except Exception:
+        popular = []
+    report = etl_report.transform(events, feedback=feedback, issues=issues, popular=popular)
+    markdown = etl_report.render_markdown(report)
+    return report, markdown
+
+
 # --------------------------------------------------------------------------- HTTP
 
 
 class App:
-    def __init__(self, store, popular_fetch=fetch_popular_from_matomo):
+    def __init__(self, store, popular_fetch=fetch_popular_from_matomo, llm_interpret=interpret_report_with_llm):
         self.store = store
         self.hasher = DailyHasher()
         self.limiter = RateLimiter(RATE_LIMIT, RATE_WINDOW)
@@ -566,6 +637,7 @@ class App:
         self.read_limiter = RateLimiter(READ_RATE_LIMIT, RATE_WINDOW)
         self.popular = PopularCache(POPULAR_TTL)
         self.popular_fetch = popular_fetch
+        self.llm_interpret = llm_interpret
 
 
 def make_handler(app):
@@ -725,9 +797,7 @@ def make_handler(app):
                     days = 0 if raw_days == "all" else max(0, min(3650, int(raw_days)))
                 except ValueError:
                     return self.send_json(400, {"error": "invalid days"})
-                events, _ = app.store.latest_events(days=days, limit=50000, offset=0)
-                report = etl_report.transform(events)
-                markdown = etl_report.render_markdown(report)
+                report, markdown = build_full_report(app, days)
                 if fmt == "md":
                     body = markdown.encode("utf-8")
                     self.send_response(200)
@@ -759,7 +829,42 @@ def make_handler(app):
                 return self.post_events()
             if path == "/webhooks/github":
                 return self.post_github()
+            if path == "/admin/report/interpret":
+                return self.post_report_interpret()
             self.send_json(404, {"error": "not found"})
+
+        def post_report_interpret(self):
+            auth = self.headers.get("Authorization", "")
+            if not ADMIN_TOKEN or not hmac.compare_digest(auth, "Bearer " + ADMIN_TOKEN):
+                return self.send_json(401, {"error": "unauthorized"}, {"WWW-Authenticate": "Bearer"})
+            url = urllib.parse.urlparse(self.path)
+            qs = urllib.parse.parse_qs(url.query)
+            raw_days = qs.get("days", ["30"])[0]
+            lang = qs.get("lang", ["es"])[0]
+            if lang not in ("es", "en"):
+                lang = "es"
+            try:
+                days = 0 if raw_days == "all" else max(0, min(3650, int(raw_days)))
+            except ValueError:
+                return self.send_json(400, {"error": "invalid days"})
+            _, markdown = build_full_report(app, days)
+            try:
+                result = app.llm_interpret(markdown, lang=lang)
+            except RuntimeError as e:
+                return self.send_json(503, {"error": str(e)}, {"Cache-Control": "no-store"})
+            except Exception as e:
+                log.exception("llm interpret failed")
+                return self.send_json(502, {"error": f"LLM request failed: {e}"}, {"Cache-Control": "no-store"})
+            return self.send_json(
+                200,
+                {
+                    "analysis": result["analysis"],
+                    "model": result["model"],
+                    "lang": lang,
+                    "days": days,
+                },
+                {"Cache-Control": "no-store"},
+            )
 
         def post_events(self):
             if self.headers.get("Origin") != ALLOWED_ORIGIN:

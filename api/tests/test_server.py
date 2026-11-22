@@ -22,8 +22,11 @@ class ApiTest(unittest.TestCase):
     def setUpClass(cls):
         server.GITHUB_WEBHOOK_SECRET, server.ADMIN_TOKEN = "whsecret", "admintoken"
         cls.tmp = tempfile.TemporaryDirectory()
-        cls.app = server.App(server.Store(os.path.join(cls.tmp.name, "t.db")),
-                             popular_fetch=lambda: [{"page": "/concepts/sorting/quicksort", "visits": 42}])
+        cls.app = server.App(
+            server.Store(os.path.join(cls.tmp.name, "t.db")),
+            popular_fetch=lambda: [{"page": "/concepts/sorting/quicksort", "visits": 42}],
+            llm_interpret=lambda md, lang="es": {"analysis": f"[{lang}] Summary of {len(md)} chars", "model": "mock-llm"},
+        )
         cls.httpd = ThreadingHTTPServer(("127.0.0.1", 0), server.make_handler(cls.app))
         cls.base = f"http://127.0.0.1:{cls.httpd.server_address[1]}"
         threading.Thread(target=cls.httpd.serve_forever, daemon=True).start()
@@ -286,6 +289,21 @@ class ApiTest(unittest.TestCase):
             self.assertIn("text/markdown", resp.headers.get("Content-Type", ""))
             md_text = resp.read().decode("utf-8")
             self.assertIn("# learnalgorithms.dev", md_text)
+            self.assertIn("## Events by Type", md_text)
+            self.assertIn("## Popular Lessons", md_text)
+
+        # Admin LLM interpretation endpoint
+        s, _, _ = self.req("POST", "/admin/report/interpret?days=0&lang=es")
+        self.assertEqual(s, 401)
+        s, ai_res, _ = self.req(
+            "POST",
+            "/admin/report/interpret?days=0&lang=es",
+            headers={"Authorization": "Bearer admintoken"},
+        )
+        self.assertEqual(s, 200)
+        self.assertEqual(ai_res["model"], "mock-llm")
+        self.assertEqual(ai_res["lang"], "es")
+        self.assertIn("[es] Summary of", ai_res["analysis"])
 
 
 if __name__ == "__main__":
