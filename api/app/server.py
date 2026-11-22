@@ -223,53 +223,57 @@ class Store:
         return len(rows)
 
     def stats_summary(self, days=30):
-        cutoff = (dt.date.today() - dt.timedelta(days=max(1, days) - 1)).isoformat()
+        all_time = days == 0
+        cutoff = None if all_time else (dt.date.today() - dt.timedelta(days=max(1, days) - 1)).isoformat()
+        where = "" if all_time else "WHERE day >= ?"
+        and_where = "" if all_time else "AND day >= ?"
+        params = () if all_time else (cutoff,)
         with self.lock:
             totals = self.db.execute(
-                """SELECT COUNT(*), COUNT(DISTINCT session_id), COUNT(DISTINCT day)
-                   FROM telemetry_events WHERE day >= ?""",
-                (cutoff,),
+                f"""SELECT COUNT(*), COUNT(DISTINCT session_id), COUNT(DISTINCT day)
+                    FROM telemetry_events {where}""",
+                params,
             ).fetchone()
             by_type = self.db.execute(
-                """SELECT event_type, COUNT(*)
-                   FROM telemetry_events WHERE day >= ?
-                   GROUP BY event_type ORDER BY COUNT(*) DESC""",
-                (cutoff,),
+                f"""SELECT event_type, COUNT(*)
+                    FROM telemetry_events {where}
+                    GROUP BY event_type ORDER BY COUNT(*) DESC""",
+                params,
             ).fetchall()
             top_pages = self.db.execute(
-                """SELECT page,
-                          SUM(CASE WHEN event_type = 'page_view' THEN 1 ELSE 0 END) AS views,
-                          COUNT(DISTINCT session_id) AS sessions,
-                          ROUND(AVG(CASE WHEN event_type = 'page_leave' AND duration_ms IS NOT NULL THEN duration_ms END)) AS avg_ms,
-                          ROUND(AVG(CASE WHEN event_type = 'page_leave' AND scroll_pct IS NOT NULL THEN scroll_pct END)) AS avg_scroll
-                   FROM telemetry_events
-                   WHERE day >= ? AND event_type IN ('page_view', 'page_leave')
-                   GROUP BY page
-                   ORDER BY views DESC, sessions DESC
-                   LIMIT 50""",
-                (cutoff,),
+                f"""SELECT page,
+                           SUM(CASE WHEN event_type = 'page_view' THEN 1 ELSE 0 END) AS views,
+                           COUNT(DISTINCT session_id) AS sessions,
+                           ROUND(AVG(CASE WHEN event_type = 'page_leave' AND duration_ms IS NOT NULL THEN duration_ms END)) AS avg_ms,
+                           ROUND(AVG(CASE WHEN event_type = 'page_leave' AND scroll_pct IS NOT NULL THEN scroll_pct END)) AS avg_scroll
+                    FROM telemetry_events
+                    WHERE event_type IN ('page_view', 'page_leave') {and_where}
+                    GROUP BY page
+                    ORDER BY views DESC, sessions DESC
+                    LIMIT 200""",
+                params,
             ).fetchall()
             completions = self.db.execute(
-                """SELECT page,
-                          SUM(CASE WHEN event_type = 'lesson_complete' THEN 1 ELSE 0 END) AS completed,
-                          SUM(CASE WHEN event_type = 'lesson_uncomplete' THEN 1 ELSE 0 END) AS uncompleted
-                   FROM telemetry_events
-                   WHERE day >= ? AND event_type IN ('lesson_complete', 'lesson_uncomplete')
-                   GROUP BY page
-                   ORDER BY completed DESC
-                   LIMIT 50""",
-                (cutoff,),
+                f"""SELECT page,
+                           SUM(CASE WHEN event_type = 'lesson_complete' THEN 1 ELSE 0 END) AS completed,
+                           SUM(CASE WHEN event_type = 'lesson_uncomplete' THEN 1 ELSE 0 END) AS uncompleted
+                    FROM telemetry_events
+                    WHERE event_type IN ('lesson_complete', 'lesson_uncomplete') {and_where}
+                    GROUP BY page
+                    ORDER BY completed DESC
+                    LIMIT 200""",
+                params,
             ).fetchall()
             daily = self.db.execute(
-                """SELECT day,
-                          COUNT(DISTINCT session_id) AS sessions,
-                          SUM(CASE WHEN event_type = 'page_view' THEN 1 ELSE 0 END) AS page_views,
-                          SUM(CASE WHEN event_type = 'lesson_complete' THEN 1 ELSE 0 END) AS completions
-                   FROM telemetry_events
-                   WHERE day >= ?
-                   GROUP BY day
-                   ORDER BY day DESC""",
-                (cutoff,),
+                f"""SELECT day,
+                           COUNT(DISTINCT session_id) AS sessions,
+                           SUM(CASE WHEN event_type = 'page_view' THEN 1 ELSE 0 END) AS page_views,
+                           SUM(CASE WHEN event_type = 'lesson_complete' THEN 1 ELSE 0 END) AS completions
+                    FROM telemetry_events
+                    {where}
+                    GROUP BY day
+                    ORDER BY day DESC""",
+                params,
             ).fetchall()
         return {
             "days": days,
@@ -305,18 +309,25 @@ class Store:
             ],
         }
 
-    def latest_events(self, days=30, limit=500):
-        cutoff = (dt.date.today() - dt.timedelta(days=max(1, days) - 1)).isoformat()
+    def latest_events(self, days=30, limit=500, offset=0):
+        all_time = days == 0
+        cutoff = None if all_time else (dt.date.today() - dt.timedelta(days=max(1, days) - 1)).isoformat()
+        where = "" if all_time else "WHERE day >= ?"
+        params = () if all_time else (cutoff,)
         with self.lock:
+            total = self.db.execute(
+                f"SELECT COUNT(*) FROM telemetry_events {where}",
+                params,
+            ).fetchone()[0]
             rows = self.db.execute(
-                """SELECT ts, day, session_id, event_type, page, duration_ms, scroll_pct, meta
-                   FROM telemetry_events
-                   WHERE day >= ?
-                   ORDER BY id DESC
-                   LIMIT ?""",
-                (cutoff, limit),
+                f"""SELECT ts, day, session_id, event_type, page, duration_ms, scroll_pct, meta
+                    FROM telemetry_events
+                    {where}
+                    ORDER BY id DESC
+                    LIMIT ? OFFSET ?""",
+                (*params, limit, offset),
             ).fetchall()
-        return [
+        events = [
             {
                 "ts": ts,
                 "day": day,
@@ -329,6 +340,7 @@ class Store:
             }
             for ts, day, sid, et, pg, dur, sc, m in rows
         ]
+        return events, total
 
 
 # --------------------------------------------------------------------------- helpers
@@ -636,8 +648,9 @@ def make_handler(app):
                 if not ADMIN_TOKEN or not hmac.compare_digest(auth, "Bearer " + ADMIN_TOKEN):
                     return self.send_json(401, {"error": "unauthorized"}, {"WWW-Authenticate": "Bearer"})
                 qs = urllib.parse.parse_qs(url.query)
+                raw_days = qs.get("days", ["30"])[0]
                 try:
-                    days = max(1, min(365, int(qs.get("days", ["30"])[0])))
+                    days = 0 if raw_days == "all" else max(0, min(3650, int(raw_days)))
                 except ValueError:
                     return self.send_json(400, {"error": "invalid days"})
                 return self.send_json(200, app.store.stats_summary(days), {"Cache-Control": "no-store"})
@@ -646,13 +659,17 @@ def make_handler(app):
                 if not ADMIN_TOKEN or not hmac.compare_digest(auth, "Bearer " + ADMIN_TOKEN):
                     return self.send_json(401, {"error": "unauthorized"}, {"WWW-Authenticate": "Bearer"})
                 qs = urllib.parse.parse_qs(url.query)
+                fmt = qs.get("format", ["json"])[0]
+                raw_days = qs.get("days", ["30"])[0]
+                max_limit = 50000 if fmt == "csv" else 5000
                 try:
-                    days = max(1, min(365, int(qs.get("days", ["30"])[0])))
-                    limit = max(1, min(5000, int(qs.get("limit", ["500"])[0])))
+                    days = 0 if raw_days == "all" else max(0, min(3650, int(raw_days)))
+                    limit = max(1, min(max_limit, int(qs.get("limit", ["500"])[0])))
+                    offset = max(0, int(qs.get("offset", ["0"])[0]))
                 except ValueError:
                     return self.send_json(400, {"error": "invalid query"})
-                events = app.store.latest_events(days=days, limit=limit)
-                if qs.get("format", ["json"])[0] == "csv":
+                events, total = app.store.latest_events(days=days, limit=limit, offset=offset)
+                if fmt == "csv":
                     body = events_to_csv(events)
                     self.send_response(200)
                     for k, v in SECURITY_HEADERS.items():
@@ -668,7 +685,11 @@ def make_handler(app):
                     if self.command != "HEAD":
                         self.wfile.write(body)
                     return
-                return self.send_json(200, {"events": events}, {"Cache-Control": "no-store"})
+                return self.send_json(
+                    200,
+                    {"events": events, "total": total, "limit": limit, "offset": offset},
+                    {"Cache-Control": "no-store"},
+                )
             self.send_json(404, {"error": "not found"})
 
         def do_POST(self):
