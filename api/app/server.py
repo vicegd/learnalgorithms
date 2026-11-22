@@ -463,20 +463,31 @@ def parse_event(raw):
     }
 
 
+def csv_safe(value):
+    """Neutralize spreadsheet formula injection (CWE-1236) on text cells."""
+    if value is None:
+        return ""
+    s = str(value)
+    if s and s[0] in ("=", "+", "-", "@", "\t", "\r"):
+        return "'" + s
+    return s
+
+
 def events_to_csv(events):
     buf = io.StringIO()
     writer = csv.writer(buf)
     writer.writerow(["ts", "day", "sessionId", "eventType", "page", "durationMs", "scrollPct", "meta"])
     for e in events:
+        meta_str = "" if e["meta"] is None else json.dumps(e["meta"], separators=(",", ":"))
         writer.writerow([
-            e["ts"],
-            e["day"],
-            e["sessionId"],
-            e["eventType"],
-            e["page"],
+            csv_safe(e["ts"]),
+            csv_safe(e["day"]),
+            csv_safe(e["sessionId"]),
+            csv_safe(e["eventType"]),
+            csv_safe(e["page"]),
             "" if e["durationMs"] is None else e["durationMs"],
             "" if e["scrollPct"] is None else e["scrollPct"],
-            "" if e["meta"] is None else json.dumps(e["meta"], separators=(",", ":")),
+            csv_safe(meta_str),
         ])
     return buf.getvalue().encode("utf-8")
 
