@@ -721,6 +721,50 @@ export default function AdminDashboardPage() {
             </section>
 
             <section className={styles.section}>
+              <h2 className={styles.sectionTitle}>Raw events ({eventsTotal})</h2>
+              {sortedEvents.length === 0 ? (
+                <p className={styles.empty}>No raw events recorded in this period.</p>
+              ) : (
+                <div className={styles.tableWrap}>
+                  <table className={styles.table}>
+                    <thead>
+                      <tr>
+                        <SortTh label="Timestamp (UTC)" sortKey="ts" sortState={eventsSort} onSort={(k) => setEventsSort((s) => nextSort(s, k))} />
+                        <SortTh label="Type" sortKey="eventType" sortState={eventsSort} onSort={(k) => setEventsSort((s) => nextSort(s, k))} />
+                        <SortTh label="Page" sortKey="page" sortState={eventsSort} onSort={(k) => setEventsSort((s) => nextSort(s, k))} />
+                        <SortTh label="Time / Scroll" sortKey="durationMs" sortState={eventsSort} onSort={(k) => setEventsSort((s) => nextSort(s, k))} />
+                        <th scope="col">Meta</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {sortedEvents.map((ev, idx) => (
+                        <tr key={`${ev.ts}-${idx}`}>
+                          <td className={styles.mono}>{ev.ts.slice(0, 19).replace('T', ' ')}</td>
+                          <td className={styles.mono}>{ev.eventType}</td>
+                          <td className={styles.mono}>{ev.page}</td>
+                          <td className={styles.mono}>
+                            {ev.durationMs !== null ? formatDuration(ev.durationMs) : '—'}
+                            {ev.scrollPct !== null ? ` · ${ev.scrollPct}%` : ''}
+                          </td>
+                          <td className={styles.mono}>
+                            {ev.meta ? JSON.stringify(ev.meta) : '—'}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+              <Pagination
+                page={eventsPage}
+                totalItems={eventsTotal}
+                pageSize={EVENTS_PAGE_SIZE}
+                loading={eventsLoading}
+                onPageChange={(nextPage) => fetchEventsPage(token, days, nextPage)}
+              />
+            </section>
+
+            <section className={styles.section}>
               <div className={styles.reportHeader}>
                 <h2 className={styles.sectionTitle}>Teaching Report (ETL) &amp; Core Web Vitals</h2>
                 {etlMarkdown && (
@@ -781,50 +825,6 @@ export default function AdminDashboardPage() {
                   <pre className={styles.reportPre}>{etlMarkdown}</pre>
                 </>
               )}
-            </section>
-
-            <section className={styles.section}>
-              <h2 className={styles.sectionTitle}>Raw events ({eventsTotal})</h2>
-              {sortedEvents.length === 0 ? (
-                <p className={styles.empty}>No raw events recorded in this period.</p>
-              ) : (
-                <div className={styles.tableWrap}>
-                  <table className={styles.table}>
-                    <thead>
-                      <tr>
-                        <SortTh label="Timestamp (UTC)" sortKey="ts" sortState={eventsSort} onSort={(k) => setEventsSort((s) => nextSort(s, k))} />
-                        <SortTh label="Type" sortKey="eventType" sortState={eventsSort} onSort={(k) => setEventsSort((s) => nextSort(s, k))} />
-                        <SortTh label="Page" sortKey="page" sortState={eventsSort} onSort={(k) => setEventsSort((s) => nextSort(s, k))} />
-                        <SortTh label="Time / Scroll" sortKey="durationMs" sortState={eventsSort} onSort={(k) => setEventsSort((s) => nextSort(s, k))} />
-                        <th scope="col">Meta</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {sortedEvents.map((ev, idx) => (
-                        <tr key={`${ev.ts}-${idx}`}>
-                          <td className={styles.mono}>{ev.ts.slice(0, 19).replace('T', ' ')}</td>
-                          <td className={styles.mono}>{ev.eventType}</td>
-                          <td className={styles.mono}>{ev.page}</td>
-                          <td className={styles.mono}>
-                            {ev.durationMs !== null ? formatDuration(ev.durationMs) : '—'}
-                            {ev.scrollPct !== null ? ` · ${ev.scrollPct}%` : ''}
-                          </td>
-                          <td className={styles.mono}>
-                            {ev.meta ? JSON.stringify(ev.meta) : '—'}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-              <Pagination
-                page={eventsPage}
-                totalItems={eventsTotal}
-                pageSize={EVENTS_PAGE_SIZE}
-                loading={eventsLoading}
-                onPageChange={(nextPage) => fetchEventsPage(token, days, nextPage)}
-              />
             </section>
           </>
         )}
