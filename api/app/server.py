@@ -608,20 +608,24 @@ def interpret_report_with_llm(markdown_report, lang="en", detail="brief"):
         )
         if is_detailed:
             system_prompt = (
-                "Eres un asesor experto en innovación docente universitaria y analítica de aprendizaje para el curso de "
-                "Diseño y Análisis de Algoritmos (learnalgorithms.dev). Redacta un INFORME ACADÉMICO EXTENSO Y EXHAUSTIVO "
-                "(objetivo: 1200–1800 palabras; escribe 2–3 párrafos analíticos profundos en cada sección, SIN resumir ni "
-                "recortar incluso si la muestra actual es pequeña: explica a fondo los datos disponibles y qué patrones "
-                "habrá que vigilar al crecer la muestra). Usa ÚNICAMENTE los datos cuantitativos y comentarios "
-                f"anonimizados del informe ETL proporcionado. No inventes cifras. {thresholds} {security_clause}\n"
-                "Desarrolla en profundidad estas 7 secciones en Markdown, incluyendo OBLIGATORIAMENTE las 3 tablas indicadas:\n"
-                "1. **Resumen ejecutivo y contexto de uso:** volumen total, sesiones, días activos, tendencia diaria (`Daily Activity`), reparto de dispositivos (escritorio/móvil/tablet) y lectura estratégica para la memoria anual.\n"
-                "2. **Análisis detallado por lección:** incluye una tabla Markdown `| Lección | Vistas | Tiempo mediano | Scroll | Completados | Diagnóstico pedagógico |` cubriendo todas las lecciones relevantes de `Top Pages`, más un análisis narrativo comparando tiempo vs. profundidad de lectura y el cruce con Matomo.\n"
-                "3. **Comportamiento de estudio y señales de dificultad:** análisis de checkpoints/soluciones más abiertos, clics a código Java/demostraciones, uso del Cheat Sheet y relación entre interactividad y retención.\n"
-                "4. **Lagunas de contenido, análisis NLP y feedback cualitativo:** análisis detallado de búsquedas, búsquedas sin resultado, términos clave y bigramas NLP, idioma, polaridad media, intención del feedback y lectura crítica de los comentarios literales.\n"
-                "5. **Auditoría técnica de rendimiento, UX y sostenibilidad (Core Web Vitals & Green Software):** incluye una tabla Markdown `| Métrica | Valor p50 / p95 | Umbral oficial | Estado | Acción recomendada |` para TTFB, LCP, CLS y huella de carbono SWDM (KB transferidos y mg CO2/visita), explicando qué significa cada métrica y su impacto.\n"
-                "6. **Validez estadística y limitaciones metodológicas:** evaluación honesta del tamaño muestral, sesgos de sesiones anónimas basadas en `sessionStorage` y recomendaciones de recogida de datos.\n"
-                "7. **Plan de acción priorizado para el próximo ciclo docente:** incluye una matriz Markdown `| # | Acción concreta | Prioridad | Esfuerzo | KPI verificable | Fuente de verificación |` con 6–8 acciones accionables."
+                "Eres un asesor experto en innovación docente universitaria, ingeniería web y analítica de aprendizaje "
+                "para el curso de Diseño y Análisis de Algoritmos (learnalgorithms.dev). Redacta un INFORME ACADÉMICO "
+                "MUY EXHAUSTIVO Y COMPLETO (objetivo: 1800–2600 palabras; escribe 2–4 párrafos analíticos profundos en "
+                "cada sección). REGLA ESTRICTA DE COBERTURA TOTAL: debes incluir y desarrollar TODAS las 9 secciones "
+                "siguientes sin omitir ninguna. Si alguna métrica o bloque aparece con 0 muestras o aún no tiene datos en "
+                "el periodo, NO lo saltes: indícalo explícitamente, explica qué mide esa capacidad de la plataforma y "
+                "cómo deberá interpretarse cuando lleguen datos. Usa ÚNICAMENTE los datos cuantitativos y comentarios "
+                f"anonimizados proporcionados. No inventes cifras. {thresholds} {security_clause}\n"
+                "Estructura OBLIGATORIA en Markdown (9 secciones + 3 tablas obligatorias):\n"
+                "1. **Resumen ejecutivo y contexto de uso:** totales globales, sesiones anónimas, días activos, tendencia diaria (`Daily Activity`), reparto por dispositivos (`Desktop`/`Mobile`/`Tablet`) y valoración global del curso.\n"
+                "2. **Distribución de eventos y observabilidad del sistema:** análisis completo de `Events by Type` y del bloque de observabilidad Prometheus (`uptime`, peticiones HTTP, tamaño de la base de datos SQLite y salud operativa).\n"
+                "3. **Auditoría detallada por lección:** tabla Markdown OBLIGATORIA `| Lección | Vistas | Tiempo mediano (s) | Scroll (%) | Completados | Diagnóstico pedagógico |` cubriendo TODAS las páginas de `Top Pages`, análisis narrativo de profundidad de lectura vs. abandono, y contraste con `Popular Lessons (Matomo 7d)`.\n"
+                "4. **Comportamiento de estudio, interactividad y señales de dificultad:** análisis de checkpoints/soluciones más abiertos (`details_open`), clics a código Java y demostraciones (`resource_click`), uso del comparador `/cheat-sheet` (filtros y comparaciones) y patrones de estudio.\n"
+                "5. **Lagunas de contenido, análisis NLP, feedback cualitativo e incidencias:** análisis exhaustivo de `Top Searches`, `Zero-Result Searches`, bloque `NLP Analysis` (términos clave, bigramas, idiomas detectados, polaridad media `-1` a `+1` e intenciones de comentarios), desglose de votos `👍/👎`, comentarios literales de alumnos e incidencias de `GitHub Issues`.\n"
+                "6. **Auditoría de rendimiento web y UX (Core Web Vitals):** tabla Markdown OBLIGATORIA `| Métrica | Valor observado (p50 / p95) | Umbral oficial Google | Estado | Acción técnica recomendada |` para TTFB, LCP y CLS, explicando claramente qué mide cada métrica y cómo corregir desviaciones (especialmente CLS).\n"
+                "7. **Auditoría de Green Software y sostenibilidad digital (SWDM):** sección dedicada OBLIGATORIA; explica el modelo *Sustainable Web Design* (`~0.35 mg CO2/KB` transferido vía `PerformanceResourceTiming`, efecto de la caché *offline* PWA y escala `A+`/`A`/`B`/`C`), analiza los KB medios/p95, mg CO2 por visita, gramos totales acumulados y calificación ambiental, y propone mejoras de eficiencia energética web.\n"
+                "8. **Validez estadística, privacidad por diseño y limitaciones metodológicas:** evaluación rigurosa del tamaño muestral, implicaciones de sesiones anónimas en `sessionStorage`, cumplimiento RGPD (sin PII/IPs) y pautas para la siguiente recogida.\n"
+                "9. **Plan de acción priorizado para el próximo ciclo docente:** matriz Markdown OBLIGATORIA `| # | Acción concreta | Área (Pedagogía/UX/Rendimiento/Green/Contenido) | Prioridad | Esfuerzo | KPI verificable | Fuente de verificación |` con 8–10 acciones concretas."
             )
         else:
             system_prompt = (
@@ -644,20 +648,24 @@ def interpret_report_with_llm(markdown_report, lang="en", detail="brief"):
         )
         if is_detailed:
             system_prompt = (
-                "You are an expert university teaching-innovation advisor and learning-analytics specialist for an "
-                "Algorithms course (learnalgorithms.dev). Write a LONG, COMPREHENSIVE, ACADEMIC REPORT (target: "
-                "1200–1800 words; write 2–3 thorough analytical paragraphs per section — DO NOT abbreviate or summarize "
-                "even if the current sample size is small: deeply analyze every available metric and explain what "
-                "patterns to monitor as usage scales). Ground every claim EXCLUSIVELY in the anonymized metrics and "
-                f"feedback comments in the provided ETL report. Never invent numbers. {thresholds} {security_clause}\n"
-                "Develop these 7 Markdown sections in depth, MANDATORILY including the 3 structured tables:\n"
-                "1. **Executive Summary & Usage Context:** total volume, sessions, active days, daily trend (`Daily Activity`), desktop/mobile/tablet split, and strategic takeaway for the annual teaching report.\n"
-                "2. **Lesson-by-Lesson Engagement Analysis:** include a Markdown table `| Lesson | Views | Median Time | Avg Scroll | Completions | Pedagogical Interpretation |` covering all relevant entries in `Top Pages`, plus narrative analysis of reading depth vs. time and comparison with Matomo.\n"
-                "3. **Study Behavior & Difficulty Signals:** analysis of most opened checkpoints/solutions, Java/proof resource clicks, Cheat Sheet usage, and how interactive elements support learning.\n"
-                "4. **Content Gaps, NLP Insights & Qualitative Feedback:** thorough review of searches, zero-result searches, NLP top terms & bigrams, detected languages, sentiment polarity, comment intents, and literal feedback comments.\n"
-                "5. **Technical Performance, UX & Green Software Audit (Core Web Vitals & SWDM):** include a Markdown table `| Metric | Observed Value | Official Threshold | Status | Recommended Action |` for TTFB, LCP, CLS, and SWDM carbon footprint (KB transferred and mg CO2/visit), explaining clearly what each metric means.\n"
-                "6. **Statistical Validity & Methodological Limitations:** honest assessment of sample size, `sessionStorage` anonymous-session caveats, and data-collection guidance.\n"
-                "7. **Prioritized Action Plan for Next Term:** include a Markdown matrix `| # | Concrete Action | Priority | Effort | Measurable KPI | Verification Source |` with 6–8 actionable items."
+                "You are an expert university teaching-innovation advisor, web engineer, and learning-analytics specialist "
+                "for an Algorithms course (learnalgorithms.dev). Write a VERY EXHAUSTIVE, COMPREHENSIVE ACADEMIC REPORT "
+                "(target: 1800–2600 words; write 2–4 deep analytical paragraphs per section). STRICT FULL-COVERAGE RULE: "
+                "you MUST include and thoroughly develop ALL 9 sections below without omitting any topic. If a metric or "
+                "section currently has 0 samples or no entries in this period, DO NOT skip it: state it explicitly, "
+                "explain what that platform capability measures, and describe how to interpret it as data accumulates. "
+                "Ground every claim EXCLUSIVELY in the anonymized metrics and comments provided. Never invent numbers. "
+                f"{thresholds} {security_clause}\n"
+                "MANDATORY Markdown structure (9 sections + 3 mandatory tables):\n"
+                "1. **Executive Summary & Usage Context:** global totals, anonymous sessions, active days, `Daily Activity` trend, `Devices` (Desktop/Mobile/Tablet) split, and strategic takeaway for the annual teaching report.\n"
+                "2. **Event Distribution & System Observability:** full breakdown of `Events by Type` plus the Prometheus observability snapshot (`uptime`, HTTP requests served, SQLite DB size, and operational health).\n"
+                "3. **Lesson-by-Lesson Engagement Audit:** MANDATORY Markdown table `| Lesson | Views | Median Time (s) | Avg Scroll (%) | Completions | Pedagogical Interpretation |` covering ALL entries in `Top Pages`, plus narrative analysis of reading depth vs. time and comparison with `Popular Lessons (Matomo 7d)`.\n"
+                "4. **Study Behavior, Interactivity & Difficulty Signals:** analysis of most opened checkpoints/solutions (`details_open`), Java/proof resource clicks (`resource_click`), `/cheat-sheet` filter & comparison usage, and learning patterns.\n"
+                "5. **Content Gaps, NLP Insights, Qualitative Feedback & Issues:** thorough review of `Top Searches`, `Zero-Result Searches`, `NLP Analysis` (top terms, bigrams, detected languages, average polarity `-1` to `+1`, comment intents), helpful/not-helpful breakdown, literal student comments, and `GitHub Issues`.\n"
+                "6. **Web Performance & UX Audit (Core Web Vitals):** MANDATORY Markdown table `| Metric | Observed (p50 / p95) | Official Google Threshold | Status | Recommended Technical Action |` for TTFB, LCP, and CLS, clearly explaining each metric and how to fix regressions (especially CLS).\n"
+                "7. **Green Software & Digital Sustainability Audit (SWDM):** MANDATORY dedicated section; explain the *Sustainable Web Design Model* (`~0.35 mg CO2/KB` transferred via `PerformanceResourceTiming`, PWA offline cache impact, and `A+`/`A`/`B`/`C` rating scale), analyze observed avg/p95 KB per load, mg CO2 per visit, cumulative g CO2, and environmental rating, and propose concrete green-engineering improvements.\n"
+                "8. **Statistical Validity, Privacy-by-Design & Methodological Limitations:** rigorous assessment of sample size, `sessionStorage` anonymous-session caveats, GDPR minimization (no PII/IPs), and data-collection guidance.\n"
+                "9. **Prioritized Action Plan for Next Term:** MANDATORY Markdown matrix `| # | Concrete Action | Area (Pedagogy/UX/Perf/Green/Content) | Priority | Effort | Measurable KPI | Verification Source |` with 8–10 actionable items."
             )
         else:
             system_prompt = (
@@ -674,7 +682,7 @@ def interpret_report_with_llm(markdown_report, lang="en", detail="brief"):
     body = json.dumps({
         "model": LLM_MODEL,
         "temperature": 0.35 if is_detailed else 0.3,
-        "max_tokens": 3500 if is_detailed else 900,
+        "max_tokens": 4500 if is_detailed else 900,
         "messages": [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": f"<untrusted_data>\n{safe_report}\n</untrusted_data>"},
@@ -1014,6 +1022,14 @@ def make_handler(app):
             except ValueError:
                 return self.send_json(400, {"error": "invalid days"})
             _, markdown = build_full_report(app, days)
+            if detail == "detailed":
+                prom_lines = [
+                    line for line in render_prometheus_metrics(app).splitlines()
+                    if line and not line.startswith("#")
+                ]
+                markdown = markdown + "\n## System Observability (Prometheus Snapshot)\n\n" + "\n".join(
+                    f"- `{line}`" for line in prom_lines
+                ) + "\n"
             try:
                 result = app.llm_interpret(markdown, lang=lang, detail=detail)
             except RuntimeError as e:
