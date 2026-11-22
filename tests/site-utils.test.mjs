@@ -8,7 +8,7 @@ import CONCEPT_LINKS from '../src/plugins/concept-links.js';
 import pluginSiteData from '../src/plugins/docusaurus-plugin-site-data.js';
 import {computeStreak, normalizePermalink} from '../src/utils/studyProgress.js';
 import {recommendNextLessons} from '../src/utils/recommender.js';
-import {createProgressBadge, verifyProgressBadge} from '../src/utils/progressBadge.js';
+import {createProgressBadge, renderBadgeSvg, verifyProgressBadge} from '../src/utils/progressBadge.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -51,10 +51,11 @@ test('recommendNextLessons suggests unlocked lessons ranked by downstream impact
   const recs = recommendNextLessons(concepts, new Set(['/concepts/ch1/a']), 3);
   assert.equal(recs.length, 2);
   assert.equal(recs[0].url, '/concepts/ch1/b'); // unlocks C
+  assert.match(recs[0].reason, /Prerequisite completed \(A\)/);
   assert.match(recs[0].reason, /unlocks 1 topic/);
 });
 
-test('createProgressBadge and verifyProgressBadge detect tampering via SHA-256', async () => {
+test('createProgressBadge, verifyProgressBadge, and renderBadgeSvg work end-to-end', async () => {
   const badge = await createProgressBadge({
     completedLessons: ['/concepts/sorting/quicksort'],
     totalLessons: 36,
@@ -62,6 +63,10 @@ test('createProgressBadge and verifyProgressBadge detect tampering via SHA-256',
     streakDays: 2,
   });
   assert.equal(await verifyProgressBadge(badge), true);
+  const svg = renderBadgeSvg(badge);
+  assert.match(svg, /^<svg /);
+  assert.match(svg, /1 \/ 36 lessons/);
+  assert.match(svg, /SHA-256:/);
   const tampered = {...badge, payload: {...badge.payload, completedCount: 36}};
   assert.equal(await verifyProgressBadge(tampered), false);
 });

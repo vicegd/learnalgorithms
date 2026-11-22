@@ -264,6 +264,29 @@ class ApiTest(unittest.TestCase):
             self.assertIn("ts,day,sessionId,eventType,page,durationMs,scrollPct,meta", csv_text)
             self.assertIn("/concepts/sorting/quicksort", csv_text)
 
+        # Admin ETL report (JSON & Markdown)
+        s, _, _ = self.req("GET", "/admin/report")
+        self.assertEqual(s, 401)
+        s, rep_json, _ = self.req(
+            "GET", "/admin/report?days=0", headers={"Authorization": "Bearer admintoken"}
+        )
+        self.assertEqual(s, 200)
+        self.assertIn("report", rep_json)
+        self.assertIn("markdown", rep_json)
+        self.assertGreaterEqual(rep_json["report"]["totals"]["events"], 6)
+        self.assertIn("# learnalgorithms.dev — Learning Analytics ETL Report", rep_json["markdown"])
+
+        req_md = urllib.request.Request(
+            self.base + "/admin/report?days=0&format=md",
+            headers={"Authorization": "Bearer admintoken", "Origin": ORIGIN},
+        )
+        with urllib.request.urlopen(req_md) as resp:
+            self.assertEqual(resp.status, 200)
+            self.assertEqual(resp.headers.get("Access-Control-Allow-Origin"), ORIGIN)
+            self.assertIn("text/markdown", resp.headers.get("Content-Type", ""))
+            md_text = resp.read().decode("utf-8")
+            self.assertIn("# learnalgorithms.dev", md_text)
+
 
 if __name__ == "__main__":
     unittest.main()

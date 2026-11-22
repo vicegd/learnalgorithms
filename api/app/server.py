@@ -15,6 +15,7 @@ POST /webhooks/github           GitHub "issues" events, verified with HMAC-SHA25
 GET  /admin/feedback            Latest votes and comments (Bearer token).
 GET  /admin/stats               Aggregated telemetry for teaching innovation (Bearer token).
 GET  /admin/events              Raw anonymized telemetry events in JSON or CSV (Bearer token).
+GET  /admin/report              ETL teaching report & Core Web Vitals in JSON or Markdown (Bearer token).
 
 Security
 --------
@@ -38,11 +39,22 @@ import os
 import re
 import secrets
 import sqlite3
+import sys
 import threading
 import time
 import urllib.parse
 import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
+
+for _analytics_dir in (
+    Path(__file__).resolve().parent / "analytics",
+    Path(__file__).resolve().parent.parent / "analytics",
+):
+    if _analytics_dir.is_dir() and str(_analytics_dir) not in sys.path:
+        sys.path.insert(0, str(_analytics_dir))
+
+import etl_report  # noqa: E402
 
 # --------------------------------------------------------------------------- config
 
@@ -700,6 +712,41 @@ def make_handler(app):
                 return self.send_json(
                     200,
                     {"events": events, "total": total, "limit": limit, "offset": offset},
+                    {"Cache-Control": "no-store"},
+                )
+            if url.path == "/admin/report":
+                auth = self.headers.get("Authorization", "")
+                if not ADMIN_TOKEN or not hmac.compare_digest(auth, "Bearer " + ADMIN_TOKEN):
+                    return self.send_json(401, {"error": "unauthorized"}, {"WWW-Authenticate": "Bearer"})
+                qs = urllib.parse.parse_qs(url.query)
+                fmt = qs.get("format", ["json"])[0]
+                raw_days = qs.get("days", ["30"])[0]
+                try:
+                    days = 0 if raw_days == "all" else max(0, min(3650, int(raw_days)))
+                except ValueError:
+                    return self.send_json(400, {"error": "invalid days"})
+                events, _ = app.store.latest_events(days=days, limit=50000, offset=0)
+                report = etl_report.transform(events)
+                markdown = etl_report.render_markdown(report)
+                if fmt == "md":
+                    body = markdown.encode("utf-8")
+                    self.send_response(200)
+                    for k, v in SECURITY_HEADERS.items():
+                        self.send_header(k, v)
+                    if self.headers.get("Origin") == ALLOWED_ORIGIN:
+                        self.send_header("Access-Control-Allow-Origin", ALLOWED_ORIGIN)
+                        self.send_header("Vary", "Origin")
+                    self.send_header("Cache-Control", "no-store")
+                    self.send_header("Content-Type", "text/markdown; charset=utf-8")
+                    self.send_header("Content-Disposition", 'attachment; filename="learnalgorithms-report.md"')
+                    self.send_header("Content-Length", str(len(body)))
+                    self.end_headers()
+                    if self.command != "HEAD":
+                        self.wfile.write(body)
+                    return
+                return self.send_json(
+                    200,
+                    {"report": report, "markdown": markdown},
                     {"Cache-Control": "no-store"},
                 )
             self.send_json(404, {"error": "not found"})

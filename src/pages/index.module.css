@@ -445,3 +445,91 @@
 .recReason {
   color: var(--ifm-color-emphasis-600);
 }
+
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(15, 23, 42, 0.58);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.modalCard {
+  width: 100%;
+  max-width: 680px;
+  background: var(--ifm-background-surface-color);
+  border-radius: 16px;
+  padding: 1.35rem 1.5rem;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+  border: 1px solid var(--ifm-color-emphasis-200);
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.85rem;
+}
+
+.modalTitle {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.modalClose {
+  background: none;
+  border: none;
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--ifm-color-emphasis-600);
+  padding: 0 0.25rem;
+}
+
+.badgePreview {
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 0.85rem;
+}
+
+.badgeImg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.modalHint {
+  font-size: 0.84rem;
+  color: var(--ifm-color-emphasis-700);
+  margin: 0 0 1rem;
+}
+
+.modalActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.verifyBox {
+  margin-top: 0.85rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.84rem;
+  font-weight: 600;
+}
+
+.verifyOk {
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid rgba(22, 163, 74, 0.35);
+}
+
+.verifyFail {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid rgba(220, 38, 38, 0.35);
+}

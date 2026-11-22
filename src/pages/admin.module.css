@@ -305,3 +305,65 @@
 .sortBtn:hover {
   color: var(--ifm-color-primary);
 }
+
+.reportHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.reportHeader .sectionTitle {
+  margin-bottom: 0;
+}
+
+.reportActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.vitalsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+
+.vitalCard {
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: 10px;
+  padding: 0.7rem 0.9rem;
+  background: var(--ifm-background-surface-color);
+}
+
+.vitalLabel {
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ifm-color-emphasis-600);
+  font-weight: 600;
+}
+
+.vitalValue {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-top: 0.2rem;
+  font-family: var(--ifm-font-family-monospace);
+}
+
+.reportPre {
+  margin: 0;
+  padding: 1rem 1.15rem;
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: 10px;
+  background: var(--ifm-color-emphasis-100);
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.8rem;
+  line-height: 1.55;
+  max-height: 420px;
+  overflow: auto;
+  white-space: pre-wrap;
+}
