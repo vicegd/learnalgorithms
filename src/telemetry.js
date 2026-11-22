@@ -185,6 +185,7 @@ function attachGlobalListeners() {
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden') {
       pauseTimer();
+      flushWebVitals();
     } else if (document.visibilityState === 'visible') {
       resumeTimer();
     }
