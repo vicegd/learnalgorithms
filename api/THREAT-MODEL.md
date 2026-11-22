@@ -25,6 +25,7 @@ The API also calls Matomo over HTTPS, and GitHub calls the webhook endpoint.
 | Tampering | Votes or telemetry from other websites (CSRF) | `Origin` must be `https://learnalgorithms.dev`; JSON content type required |
 | Tampering | Ballot stuffing by bots | Honeypot field, minimum time on page, one vote per page and day, rate limit |
 | Tampering | Arbitrary or oversized telemetry payloads (`POST /events`) | Strict allowlist for `eventType`, path regex for `page`, UUID check for `sessionId`, max 20 events/batch, 512 B metadata cap, clamped `durationMs`/`scrollPct` |
+| Tampering | CSV formula injection in `/admin/events?format=csv` (CWE-1236) | Leading `=`, `+`, `-`, `@`, `\t`, `\r` neutralized with a leading apostrophe in `csv_safe` |
 | **R**epudiation | Unknown changes to the deployment | Code, configuration and this document versioned in Git |
 | **I**nformation disclosure | Leaking secrets | Secrets only in `.env` (mode 600) on the server; never in Git (push protection on) |
 | Information disclosure | Personal data of visitors | No IPs stored or logged; daily-rotating salted hashes for rate limits; telemetry uses only random per-session UUIDs in `sessionStorage`; proxy keeps no access log |

@@ -238,6 +238,13 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(len(page2["events"]), 2)
         self.assertEqual(page2["offset"], 2)
 
+        # CSV formula injection neutralization (CWE-1236)
+        self.assertEqual(server.csv_safe("=SUM(A1:A2)"), "'=SUM(A1:A2)")
+        self.assertEqual(server.csv_safe("+1+1"), "'+1+1")
+        self.assertEqual(server.csv_safe("-1"), "'-1")
+        self.assertEqual(server.csv_safe("@cmd"), "'@cmd")
+        self.assertEqual(server.csv_safe("/concepts/sorting/quicksort"), "/concepts/sorting/quicksort")
+
         # Admin events CSV export with CORS header for /admin dashboard
         req = urllib.request.Request(
             self.base + "/admin/events?days=7&format=csv",
