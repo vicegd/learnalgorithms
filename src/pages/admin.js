@@ -102,6 +102,12 @@ export default function AdminDashboardPage() {
   const [etlReport, setEtlReport] = useState(null);
   const [etlMarkdown, setEtlMarkdown] = useState('');
   const [reportCopied, setReportCopied] = useState(false);
+  const [health, setHealth] = useState(null);
+  const [popular, setPopular] = useState([]);
+  const [summaryPage, setSummaryPage] = useState('');
+  const [summaryData, setSummaryData] = useState(null);
+  const [summaryError, setSummaryError] = useState('');
+  const [summaryLoading, setSummaryLoading] = useState(false);
   const [topPagesPage, setTopPagesPage] = useState(0);
   const [completionsPage, setCompletionsPage] = useState(0);
   const [feedbackPage, setFeedbackPage] = useState(0);
@@ -161,7 +167,10 @@ export default function AdminDashboardPage() {
     const headers = {Authorization: `Bearer ${authToken}`};
 
     try {
-      const [statsRes, fbRes, issuesRes, eventsRes, reportRes] = await Promise.all([
+      const healthStart = performance.now();
+      const [healthRes, popularRes, statsRes, fbRes, issuesRes, eventsRes, reportRes] = await Promise.all([
+        fetch(`${API_BASE}/health`, {mode: 'cors'}).catch(() => null),
+        fetch(`${API_BASE}/popular`, {mode: 'cors'}).catch(() => null),
         fetch(`${API_BASE}/admin/stats?days=${periodDays}`, {headers, mode: 'cors'}),
         fetch(`${API_BASE}/admin/feedback`, {headers, mode: 'cors'}),
         fetch(`${API_BASE}/admin/issues`, {headers, mode: 'cors'}),
@@ -171,6 +180,7 @@ export default function AdminDashboardPage() {
         }),
         fetch(`${API_BASE}/admin/report?days=${periodDays}`, {headers, mode: 'cors'}).catch(() => null),
       ]);
+      const healthMs = Math.round(performance.now() - healthStart);
 
       if (statsRes.status === 401 || fbRes.status === 401) {
         setError('Unauthorized: invalid ADMIN_TOKEN.');
@@ -187,12 +197,16 @@ export default function AdminDashboardPage() {
         throw new Error(`API returned HTTP ${statsRes.status}`);
       }
 
+      const healthJson = healthRes && healthRes.ok ? await healthRes.json() : null;
+      const popularJson = popularRes && popularRes.ok ? await popularRes.json() : {pages: []};
       const statsJson = await statsRes.json();
       const fbJson = fbRes.ok ? await fbRes.json() : {feedback: []};
       const issuesJson = issuesRes.ok ? await issuesRes.json() : {issues: []};
       const eventsJson = eventsRes.ok ? await eventsRes.json() : {events: [], total: 0};
       const reportJson = reportRes && reportRes.ok ? await reportRes.json() : null;
 
+      setHealth(healthJson ? {ok: healthJson.status === 'ok', status: healthJson.status, latencyMs: healthMs} : {ok: false, status: 'error', latencyMs: healthMs});
+      setPopular(popularJson.pages || []);
       setStats(statsJson);
       setFeedback(fbJson.feedback || []);
       setIssues(issuesJson.issues || []);
@@ -241,6 +255,10 @@ export default function AdminDashboardPage() {
     setEvents([]);
     setEtlReport(null);
     setEtlMarkdown('');
+    setHealth(null);
+    setPopular([]);
+    setSummaryData(null);
+    setSummaryError('');
     setError('');
     try {
       window.sessionStorage.removeItem(TOKEN_KEY);
@@ -297,6 +315,46 @@ export default function AdminDashboardPage() {
     URL.revokeObjectURL(url);
   }
 
+  async function handleFetchSummary(e) {
+    e.preventDefault();
+    const cleaned = summaryPage.trim().replace(/\/+$/, '');
+    if (!cleaned) return;
+    setSummaryLoading(true);
+    setSummaryError('');
+    try {
+      const res = await fetch(
+        `${API_BASE}/feedback/summary?page=${encodeURIComponent(cleaned)}`,
+        {mode: 'cors'},
+      );
+      const json = await res.json();
+      if (!res.ok) {
+        setSummaryData(null);
+        setSummaryError(json.error || `HTTP ${res.status}`);
+      } else {
+        setSummaryData(json);
+      }
+    } catch (err) {
+      setSummaryData(null);
+      setSummaryError(`Request failed: ${err.message}`);
+    } finally {
+      setSummaryLoading(false);
+    }
+  }
+
+  const knownConceptPages = useMemo(() => {
+    const set = new Set();
+    for (const f of feedback) {
+      if (f.page && f.page.startsWith('/concepts/')) set.add(f.page);
+    }
+    for (const p of stats?.topPages || []) {
+      if (p.page && p.page.startsWith('/concepts/')) set.add(p.page);
+    }
+    for (const p of popular) {
+      if (p.page && p.page.startsWith('/concepts/')) set.add(p.page);
+    }
+    return [...set].sort();
+  }, [feedback, stats, popular]);
+
   return (
     <Layout title="Admin Analytics" description="Private teaching analytics dashboard">
       <Head>
@@ -333,7 +391,19 @@ export default function AdminDashboardPage() {
             <header className={styles.topBar}>
               <div>
                 <p className={styles.eyebrow}>Teaching Innovation Analytics</p>
-                <h1 className={styles.title}>Admin Dashboard</h1>
+                <div className={styles.titleRow}>
+                  <h1 className={styles.title}>Admin Dashboard</h1>
+                  {health && (
+                    <span
+                      className={health.ok ? styles.healthOk : styles.healthFail}
+                      title="Live status from GET /health">
+                      ● API {health.ok ? 'OK' : 'ERROR'} · {health.latencyMs} ms
+                    </span>
+                  )}
+                  <a href="/api-docs" className={styles.apiDocsLink}>
+                    OpenAPI docs ↗
+                  </a>
+                </div>
               </div>
               <div className={styles.toolbar}>
                 <select
@@ -516,7 +586,61 @@ export default function AdminDashboardPage() {
             )}
 
             <section className={styles.section}>
+              <h2 className={styles.sectionTitle}>Popular lessons — Matomo last 7 days (<code>GET /popular</code>)</h2>
+              {popular.length === 0 ? (
+                <p className={styles.empty}>No popular pages returned by Matomo (or MATOMO_TOKEN is not configured).</p>
+              ) : (
+                <div className={styles.tableWrap}>
+                  <table className={styles.table}>
+                    <thead>
+                      <tr>
+                        <th scope="col">Lesson</th>
+                        <th scope="col">Visits (7d)</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {popular.map((p) => (
+                        <tr key={p.page}>
+                          <td className={styles.mono}>{p.page}</td>
+                          <td>{p.visits}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </section>
+
+            <section className={styles.section}>
               <h2 className={styles.sectionTitle}>Latest feedback ({sortedFeedback.length})</h2>
+              <form className={styles.summaryBar} onSubmit={handleFetchSummary}>
+                <label className={styles.summaryLabel} htmlFor="feedback-summary-page">
+                  Live page summary (<code>GET /feedback/summary</code>):
+                </label>
+                <input
+                  id="feedback-summary-page"
+                  type="text"
+                  list="known-concept-pages"
+                  className={styles.summaryInput}
+                  placeholder="/concepts/sorting/quicksort"
+                  value={summaryPage}
+                  onChange={(e) => setSummaryPage(e.target.value)}
+                />
+                <datalist id="known-concept-pages">
+                  {knownConceptPages.map((p) => (
+                    <option key={p} value={p} />
+                  ))}
+                </datalist>
+                <button type="submit" className={styles.secondaryBtn} disabled={summaryLoading}>
+                  {summaryLoading ? 'Checking…' : 'Check page'}
+                </button>
+                {summaryData && (
+                  <span className={styles.summaryResult}>
+                    <code>{summaryData.page}</code>: 👍 <strong>{summaryData.helpful}</strong> · 👎 <strong>{summaryData.notHelpful}</strong>
+                  </span>
+                )}
+                {summaryError && <span className={styles.summaryError}>{summaryError}</span>}
+              </form>
               {sortedFeedback.length === 0 ? (
                 <p className={styles.empty}>No feedback votes recorded yet.</p>
               ) : (

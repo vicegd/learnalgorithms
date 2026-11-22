@@ -367,3 +367,77 @@
   overflow: auto;
   white-space: pre-wrap;
 }
+
+.titleRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.healthOk,
+.healthFail {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-family: var(--ifm-font-family-monospace);
+}
+
+.healthOk {
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid rgba(22, 163, 74, 0.35);
+}
+
+.healthFail {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid rgba(220, 38, 38, 0.35);
+}
+
+.apiDocsLink {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.summaryBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem;
+  margin-bottom: 0.85rem;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: 10px;
+  background: var(--ifm-color-emphasis-100);
+}
+
+.summaryLabel {
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.summaryInput {
+  flex: 1 1 240px;
+  min-width: 180px;
+  padding: 0.38rem 0.6rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 6px;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.82rem;
+  background: var(--ifm-background-surface-color);
+  color: var(--ifm-font-color-base);
+}
+
+.summaryResult {
+  font-size: 0.84rem;
+}
+
+.summaryError {
+  font-size: 0.82rem;
+  color: #b91c1c;
+  font-weight: 600;
+}
