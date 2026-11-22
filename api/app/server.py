@@ -559,34 +559,80 @@ def fetch_popular_from_matomo(limit=5):
     return [{"page": p, "visits": v} for p, v in top]
 
 
-def interpret_report_with_llm(markdown_report, lang="es"):
+def interpret_report_with_llm(markdown_report, lang="en", detail="brief"):
     """Call an OpenAI-compatible chat completions API (OpenAI, Gemini OpenAI-compat, Groq, etc.)
     to synthesize an anonymized ETL teaching report into actionable teaching insights."""
     if not LLM_API_KEY:
         raise RuntimeError("LLM_API_KEY is not configured")
-    is_es = (lang or "es").lower().startswith("es")
-    system_prompt = (
-        "Eres un asesor experto en innovación docente universitaria para un curso de Diseño y Análisis de Algoritmos "
-        "(learnalgorithms.dev). Analiza ÚNICAMENTE los datos cuantitativos y comentarios anonimizados del informe ETL "
-        "que se te proporciona. No inventes cifras ni supongas datos ausentes. Responde en español claro y conciso, "
-        "listo para incluir en una memoria docente, con exactamente estas 5 secciones en Markdown:\n"
-        "1. Resumen ejecutivo\n"
-        "2. Lecciones con mayor interés y posibles puntos de dificultad\n"
-        "3. Lagunas detectadas (búsquedas sin resultado y feedback)\n"
-        "4. Rendimiento técnico percibido (Core Web Vitals)\n"
-        "5. Recomendaciones concretas para el próximo ciclo docente (3–5 puntos accionables)"
-        if is_es
-        else
-        "You are an expert university teaching-innovation advisor for an Algorithms course (learnalgorithms.dev). "
-        "Analyze ONLY the anonymized quantitative metrics and feedback comments in the provided ETL report. "
-        "Never invent numbers. Reply in clear, concise English ready for a teaching report with exactly these 5 "
-        "Markdown sections:\n"
-        "1. Executive Summary\n"
-        "2. High-Engagement & Potentially Difficult Lessons\n"
-        "3. Detected Content Gaps (Zero-Result Searches & Feedback)\n"
-        "4. Perceived Technical Performance (Core Web Vitals)\n"
-        "5. Concrete Recommendations for Next Term (3–5 actionable bullets)"
-    )
+    is_es = (lang or "en").lower().startswith("es")
+    is_detailed = (detail or "brief").lower() == "detailed"
+
+    if is_es:
+        thresholds = (
+            "Umbrales oficiales de Core Web Vitals de Google: "
+            "TTFB < 800 ms es bueno, LCP < 2500 ms es bueno (y < 1000 ms es excelente), CLS < 0.1 es bueno (> 0.25 es pobre)."
+        )
+        if is_detailed:
+            system_prompt = (
+                "Eres un asesor experto en innovación docente universitaria y analítica de aprendizaje para el curso de "
+                "Diseño y Análisis de Algoritmos (learnalgorithms.dev). Redacta un informe extenso, riguroso y bien "
+                "estructurado en español listo para incluir en una memoria anual oficial de innovación docente, usando "
+                "ÚNICAMENTE los datos cuantitativos y comentarios anonimizados del informe ETL proporcionado. No inventes "
+                f"cifras ni supongas datos ausentes. {thresholds}\n"
+                "Desarrolla en profundidad estas 7 secciones en Markdown (con viñetas, tablas comparativas cuando aporten "
+                "claridad y análisis detallado de los números):\n"
+                "1. Resumen ejecutivo y contexto de uso (volumen, sesiones, días activos, tendencia diaria y dispositivos móvil/escritorio)\n"
+                "2. Análisis detallado de participación por lección (vistas, mediana de tiempo, profundidad de scroll, tasas de completado y cruce con Matomo)\n"
+                "3. Señales de dificultad y comportamiento de estudio (checkpoints más abiertos, clics a código/demostraciones y uso del Cheat Sheet)\n"
+                "4. Lagunas de contenido y retroalimentación cualitativa (búsquedas totales, búsquedas sin resultado, feedback positivo/negativo y comentarios)\n"
+                "5. Diagnóstico de rendimiento técnico y UX (evaluación rigurosa de TTFB, LCP y CLS según umbrales oficiales)\n"
+                "6. Limitaciones metodológicas y tamaño muestral actual\n"
+                "7. Plan de acción priorizado para el próximo ciclo docente (5–7 acciones concretas con prioridad Alta/Media y KPI verificable)"
+            )
+        else:
+            system_prompt = (
+                "Eres un asesor experto en innovación docente universitaria para un curso de Diseño y Análisis de Algoritmos "
+                "(learnalgorithms.dev). Analiza ÚNICAMENTE los datos cuantitativos y comentarios anonimizados del informe ETL "
+                f"que se te proporciona. No inventes cifras ni supongas datos ausentes. {thresholds} "
+                "Responde en español claro y conciso, listo para incluir en una memoria docente, con exactamente estas 5 secciones en Markdown:\n"
+                "1. Resumen ejecutivo\n"
+                "2. Lecciones con mayor interés y posibles puntos de dificultad\n"
+                "3. Lagunas detectadas (búsquedas sin resultado y feedback)\n"
+                "4. Rendimiento técnico percibido (Core Web Vitals)\n"
+                "5. Recomendaciones concretas para el próximo ciclo docente (3–5 puntos accionables)"
+            )
+    else:
+        thresholds = (
+            "Official Google Core Web Vitals thresholds: "
+            "TTFB < 800 ms is good, LCP < 2500 ms is good (< 1000 ms is excellent), CLS < 0.1 is good (> 0.25 is poor)."
+        )
+        if is_detailed:
+            system_prompt = (
+                "You are an expert university teaching-innovation advisor and learning-analytics specialist for an "
+                "Algorithms course (learnalgorithms.dev). Write a comprehensive, rigorous, well-structured English "
+                "report suitable for an official annual teaching-innovation report, grounded EXCLUSIVELY in the "
+                f"anonymized metrics and feedback comments in the provided ETL report. Never invent numbers. {thresholds}\n"
+                "Develop these 7 Markdown sections in depth (using structured bullets and comparative insights):\n"
+                "1. Executive Summary & Usage Context (volume, sessions, active days, daily trend, and desktop/mobile split)\n"
+                "2. Lesson-by-Lesson Engagement Analysis (views, median reading time, scroll depth, completion rates, and Matomo comparison)\n"
+                "3. Difficulty Signals & Study Behavior (most opened checkpoints, Java/proof resource clicks, and Cheat Sheet usage)\n"
+                "4. Content Gaps & Qualitative Feedback (top searches, zero-result searches, helpful/not-helpful ratio, and comments)\n"
+                "5. Technical Performance & UX Diagnosis (accurate assessment of TTFB, LCP, and CLS against official thresholds)\n"
+                "6. Methodological Limitations & Sample Size Caveats\n"
+                "7. Prioritized Action Plan for Next Term (5–7 concrete actions with High/Medium priority and measurable KPI)"
+            )
+        else:
+            system_prompt = (
+                "You are an expert university teaching-innovation advisor for an Algorithms course (learnalgorithms.dev). "
+                "Analyze ONLY the anonymized quantitative metrics and feedback comments in the provided ETL report. "
+                f"Never invent numbers. {thresholds} Reply in clear, concise English ready for a teaching report with "
+                "exactly these 5 Markdown sections:\n"
+                "1. Executive Summary\n"
+                "2. High-Engagement & Potentially Difficult Lessons\n"
+                "3. Detected Content Gaps (Zero-Result Searches & Feedback)\n"
+                "4. Perceived Technical Performance (Core Web Vitals)\n"
+                "5. Concrete Recommendations for Next Term (3–5 actionable bullets)"
+            )
     body = json.dumps({
         "model": LLM_MODEL,
         "temperature": 0.3,
@@ -604,7 +650,7 @@ def interpret_report_with_llm(markdown_report, lang="es"):
         },
         method="POST",
     )
-    with urllib.request.urlopen(req, timeout=45) as resp:
+    with urllib.request.urlopen(req, timeout=55) as resp:
         data = json.loads(resp.read(2_000_000))
     choices = data.get("choices") or []
     if not choices or not isinstance(choices[0], dict):
@@ -844,13 +890,16 @@ def make_handler(app):
             lang = qs.get("lang", ["en"])[0]
             if lang not in ("es", "en"):
                 lang = "en"
+            detail = qs.get("detail", ["brief"])[0]
+            if detail not in ("brief", "detailed"):
+                detail = "brief"
             try:
                 days = 0 if raw_days == "all" else max(0, min(3650, int(raw_days)))
             except ValueError:
                 return self.send_json(400, {"error": "invalid days"})
             _, markdown = build_full_report(app, days)
             try:
-                result = app.llm_interpret(markdown, lang=lang)
+                result = app.llm_interpret(markdown, lang=lang, detail=detail)
             except RuntimeError as e:
                 return self.send_json(503, {"error": str(e)}, {"Cache-Control": "no-store"})
             except urllib.error.HTTPError as e:
@@ -871,6 +920,7 @@ def make_handler(app):
                     "analysis": result["analysis"],
                     "model": result["model"],
                     "lang": lang,
+                    "detail": detail,
                     "days": days,
                 },
                 {"Cache-Control": "no-store"},
