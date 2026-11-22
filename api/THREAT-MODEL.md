@@ -41,3 +41,12 @@ The API also calls Matomo over HTTPS, and GitHub calls the webhook endpoint.
 
 - `api/tests`: unit tests for validation, CORS, rate limits, bot filtering, authentication and webhook signatures, run by GitHub Actions on every change.
 - OWASP ZAP baseline scan against the deployed API after each release.
+
+## AI Security (OWASP Top 10 for LLM Applications)
+
+The authenticated endpoint `POST /admin/report/interpret` forwards anonymized ETL teaching reports to an external OpenAI-compatible LLM provider. Specific controls:
+
+- **LLM01 — Indirect Prompt Injection:** Student-submitted feedback comments and search queries are sanitized by `sanitize_for_llm()` to strip directive patterns and wrapped inside explicit `<untrusted_data>…</untrusted_data>` delimiters, while the system prompt instructs the model to treat the block strictly as passive data.
+- **LLM02 — Sensitive Information Disclosure (PII):** `sanitize_for_llm()` redacts accidental emails, phone numbers, and Spanish IDs (`DNI`/`NIE`) before any text leaves the VPS. Only aggregated, anonymized telemetry is sent.
+- **LLM04 / LLM10 — Unbounded Consumption / Cost Abuse:** Access requires `ADMIN_TOKEN` (constant-time `hmac.compare_digest`), a dedicated `LLM_RATE_LIMIT` (`20` requests/hour), input truncation (`16 KB`), and explicit `max_tokens` caps (`900` brief / `2500` detailed).
+- **LLM09 — Misinformation / Overreliance:** Output is displayed only to the instructor inside `/admin` alongside the raw ETL report with an explicit *human-in-the-loop* disclaimer and official Core Web Vitals thresholds embedded in the system prompt.
