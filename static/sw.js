@@ -1,4 +1,4 @@
-const CACHE_NAME = 'learnalgorithms-pwa-v1';
+const CACHE_NAME = 'learnalgorithms-pwa-v2';
 const PRECACHE_URLS = ['/', '/cheat-sheet', '/knowledge-graph', '/manifest.json'];
 
 self.addEventListener('install', (event) => {

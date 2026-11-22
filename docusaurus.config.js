@@ -174,8 +174,28 @@ const config = {
       attributes: {rel: 'manifest', href: '/manifest.json'},
     },
     {
+      tagName: 'link',
+      attributes: {rel: 'apple-touch-icon', sizes: '180x180', href: '/img/apple-touch-icon.png'},
+    },
+    {
       tagName: 'meta',
       attributes: {name: 'theme-color', content: '#2e8555'},
+    },
+    {
+      tagName: 'meta',
+      attributes: {name: 'apple-mobile-web-app-capable', content: 'yes'},
+    },
+    {
+      tagName: 'meta',
+      attributes: {name: 'mobile-web-app-capable', content: 'yes'},
+    },
+    {
+      tagName: 'meta',
+      attributes: {name: 'apple-mobile-web-app-title', content: 'LearnAlg'},
+    },
+    {
+      tagName: 'meta',
+      attributes: {name: 'apple-mobile-web-app-status-bar-style', content: 'default'},
     },
     // Security: Content Security Policy. GitHub Pages cannot send HTTP headers,
     // so the policy goes in a <meta> tag (frame-ancestors and report-uri are
