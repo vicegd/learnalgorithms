@@ -1,4 +1,4 @@
-const CACHE_NAME = 'learnalgorithms-pwa-v2';
+const CACHE_NAME = 'learnalgorithms-pwa-v3';
 const PRECACHE_URLS = ['/', '/cheat-sheet', '/knowledge-graph', '/manifest.json'];
 
 self.addEventListener('install', (event) => {
@@ -32,7 +32,7 @@ self.addEventListener('fetch', (event) => {
   // with offline fallback to previously visited lessons.
   if (request.mode === 'navigate') {
     event.respondWith(
-      fetch(request)
+      fetch(request, {cache: 'no-cache'})
         .then((response) => {
           if (response.ok) {
             const copy = response.clone();
