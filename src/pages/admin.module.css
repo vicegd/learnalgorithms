@@ -582,6 +582,38 @@
     overflow: visible !important;
   }
 
+  .table {
+    width: 100% !important;
+    table-layout: auto;
+    font-size: 0.7rem !important;
+  }
+
+  .table th,
+  .table td {
+    padding: 0.25rem 0.32rem !important;
+    white-space: normal !important;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+
+  .sortBtn {
+    font-size: 0.68rem !important;
+    white-space: normal !important;
+    text-align: left;
+  }
+
+  .sortBtn span {
+    display: none;
+  }
+
+  .badgeOk,
+  .badgeWarn,
+  .badgeDanger {
+    font-size: 0.64rem;
+    padding: 0.08rem 0.32rem;
+    white-space: normal;
+  }
+
   .table thead {
     display: table-header-group;
   }
