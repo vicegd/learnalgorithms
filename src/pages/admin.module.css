@@ -567,6 +567,7 @@
   .toolbar,
   .reportActions,
   .pagination,
+  .summaryBar,
   .apiDocsLink,
   .noPrint {
     display: none !important;
@@ -577,7 +578,15 @@
     padding: 0;
   }
 
-  .section {
+  .tableWrap {
+    overflow: visible !important;
+  }
+
+  .table thead {
+    display: table-header-group;
+  }
+
+  .table tr {
     break-inside: avoid;
     page-break-inside: avoid;
   }
