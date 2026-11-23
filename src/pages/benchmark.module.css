@@ -159,3 +159,28 @@
 .mono {
   font-family: var(--ifm-font-family-monospace);
 }
+
+.explainer {
+  margin-top: 1.1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  border: 1px solid var(--ifm-color-emphasis-200);
+  background: var(--ifm-color-emphasis-100);
+  font-size: 0.85rem;
+}
+
+.explainer summary {
+  font-weight: 700;
+  cursor: pointer;
+  color: var(--ifm-font-color-base);
+}
+
+.explainerList {
+  margin: 0.65rem 0 0;
+  padding-left: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  line-height: 1.5;
+  color: var(--ifm-color-emphasis-800);
+}

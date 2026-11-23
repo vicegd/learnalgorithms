@@ -17,7 +17,7 @@ const FIB_WASM_BYTES = [
   0x6a, 0x0b, 0x0b,
 ];
 
-const SANDBOX_TIMEOUT_MS = 5000;
+const SANDBOX_TIMEOUT_MS = 10000;
 const WORKER_URL = '/workers/benchmark-worker.js';
 
 function runWasmSandboxWorker(n) {
@@ -167,7 +167,7 @@ export default function BenchmarkPage() {
         <h1 className={styles.title}>Algorithm Benchmark Lab</h1>
         <p className={styles.intro}>
           Measure real execution times right inside your browser using isolated{' '}
-          <strong>Web Workers</strong> (no server load, 5-second watchdog timeout) and compare{' '}
+          <strong>Web Workers</strong> (no server load, 10-second watchdog timeout) and compare{' '}
           <strong>JavaScript vs. WebAssembly</strong> and <strong>multi-core speedup vs. Amdahl’s Law</strong>.
         </p>
 
@@ -177,7 +177,7 @@ export default function BenchmarkPage() {
             <div>
               <h2 className={styles.cardTitle}>1. Isolated Sandbox: JavaScript vs. WebAssembly (WASM)</h2>
               <p className={styles.cardHint}>
-                Executes recursive <code>fib(n)</code> (exponential <code>O(φ<sup>n</sup>)</code> workload) inside an isolated Blob Web Worker with a 5s watchdog, comparing JS against an embedded 60-byte <code>.wasm</code> binary.{' '}
+                Executes naive recursive <code>fib(n)</code> (exponential <code>O(φ<sup>n</sup>)</code> workload, up to <code>n = 46</code>, the largest Fibonacci number that fits in a signed 32-bit integer) inside an isolated same-origin Web Worker with a 10 s watchdog, comparing JavaScript against an embedded 60-byte <code>.wasm</code> binary.{' '}
                 <Link to="/concepts/principles-of-algorithmics/measuring-efficiency">Chapter 1 →</Link>
               </p>
             </div>
@@ -185,11 +185,11 @@ export default function BenchmarkPage() {
 
           <div className={styles.controls}>
             <label className={styles.label}>
-              Input <code>n</code>: <strong>{fibN}</strong>
+              Input <code>n</code>: <strong>{fibN}</strong> {fibN >= 43 ? '(heavy — may trigger 10s watchdog)' : ''}
               <input
                 type="range"
                 min={28}
-                max={41}
+                max={46}
                 value={fibN}
                 onChange={(e) => setFibN(Number(e.target.value))}
                 className={styles.slider}
@@ -234,6 +234,27 @@ export default function BenchmarkPage() {
               </div>
             </div>
           )}
+
+          <details className={styles.explainer}>
+            <summary>What do these concepts mean? (O(φⁿ), Web Worker sandbox, Watchdog, WASM)</summary>
+            <ul className={styles.explainerList}>
+              <li>
+                <strong><code>O(φ<sup>n</sup>)</code> (exponential workload):</strong> <code>φ = (1 + √5) / 2 ≈ 1.618</code> is the <em>golden ratio</em>. Naive recursive Fibonacci recomputes the same subproblems over and over, so each increment of <code>n</code> multiplies the work by ~1.618× (going from <code>n = 35</code> to <code>n = 45</code> makes it ~123× slower).
+              </li>
+              <li>
+                <strong>Isolated Web Worker (sandbox):</strong> a separate background thread loaded from a static same-origin script (<code>/workers/benchmark-worker.js</code>) with <em>no access to the DOM, cookies, or localStorage</em>, keeping the interface responsive while heavy computations run.
+              </li>
+              <li>
+                <strong>Watchdog timeout (10 s):</strong> a safety timer on the main thread that forcefully kills (<code>worker.terminate()</code>) any execution exceeding 10 seconds (try <code>n = 45</code> or <code>46</code> to see it protect the browser).
+              </li>
+              <li>
+                <strong>WebAssembly (<code>.wasm</code>):</strong> a compact binary instruction format (here just 60 bytes) compiled directly to native machine code by the browser without JavaScript’s dynamic-typing overhead.
+              </li>
+              <li>
+                <strong>WASM Speedup (<code>T<sub>JS</sub> / T<sub>WASM</sub></code>):</strong> how many times faster WebAssembly ran than JavaScript on the exact same recursive algorithm (<code>&gt; 1.0×</code> means WASM is faster).
+              </li>
+            </ul>
+          </details>
         </section>
 
         {/* ── Lab 2: Parallel Computing (HPC & Amdahl's Law) ─────────────── */}
@@ -315,6 +336,27 @@ export default function BenchmarkPage() {
               </table>
             </div>
           )}
+
+          <details className={styles.explainer}>
+            <summary>What do these metrics mean? (Workers p, Speedup S(p), Efficiency E(p), Amdahl’s Law)</summary>
+            <ul className={styles.explainerList}>
+              <li>
+                <strong>Workers (<code>p</code>):</strong> number of concurrent Web Workers running in parallel, each testing a disjoint sub-range of <code>[2..N]</code> across your CPU’s logical cores (<code>navigator.hardwareConcurrency</code>).
+              </li>
+              <li>
+                <strong>Wall Time (<code>T(p)</code>):</strong> total elapsed time in milliseconds from launching all <code>p</code> workers until the slowest worker finishes.
+              </li>
+              <li>
+                <strong>Measured Speedup <code>S(p) = T(1) / T(p)</code>:</strong> how many times faster <code>p</code> workers ran compared to 1 worker. Ideal linear scaling would be <code>S(p) = p</code> (e.g., 4× faster on 4 cores).
+              </li>
+              <li>
+                <strong>Efficiency <code>E(p) = (S(p) / p) × 100%</code>:</strong> fraction of theoretical linear speedup actually achieved per core (100% = perfect scaling; lower values reflect worker startup, message-passing overhead, and the fact that larger numbers take longer to test for primality).
+              </li>
+              <li>
+                <strong>Amdahl’s Law <code>S<sub>Amdahl</sub>(p) = 1 / (s + (1 − s) / p)</code>:</strong> theoretical ceiling on speedup when a fraction <code>s</code> of the program is strictly sequential. Even with infinite cores (<code>p → ∞</code>), speedup can never exceed <code>1 / s</code> (e.g., <code>s = 10%</code> caps speedup at <code>10×</code>).
+              </li>
+            </ul>
+          </details>
         </section>
       </main>
     </Layout>
