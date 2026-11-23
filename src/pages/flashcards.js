@@ -243,16 +243,19 @@ export default function FlashcardsPage() {
   }, [visibleCards.length]);
 
   const markStatus = useCallback(
-    (isMastered) => {
+    (status) => {
       if (!currentCard) return;
       const nextMastered = new Set(mastered);
       const nextReview = new Set(needsReview);
-      if (isMastered) {
+      if (status === 'mastered') {
         nextMastered.add(currentCard.id);
         nextReview.delete(currentCard.id);
-      } else {
+      } else if (status === 'review') {
         nextMastered.delete(currentCard.id);
         nextReview.add(currentCard.id);
+      } else {
+        nextMastered.delete(currentCard.id);
+        nextReview.delete(currentCard.id);
       }
       persistSets(nextMastered, nextReview);
       setFlipped(false);
@@ -293,9 +296,11 @@ export default function FlashcardsPage() {
         e.preventDefault();
         goPrev();
       } else if (e.key.toLowerCase() === 'm') {
-        markStatus(true);
+        markStatus('mastered');
       } else if (e.key.toLowerCase() === 'r') {
-        markStatus(false);
+        markStatus('review');
+      } else if (e.key.toLowerCase() === 'u') {
+        markStatus('unseen');
       }
     }
     window.addEventListener('keydown', onKeyDown);
@@ -494,14 +499,21 @@ export default function FlashcardsPage() {
               <div className={styles.gradeBtns}>
                 <button
                   type="button"
+                  className={styles.unseenBtn}
+                  disabled={!mastered.has(currentCard.id) && !needsReview.has(currentCard.id)}
+                  onClick={() => markStatus('unseen')}>
+                  ○ Unseen (U)
+                </button>
+                <button
+                  type="button"
                   className={styles.reviewBtn}
-                  onClick={() => markStatus(false)}>
+                  onClick={() => markStatus('review')}>
                   ↻ Needs review (R)
                 </button>
                 <button
                   type="button"
                   className={styles.masterBtn}
-                  onClick={() => markStatus(true)}>
+                  onClick={() => markStatus('mastered')}>
                   ✓ Mastered (M)
                 </button>
               </div>
@@ -511,7 +523,7 @@ export default function FlashcardsPage() {
             </div>
 
             <p className={styles.kbdHint}>
-              Shortcuts: <kbd>Space</kbd> flip · <kbd>←</kbd>/<kbd>→</kbd> prev/next · <kbd>M</kbd> mastered · <kbd>R</kbd> review
+              Shortcuts: <kbd>Space</kbd> flip · <kbd>←</kbd>/<kbd>→</kbd> prev/next · <kbd>U</kbd> unseen · <kbd>R</kbd> review · <kbd>M</kbd> mastered
             </p>
           </>
         )}

@@ -210,8 +210,8 @@
 }
 
 .cardFlipped {
-  border-color: var(--ifm-color-primary);
-  background: color-mix(in srgb, var(--ifm-color-primary) 9%, var(--ifm-background-surface-color));
+  border-color: #3b82f6;
+  background: color-mix(in srgb, #3b82f6 9%, var(--ifm-background-surface-color));
 }
 
 .cardMastered {
@@ -221,6 +221,7 @@
 }
 
 .cardMastered.cardFlipped {
+  border-color: var(--ifm-color-primary);
   background: color-mix(in srgb, var(--ifm-color-primary) 18%, var(--ifm-background-surface-color));
 }
 
@@ -231,6 +232,7 @@
 }
 
 .cardReview.cardFlipped {
+  border-color: #d97706;
   background: color-mix(in srgb, #d97706 16%, var(--ifm-background-surface-color));
 }
 
@@ -360,6 +362,7 @@
 }
 
 .secondaryBtn,
+.unseenBtn,
 .reviewBtn,
 .masterBtn {
   padding: 0.5rem 0.95rem;
@@ -367,6 +370,17 @@
   font-size: 0.86rem;
   font-weight: 600;
   cursor: pointer;
+}
+
+.unseenBtn {
+  border: 1px solid var(--ifm-color-emphasis-300);
+  background: var(--ifm-color-emphasis-100);
+  color: var(--ifm-font-color-base);
+}
+
+.unseenBtn:disabled {
+  opacity: 0.45;
+  cursor: default;
 }
 
 .secondaryBtn {
