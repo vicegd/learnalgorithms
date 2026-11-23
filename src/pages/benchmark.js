@@ -17,15 +17,31 @@ const FIB_WASM_BYTES = [
   0x6a, 0x0b, 0x0b,
 ];
 
-const SANDBOX_TIMEOUT_MS = 10000;
+// Hand-encoded 106-byte WebAssembly binary exporting: fib_iter(n: i32) -> i32 (mod 1,000,000,007)
+const FIB_ITER_WASM_BYTES = [
+  0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00,
+  0x01, 0x06, 0x01, 0x60, 0x01, 0x7f, 0x01, 0x7f,
+  0x03, 0x02, 0x01, 0x00,
+  0x07, 0x0c, 0x01, 0x08, 0x66, 0x69, 0x62, 0x5f, 0x69, 0x74, 0x65, 0x72, 0x00, 0x00,
+  0x0a, 0x46, 0x01, 0x44, 0x01, 0x04, 0x7f,
+  0x20, 0x00, 0x41, 0x02, 0x48, 0x04, 0x40, 0x20, 0x00, 0x0f, 0x0b,
+  0x41, 0x00, 0x21, 0x01, 0x41, 0x01, 0x21, 0x02, 0x41, 0x02, 0x21, 0x04,
+  0x03, 0x40,
+  0x20, 0x01, 0x20, 0x02, 0x6a, 0x41, 0x87, 0x94, 0xeb, 0xdc, 0x03, 0x70, 0x21, 0x03,
+  0x20, 0x02, 0x21, 0x01, 0x20, 0x03, 0x21, 0x02, 0x20, 0x04, 0x41, 0x01, 0x6a, 0x21, 0x04,
+  0x20, 0x04, 0x20, 0x00, 0x4c, 0x0d, 0x00, 0x0b,
+  0x20, 0x02, 0x0b,
+];
+
+const SANDBOX_TIMEOUT_MS = 30000;
 const WORKER_URL = '/workers/benchmark-worker.js';
 
-function runWasmSandboxWorker(n) {
+function runWasmSandboxWorker(mode, n) {
   return new Promise((resolve, reject) => {
     const worker = new Worker(WORKER_URL);
     const timer = window.setTimeout(() => {
       worker.terminate();
-      reject(new Error(`Sandbox watchdog terminated execution after ${SANDBOX_TIMEOUT_MS} ms.`));
+      reject(new Error(`Sandbox watchdog terminated execution after ${SANDBOX_TIMEOUT_MS / 1000} s.`));
     }, SANDBOX_TIMEOUT_MS);
 
     worker.onmessage = (e) => {
@@ -42,7 +58,12 @@ function runWasmSandboxWorker(n) {
       worker.terminate();
       reject(new Error(err.message || 'Worker execution failed'));
     };
-    worker.postMessage({task: 'fib_wasm', n, wasmBytes: FIB_WASM_BYTES});
+    const isIter = mode === 'iterative';
+    worker.postMessage({
+      task: isIter ? 'fib_iter_wasm' : 'fib_wasm',
+      n,
+      wasmBytes: isIter ? FIB_ITER_WASM_BYTES : FIB_WASM_BYTES,
+    });
   });
 }
 
@@ -51,8 +72,8 @@ function runPrimeSliceWorker(start, end) {
     const worker = new Worker(WORKER_URL);
     const timer = window.setTimeout(() => {
       worker.terminate();
-      reject(new Error('Parallel worker timed out'));
-    }, 10000);
+      reject(new Error(`Parallel worker timed out after ${SANDBOX_TIMEOUT_MS / 1000} s.`));
+    }, SANDBOX_TIMEOUT_MS);
 
     worker.onmessage = (e) => {
       window.clearTimeout(timer);
@@ -88,7 +109,9 @@ async function runParallelPrimeBenchmark(limit, threads) {
 }
 
 export default function BenchmarkPage() {
+  const [fibMode, setFibMode] = useState('recursive'); // 'recursive' | 'iterative'
   const [fibN, setFibN] = useState(38);
+  const [fibIterN, setFibIterN] = useState(50000000);
   const [wasmRunning, setWasmRunning] = useState(false);
   const [wasmResult, setWasmResult] = useState(null);
   const [wasmError, setWasmError] = useState('');
@@ -120,9 +143,10 @@ export default function BenchmarkPage() {
   async function handleRunWasm() {
     setWasmRunning(true);
     setWasmError('');
+    const n = fibMode === 'iterative' ? fibIterN : fibN;
     try {
-      const res = await runWasmSandboxWorker(fibN);
-      setWasmResult({...res, n: fibN});
+      const res = await runWasmSandboxWorker(fibMode, n);
+      setWasmResult({...res, n, mode: fibMode});
     } catch (err) {
       setWasmError(err.message);
     } finally {
@@ -167,7 +191,7 @@ export default function BenchmarkPage() {
         <h1 className={styles.title}>Algorithm Benchmark Lab</h1>
         <p className={styles.intro}>
           Measure real execution times right inside your browser using isolated{' '}
-          <strong>Web Workers</strong> (no server load, 10-second watchdog timeout) and compare{' '}
+          <strong>Web Workers</strong> (no server load, 30-second watchdog timeout) and compare{' '}
           <strong>JavaScript vs. WebAssembly</strong> and <strong>multi-core speedup vs. Amdahl’s Law</strong>.
         </p>
 
@@ -177,24 +201,54 @@ export default function BenchmarkPage() {
             <div>
               <h2 className={styles.cardTitle}>1. Isolated Sandbox: JavaScript vs. WebAssembly (WASM)</h2>
               <p className={styles.cardHint}>
-                Executes naive recursive <code>fib(n)</code> (exponential <code>O(φ<sup>n</sup>)</code> workload, up to <code>n = 46</code>, the largest Fibonacci number that fits in a signed 32-bit integer) inside an isolated same-origin Web Worker with a 10 s watchdog, comparing JavaScript against an embedded 60-byte <code>.wasm</code> binary.{' '}
+                Compare JavaScript against embedded <code>.wasm</code> binaries inside an isolated same-origin Web Worker with a 30 s watchdog. Switch between <strong>Naive Recursive <code>O(φ<sup>n</sup>)</code></strong> (up to <code>n = 46</code>) and <strong>Iterative DP <code>O(n)</code></strong> (up to <code>n = 100,000,000</code>, mod <code>10<sup>9</sup>+7</code>) to see both language speedup and algorithmic complexity in action.{' '}
                 <Link to="/concepts/principles-of-algorithmics/measuring-efficiency">Chapter 1 →</Link>
               </p>
             </div>
           </div>
 
+          <div className={styles.modeRow} role="group" aria-label="Fibonacci algorithm mode">
+            <button
+              type="button"
+              className={`${styles.modeBtn} ${fibMode === 'recursive' ? styles.modeBtnActive : ''}`}
+              onClick={() => { setFibMode('recursive'); setWasmError(''); }}>
+              Naive Recursive · O(φⁿ) (n ≤ 46)
+            </button>
+            <button
+              type="button"
+              className={`${styles.modeBtn} ${fibMode === 'iterative' ? styles.modeBtnActive : ''}`}
+              onClick={() => { setFibMode('iterative'); setWasmError(''); }}>
+              Iterative DP · O(n) (n ≤ 100M)
+            </button>
+          </div>
+
           <div className={styles.controls}>
-            <label className={styles.label}>
-              Input <code>n</code>: <strong>{fibN}</strong> {fibN >= 43 ? '(heavy — may trigger 10s watchdog)' : ''}
-              <input
-                type="range"
-                min={28}
-                max={46}
-                value={fibN}
-                onChange={(e) => setFibN(Number(e.target.value))}
-                className={styles.slider}
-              />
-            </label>
+            {fibMode === 'recursive' ? (
+              <label className={styles.label}>
+                Input <code>n</code>: <strong>{fibN}</strong> {fibN >= 45 ? '(very heavy — may approach 30s watchdog)' : ''}
+                <input
+                  type="range"
+                  min={28}
+                  max={46}
+                  value={fibN}
+                  onChange={(e) => setFibN(Number(e.target.value))}
+                  className={styles.slider}
+                />
+              </label>
+            ) : (
+              <label className={styles.label}>
+                Input <code>n</code>: <strong>{fibIterN.toLocaleString()}</strong> (<code>fib(n) mod 10<sup>9</sup>+7</code>)
+                <input
+                  type="range"
+                  min={1000000}
+                  max={100000000}
+                  step={1000000}
+                  value={fibIterN}
+                  onChange={(e) => setFibIterN(Number(e.target.value))}
+                  className={styles.slider}
+                />
+              </label>
+            )}
             <button
               type="button"
               className={styles.primaryBtn}
@@ -209,7 +263,11 @@ export default function BenchmarkPage() {
           {wasmResult && (
             <div className={styles.metricsGrid}>
               <div className={styles.metricBox}>
-                <span className={styles.metricLabel}>Result fib({wasmResult.n})</span>
+                <span className={styles.metricLabel}>
+                  {wasmResult.mode === 'iterative'
+                    ? `fib(${wasmResult.n.toLocaleString()}) mod 10⁹+7`
+                    : `Result fib(${wasmResult.n})`}
+                </span>
                 <span className={styles.metricVal}>{wasmResult.wasmVal.toLocaleString()}</span>
                 <span className={styles.metricSub}>
                   Verified identical: {wasmResult.jsVal === wasmResult.wasmVal ? '✓ Yes' : '✗ Mismatch'}
@@ -223,7 +281,9 @@ export default function BenchmarkPage() {
               <div className={styles.metricBox}>
                 <span className={styles.metricLabel}>WebAssembly (.wasm)</span>
                 <span className={styles.metricVal}>{wasmResult.wasmMs.toFixed(1)} ms</span>
-                <span className={styles.metricSub}>Native 32-bit integer bytecode</span>
+                <span className={styles.metricSub}>
+                  {wasmResult.mode === 'iterative' ? '106-byte .wasm loop' : '60-byte .wasm recursion'}
+                </span>
               </div>
               <div className={styles.metricBox}>
                 <span className={styles.metricLabel}>WASM Speedup</span>
@@ -236,22 +296,22 @@ export default function BenchmarkPage() {
           )}
 
           <details className={styles.explainer}>
-            <summary>What do these concepts mean? (O(φⁿ), Web Worker sandbox, Watchdog, WASM)</summary>
+            <summary>What do these concepts mean? (O(φⁿ) vs O(n), Web Worker sandbox, Watchdog, WASM)</summary>
             <ul className={styles.explainerList}>
               <li>
-                <strong><code>O(φ<sup>n</sup>)</code> (exponential workload):</strong> <code>φ = (1 + √5) / 2 ≈ 1.618</code> is the <em>golden ratio</em>. Naive recursive Fibonacci recomputes the same subproblems over and over, so each increment of <code>n</code> multiplies the work by ~1.618× (going from <code>n = 35</code> to <code>n = 45</code> makes it ~123× slower).
+                <strong><code>O(φ<sup>n</sup>)</code> vs. <code>O(n)</code>:</strong> <code>φ = (1 + √5) / 2 ≈ 1.618</code> is the <em>golden ratio</em>. Naive recursive Fibonacci multiplies work by ~1.618× per step (so <code>n = 46</code> takes billions of calls), whereas Iterative DP runs in linear <code>O(n)</code> time and computes <code>n = 50,000,000</code> in a fraction of a second (using <code>mod 10<sup>9</sup>+7</code> to stay inside 32-bit integers).
               </li>
               <li>
                 <strong>Isolated Web Worker (sandbox):</strong> a separate background thread loaded from a static same-origin script (<code>/workers/benchmark-worker.js</code>) with <em>no access to the DOM, cookies, or localStorage</em>, keeping the interface responsive while heavy computations run.
               </li>
               <li>
-                <strong>Watchdog timeout (10 s):</strong> a safety timer on the main thread that forcefully kills (<code>worker.terminate()</code>) any execution exceeding 10 seconds (try <code>n = 45</code> or <code>46</code> to see it protect the browser).
+                <strong>Watchdog timeout (30 s):</strong> a safety timer on the main thread that forcefully kills (<code>worker.terminate()</code>) any execution exceeding 30 seconds so a runaway job can never freeze the browser.
               </li>
               <li>
-                <strong>WebAssembly (<code>.wasm</code>):</strong> a compact binary instruction format (here just 60 bytes) compiled directly to native machine code by the browser without JavaScript’s dynamic-typing overhead.
+                <strong>WebAssembly (<code>.wasm</code>):</strong> a compact binary instruction format (60 bytes for recursive <code>fib</code>, 106 bytes for iterative <code>fib_iter</code>) compiled directly to native machine code by the browser without JavaScript’s dynamic-typing overhead.
               </li>
               <li>
-                <strong>WASM Speedup (<code>T<sub>JS</sub> / T<sub>WASM</sub></code>):</strong> how many times faster WebAssembly ran than JavaScript on the exact same recursive algorithm (<code>&gt; 1.0×</code> means WASM is faster).
+                <strong>WASM Speedup (<code>T<sub>JS</sub> / T<sub>WASM</sub></code>):</strong> how many times faster WebAssembly ran than JavaScript on the exact same algorithm (<code>&gt; 1.0×</code> means WASM is faster).
               </li>
             </ul>
           </details>
