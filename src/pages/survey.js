@@ -111,13 +111,18 @@ export default function CourseSurveyPage() {
         <h1 className={styles.title}>Course Satisfaction Survey</h1>
         <p className={styles.intro}>
           Takes less than a minute. Completely anonymous (no account, no IP stored) — your ratings
-          help evaluate and improve <strong>learnalgorithms.dev</strong> for future cohorts.
+          help evaluate and improve <strong>learnalgorithms.dev</strong> for future cohorts. One
+          response is stored per browser per day: if you submit again today, only your latest
+          submission is kept.
         </p>
 
         {submitted ? (
           <div className={styles.thanksBox} role="status" aria-live="polite">
             <h2>Thank you for your feedback!</h2>
-            <p>Your anonymous satisfaction ratings have been recorded.</p>
+            <p>
+              Your anonymous satisfaction ratings have been recorded (if you already submitted
+              earlier today, your latest response has replaced it).
+            </p>
             <Link to="/" className={styles.backLink}>
               ← Back to the course
             </Link>
