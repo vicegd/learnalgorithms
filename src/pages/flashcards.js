@@ -5,6 +5,7 @@ import {ALGORITHMS} from './cheat-sheet';
 import styles from './flashcards.module.css';
 
 const STORAGE_KEY = 'la.flashcards.mastered:v1';
+const REVIEW_STORAGE_KEY = 'la.flashcards.review:v1';
 
 const THEORY_CARDS = [
   {
@@ -150,9 +151,9 @@ function buildDeck() {
   return [...THEORY_CARDS, ...algoCards];
 }
 
-function loadMastered() {
+function loadSet(key) {
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
+    const raw = window.localStorage.getItem(key);
     if (!raw) return new Set();
     const parsed = JSON.parse(raw);
     return new Set(Array.isArray(parsed) ? parsed : []);
@@ -171,18 +172,22 @@ export default function FlashcardsPage() {
   const [selectedParadigm, setSelectedParadigm] = useState('All');
   const [reviewOnly, setReviewOnly] = useState(false);
   const [mastered, setMastered] = useState(() => new Set());
+  const [needsReview, setNeedsReview] = useState(() => new Set());
   const [order, setOrder] = useState(() => allCards.map((c) => c.id));
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
 
   useEffect(() => {
-    setMastered(loadMastered());
+    setMastered(loadSet(STORAGE_KEY));
+    setNeedsReview(loadSet(REVIEW_STORAGE_KEY));
   }, []);
 
-  const persistMastered = useCallback((nextSet) => {
-    setMastered(nextSet);
+  const persistSets = useCallback((nextMastered, nextReview) => {
+    setMastered(nextMastered);
+    setNeedsReview(nextReview);
     try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify([...nextSet]));
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify([...nextMastered]));
+      window.localStorage.setItem(REVIEW_STORAGE_KEY, JSON.stringify([...nextReview]));
     } catch {
       // ignore storage errors
     }
@@ -220,16 +225,22 @@ export default function FlashcardsPage() {
   const markStatus = useCallback(
     (isMastered) => {
       if (!currentCard) return;
-      const next = new Set(mastered);
-      if (isMastered) next.add(currentCard.id);
-      else next.delete(currentCard.id);
-      persistMastered(next);
+      const nextMastered = new Set(mastered);
+      const nextReview = new Set(needsReview);
+      if (isMastered) {
+        nextMastered.add(currentCard.id);
+        nextReview.delete(currentCard.id);
+      } else {
+        nextMastered.delete(currentCard.id);
+        nextReview.add(currentCard.id);
+      }
+      persistSets(nextMastered, nextReview);
       setFlipped(false);
       if (!reviewOnly && visibleCards.length > 1) {
         setIndex((i) => (i + 1) % visibleCards.length);
       }
     },
-    [currentCard, mastered, persistMastered, reviewOnly, visibleCards.length],
+    [currentCard, mastered, needsReview, persistSets, reviewOnly, visibleCards.length],
   );
 
   function handleShuffle() {
@@ -244,7 +255,7 @@ export default function FlashcardsPage() {
   }
 
   function handleResetProgress() {
-    persistMastered(new Set());
+    persistSets(new Set(), new Set());
     setIndex(0);
     setFlipped(false);
   }
@@ -354,12 +365,21 @@ export default function FlashcardsPage() {
               {mastered.has(currentCard.id) && (
                 <span className={styles.masteredTag}>✓ Mastered</span>
               )}
+              {!mastered.has(currentCard.id) && needsReview.has(currentCard.id) && (
+                <span className={styles.reviewTag}>↻ Needs review</span>
+              )}
             </div>
 
             <div
               role="button"
               tabIndex={0}
-              className={`${styles.card} ${flipped ? styles.cardFlipped : ''} ${mastered.has(currentCard.id) ? styles.cardMastered : ''}`}
+              className={`${styles.card} ${flipped ? styles.cardFlipped : ''} ${
+                mastered.has(currentCard.id)
+                  ? styles.cardMastered
+                  : needsReview.has(currentCard.id)
+                  ? styles.cardReview
+                  : ''
+              }`}
               onClick={() => setFlipped((f) => !f)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
