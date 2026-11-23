@@ -359,7 +359,7 @@ export default function FlashcardsPage() {
             <div
               role="button"
               tabIndex={0}
-              className={`${styles.card} ${flipped ? styles.cardFlipped : ''}`}
+              className={`${styles.card} ${flipped ? styles.cardFlipped : ''} ${mastered.has(currentCard.id) ? styles.cardMastered : ''}`}
               onClick={() => setFlipped((f) => !f)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
