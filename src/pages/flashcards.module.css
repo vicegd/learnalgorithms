@@ -132,6 +132,15 @@
   font-size: 0.78rem;
 }
 
+.reviewTag {
+  padding: 0.14rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(217, 119, 6, 0.16);
+  color: #b45309;
+  font-weight: 700;
+  font-size: 0.78rem;
+}
+
 .card {
   min-height: 270px;
   padding: 1.5rem 1.75rem;
@@ -163,6 +172,16 @@
 
 .cardMastered.cardFlipped {
   background: color-mix(in srgb, var(--ifm-color-primary) 18%, var(--ifm-background-surface-color));
+}
+
+.cardReview {
+  border-color: #d97706;
+  background: color-mix(in srgb, #d97706 11%, var(--ifm-background-surface-color));
+  box-shadow: inset 6px 0 0 #d97706, 0 6px 20px rgba(217, 119, 6, 0.12);
+}
+
+.cardReview.cardFlipped {
+  background: color-mix(in srgb, #d97706 16%, var(--ifm-background-surface-color));
 }
 
 .cardTop {
