@@ -21,7 +21,7 @@ const QUESTIONS = [
   {
     key: 'tools',
     label: '3. Interactive study tools',
-    hint: 'Big-O Cheat Sheet, Knowledge Graph, Flashcards, progress tracker, search, and audio narration.',
+    hint: 'Big-O Cheat Sheet, Knowledge Graph, Flashcards, WASM/HPC Benchmark Lab, progress tracker, search, and audio narration.',
   },
   {
     key: 'overall',

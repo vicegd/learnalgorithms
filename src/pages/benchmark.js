@@ -18,96 +18,57 @@ const FIB_WASM_BYTES = [
 ];
 
 const SANDBOX_TIMEOUT_MS = 5000;
+const WORKER_URL = '/workers/benchmark-worker.js';
 
 function runWasmSandboxWorker(n) {
   return new Promise((resolve, reject) => {
-    const workerCode = `
-      function fibJs(k) {
-        if (k < 2) return k;
-        return fibJs(k - 1) + fibJs(k - 2);
-      }
-      self.onmessage = async (e) => {
-        const { n, wasmBytes } = e.data;
-        const t0 = performance.now();
-        const jsVal = fibJs(n);
-        const jsMs = performance.now() - t0;
-
-        const { instance } = await WebAssembly.instantiate(new Uint8Array(wasmBytes));
-        const t1 = performance.now();
-        const wasmVal = instance.exports.fib(n);
-        const wasmMs = performance.now() - t1;
-
-        self.postMessage({ jsVal, jsMs, wasmVal, wasmMs });
-      };
-    `;
-    const blob = new Blob([workerCode], {type: 'application/javascript'});
-    const url = URL.createObjectURL(blob);
-    const worker = new Worker(url);
+    const worker = new Worker(WORKER_URL);
     const timer = window.setTimeout(() => {
       worker.terminate();
-      URL.revokeObjectURL(url);
       reject(new Error(`Sandbox watchdog terminated execution after ${SANDBOX_TIMEOUT_MS} ms.`));
     }, SANDBOX_TIMEOUT_MS);
 
     worker.onmessage = (e) => {
       window.clearTimeout(timer);
       worker.terminate();
-      URL.revokeObjectURL(url);
-      resolve(e.data);
+      if (e.data && e.data.ok) {
+        resolve(e.data);
+      } else {
+        reject(new Error((e.data && e.data.error) || 'Worker execution failed'));
+      }
     };
     worker.onerror = (err) => {
       window.clearTimeout(timer);
       worker.terminate();
-      URL.revokeObjectURL(url);
       reject(new Error(err.message || 'Worker execution failed'));
     };
-    worker.postMessage({n, wasmBytes: FIB_WASM_BYTES});
+    worker.postMessage({task: 'fib_wasm', n, wasmBytes: FIB_WASM_BYTES});
   });
 }
 
 function runPrimeSliceWorker(start, end) {
   return new Promise((resolve, reject) => {
-    const workerCode = `
-      function isPrime(x) {
-        if (x < 2) return false;
-        if (x === 2) return true;
-        if (x % 2 === 0) return false;
-        for (let d = 3; d * d <= x; d += 2) {
-          if (x % d === 0) return false;
-        }
-        return true;
-      }
-      self.onmessage = (e) => {
-        const { start, end } = e.data;
-        let count = 0;
-        for (let x = start; x <= end; x++) {
-          if (isPrime(x)) count++;
-        }
-        self.postMessage(count);
-      };
-    `;
-    const blob = new Blob([workerCode], {type: 'application/javascript'});
-    const url = URL.createObjectURL(blob);
-    const worker = new Worker(url);
+    const worker = new Worker(WORKER_URL);
     const timer = window.setTimeout(() => {
       worker.terminate();
-      URL.revokeObjectURL(url);
       reject(new Error('Parallel worker timed out'));
     }, 10000);
 
     worker.onmessage = (e) => {
       window.clearTimeout(timer);
       worker.terminate();
-      URL.revokeObjectURL(url);
-      resolve(e.data);
+      if (e.data && e.data.ok) {
+        resolve(e.data.count);
+      } else {
+        reject(new Error((e.data && e.data.error) || 'Parallel worker failed'));
+      }
     };
     worker.onerror = (err) => {
       window.clearTimeout(timer);
       worker.terminate();
-      URL.revokeObjectURL(url);
       reject(new Error(err.message || 'Parallel worker failed'));
     };
-    worker.postMessage({start, end});
+    worker.postMessage({task: 'primes', start, end});
   });
 }
 

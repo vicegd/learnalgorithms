@@ -215,7 +215,7 @@ const config = {
       tagName: 'meta',
       attributes: {
         'http-equiv': 'Content-Security-Policy',
-        content: "default-src 'self'; script-src 'self' 'unsafe-inline' https://stats.garcia.at; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' data: https://cdn.jsdelivr.net; img-src 'self' data: https://stats.garcia.at; connect-src 'self' https://stats.garcia.at https://api.learnalgorithms.dev; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests",
+        content: "default-src 'self'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://stats.garcia.at; worker-src 'self'; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src 'self' data: https://cdn.jsdelivr.net; img-src 'self' data: https://stats.garcia.at; connect-src 'self' https://stats.garcia.at https://api.learnalgorithms.dev; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests",
       },
     },
     {
