@@ -170,7 +170,7 @@ export default function FlashcardsPage() {
   }, [allCards]);
 
   const [selectedParadigm, setSelectedParadigm] = useState('All');
-  const [reviewOnly, setReviewOnly] = useState(false);
+  const [statusFilter, setStatusFilter] = useState('all'); // 'all' | 'unseen' | 'review' | 'mastered'
   const [mastered, setMastered] = useState(() => new Set());
   const [needsReview, setNeedsReview] = useState(() => new Set());
   const [order, setOrder] = useState(() => allCards.map((c) => c.id));
@@ -199,13 +199,33 @@ export default function FlashcardsPage() {
     return map;
   }, [allCards]);
 
-  const visibleCards = useMemo(() => {
+  const paradigmCards = useMemo(() => {
     return order
       .map((id) => cardById.get(id))
       .filter(Boolean)
-      .filter((c) => selectedParadigm === 'All' || c.paradigm === selectedParadigm)
-      .filter((c) => !reviewOnly || !mastered.has(c.id));
-  }, [order, cardById, selectedParadigm, reviewOnly, mastered]);
+      .filter((c) => selectedParadigm === 'All' || c.paradigm === selectedParadigm);
+  }, [order, cardById, selectedParadigm]);
+
+  const statusCounts = useMemo(() => {
+    let mCount = 0;
+    let rCount = 0;
+    let uCount = 0;
+    for (const c of paradigmCards) {
+      if (mastered.has(c.id)) mCount += 1;
+      else if (needsReview.has(c.id)) rCount += 1;
+      else uCount += 1;
+    }
+    return {all: paradigmCards.length, unseen: uCount, review: rCount, mastered: mCount};
+  }, [paradigmCards, mastered, needsReview]);
+
+  const visibleCards = useMemo(() => {
+    if (statusFilter === 'all') return paradigmCards;
+    if (statusFilter === 'mastered') return paradigmCards.filter((c) => mastered.has(c.id));
+    if (statusFilter === 'review') {
+      return paradigmCards.filter((c) => !mastered.has(c.id) && needsReview.has(c.id));
+    }
+    return paradigmCards.filter((c) => !mastered.has(c.id) && !needsReview.has(c.id));
+  }, [paradigmCards, statusFilter, mastered, needsReview]);
 
   const safeIndex = visibleCards.length > 0 ? Math.min(index, visibleCards.length - 1) : 0;
   const currentCard = visibleCards[safeIndex] || null;
@@ -236,11 +256,11 @@ export default function FlashcardsPage() {
       }
       persistSets(nextMastered, nextReview);
       setFlipped(false);
-      if (!reviewOnly && visibleCards.length > 1) {
+      if (statusFilter === 'all' && visibleCards.length > 1) {
         setIndex((i) => (i + 1) % visibleCards.length);
       }
     },
-    [currentCard, mastered, needsReview, persistSets, reviewOnly, visibleCards.length],
+    [currentCard, mastered, needsReview, persistSets, statusFilter, visibleCards.length],
   );
 
   function handleShuffle() {
@@ -330,31 +350,55 @@ export default function FlashcardsPage() {
             ))}
           </div>
           <div className={styles.toolRow}>
-            <label className={styles.checkboxLabel}>
-              <input
-                type="checkbox"
-                checked={reviewOnly}
-                onChange={(e) => {
-                  setReviewOnly(e.target.checked);
-                  setIndex(0);
-                  setFlipped(false);
-                }}
-              />
-              Review only (hide mastered)
-            </label>
-            <button type="button" className={styles.secondaryBtn} onClick={handleShuffle}>
-              🔀 Shuffle
-            </button>
-            <button type="button" className={styles.secondaryBtn} onClick={handleResetProgress}>
-              Reset progress
-            </button>
+            <div className={styles.statusPills} role="group" aria-label="Filter by card status">
+              <button
+                type="button"
+                className={`${styles.statusPill} ${statusFilter === 'all' ? styles.statusPillActive : ''}`}
+                onClick={() => { setStatusFilter('all'); setIndex(0); setFlipped(false); }}>
+                All ({statusCounts.all})
+              </button>
+              <button
+                type="button"
+                className={`${styles.statusPill} ${statusFilter === 'unseen' ? styles.statusPillActive : ''}`}
+                onClick={() => { setStatusFilter('unseen'); setIndex(0); setFlipped(false); }}>
+                Unseen ({statusCounts.unseen})
+              </button>
+              <button
+                type="button"
+                className={`${styles.statusPill} ${styles.statusPillReview} ${statusFilter === 'review' ? styles.statusPillReviewActive : ''}`}
+                onClick={() => { setStatusFilter('review'); setIndex(0); setFlipped(false); }}>
+                ↻ Needs review ({statusCounts.review})
+              </button>
+              <button
+                type="button"
+                className={`${styles.statusPill} ${styles.statusPillMastered} ${statusFilter === 'mastered' ? styles.statusPillMasteredActive : ''}`}
+                onClick={() => { setStatusFilter('mastered'); setIndex(0); setFlipped(false); }}>
+                ✓ Mastered ({statusCounts.mastered})
+              </button>
+            </div>
+            <div className={styles.toolBtns}>
+              <button type="button" className={styles.secondaryBtn} onClick={handleShuffle}>
+                🔀 Shuffle
+              </button>
+              <button type="button" className={styles.secondaryBtn} onClick={handleResetProgress}>
+                Reset progress
+              </button>
+            </div>
           </div>
         </section>
 
         {!currentCard ? (
           <div className={styles.emptyBox} role="status">
-            <h2>All caught up! 🎉</h2>
-            <p>You have mastered every card in this filter. Switch off &ldquo;Review only&rdquo; or pick another topic.</p>
+            <h2>
+              {statusFilter === 'review'
+                ? 'No cards marked for review 🎉'
+                : statusFilter === 'unseen'
+                ? 'All cards reviewed! 🎉'
+                : statusFilter === 'mastered'
+                ? 'No mastered cards yet'
+                : 'No cards in this filter'}
+            </h2>
+            <p>Switch status filter above or pick another topic to keep studying.</p>
           </div>
         ) : (
           <>
