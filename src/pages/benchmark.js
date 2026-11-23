@@ -83,49 +83,41 @@ function waitWorkerReady(worker) {
   });
 }
 
-async function runParallelPrimeBenchmark(limit, threads, seqPct) {
-  // Pre-spawn workers and run a ping/ready handshake + short JIT warm-up before timing.
-  // Actually executes seqPct% of odd candidates sequentially on 1 worker and the remaining
-  // (100 - seqPct)% in parallel across `threads` workers so Amdahl's Law holds empirically!
-  const workers = Array.from({length: threads}, () => new Worker(WORKER_URL));
-  try {
-    await Promise.all(workers.map((w) => waitWorkerReady(w)));
-    // Short JIT warm-up on worker 0 so p=1 isn't penalized by cold compilation
-    await runPrimeWorker(workers[0], {start: 3, end: Math.min(limit, 50000), step: 2});
-
-    const t0 = performance.now();
-    let seqCount = 0;
-    if (seqPct > 0) {
-      seqCount = await runPrimeWorker(workers[0], {
-        start: 3,
-        end: limit,
-        step: 2,
-        mod: 100,
-        modMin: 0,
-        modMax: seqPct,
-      });
-    }
-    let parCounts = [];
-    if (seqPct < 100) {
-      const tasks = workers.map((w, i) =>
-        runPrimeWorker(w, {
-          start: 3 + 2 * i,
-          end: limit,
-          step: 2 * threads,
-          mod: seqPct > 0 ? 100 : 0,
-          modMin: seqPct,
-          modMax: 100,
-        }),
-      );
-      parCounts = await Promise.all(tasks);
-    }
-    const elapsedMs = performance.now() - t0;
-    const totalPrimes =
-      (limit >= 2 ? 1 : 0) + seqCount + parCounts.reduce((a, b) => a + b, 0);
-    return {threads, elapsedMs, totalPrimes};
-  } finally {
-    for (const w of workers) w.terminate();
+async function runParallelPrimeBenchmark(pool, limit, threads, seqPct) {
+  // Reuse the pre-warmed worker pool so p=1 and p=N run on identically warm V8 isolates.
+  // Executes seqPct% of odd candidates sequentially on worker 0 and the remaining (100 - seqPct)%
+  // in parallel across `threads` workers so Amdahl's Law holds empirically.
+  const active = pool.slice(0, threads);
+  const t0 = performance.now();
+  let seqCount = 0;
+  if (seqPct > 0) {
+    seqCount = await runPrimeWorker(active[0], {
+      start: 3,
+      end: limit,
+      step: 2,
+      mod: 100,
+      modMin: 0,
+      modMax: seqPct,
+    });
   }
+  let parCounts = [];
+  if (seqPct < 100) {
+    const tasks = active.map((w, i) =>
+      runPrimeWorker(w, {
+        start: 3 + 2 * i,
+        end: limit,
+        step: 2 * threads,
+        mod: seqPct > 0 ? 100 : 0,
+        modMin: seqPct,
+        modMax: 100,
+      }),
+    );
+    parCounts = await Promise.all(tasks);
+  }
+  const elapsedMs = performance.now() - t0;
+  const totalPrimes =
+    (limit >= 2 ? 1 : 0) + seqCount + parCounts.reduce((a, b) => a + b, 0);
+  return {threads, elapsedMs, totalPrimes};
 }
 
 export default function BenchmarkPage() {
@@ -175,11 +167,18 @@ export default function BenchmarkPage() {
     setHpcRunning(true);
     setHpcError('');
     setHpcRows([]);
+    const maxThreads = threadCounts[threadCounts.length - 1] || 1;
+    const pool = Array.from({length: maxThreads}, () => new Worker(WORKER_URL));
     try {
+      await Promise.all(pool.map((w) => waitWorkerReady(w)));
+      // Warm up JIT across all workers in the pool before measuring p=1..N
+      await Promise.all(
+        pool.map((w) => runPrimeWorker(w, {start: 3, end: 100000, step: 2})),
+      );
       const out = [];
       let baseMs = null;
       for (const p of threadCounts) {
-        const res = await runParallelPrimeBenchmark(primeLimit, p, seqFraction);
+        const res = await runParallelPrimeBenchmark(pool, primeLimit, p, seqFraction);
         if (baseMs === null) baseMs = res.elapsedMs;
         const speedup = baseMs / res.elapsedMs;
         const efficiency = (speedup / p) * 100;
@@ -193,6 +192,7 @@ export default function BenchmarkPage() {
     } catch (err) {
       setHpcError(err.message);
     } finally {
+      for (const w of pool) w.terminate();
       setHpcRunning(false);
     }
   }
