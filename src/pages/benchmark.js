@@ -1,0 +1,361 @@
+import React, {useEffect, useMemo, useState} from 'react';
+import Link from '@docusaurus/Link';
+import Layout from '@theme/Layout';
+import styles from './benchmark.module.css';
+
+// Hand-encoded 60-byte WebAssembly binary exporting: fib(n: i32) -> i32
+const FIB_WASM_BYTES = [
+  0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00,
+  0x01, 0x06, 0x01, 0x60, 0x01, 0x7f, 0x01, 0x7f,
+  0x03, 0x02, 0x01, 0x00,
+  0x07, 0x07, 0x01, 0x03, 0x66, 0x69, 0x62, 0x00, 0x00,
+  0x0a, 0x1e, 0x01, 0x1c, 0x00,
+  0x20, 0x00, 0x41, 0x02, 0x48, 0x04, 0x7f,
+  0x20, 0x00, 0x05,
+  0x20, 0x00, 0x41, 0x01, 0x6b, 0x10, 0x00,
+  0x20, 0x00, 0x41, 0x02, 0x6b, 0x10, 0x00,
+  0x6a, 0x0b, 0x0b,
+];
+
+const SANDBOX_TIMEOUT_MS = 5000;
+
+function runWasmSandboxWorker(n) {
+  return new Promise((resolve, reject) => {
+    const workerCode = `
+      function fibJs(k) {
+        if (k < 2) return k;
+        return fibJs(k - 1) + fibJs(k - 2);
+      }
+      self.onmessage = async (e) => {
+        const { n, wasmBytes } = e.data;
+        const t0 = performance.now();
+        const jsVal = fibJs(n);
+        const jsMs = performance.now() - t0;
+
+        const { instance } = await WebAssembly.instantiate(new Uint8Array(wasmBytes));
+        const t1 = performance.now();
+        const wasmVal = instance.exports.fib(n);
+        const wasmMs = performance.now() - t1;
+
+        self.postMessage({ jsVal, jsMs, wasmVal, wasmMs });
+      };
+    `;
+    const blob = new Blob([workerCode], {type: 'application/javascript'});
+    const url = URL.createObjectURL(blob);
+    const worker = new Worker(url);
+    const timer = window.setTimeout(() => {
+      worker.terminate();
+      URL.revokeObjectURL(url);
+      reject(new Error(`Sandbox watchdog terminated execution after ${SANDBOX_TIMEOUT_MS} ms.`));
+    }, SANDBOX_TIMEOUT_MS);
+
+    worker.onmessage = (e) => {
+      window.clearTimeout(timer);
+      worker.terminate();
+      URL.revokeObjectURL(url);
+      resolve(e.data);
+    };
+    worker.onerror = (err) => {
+      window.clearTimeout(timer);
+      worker.terminate();
+      URL.revokeObjectURL(url);
+      reject(new Error(err.message || 'Worker execution failed'));
+    };
+    worker.postMessage({n, wasmBytes: FIB_WASM_BYTES});
+  });
+}
+
+function runPrimeSliceWorker(start, end) {
+  return new Promise((resolve, reject) => {
+    const workerCode = `
+      function isPrime(x) {
+        if (x < 2) return false;
+        if (x === 2) return true;
+        if (x % 2 === 0) return false;
+        for (let d = 3; d * d <= x; d += 2) {
+          if (x % d === 0) return false;
+        }
+        return true;
+      }
+      self.onmessage = (e) => {
+        const { start, end } = e.data;
+        let count = 0;
+        for (let x = start; x <= end; x++) {
+          if (isPrime(x)) count++;
+        }
+        self.postMessage(count);
+      };
+    `;
+    const blob = new Blob([workerCode], {type: 'application/javascript'});
+    const url = URL.createObjectURL(blob);
+    const worker = new Worker(url);
+    const timer = window.setTimeout(() => {
+      worker.terminate();
+      URL.revokeObjectURL(url);
+      reject(new Error('Parallel worker timed out'));
+    }, 10000);
+
+    worker.onmessage = (e) => {
+      window.clearTimeout(timer);
+      worker.terminate();
+      URL.revokeObjectURL(url);
+      resolve(e.data);
+    };
+    worker.onerror = (err) => {
+      window.clearTimeout(timer);
+      worker.terminate();
+      URL.revokeObjectURL(url);
+      reject(new Error(err.message || 'Parallel worker failed'));
+    };
+    worker.postMessage({start, end});
+  });
+}
+
+async function runParallelPrimeBenchmark(limit, threads) {
+  const t0 = performance.now();
+  const chunk = Math.ceil((limit - 1) / threads);
+  const tasks = [];
+  for (let i = 0; i < threads; i += 1) {
+    const start = 2 + i * chunk;
+    const end = Math.min(limit, start + chunk - 1);
+    if (start <= end) tasks.push(runPrimeSliceWorker(start, end));
+  }
+  const counts = await Promise.all(tasks);
+  const elapsedMs = performance.now() - t0;
+  const totalPrimes = counts.reduce((a, b) => a + b, 0);
+  return {threads, elapsedMs, totalPrimes};
+}
+
+export default function BenchmarkPage() {
+  const [fibN, setFibN] = useState(38);
+  const [wasmRunning, setWasmRunning] = useState(false);
+  const [wasmResult, setWasmResult] = useState(null);
+  const [wasmError, setWasmError] = useState('');
+
+  const [cores, setCores] = useState(4);
+  const [primeLimit, setPrimeLimit] = useState(600000);
+  const [seqFraction, setSeqFraction] = useState(10); // % sequential for Amdahl's Law
+  const [hpcRunning, setHpcRunning] = useState(false);
+  const [hpcRows, setHpcRows] = useState([]);
+  const [hpcError, setHpcError] = useState('');
+
+  useEffect(() => {
+    if (typeof navigator !== 'undefined' && navigator.hardwareConcurrency) {
+      setCores(Math.max(2, Math.min(16, navigator.hardwareConcurrency)));
+    }
+  }, []);
+
+  const threadCounts = useMemo(() => {
+    const list = [1];
+    let p = 2;
+    while (p < cores) {
+      list.push(p);
+      p *= 2;
+    }
+    if (cores > 1 && !list.includes(cores)) list.push(cores);
+    return list;
+  }, [cores]);
+
+  async function handleRunWasm() {
+    setWasmRunning(true);
+    setWasmError('');
+    try {
+      const res = await runWasmSandboxWorker(fibN);
+      setWasmResult({...res, n: fibN});
+    } catch (err) {
+      setWasmError(err.message);
+    } finally {
+      setWasmRunning(false);
+    }
+  }
+
+  async function handleRunHpc() {
+    setHpcRunning(true);
+    setHpcError('');
+    setHpcRows([]);
+    try {
+      const out = [];
+      let baseMs = null;
+      for (const p of threadCounts) {
+        const res = await runParallelPrimeBenchmark(primeLimit, p);
+        if (baseMs === null) baseMs = res.elapsedMs;
+        const speedup = baseMs / res.elapsedMs;
+        const efficiency = (speedup / p) * 100;
+        out.push({
+          ...res,
+          speedup,
+          efficiency,
+        });
+        setHpcRows([...out]);
+      }
+    } catch (err) {
+      setHpcError(err.message);
+    } finally {
+      setHpcRunning(false);
+    }
+  }
+
+  const s = seqFraction / 100;
+
+  return (
+    <Layout
+      title="Sandbox & Parallel Benchmark (WASM · HPC)"
+      description="Run isolated WebAssembly vs. JavaScript benchmarks and multi-core parallel speedup tests directly in your browser.">
+      <main className={styles.main}>
+        <p className={styles.eyebrow}>Browser Sandbox · WebAssembly · Multi-Core HPC</p>
+        <h1 className={styles.title}>Algorithm Benchmark Lab</h1>
+        <p className={styles.intro}>
+          Measure real execution times right inside your browser using isolated{' '}
+          <strong>Web Workers</strong> (no server load, 5-second watchdog timeout) and compare{' '}
+          <strong>JavaScript vs. WebAssembly</strong> and <strong>multi-core speedup vs. Amdahl’s Law</strong>.
+        </p>
+
+        {/* ── Lab 1: Sandbox JS vs WebAssembly ───────────────────────────── */}
+        <section className={styles.card}>
+          <div className={styles.cardHeader}>
+            <div>
+              <h2 className={styles.cardTitle}>1. Isolated Sandbox: JavaScript vs. WebAssembly (WASM)</h2>
+              <p className={styles.cardHint}>
+                Executes recursive <code>fib(n)</code> (exponential <code>O(φ<sup>n</sup>)</code> workload) inside an isolated Blob Web Worker with a 5s watchdog, comparing JS against an embedded 60-byte <code>.wasm</code> binary.{' '}
+                <Link to="/concepts/principles-of-algorithmics/measuring-efficiency">Chapter 1 →</Link>
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.controls}>
+            <label className={styles.label}>
+              Input <code>n</code>: <strong>{fibN}</strong>
+              <input
+                type="range"
+                min={28}
+                max={41}
+                value={fibN}
+                onChange={(e) => setFibN(Number(e.target.value))}
+                className={styles.slider}
+              />
+            </label>
+            <button
+              type="button"
+              className={styles.primaryBtn}
+              disabled={wasmRunning}
+              onClick={handleRunWasm}>
+              {wasmRunning ? 'Running in sandbox…' : '▶ Run JS vs. WASM'}
+            </button>
+          </div>
+
+          {wasmError && <p className={styles.error} role="alert">{wasmError}</p>}
+
+          {wasmResult && (
+            <div className={styles.metricsGrid}>
+              <div className={styles.metricBox}>
+                <span className={styles.metricLabel}>Result fib({wasmResult.n})</span>
+                <span className={styles.metricVal}>{wasmResult.wasmVal.toLocaleString()}</span>
+                <span className={styles.metricSub}>
+                  Verified identical: {wasmResult.jsVal === wasmResult.wasmVal ? '✓ Yes' : '✗ Mismatch'}
+                </span>
+              </div>
+              <div className={styles.metricBox}>
+                <span className={styles.metricLabel}>JavaScript (Worker)</span>
+                <span className={styles.metricVal}>{wasmResult.jsMs.toFixed(1)} ms</span>
+                <span className={styles.metricSub}>JIT-compiled V8 / SpiderMonkey</span>
+              </div>
+              <div className={styles.metricBox}>
+                <span className={styles.metricLabel}>WebAssembly (.wasm)</span>
+                <span className={styles.metricVal}>{wasmResult.wasmMs.toFixed(1)} ms</span>
+                <span className={styles.metricSub}>Native 32-bit integer bytecode</span>
+              </div>
+              <div className={styles.metricBox}>
+                <span className={styles.metricLabel}>WASM Speedup</span>
+                <span className={styles.metricVal}>
+                  {(wasmResult.jsMs / Math.max(0.01, wasmResult.wasmMs)).toFixed(2)}×
+                </span>
+                <span className={styles.metricSub}>Higher = faster WebAssembly</span>
+              </div>
+            </div>
+          )}
+        </section>
+
+        {/* ── Lab 2: Parallel Computing (HPC & Amdahl's Law) ─────────────── */}
+        <section className={styles.card}>
+          <div className={styles.cardHeader}>
+            <div>
+              <h2 className={styles.cardTitle}>2. Multi-Core Parallelism (HPC) vs. Amdahl’s Law</h2>
+              <p className={styles.cardHint}>
+                Counts prime numbers up to <code>N</code> in parallel across <code>1..{cores}</code> concurrent Web Workers (detected <strong>{cores}</strong> logical CPU cores on this device) and compares empirical speedup <code>S(p)</code> and efficiency <code>E(p)</code> with Amdahl’s Law.{' '}
+                <Link to="/concepts/parallel-algorithms/parallel-performance">Chapter 9 →</Link>
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.controls}>
+            <label className={styles.label}>
+              Upper bound <code>N</code>: <strong>{primeLimit.toLocaleString()}</strong>
+              <input
+                type="range"
+                min={200000}
+                max={1500000}
+                step={100000}
+                value={primeLimit}
+                onChange={(e) => setPrimeLimit(Number(e.target.value))}
+                className={styles.slider}
+              />
+            </label>
+            <label className={styles.label}>
+              Amdahl sequential fraction <code>s</code>: <strong>{seqFraction}%</strong> (max speedup: {seqFraction === 0 ? '∞' : `${(1 / s).toFixed(1)}×`})
+              <input
+                type="range"
+                min={0}
+                max={50}
+                step={5}
+                value={seqFraction}
+                onChange={(e) => setSeqFraction(Number(e.target.value))}
+                className={styles.slider}
+              />
+            </label>
+            <button
+              type="button"
+              className={styles.primaryBtn}
+              disabled={hpcRunning}
+              onClick={handleRunHpc}>
+              {hpcRunning ? 'Benchmarking cores…' : `▶ Run Parallel Benchmark (1..${cores} workers)`}
+            </button>
+          </div>
+
+          {hpcError && <p className={styles.error} role="alert">{hpcError}</p>}
+
+          {hpcRows.length > 0 && (
+            <div className={styles.tableWrap}>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th scope="col">Workers (p)</th>
+                    <th scope="col">Primes Found</th>
+                    <th scope="col">Wall Time (ms)</th>
+                    <th scope="col">Measured Speedup S(p)</th>
+                    <th scope="col">Efficiency E(p)</th>
+                    <th scope="col">Amdahl Theoretical (s={seqFraction}%)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {hpcRows.map((row) => {
+                    const amdahl = 1 / (s + (1 - s) / row.threads);
+                    return (
+                      <tr key={row.threads}>
+                        <td><strong>{row.threads}</strong></td>
+                        <td className={styles.mono}>{row.totalPrimes.toLocaleString()}</td>
+                        <td className={styles.mono}>{row.elapsedMs.toFixed(1)} ms</td>
+                        <td className={styles.mono}><strong>{row.speedup.toFixed(2)}×</strong></td>
+                        <td className={styles.mono}>{row.efficiency.toFixed(1)}%</td>
+                        <td className={styles.mono}>{amdahl.toFixed(2)}×</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
+      </main>
+    </Layout>
+  );
+}
