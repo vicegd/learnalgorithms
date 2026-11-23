@@ -80,9 +80,10 @@ class ApiTest(unittest.TestCase):
     def test_vote_once_per_day(self):
         self.assertEqual(self.vote(ip="2.2.2.2")[0], 201)
         self.assertEqual(self.vote(ip="2.2.2.2")[0], 200)  # already voted same value without comment
-        # Attaching an optional comment after voting succeeds once without duplicating the vote
+        # Attaching or updating an optional comment after voting succeeds without duplicating the vote
         self.assertEqual(self.vote(ip="2.2.2.2", comment="Very clear explanation!")[0], 201)
-        self.assertEqual(self.vote(ip="2.2.2.2", comment="Second comment rejected")[0], 200)
+        self.assertEqual(self.vote(ip="2.2.2.2", comment="Very clear explanation!")[0], 200)  # identical comment
+        self.assertEqual(self.vote(ip="2.2.2.2", comment="Updated comment text")[0], 201)
         # Changing mind (Yes -> No) updates the existing row without duplicating it
         self.assertEqual(self.vote(ip="2.2.2.2", helpful=False)[0], 201)
         status, data, _ = self.req("GET", "/feedback/summary?page=/concepts/sorting/quicksort")
