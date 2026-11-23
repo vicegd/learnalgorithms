@@ -92,7 +92,7 @@ POPULAR_TTL = 900               # seconds the Matomo answer is cached
 
 PAGE_RE = re.compile(r"^/concepts(/[a-z0-9][a-z0-9-]{0,80}){1,3}/?$")
 TELEMETRY_PAGE_RE = re.compile(
-    r"^/(?:(?:concepts|algorithms)(?:/[a-z0-9][a-z0-9-]{0,80}){0,3}|cheat-sheet|knowledge-graph|survey|stats)?/?$"
+    r"^/(?:(?:concepts|algorithms)(?:/[a-z0-9][a-z0-9-]{0,80}){0,3}|cheat-sheet|knowledge-graph|flashcards|survey|stats)?/?$"
 )
 ALLOWED_EVENT_TYPES = frozenset({
     "page_view",
@@ -166,6 +166,16 @@ CREATE TABLE IF NOT EXISTS course_survey (
     UNIQUE (day, voter)
 );
 CREATE INDEX IF NOT EXISTS survey_day ON course_survey (day);
+CREATE TABLE IF NOT EXISTS ai_reports (
+    id         INTEGER PRIMARY KEY,
+    created_at TEXT    NOT NULL,
+    days       INTEGER NOT NULL,
+    lang       TEXT    NOT NULL,
+    detail     TEXT    NOT NULL,
+    model      TEXT    NOT NULL,
+    analysis   TEXT    NOT NULL
+);
+CREATE INDEX IF NOT EXISTS ai_reports_created ON ai_reports (created_at);
 """
 
 
@@ -294,6 +304,43 @@ class Store:
                 for d, cl, us, tl, ov, cm in entries
             ],
         }
+
+    def add_ai_report(self, days, lang, detail, model, analysis):
+        created_at = dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")
+        with self.lock:
+            cur = self.db.execute(
+                """INSERT INTO ai_reports (created_at, days, lang, detail, model, analysis)
+                   VALUES (?, ?, ?, ?, ?, ?)""",
+                (created_at, int(days), lang, detail, model, analysis),
+            )
+            self.db.commit()
+            return cur.lastrowid, created_at
+
+    def list_ai_reports(self, limit=25):
+        with self.lock:
+            rows = self.db.execute(
+                """SELECT id, created_at, days, lang, detail, model, analysis
+                   FROM ai_reports ORDER BY id DESC LIMIT ?""",
+                (limit,),
+            ).fetchall()
+        return [
+            {
+                "id": r[0],
+                "createdAt": r[1],
+                "days": r[2],
+                "lang": r[3],
+                "detail": r[4],
+                "model": r[5],
+                "analysis": r[6],
+            }
+            for r in rows
+        ]
+
+    def delete_ai_report(self, report_id):
+        with self.lock:
+            cur = self.db.execute("DELETE FROM ai_reports WHERE id = ?", (int(report_id),))
+            self.db.commit()
+            return cur.rowcount > 0
 
     def add_issue_event(self, delivery, action, number, title, url):
         with self.lock:
@@ -963,7 +1010,7 @@ def make_handler(app):
             if self.headers.get("Origin") != ALLOWED_ORIGIN:
                 return self.send_json(403, {"error": "origin not allowed"})
             self.send_json(204, None, {
-                "Access-Control-Allow-Methods": "GET, POST",
+                "Access-Control-Allow-Methods": "GET, POST, DELETE",
                 "Access-Control-Allow-Headers": "Content-Type, Authorization",
                 "Access-Control-Max-Age": "86400",
             })
@@ -1087,6 +1134,20 @@ def make_handler(app):
                     {"report": report, "markdown": markdown},
                     {"Cache-Control": "no-store"},
                 )
+            if url.path == "/admin/report/history":
+                auth = self.headers.get("Authorization", "")
+                if not ADMIN_TOKEN or not hmac.compare_digest(auth, "Bearer " + ADMIN_TOKEN):
+                    return self.send_json(401, {"error": "unauthorized"}, {"WWW-Authenticate": "Bearer"})
+                qs = urllib.parse.parse_qs(url.query)
+                try:
+                    limit = max(1, min(100, int(qs.get("limit", ["25"])[0])))
+                except ValueError:
+                    return self.send_json(400, {"error": "invalid limit"})
+                return self.send_json(
+                    200,
+                    {"reports": app.store.list_ai_reports(limit=limit)},
+                    {"Cache-Control": "no-store"},
+                )
             if url.path == "/admin/metrics":
                 auth = self.headers.get("Authorization", "")
                 if not ADMIN_TOKEN or not hmac.compare_digest(auth, "Bearer " + ADMIN_TOKEN):
@@ -1106,6 +1167,19 @@ def make_handler(app):
                     self.wfile.write(body)
                 return
             self.send_json(404, {"error": "not found"})
+
+        def do_DELETE(self):
+            url = urllib.parse.urlparse(self.path)
+            m = re.match(r"^/admin/report/history/(\d+)$", url.path)
+            if not m:
+                return self.send_json(404, {"error": "not found"})
+            auth = self.headers.get("Authorization", "")
+            if not ADMIN_TOKEN or not hmac.compare_digest(auth, "Bearer " + ADMIN_TOKEN):
+                return self.send_json(401, {"error": "unauthorized"}, {"WWW-Authenticate": "Bearer"})
+            deleted = app.store.delete_ai_report(int(m.group(1)))
+            if not deleted:
+                return self.send_json(404, {"error": "not found"})
+            return self.send_json(200, {"status": "deleted", "id": int(m.group(1))}, {"Cache-Control": "no-store"})
 
         def do_POST(self):
             path = urllib.parse.urlparse(self.path).path
@@ -1197,9 +1271,18 @@ def make_handler(app):
             except Exception as e:
                 log.exception("llm interpret failed")
                 return self.send_json(502, {"error": f"LLM request failed: {e}"}, {"Cache-Control": "no-store"})
+            report_id, created_at = app.store.add_ai_report(
+                days=days,
+                lang=lang,
+                detail=detail,
+                model=result["model"],
+                analysis=result["analysis"],
+            )
             return self.send_json(
                 200,
                 {
+                    "id": report_id,
+                    "createdAt": created_at,
                     "analysis": result["analysis"],
                     "model": result["model"],
                     "lang": lang,

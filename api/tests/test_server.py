@@ -316,6 +316,23 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(ai_res["lang"], "es")
         self.assertEqual(ai_res["detail"], "detailed")
         self.assertIn("[es/detailed] Summary of", ai_res["analysis"])
+        self.assertIsInstance(ai_res["id"], int)
+        self.assertIn("createdAt", ai_res)
+
+        # Persisted AI report history (GET & DELETE)
+        s, _, _ = self.req("GET", "/admin/report/history")
+        self.assertEqual(s, 401)
+        s, hist_json, _ = self.req("GET", "/admin/report/history", headers={"Authorization": "Bearer admintoken"})
+        self.assertEqual(s, 200)
+        self.assertEqual(len(hist_json["reports"]), 1)
+        self.assertEqual(hist_json["reports"][0]["id"], ai_res["id"])
+        s, del_json, _ = self.req(
+            "DELETE", f"/admin/report/history/{ai_res['id']}", headers={"Authorization": "Bearer admintoken"}
+        )
+        self.assertEqual(s, 200)
+        self.assertEqual(del_json["status"], "deleted")
+        s, hist_after, _ = self.req("GET", "/admin/report/history", headers={"Authorization": "Bearer admintoken"})
+        self.assertEqual(len(hist_after["reports"]), 0)
 
         # OWASP LLM guardrail: PII redaction & prompt-injection neutralization
         sanitized = server.sanitize_for_llm(
