@@ -1023,7 +1023,7 @@ export default function AdminDashboardPage() {
               </div>
               {metricsUpdatedAt && (
                 <p className={styles.sectionHint}>
-                  Computed live on every request (no server cache).{' '}
+                  Computed live on every request (independent of the top time selector: totals are all-time, Web Vitals p95 cover a fixed rolling 30-day window).{' '}
                   <strong>Last scrape:</strong> {metricsUpdatedAt.toLocaleString()}
                   {metricsAutoRefresh && (
                     <>
