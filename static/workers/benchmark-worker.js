@@ -18,6 +18,11 @@ function isPrime(x) {
 self.onmessage = async (e) => {
   const data = e.data || {};
   try {
+    if (data.task === 'ping') {
+      self.postMessage({ok: true, ready: true});
+      return;
+    }
+
     if (data.task === 'fib_wasm') {
       const {n, wasmBytes} = data;
       const t0 = performance.now();

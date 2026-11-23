@@ -18,7 +18,7 @@ const FIB_WASM_BYTES = [
 ];
 
 const SANDBOX_TIMEOUT_MS = 30000;
-const WORKER_URL = '/workers/benchmark-worker.js?v=3';
+const WORKER_URL = '/workers/benchmark-worker.js?v=4';
 
 function runWasmSandboxWorker(n) {
   return new Promise((resolve, reject) => {
@@ -68,11 +68,27 @@ function runPrimeWorker(worker, start, end, step) {
   });
 }
 
+function waitWorkerReady(worker) {
+  return new Promise((resolve, reject) => {
+    const timer = window.setTimeout(() => reject(new Error('Worker failed to initialize')), 10000);
+    worker.onmessage = () => {
+      window.clearTimeout(timer);
+      resolve();
+    };
+    worker.onerror = (err) => {
+      window.clearTimeout(timer);
+      reject(new Error(err.message || 'Worker failed to initialize'));
+    };
+    worker.postMessage({task: 'ping'});
+  });
+}
+
 async function runParallelPrimeBenchmark(limit, threads) {
-  // Pre-spawn workers and distribute ONLY odd candidates cyclically (start = 3 + 2*i, step = 2*threads)
-  // so no worker wastes a core on trivial even numbers, achieving near-perfect load balance.
+  // Pre-spawn workers and wait for ping/ready handshake so V8 isolate boot time is excluded
+  // from the parallel compute measurement; distribute odd candidates cyclically for load balance.
   const workers = Array.from({length: threads}, () => new Worker(WORKER_URL));
   try {
+    await Promise.all(workers.map((w) => waitWorkerReady(w)));
     const t0 = performance.now();
     const tasks = workers.map((w, i) => runPrimeWorker(w, 3 + 2 * i, limit, 2 * threads));
     const counts = await Promise.all(tasks);
