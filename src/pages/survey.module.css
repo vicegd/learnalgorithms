@@ -88,13 +88,17 @@
   color: var(--ifm-color-primary);
 }
 
-.scoreBtnActive {
+.scoreBtn.scoreBtnActive,
+.scoreBtn[aria-checked='true'] {
   background: var(--ifm-color-primary);
   border-color: var(--ifm-color-primary);
   color: #ffffff;
 }
 
-.scoreBtnActive:hover {
+.scoreBtn.scoreBtnActive:hover,
+.scoreBtn[aria-checked='true']:hover {
+  background: var(--ifm-color-primary-dark);
+  border-color: var(--ifm-color-primary-dark);
   color: #ffffff;
 }
 
