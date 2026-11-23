@@ -101,6 +101,7 @@ export default function AdminDashboardPage() {
   const [eventsPage, setEventsPage] = useState(0);
   const [etlReport, setEtlReport] = useState(null);
   const [etlMarkdown, setEtlMarkdown] = useState('');
+  const [reportUpdatedAt, setReportUpdatedAt] = useState(null);
   const [reportCopied, setReportCopied] = useState(false);
   const [aiLang, setAiLang] = useState('en');
   const [aiLoadingMode, setAiLoadingMode] = useState(null);
@@ -223,6 +224,7 @@ export default function AdminDashboardPage() {
       setEvents(eventsJson.events || []);
       setEtlReport(reportJson?.report || null);
       setEtlMarkdown(reportJson?.markdown || '');
+      if (reportJson?.report) setReportUpdatedAt(new Date());
       setMetricsText(promText);
       if (promText) setMetricsUpdatedAt(new Date());
       setEventsTotal(
@@ -291,6 +293,7 @@ export default function AdminDashboardPage() {
     setEvents([]);
     setEtlReport(null);
     setEtlMarkdown('');
+    setReportUpdatedAt(null);
     setAiAnalysis(null);
     setAiError('');
     setMetricsText('');
@@ -898,6 +901,14 @@ export default function AdminDashboardPage() {
                   </div>
                 )}
               </div>
+              {reportUpdatedAt && (
+                <p className={styles.sectionHint}>
+                  Computed live on every load / refresh (no server cache).{' '}
+                  <strong>Window:</strong> {days === 0 ? 'All time' : `Last ${days} days`}
+                  {' · '}
+                  <strong>Last generated:</strong> {reportUpdatedAt.toLocaleString()}
+                </p>
+              )}
               {!etlReport ? (
                 <p className={styles.empty}>
                   ETL report endpoint (<code>GET /admin/report</code>) not available yet on the API server. Rebuild the API container on the VPS to enable it.
