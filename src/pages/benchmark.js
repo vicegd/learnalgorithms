@@ -34,7 +34,7 @@ const FIB_ITER_WASM_BYTES = [
 ];
 
 const SANDBOX_TIMEOUT_MS = 30000;
-const WORKER_URL = '/workers/benchmark-worker.js';
+const WORKER_URL = '/workers/benchmark-worker.js?v=2';
 
 function runWasmSandboxWorker(mode, n) {
   return new Promise((resolve, reject) => {
@@ -198,7 +198,7 @@ export default function BenchmarkPage() {
             <div>
               <h2 className={styles.cardTitle}>1. Isolated Sandbox: JavaScript vs. WebAssembly (WASM)</h2>
               <p className={styles.cardHint}>
-                Compare JavaScript against embedded <code>.wasm</code> binaries inside an isolated same-origin Web Worker with a 30 s watchdog. Switch between <strong>Naive Recursive <code>O(φ<sup>n</sup>)</code></strong> (up to <code>n = 46</code>) and <strong>Iterative DP <code>O(n)</code></strong> (up to <code>n = 100,000,000</code>, mod <code>10<sup>9</sup>+7</code>) to see both language speedup and algorithmic complexity in action.{' '}
+                Compare JavaScript against embedded <code>.wasm</code> binaries inside an isolated same-origin Web Worker with a 30 s watchdog. Switch between <strong>Naive Recursive <code>O(φ<sup>n</sup>)</code></strong> (up to <code>n = 46</code>) and <strong>Iterative DP <code>O(n)</code></strong> (up to <code>n = 100,000,000</code>, modulo <code>1,000,000,007</code> to avoid integer overflow) to see both language speedup and algorithmic complexity in action.{' '}
                 <Link to="/concepts/principles-of-algorithmics/measuring-efficiency">Chapter 1 →</Link>
               </p>
             </div>
@@ -234,7 +234,7 @@ export default function BenchmarkPage() {
               </label>
             ) : (
               <label className={styles.label}>
-                Input <code>n</code>: <strong>{fibIterN.toLocaleString()}</strong> (<code>fib(n) mod 10<sup>9</sup>+7</code>)
+                Input <code>n</code>: <strong>{fibIterN.toLocaleString()}</strong> (remainder mod <code>1,000,000,007</code>)
                 <input
                   type="range"
                   min={1000000}
@@ -262,7 +262,7 @@ export default function BenchmarkPage() {
               <div className={styles.metricBox}>
                 <span className={styles.metricLabel}>
                   {wasmResult.mode === 'iterative'
-                    ? `fib(${wasmResult.n.toLocaleString()}) mod 10⁹+7`
+                    ? `fib(${wasmResult.n.toLocaleString()}) mod 1,000,000,007`
                     : `Result fib(${wasmResult.n})`}
                 </span>
                 <span className={styles.metricVal}>{wasmResult.wasmVal.toLocaleString()}</span>
@@ -296,7 +296,10 @@ export default function BenchmarkPage() {
             <summary>What do these concepts mean? (O(φⁿ) vs O(n), Web Worker sandbox, Watchdog, WASM)</summary>
             <ul className={styles.explainerList}>
               <li>
-                <strong><code>O(φ<sup>n</sup>)</code> vs. <code>O(n)</code>:</strong> <code>φ = (1 + √5) / 2 ≈ 1.618</code> is the <em>golden ratio</em>. Naive recursive Fibonacci multiplies work by ~1.618× per step (so <code>n = 46</code> takes billions of calls), whereas Iterative DP runs in linear <code>O(n)</code> time and computes <code>n = 50,000,000</code> in a fraction of a second (using <code>mod 10<sup>9</sup>+7</code> to stay inside 32-bit integers).
+                <strong><code>O(φ<sup>n</sup>)</code> vs. <code>O(n)</code>:</strong> <code>φ = (1 + √5) / 2 ≈ 1.618</code> is the <em>golden ratio</em>. Naive recursive Fibonacci multiplies work by ~1.618× per step (so <code>n = 46</code> takes billions of calls), whereas Iterative DP runs in linear <code>O(n)</code> time and computes <code>n = 50,000,000</code> in a fraction of a second.
+              </li>
+              <li>
+                <strong>Why <code>mod 1,000,000,007</code> (remainder modulo 10<sup>9</sup> + 7)?</strong> <code>fib(50,000,000)</code> has over 10 million digits and would overflow any 32-bit or 64-bit CPU integer. Taking the remainder modulo the large prime <code>1,000,000,007</code> at each step (standard practice in algorithm benchmarks and competitive programming) keeps every intermediate sum inside a 32-bit integer without losing the exact number of iterations.
               </li>
               <li>
                 <strong>Isolated Web Worker (sandbox):</strong> a separate background thread loaded from a static same-origin script (<code>/workers/benchmark-worker.js</code>) with <em>no access to the DOM, cookies, or localStorage</em>, keeping the interface responsive while heavy computations run.
