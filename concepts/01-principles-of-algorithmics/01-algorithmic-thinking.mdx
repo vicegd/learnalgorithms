@@ -300,7 +300,7 @@ This version is also **iterative**. The recursive versions need one stack frame 
 
   **Question:** Suppose we run the naive version in a language with *tail call optimization* (TCO), where certain recursive calls reuse the current stack frame instead of allocating a new one. Would TCO make the naive implementation correct for negative inputs?
 
-  **Answer:** No. TCO might prevent the `StackOverflowError`, but it does not fix the logical problem: the control flow still never reaches a base case. The program would loop forever, consuming CPU time without producing an output. Finiteness is still violated, regardless of how the runtime manages the stack. (Incidentally, `n * factorial(n - 1)` is not even a tail call, because the multiplication happens *after* the recursive call returns.)
+  **Answer:** No. TCO might prevent the `StackOverflowError`, but it does not fix the logical problem: the control flow still never reaches a base case. The program would loop forever, consuming CPU time without producing an output. Finiteness is still violated, regardless of how the runtime manages the stack.
 
 </details>
 
@@ -424,6 +424,7 @@ Aho, Hopcroft and Ullman, in their classic *The Design and Analysis of Computer 
 
 Algorithms are no longer confined to textbooks and servers: they make decisions that affect people's lives every day. A quick look at news headlines from recent years shows the variety:
 
+- **Generative AI and Large Language Models (LLMs).** Modern chatbots, coding assistants and conversational search tools rely on algorithms at every layer: subword tokenization, attention and matrix multiplication over massive tensors, key-value caching, and decoding strategies that choose each output token in milliseconds. Here, algorithmic complexity directly determines response time, GPU memory and energy consumption.
 - **Recommendation and entertainment.** In 2009, Netflix awarded a one-million-dollar prize to a team of researchers (*BellKor's Pragmatic Chaos*) for improving the accuracy of its movie recommendation algorithm. Streaming platforms also use algorithms to estimate how much a piece of content is worth.
 - **Science and health.** Algorithms compete to predict the structure of proteins (a field in which DeepMind's AlphaFold achieved a historic breakthrough) and to help design personalised cancer vaccines.
 - **Safety-critical systems.** Aircraft, drones and medical devices are controlled by algorithms. News reports have attributed crashes of military drones to poor software design, a reminder that an algorithmic error can destroy expensive equipment or put lives at risk.
