@@ -494,6 +494,10 @@ export default function AdminDashboardPage() {
                   <option value={7}>Last 7 days</option>
                   <option value={30}>Last 30 days</option>
                   <option value={90}>Last 90 days</option>
+                  <option value={120}>Last 120 days</option>
+                  <option value={150}>Last 150 days</option>
+                  <option value={180}>Last 180 days</option>
+                  <option value={210}>Last 210 days</option>
                   <option value={365}>Last 365 days</option>
                   <option value={0}>All time</option>
                 </select>
