@@ -92,7 +92,7 @@ POPULAR_TTL = 900               # seconds the Matomo answer is cached
 
 PAGE_RE = re.compile(r"^/concepts(/[a-z0-9][a-z0-9-]{0,80}){1,3}/?$")
 TELEMETRY_PAGE_RE = re.compile(
-    r"^/(?:(?:concepts|algorithms)(?:/[a-z0-9][a-z0-9-]{0,80}){0,3}|cheat-sheet|knowledge-graph|stats)?/?$"
+    r"^/(?:(?:concepts|algorithms)(?:/[a-z0-9][a-z0-9-]{0,80}){0,3}|cheat-sheet|knowledge-graph|survey|stats)?/?$"
 )
 ALLOWED_EVENT_TYPES = frozenset({
     "page_view",
