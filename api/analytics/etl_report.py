@@ -589,18 +589,27 @@ def render_markdown(report):
 
     ml = report.get("mlClustering") or {}
     if ml.get("clusters"):
+        sil = ml.get("silhouette")
+        sil_interp = (
+            "strong cluster separation" if sil is not None and sil >= 0.5 else
+            "moderate cluster separation" if sil is not None and sil >= 0.25 else
+            "overlapping engagement profiles" if sil is not None else "n/a"
+        )
         lines.extend([
             "",
             "## Unsupervised ML — Lesson Engagement Clusters (K-Means)",
             "",
-            f"- **Clusters (k):** {ml['k']} · **Silhouette score:** {ml['silhouette']}",
+            "_Groups `/concepts/` lessons into engagement profiles via standardized (z-score) K-Means on views, median active time, average scroll depth, and completions. Silhouette score ranges from -1 to +1 (> 0.5 strong separation, 0.25–0.5 moderate, < 0.25 overlapping)._",
             "",
-            "| Cluster | Lessons | Avg Views | Avg Time (s) | Avg Scroll (%) | Avg Completions |",
-            "| :--- | ---: | ---: | ---: | ---: | ---: |",
+            f"- **Clusters (k):** {ml['k']} · **Silhouette score:** {sil} ({sil_interp})",
+            "",
+            "| Cluster | Lessons | Avg Views | Avg Time (s) | Avg Scroll (%) | Avg Completions | Representative Lessons |",
+            "| :--- | ---: | ---: | ---: | ---: | ---: | :--- |",
         ])
         for cl in ml["clusters"]:
+            samples = ", ".join(f"`{p}`" for p in (cl.get("samplePages") or [])[:4]) or "—"
             lines.append(
-                f"| {cl['cluster']} | {cl['count']} | {cl['avgViews']} | {cl['avgDurationSec']} | {cl['avgScrollPct']}% | {cl['avgCompletions']} |"
+                f"| {cl['cluster']} | {cl['count']} | {cl['avgViews']} | {cl['avgDurationSec']} | {cl['avgScrollPct']}% | {cl['avgCompletions']} | {samples} |"
             )
 
     return "\n".join(lines) + "\n"
