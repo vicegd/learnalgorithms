@@ -421,11 +421,40 @@ paths:
           required: false
           schema: { type: string, enum: [brief, detailed], default: brief }
       responses:
-        '200': { description: Structured Markdown pedagogical analysis }
+        '200': { description: Structured Markdown pedagogical analysis (also persisted in SQLite history) }
         '401': { description: Unauthorized }
         '429': { description: LLM rate limit exceeded }
         '502': { description: Upstream LLM error }
         '503': { description: LLM_API_KEY not configured }
+
+  /admin/report/history:
+    get:
+      summary: List previously saved AI pedagogical reports from SQLite
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema: { type: integer, minimum: 1, maximum: 100, default: 25 }
+      responses:
+        '200': { description: Ordered list of saved AI report interpretations }
+        '401': { description: Unauthorized }
+
+  /admin/report/history/{id}:
+    delete:
+      summary: Delete a saved AI pedagogical report from SQLite
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        '200': { description: Deleted }
+        '401': { description: Unauthorized }
+        '404': { description: Not found }
 
   /admin/metrics:
     get:

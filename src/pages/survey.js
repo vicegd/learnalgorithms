@@ -87,6 +87,11 @@ export default function CourseSurveyPage() {
       });
       if (resp.status === 201 || resp.status === 202 || resp.status === 200) {
         setSubmitted(true);
+        try {
+          window.localStorage.setItem('la.surveySubmitted', '1');
+        } catch {
+          // ignore storage errors
+        }
       } else {
         setError('Could not save your response right now. Please try again later.');
       }

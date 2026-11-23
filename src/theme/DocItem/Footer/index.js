@@ -7,6 +7,7 @@ import {usePluginData} from '@docusaurus/useGlobalData';
 import {normalizePermalink, useStudyProgress} from '@site/src/utils/studyProgress';
 import {trackEvent} from '@site/src/telemetry';
 import PageFeedback from '@site/src/components/PageFeedback';
+import SurveyPrompt from '@site/src/components/SurveyPrompt';
 import styles from './styles.module.css';
 
 const REPO = 'https://github.com/vicegd/learnalgorithms';
@@ -68,6 +69,7 @@ export default function FooterWrapper(props) {
           </span>
         </div>
       )}
+      {trackable && <SurveyPrompt />}
       {relatedLessons.length > 0 && (
         <aside className={styles.relatedBox} aria-label="Related lessons by content similarity">
           <div className={styles.relatedTitle}>Related lessons (content similarity · TF-IDF)</div>

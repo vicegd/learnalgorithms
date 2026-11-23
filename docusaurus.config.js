@@ -142,6 +142,11 @@ const config = {
             position: 'left',
           },
           {
+            to: '/flashcards',
+            label: 'Flashcards',
+            position: 'left',
+          },
+          {
             href: 'https://github.com/vicegd/learnalgorithms',
             label: 'GitHub',
             position: 'right',

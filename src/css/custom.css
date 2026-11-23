@@ -192,3 +192,51 @@ svg.dg .ln-strong { stroke: var(--dg-fg); stroke-width: 2.2; fill: none; }
 .practice-box > :last-child { margin-bottom: 0; }
 .practice-box a { color: var(--ifm-color-success-darkest); text-decoration: underline; }
 [data-theme='dark'] .practice-box a { color: var(--ifm-color-success-lightest); }
+
+/* ── Clean Print / Save as PDF stylesheet for lessons and reports ─────────── */
+@media print {
+  .navbar,
+  .footer,
+  .theme-doc-sidebar-container,
+  .theme-doc-toc-desktop,
+  .theme-doc-toc-mobile,
+  .theme-doc-breadcrumbs,
+  .pagination-nav,
+  .theme-doc-footer,
+  [class*='listenBar'],
+  [class*='progressBar'],
+  [class*='relatedBox'],
+  [class*='feedback'],
+  [class*='copyButton'],
+  [class*='skipToContent'] {
+    display: none !important;
+  }
+
+  main,
+  article,
+  .docMainContainer_TBSr,
+  [class*='docMainContainer'],
+  [class*='docItemCol'] {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #111827 !important;
+    font-size: 11pt;
+    line-height: 1.5;
+  }
+
+  pre,
+  code {
+    white-space: pre-wrap !important;
+    word-break: break-word;
+  }
+
+  details {
+    break-inside: avoid;
+  }
+}

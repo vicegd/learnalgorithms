@@ -1,6 +1,7 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import Head from '@docusaurus/Head';
 import Layout from '@theme/Layout';
+import {usePluginData} from '@docusaurus/useGlobalData';
 import styles from './admin.module.css';
 
 const API_BASE = 'https://api.learnalgorithms.dev';
@@ -87,6 +88,7 @@ function Pagination({page, totalItems, pageSize, onPageChange, loading = false})
 }
 
 export default function AdminDashboardPage() {
+  const siteData = usePluginData('docusaurus-plugin-site-data');
   const [token, setToken] = useState('');
   const [tokenInput, setTokenInput] = useState('');
   const [days, setDays] = useState(30);
@@ -107,8 +109,11 @@ export default function AdminDashboardPage() {
   const [aiLang, setAiLang] = useState('en');
   const [aiLoadingMode, setAiLoadingMode] = useState(null);
   const [aiAnalysis, setAiAnalysis] = useState(null);
+  const [aiHistory, setAiHistory] = useState([]);
   const [aiError, setAiError] = useState('');
   const [aiCopied, setAiCopied] = useState(false);
+  const [readabilitySort, setReadabilitySort] = useState({key: 'fkGrade', dir: 'desc'});
+  const [readabilityPage, setReadabilityPage] = useState(0);
   const [metricsText, setMetricsText] = useState('');
   const [metricsUpdatedAt, setMetricsUpdatedAt] = useState(null);
   const [metricsAutoRefresh, setMetricsAutoRefresh] = useState(true);
@@ -178,7 +183,7 @@ export default function AdminDashboardPage() {
 
     try {
       const healthStart = performance.now();
-      const [healthRes, popularRes, statsRes, fbRes, surveyRes, issuesRes, eventsRes, reportRes, metricsRes] = await Promise.all([
+      const [healthRes, popularRes, statsRes, fbRes, surveyRes, issuesRes, eventsRes, reportRes, historyRes, metricsRes] = await Promise.all([
         fetch(`${API_BASE}/health`, {mode: 'cors'}).catch(() => null),
         fetch(`${API_BASE}/popular`, {mode: 'cors'}).catch(() => null),
         fetch(`${API_BASE}/admin/stats?days=${periodDays}`, {headers, mode: 'cors'}),
@@ -190,6 +195,7 @@ export default function AdminDashboardPage() {
           mode: 'cors',
         }),
         fetch(`${API_BASE}/admin/report?days=${periodDays}`, {headers, mode: 'cors'}).catch(() => null),
+        fetch(`${API_BASE}/admin/report/history?limit=25`, {headers, mode: 'cors'}).catch(() => null),
         fetch(`${API_BASE}/admin/metrics`, {headers, mode: 'cors'}).catch(() => null),
       ]);
       const healthMs = Math.round(performance.now() - healthStart);
@@ -217,6 +223,7 @@ export default function AdminDashboardPage() {
       const issuesJson = issuesRes.ok ? await issuesRes.json() : {issues: []};
       const eventsJson = eventsRes.ok ? await eventsRes.json() : {events: [], total: 0};
       const reportJson = reportRes && reportRes.ok ? await reportRes.json() : null;
+      const historyJson = historyRes && historyRes.ok ? await historyRes.json() : {reports: []};
       const promText = metricsRes && metricsRes.ok ? await metricsRes.text() : '';
 
       setHealth(healthJson ? {ok: healthJson.status === 'ok', status: healthJson.status, latencyMs: healthMs} : {ok: false, status: 'error', latencyMs: healthMs});
@@ -229,6 +236,7 @@ export default function AdminDashboardPage() {
       setEtlReport(reportJson?.report || null);
       setEtlMarkdown(reportJson?.markdown || '');
       if (reportJson?.report) setReportUpdatedAt(new Date());
+      setAiHistory(historyJson?.reports || []);
       setMetricsText(promText);
       if (promText) setMetricsUpdatedAt(new Date());
       setEventsTotal(
@@ -300,6 +308,7 @@ export default function AdminDashboardPage() {
     setEtlMarkdown('');
     setReportUpdatedAt(null);
     setAiAnalysis(null);
+    setAiHistory([]);
     setAiError('');
     setMetricsText('');
     setMetricsUpdatedAt(null);
@@ -381,11 +390,46 @@ export default function AdminDashboardPage() {
         setAiError(json.error || `HTTP ${res.status}`);
       } else {
         setAiAnalysis(json);
+        if (json.id) {
+          setAiHistory((prev) => [json, ...prev.filter((r) => r.id !== json.id)]);
+        }
       }
     } catch (err) {
       setAiError(`AI interpretation failed: ${err.message}`);
     } finally {
       setAiLoadingMode(null);
+    }
+  }
+
+  function handleDownloadAiReport(item) {
+    if (!item?.analysis) return;
+    const blob = new Blob([item.analysis], {type: 'text/markdown;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const winLabel = item.days === 0 ? 'all' : `${item.days}d`;
+    const stamp = (item.createdAt || new Date().toISOString()).slice(0, 10);
+    a.href = url;
+    a.download = `learnalgorithms-ai-${item.detail || 'brief'}-${item.lang || 'en'}-${winLabel}-${stamp}.md`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  async function handleDeleteAiReport(reportId) {
+    if (!token || !reportId) return;
+    try {
+      const res = await fetch(`${API_BASE}/admin/report/history/${reportId}`, {
+        method: 'DELETE',
+        headers: {Authorization: `Bearer ${token}`},
+        mode: 'cors',
+      });
+      if (res.ok) {
+        setAiHistory((prev) => prev.filter((r) => r.id !== reportId));
+        if (aiAnalysis?.id === reportId) setAiAnalysis(null);
+      }
+    } catch {
+      // Ignore transient network errors
     }
   }
 
@@ -425,6 +469,58 @@ export default function AdminDashboardPage() {
       setSummaryLoading(false);
     }
   }
+
+  const readabilityRows = useMemo(() => {
+    const concepts = (siteData?.concepts || []).filter(
+      (c) => c.readability && !/\/(exercises|proofs|references|summary)$/.test(c.url),
+    );
+    const pageMap = new Map();
+    for (const p of stats?.topPages || []) {
+      const key = (p.page || '').replace(/\/+$/, '');
+      pageMap.set(key, p);
+    }
+    const negMap = new Map();
+    for (const f of feedback) {
+      if (!f.helpful && f.page) {
+        const key = f.page.replace(/\/+$/, '');
+        negMap.set(key, (negMap.get(key) || 0) + 1);
+      }
+    }
+    const rows = concepts.map((c) => {
+      const key = (c.url || '').replace(/\/+$/, '');
+      const tel = pageMap.get(key);
+      const negVotes = negMap.get(key) || 0;
+      const views = tel?.views || 0;
+      const avgDurationMs = tel?.avgDurationMs ?? null;
+      const avgScrollPct = tel?.avgScrollPct ?? null;
+      const fkGrade = c.readability.fkGrade;
+      const fleschEase = c.readability.fleschEase;
+      const ttr = c.readability.ttr;
+      const dense = fkGrade >= 12 || fleschEase < 45;
+      const lowEngagement = (avgScrollPct !== null && avgScrollPct < 60) || negVotes > 0;
+      const status =
+        dense && lowEngagement
+          ? 'High friction'
+          : dense
+          ? 'Dense'
+          : views === 0
+          ? 'No traffic'
+          : 'Healthy';
+      return {
+        url: c.url,
+        title: c.title,
+        fkGrade,
+        fleschEase,
+        ttr,
+        views,
+        avgDurationMs,
+        avgScrollPct,
+        negVotes,
+        status,
+      };
+    });
+    return sortRows(rows, readabilitySort);
+  }, [siteData, stats, feedback, readabilitySort]);
 
   const knownConceptPages = useMemo(() => {
     const set = new Set();
@@ -516,6 +612,13 @@ export default function AdminDashboardPage() {
                 </button>
                 <button type="button" onClick={handleDownloadCsv} className={styles.primaryBtn}>
                   Download CSV ↓
+                </button>
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  className={styles.secondaryBtn}
+                  title="Print or save the Teaching Report, AI summary, and Survey results as PDF">
+                  🖨️ Print / PDF
                 </button>
                 <button type="button" onClick={handleLogout} className={styles.secondaryBtn}>
                   Lock
@@ -888,7 +991,7 @@ export default function AdminDashboardPage() {
               />
             </section>
 
-            <section className={styles.section}>
+            <section className={`${styles.section} ${styles.noPrint}`}>
               <h2 className={styles.sectionTitle}>
                 Raw events ({eventsTotal}) <code className={styles.endpointTag}>GET /admin/events</code>
               </h2>
@@ -932,6 +1035,74 @@ export default function AdminDashboardPage() {
                 loading={eventsLoading}
                 onPageChange={(nextPage) => fetchEventsPage(token, days, nextPage)}
               />
+            </section>
+
+            <section className={styles.section}>
+              <h2 className={styles.sectionTitle}>
+                Readability vs. Engagement (NLP × Telemetry) ({readabilityRows.length})
+              </h2>
+              <p className={styles.sectionHint}>
+                Cross-checks build-time NLP readability metrics (Flesch-Kincaid Grade, Flesch Reading Ease, lexical richness TTR) against live telemetry and negative feedback to flag dense lessons with low scroll depth (&lt; 60%) or negative votes.
+              </p>
+              {readabilityRows.length === 0 ? (
+                <p className={styles.empty}>No lesson readability metadata available.</p>
+              ) : (
+                <>
+                  <div className={styles.tableWrap}>
+                    <table className={styles.table}>
+                      <thead>
+                        <tr>
+                          <SortTh label="Lesson" sortKey="title" sortState={readabilitySort} onSort={(k) => { setReadabilitySort((s) => nextSort(s, k)); setReadabilityPage(0); }} />
+                          <SortTh label="FK Grade" sortKey="fkGrade" sortState={readabilitySort} onSort={(k) => { setReadabilitySort((s) => nextSort(s, k)); setReadabilityPage(0); }} />
+                          <SortTh label="Flesch Ease" sortKey="fleschEase" sortState={readabilitySort} onSort={(k) => { setReadabilitySort((s) => nextSort(s, k)); setReadabilityPage(0); }} />
+                          <SortTh label="TTR" sortKey="ttr" sortState={readabilitySort} onSort={(k) => { setReadabilitySort((s) => nextSort(s, k)); setReadabilityPage(0); }} />
+                          <SortTh label="Views" sortKey="views" sortState={readabilitySort} onSort={(k) => { setReadabilitySort((s) => nextSort(s, k)); setReadabilityPage(0); }} />
+                          <SortTh label="Avg Time" sortKey="avgDurationMs" sortState={readabilitySort} onSort={(k) => { setReadabilitySort((s) => nextSort(s, k)); setReadabilityPage(0); }} />
+                          <SortTh label="Avg Scroll" sortKey="avgScrollPct" sortState={readabilitySort} onSort={(k) => { setReadabilitySort((s) => nextSort(s, k)); setReadabilityPage(0); }} />
+                          <SortTh label="Neg. Votes" sortKey="negVotes" sortState={readabilitySort} onSort={(k) => { setReadabilitySort((s) => nextSort(s, k)); setReadabilityPage(0); }} />
+                          <SortTh label="Status" sortKey="status" sortState={readabilitySort} onSort={(k) => { setReadabilitySort((s) => nextSort(s, k)); setReadabilityPage(0); }} />
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {readabilityRows
+                          .slice(readabilityPage * PAGE_SIZE, (readabilityPage + 1) * PAGE_SIZE)
+                          .map((r) => (
+                            <tr key={r.url}>
+                              <td>
+                                <a href={r.url} target="_blank" rel="noopener noreferrer">{r.title}</a>
+                              </td>
+                              <td className={styles.mono}>{r.fkGrade}</td>
+                              <td className={styles.mono}>{r.fleschEase}</td>
+                              <td className={styles.mono}>{r.ttr}</td>
+                              <td className={styles.mono}>{r.views}</td>
+                              <td className={styles.mono}>{formatDuration(r.avgDurationMs)}</td>
+                              <td className={styles.mono}>{r.avgScrollPct !== null ? `${r.avgScrollPct}%` : '—'}</td>
+                              <td className={styles.mono}>{r.negVotes}</td>
+                              <td>
+                                <span
+                                  className={
+                                    r.status === 'High friction'
+                                      ? styles.badgeDanger
+                                      : r.status === 'Dense'
+                                      ? styles.badgeWarn
+                                      : styles.badgeOk
+                                  }>
+                                  {r.status}
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <Pagination
+                    page={readabilityPage}
+                    totalItems={readabilityRows.length}
+                    pageSize={PAGE_SIZE}
+                    onPageChange={setReadabilityPage}
+                  />
+                </>
+              )}
             </section>
 
             <section className={styles.section}>
@@ -1054,9 +1225,17 @@ export default function AdminDashboardPage() {
                           <code className={styles.endpointTag}>POST /admin/report/interpret</code>{' '}
                           <code className={styles.endpointTag}>{aiAnalysis.model}</code>
                         </div>
-                        <button type="button" className={styles.secondaryBtn} onClick={handleCopyAiAnalysis}>
-                          {aiCopied ? 'Copied!' : 'Copy AI summary'}
-                        </button>
+                        <div className={styles.reportActions}>
+                          <button type="button" className={styles.secondaryBtn} onClick={handleCopyAiAnalysis}>
+                            {aiCopied ? 'Copied!' : 'Copy AI summary'}
+                          </button>
+                          <button
+                            type="button"
+                            className={styles.secondaryBtn}
+                            onClick={() => handleDownloadAiReport(aiAnalysis)}>
+                            Download .md
+                          </button>
+                        </div>
                       </div>
                       <p className={styles.aiDisclaimer}>
                         Generated exclusively from the anonymized ETL metrics below. Review before including in official teaching reports (human-in-the-loop).
@@ -1064,12 +1243,60 @@ export default function AdminDashboardPage() {
                       <pre className={styles.reportPre}>{aiAnalysis.analysis}</pre>
                     </div>
                   )}
+                  {aiHistory.length > 0 && (
+                    <div className={`${styles.historyBox} ${styles.noPrint}`}>
+                      <div className={styles.historyTitle}>
+                        Saved AI report history ({aiHistory.length}){' '}
+                        <code className={styles.endpointTag}>GET /admin/report/history</code>
+                      </div>
+                      <div className={styles.historyList}>
+                        {aiHistory.map((item) => (
+                          <div
+                            key={item.id}
+                            className={`${styles.historyItem} ${aiAnalysis?.id === item.id ? styles.historyItemActive : ''}`}>
+                            <div className={styles.historyMeta}>
+                              <strong>
+                                {item.detail === 'detailed' ? '📄 Detailed' : '✨ Summary'} ({item.lang.toUpperCase()})
+                              </strong>
+                              {' · '}
+                              <span>{item.days === 0 ? 'All time' : `${item.days}d`}</span>
+                              {' · '}
+                              <span className={styles.mono}>{item.createdAt?.slice(0, 19).replace('T', ' ')} UTC</span>
+                              {' · '}
+                              <span className={styles.mono}>{item.model}</span>
+                            </div>
+                            <div className={styles.historyActions}>
+                              <button
+                                type="button"
+                                className={styles.secondaryBtn}
+                                onClick={() => setAiAnalysis(item)}>
+                                View
+                              </button>
+                              <button
+                                type="button"
+                                className={styles.secondaryBtn}
+                                onClick={() => handleDownloadAiReport(item)}>
+                                .md
+                              </button>
+                              <button
+                                type="button"
+                                className={styles.secondaryBtn}
+                                onClick={() => handleDeleteAiReport(item.id)}
+                                aria-label={`Delete report ${item.id}`}>
+                                ✕
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                   <pre className={styles.reportPre}>{etlMarkdown}</pre>
                 </>
               )}
             </section>
 
-            <section className={styles.section}>
+            <section className={`${styles.section} ${styles.noPrint}`}>
               <div className={styles.reportHeader}>
                 <h2 className={styles.sectionTitle}>
                   Observability — Prometheus metrics <code className={styles.endpointTag}>GET /admin/metrics</code>

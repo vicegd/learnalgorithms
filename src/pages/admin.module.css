@@ -483,3 +483,110 @@
   color: var(--ifm-color-emphasis-600);
   margin: 0 0 0.75rem;
 }
+
+.historyBox {
+  margin-bottom: 1rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: 10px;
+  background: var(--ifm-background-surface-color);
+}
+
+.historyTitle {
+  font-size: 0.86rem;
+  font-weight: 700;
+  margin-bottom: 0.55rem;
+}
+
+.historyList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.historyItem {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.45rem 0.65rem;
+  border-radius: 8px;
+  border: 1px solid var(--ifm-color-emphasis-200);
+  font-size: 0.82rem;
+}
+
+.historyItemActive {
+  border-color: var(--ifm-color-primary);
+  background: rgba(46, 133, 85, 0.07);
+}
+
+.historyMeta {
+  color: var(--ifm-font-color-base);
+}
+
+.historyActions {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.badgeOk,
+.badgeWarn,
+.badgeDanger {
+  display: inline-block;
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 0.14rem 0.5rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.badgeOk {
+  background: rgba(46, 133, 85, 0.12);
+  color: var(--ifm-color-primary-darkest);
+}
+
+.badgeWarn {
+  background: rgba(217, 119, 6, 0.14);
+  color: #b45309;
+}
+
+.badgeDanger {
+  background: rgba(220, 38, 38, 0.14);
+  color: #b91c1c;
+}
+
+.noPrint {
+  /* Marker class hidden in @media print */
+}
+
+@media print {
+  .toolbar,
+  .reportActions,
+  .pagination,
+  .apiDocsLink,
+  .noPrint {
+    display: none !important;
+  }
+
+  .container {
+    max-width: 100%;
+    padding: 0;
+  }
+
+  .section {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .reportPre {
+    max-height: none !important;
+    overflow: visible !important;
+    white-space: pre-wrap !important;
+    word-break: break-word;
+    font-size: 0.78rem;
+  }
+}

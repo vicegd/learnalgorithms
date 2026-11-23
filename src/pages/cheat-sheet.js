@@ -7,7 +7,7 @@ import styles from './cheat-sheet.module.css';
 
 const JAVA_REPO = 'https://github.com/vicegd/algorithms/tree/master/src/topics';
 
-const ALGORITHMS = [
+export const ALGORITHMS = [
   // ── Foundations & Brute Force ─────────────────────────────────────────────
   {
     id: 'pairwise-brute',
