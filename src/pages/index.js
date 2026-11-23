@@ -275,6 +275,9 @@ function Intro({
         <Link className={clsx('button button--lg', styles.btnGhost)} to="/knowledge-graph">
           Knowledge Graph
         </Link>
+        <Link className={clsx('button button--lg', styles.btnGhost)} to="/flashcards">
+          Flashcards
+        </Link>
         <Link className={clsx('button button--lg', styles.btnGhost)} to="/concepts/glossary">
           Glossary
         </Link>
