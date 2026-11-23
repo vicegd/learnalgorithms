@@ -5,6 +5,18 @@ function fibJs(k) {
   return fibJs(k - 1) + fibJs(k - 2);
 }
 
+function fibIterJs(n) {
+  if (n < 2) return n;
+  let a = 0;
+  let b = 1;
+  for (let i = 2; i <= n; i += 1) {
+    const t = (a + b) % 1000000007;
+    a = b;
+    b = t;
+  }
+  return b;
+}
+
 function isPrime(x) {
   if (x < 2) return false;
   if (x === 2) return true;
@@ -27,6 +39,21 @@ self.onmessage = async (e) => {
       const {instance} = await WebAssembly.instantiate(new Uint8Array(wasmBytes));
       const t1 = performance.now();
       const wasmVal = instance.exports.fib(n);
+      const wasmMs = performance.now() - t1;
+
+      self.postMessage({ok: true, jsVal, jsMs, wasmVal, wasmMs});
+      return;
+    }
+
+    if (data.task === 'fib_iter_wasm') {
+      const {n, wasmBytes} = data;
+      const t0 = performance.now();
+      const jsVal = fibIterJs(n);
+      const jsMs = performance.now() - t0;
+
+      const {instance} = await WebAssembly.instantiate(new Uint8Array(wasmBytes));
+      const t1 = performance.now();
+      const wasmVal = instance.exports.fib_iter(n);
       const wasmMs = performance.now() - t1;
 
       self.postMessage({ok: true, jsVal, jsMs, wasmVal, wasmMs});
