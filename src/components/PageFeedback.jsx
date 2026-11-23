@@ -31,51 +31,59 @@ export default function PageFeedback({permalink}) {
   const page = normalizePermalink(permalink);
   const enteredAt = useRef(Date.now());
   const [choice, setChoice] = useState(null); // true | false | null
+  const [voteSaved, setVoteSaved] = useState(false);
+  const [alreadyVoted, setAlreadyVoted] = useState(false);
   const [comment, setComment] = useState('');
   const [website, setWebsite] = useState(''); // honeypot
   const [submitting, setSubmitting] = useState(false);
-  const [statusMessage, setStatusMessage] = useState('');
+  const [commentSent, setCommentSent] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     enteredAt.current = Date.now();
     setChoice(null);
+    setVoteSaved(false);
+    setAlreadyVoted(false);
     setComment('');
     setWebsite('');
     setSubmitting(false);
-    setStatusMessage('');
+    setCommentSent(false);
     setErrorMessage('');
   }, [page]);
 
-  async function handleSubmit(e) {
-    e.preventDefault();
-    if (choice === null || submitting) return;
-    setSubmitting(true);
-    setErrorMessage('');
-
+  async function sendPayload(helpfulVal, commentText) {
     const payload = {
       page,
-      helpful: choice,
-      comment: comment.trim() || null,
+      helpful: helpfulVal,
+      comment: commentText || null,
       elapsed: Math.max(0, Date.now() - enteredAt.current),
       website,
     };
     const client = getClientId();
     if (client) payload.client = client;
 
+    return fetch(API_URL, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(payload),
+      mode: 'cors',
+    });
+  }
+
+  async function handleVote(helpfulVal) {
+    if (submitting || voteSaved) return;
+    setChoice(helpfulVal);
+    setSubmitting(true);
+    setErrorMessage('');
     try {
-      const resp = await fetch(API_URL, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(payload),
-        mode: 'cors',
-      });
+      const resp = await sendPayload(helpfulVal, null);
       if (resp.status === 201 || resp.status === 202) {
-        setStatusMessage('Thanks for your feedback! It helps improve the course.');
+        setVoteSaved(true);
       } else if (resp.status === 200) {
-        setStatusMessage('You already sent feedback for this lesson today. Thanks!');
+        setVoteSaved(true);
+        setAlreadyVoted(true);
       } else {
-        setErrorMessage('Could not send feedback right now. Please try again later.');
+        setErrorMessage('Could not record your vote right now. Please try again later.');
       }
     } catch {
       setErrorMessage('Could not reach the feedback service. Please try again later.');
@@ -84,10 +92,32 @@ export default function PageFeedback({permalink}) {
     }
   }
 
-  if (statusMessage) {
+  async function handleSendComment(e) {
+    e.preventDefault();
+    const cleaned = comment.trim();
+    if (choice === null || !cleaned || submitting) return;
+    setSubmitting(true);
+    setErrorMessage('');
+    try {
+      const resp = await sendPayload(choice, cleaned);
+      if (resp.status === 201 || resp.status === 202) {
+        setCommentSent(true);
+      } else if (resp.status === 200) {
+        setCommentSent(true);
+      } else {
+        setErrorMessage('Could not send comment right now. Please try again later.');
+      }
+    } catch {
+      setErrorMessage('Could not reach the feedback service. Please try again later.');
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  if (commentSent) {
     return (
       <div className={styles.box} role="status" aria-live="polite">
-        <p className={styles.status}>{statusMessage}</p>
+        <p className={styles.status}>Thanks! Your vote and comment have been saved.</p>
       </div>
     );
   }
@@ -95,18 +125,26 @@ export default function PageFeedback({permalink}) {
   return (
     <section className={styles.box} aria-label="Lesson feedback">
       <div className={styles.row}>
-        <span className={styles.prompt}>Was this lesson helpful?</span>
+        <span className={styles.prompt}>
+          {voteSaved
+            ? alreadyVoted
+              ? 'You already voted for this lesson today — thanks!'
+              : '✓ Vote recorded! Want to add an optional comment?'
+            : 'Was this lesson helpful?'}
+        </span>
         <div className={styles.actions}>
           <button
             type="button"
-            onClick={() => setChoice(true)}
+            disabled={submitting || voteSaved}
+            onClick={() => handleVote(true)}
             className={`${styles.voteBtn} ${choice === true ? styles.voteBtnActive : ''}`}
             aria-pressed={choice === true}>
             <span aria-hidden="true">👍</span> Yes
           </button>
           <button
             type="button"
-            onClick={() => setChoice(false)}
+            disabled={submitting || voteSaved}
+            onClick={() => handleVote(false)}
             className={`${styles.voteBtn} ${choice === false ? styles.voteBtnActive : ''}`}
             aria-pressed={choice === false}>
             <span aria-hidden="true">👎</span> No
@@ -114,8 +152,8 @@ export default function PageFeedback({permalink}) {
         </div>
       </div>
 
-      {choice !== null && (
-        <form className={styles.form} onSubmit={handleSubmit}>
+      {voteSaved && (
+        <form className={styles.form} onSubmit={handleSendComment}>
           <input
             type="text"
             name="website"
@@ -142,13 +180,17 @@ export default function PageFeedback({permalink}) {
             <span className={styles.charCount}>
               Anonymous · {comment.length}/{MAX_COMMENT}
             </span>
-            <button type="submit" className={styles.submitBtn} disabled={submitting}>
-              {submitting ? 'Sending…' : 'Send feedback'}
+            <button
+              type="submit"
+              className={styles.submitBtn}
+              disabled={submitting || comment.trim().length === 0}>
+              {submitting ? 'Sending…' : 'Send comment'}
             </button>
           </div>
           {errorMessage && <p className={styles.error} role="alert">{errorMessage}</p>}
         </form>
       )}
+      {!voteSaved && errorMessage && <p className={styles.error} role="alert">{errorMessage}</p>}
     </section>
   );
 }

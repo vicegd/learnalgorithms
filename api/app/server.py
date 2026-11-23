@@ -164,7 +164,9 @@ class Store:
         self.db.commit()
 
     def add_vote(self, page, helpful, comment, day, voter):
-        """Returns False if this client already voted for this page today."""
+        """Record a vote once per (page, day, voter). If the voter already submitted a
+        vote without a comment today, a follow-up request with a comment attaches it
+        to that existing vote without counting a second vote."""
         with self.lock:
             try:
                 self.db.execute(
@@ -174,6 +176,14 @@ class Store:
                 self.db.commit()
                 return True
             except sqlite3.IntegrityError:
+                if comment:
+                    cur = self.db.execute(
+                        "UPDATE feedback SET comment = ? WHERE page = ? AND day = ? AND voter = ? AND comment IS NULL",
+                        (comment, page, day, voter),
+                    )
+                    if cur.rowcount == 1:
+                        self.db.commit()
+                        return True
                 return False
 
     def summary(self, page):
