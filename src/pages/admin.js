@@ -491,6 +491,7 @@ export default function AdminDashboardPage() {
                   value={days}
                   onChange={(e) => setDays(Number(e.target.value))}
                   aria-label="Time window">
+                  <option value={1}>Last day</option>
                   <option value={7}>Last 7 days</option>
                   <option value={30}>Last 30 days</option>
                   <option value={90}>Last 90 days</option>
@@ -908,7 +909,7 @@ export default function AdminDashboardPage() {
               {reportUpdatedAt && (
                 <p className={styles.sectionHint}>
                   Computed live on every load / refresh (no server cache).{' '}
-                  <strong>Window:</strong> {days === 0 ? 'All time' : `Last ${days} days`}
+                  <strong>Window:</strong> {days === 0 ? 'All time' : days === 1 ? 'Last day' : `Last ${days} days`}
                   {' · '}
                   <strong>Last generated:</strong> {reportUpdatedAt.toLocaleString()}
                 </p>
