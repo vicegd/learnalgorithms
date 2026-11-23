@@ -90,15 +90,15 @@ function runPrimeWorker(worker, start, end, step) {
 }
 
 async function runParallelPrimeBenchmark(limit, threads) {
-  // Pre-spawn workers so we measure parallel compute time rather than thread-creation overhead,
-  // and use cyclic (strided) scheduling so every worker gets an equal mix of small & large numbers.
+  // Pre-spawn workers and distribute ONLY odd candidates cyclically (start = 3 + 2*i, step = 2*threads)
+  // so no worker wastes a core on trivial even numbers, achieving near-perfect load balance.
   const workers = Array.from({length: threads}, () => new Worker(WORKER_URL));
   try {
     const t0 = performance.now();
-    const tasks = workers.map((w, i) => runPrimeWorker(w, 2 + i, limit, threads));
+    const tasks = workers.map((w, i) => runPrimeWorker(w, 3 + 2 * i, limit, 2 * threads));
     const counts = await Promise.all(tasks);
     const elapsedMs = performance.now() - t0;
-    const totalPrimes = counts.reduce((a, b) => a + b, 0);
+    const totalPrimes = (limit >= 2 ? 1 : 0) + counts.reduce((a, b) => a + b, 0);
     return {threads, elapsedMs, totalPrimes};
   } finally {
     for (const w of workers) w.terminate();
