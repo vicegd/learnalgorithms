@@ -1326,6 +1326,79 @@ export default function AdminDashboardPage() {
                       </div>
                     </div>
                   )}
+                  {etlReport.mlClustering?.clusters?.length > 0 && (
+                    <div className={styles.historyBox}>
+                      <div className={styles.historyTitle}>
+                        Unsupervised ML — Lesson Engagement Clusters (K-Means, k={etlReport.mlClustering.k} · Silhouette: {etlReport.mlClustering.silhouette ?? '—'})
+                      </div>
+                      <p className={styles.aiDisclaimer}>
+                        Standardized K-Means clustering on views, median reading time, scroll depth, and completions (Python stdlib). Silhouette closer to 1.0 indicates stronger cluster separation.
+                      </p>
+                      <div className={styles.tableWrap}>
+                        <table className={styles.table}>
+                          <thead>
+                            <tr>
+                              <th scope="col">Cluster</th>
+                              <th scope="col">Lessons</th>
+                              <th scope="col">Avg Views</th>
+                              <th scope="col">Avg Time (s)</th>
+                              <th scope="col">Avg Scroll</th>
+                              <th scope="col">Avg Completions</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {etlReport.mlClustering.clusters.map((cl) => (
+                              <tr key={cl.cluster}>
+                                <td><strong>{cl.cluster}</strong></td>
+                                <td className={styles.mono}>{cl.count}</td>
+                                <td className={styles.mono}>{cl.avgViews}</td>
+                                <td className={styles.mono}>{cl.avgDurationSec}s</td>
+                                <td className={styles.mono}>{cl.avgScrollPct}%</td>
+                                <td className={styles.mono}>{cl.avgCompletions}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  )}
+                  {(etlReport.abExperiments || []).length > 0 && (
+                    <div className={styles.historyBox}>
+                      <div className={styles.historyTitle}>
+                        UX A/B Experiments (two-proportion z-test)
+                      </div>
+                      {etlReport.abExperiments.map((exp) => (
+                        <div key={exp.experiment} style={{marginBottom: '0.75rem'}}>
+                          <p className={styles.aiDisclaimer}>
+                            Experiment <code>{exp.experiment}</code> · z = <strong>{exp.zScore ?? '—'}</strong> · p = <strong>{exp.pValue ?? '—'}</strong>{' '}
+                            ({exp.significant ? 'statistically significant, p < 0.05' : 'collecting more samples'})
+                          </p>
+                          <div className={styles.tableWrap}>
+                            <table className={styles.table}>
+                              <thead>
+                                <tr>
+                                  <th scope="col">Variant</th>
+                                  <th scope="col">Exposures</th>
+                                  <th scope="col">Conversions</th>
+                                  <th scope="col">Rate (%)</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {exp.variants.map((v) => (
+                                  <tr key={v.variant}>
+                                    <td><strong>{v.variant}</strong></td>
+                                    <td className={styles.mono}>{v.exposures}</td>
+                                    <td className={styles.mono}>{v.conversions}</td>
+                                    <td className={styles.mono}>{v.ratePct}%</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                   <MarkdownView content={etlMarkdown} />
                 </>
               )}

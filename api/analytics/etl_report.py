@@ -13,6 +13,7 @@ Standard library only (no third-party packages).
 import argparse
 import csv
 import json
+import math
 import re
 import sqlite3
 import statistics
@@ -375,6 +376,8 @@ def transform(events, feedback=None, issues=None, popular=None, survey=None):
         },
         "survey": survey or {"total": 0, "averages": {}, "distribution": {}, "entries": []},
         "nlp": nlp,
+        "abExperiments": analyze_ab_experiments(events),
+        "mlClustering": cluster_lessons_kmeans(top_pages, k=3),
         "issues": issues_list[:20],
         "webVitals": {
             "samples": max(len(ttfb_vals), len(lcp_vals), len(cls_vals)),
@@ -571,7 +574,231 @@ def render_markdown(report):
             f"- **Total estimated CO2 (period):** {gs['totalCo2Grams']} g (cumulative across all measured loads)",
         ])
 
+    ab_exps = report.get("abExperiments") or []
+    if ab_exps:
+        lines.extend(["", "## UX A/B Experiments", ""])
+        for exp in ab_exps:
+            sig = "statistically significant (p < 0.05)" if exp.get("significant") else "not yet significant"
+            lines.append(f"### Experiment `{exp['experiment']}` — z = {exp['zScore']}, p = {exp['pValue']} ({sig})")
+            lines.append("")
+            lines.append("| Variant | Exposures | Conversions | Conversion Rate (%) |")
+            lines.append("| :--- | ---: | ---: | ---: |")
+            for v in exp["variants"]:
+                lines.append(f"| {v['variant']} | {v['exposures']} | {v['conversions']} | {v['ratePct']}% |")
+            lines.append("")
+
+    ml = report.get("mlClustering") or {}
+    if ml.get("clusters"):
+        lines.extend([
+            "",
+            "## Unsupervised ML — Lesson Engagement Clusters (K-Means)",
+            "",
+            f"- **Clusters (k):** {ml['k']} · **Silhouette score:** {ml['silhouette']}",
+            "",
+            "| Cluster | Lessons | Avg Views | Avg Time (s) | Avg Scroll (%) | Avg Completions |",
+            "| :--- | ---: | ---: | ---: | ---: | ---: |",
+        ])
+        for cl in ml["clusters"]:
+            lines.append(
+                f"| {cl['cluster']} | {cl['count']} | {cl['avgViews']} | {cl['avgDurationSec']} | {cl['avgScrollPct']}% | {cl['avgCompletions']} |"
+            )
+
     return "\n".join(lines) + "\n"
+
+
+def two_proportion_z_test(conv_a, exp_a, conv_b, exp_b):
+    """Two-sided two-proportion z-test returning (z_score, p_value) using stdlib math.erfc."""
+    if exp_a <= 0 or exp_b <= 0:
+        return None, None
+    p_a = conv_a / exp_a
+    p_b = conv_b / exp_b
+    pooled = (conv_a + conv_b) / (exp_a + exp_b)
+    se = math.sqrt(max(0.0, pooled * (1.0 - pooled) * (1.0 / exp_a + 1.0 / exp_b)))
+    if se == 0.0:
+        return 0.0, 1.0
+    z = (p_b - p_a) / se
+    p_val = math.erfc(abs(z) / math.sqrt(2.0))
+    return round(z, 3), round(p_val, 4)
+
+
+def analyze_ab_experiments(events):
+    """Aggregate anonymous A/B exposures & conversions with two-proportion z-test significance."""
+    exp_sessions = defaultdict(lambda: defaultdict(set))
+    conv_sessions = defaultdict(lambda: defaultdict(set))
+    for ev in events:
+        et = ev.get("eventType")
+        if et not in ("ab_exposure", "ab_conversion"):
+            continue
+        meta = ev.get("meta")
+        if not isinstance(meta, dict):
+            continue
+        exp_id = str(meta.get("experiment") or "").strip()[:60]
+        variant = str(meta.get("variant") or "").strip().upper()[:16]
+        sid = ev.get("sessionId") or ""
+        if not exp_id or not variant or not sid:
+            continue
+        if et == "ab_exposure":
+            exp_sessions[exp_id][variant].add(sid)
+        else:
+            conv_sessions[exp_id][variant].add(sid)
+
+    results = []
+    for exp_id in sorted(exp_sessions.keys()):
+        variants_map = exp_sessions[exp_id]
+        variant_rows = []
+        for v in sorted(variants_map.keys()):
+            e_cnt = len(variants_map[v])
+            c_cnt = len(conv_sessions[exp_id].get(v, set()) & variants_map[v]) or len(conv_sessions[exp_id].get(v, set()))
+            rate = round((100.0 * c_cnt / e_cnt), 2) if e_cnt > 0 else 0.0
+            variant_rows.append({
+                "variant": v,
+                "exposures": e_cnt,
+                "conversions": c_cnt,
+                "ratePct": rate,
+            })
+        z_score, p_value = (None, None)
+        significant = False
+        if len(variant_rows) >= 2:
+            a, b = variant_rows[0], variant_rows[1]
+            z_score, p_value = two_proportion_z_test(
+                a["conversions"], a["exposures"], b["conversions"], b["exposures"]
+            )
+            significant = p_value is not None and p_value < 0.05
+        results.append({
+            "experiment": exp_id,
+            "variants": variant_rows,
+            "zScore": z_score,
+            "pValue": p_value,
+            "significant": significant,
+        })
+    return results
+
+
+def cluster_lessons_kmeans(top_pages, k=3, max_iter=30):
+    """Unsupervised ML: K-Means clustering on standardized lesson engagement features
+    (views, medianDurationSec, avgScrollPct, completions) with deterministic farthest-point
+    initialization and Silhouette Score evaluation (Python stdlib only)."""
+    items = [p for p in top_pages if (p.get("page") or "").startswith("/concepts/")]
+    n = len(items)
+    if n < 3:
+        return {"k": 0, "silhouette": None, "clusters": [], "assignments": []}
+    k = min(k, n)
+
+    raw_feats = [
+        [
+            float(p.get("views") or 0),
+            float(p.get("medianDurationSec") or 0.0),
+            float(p.get("avgScrollPct") or 0.0),
+            float(p.get("completions") or 0),
+        ]
+        for p in items
+    ]
+    dim = 4
+    means = [sum(row[j] for row in raw_feats) / n for j in range(dim)]
+    stds = [
+        math.sqrt(sum((row[j] - means[j]) ** 2 for row in raw_feats) / n) or 1.0
+        for j in range(dim)
+    ]
+    X = [[(row[j] - means[j]) / stds[j] for j in range(dim)] for row in raw_feats]
+
+    def dist2(a, b):
+        return sum((a[j] - b[j]) ** 2 for j in range(dim))
+
+    # Deterministic K-Means++ style farthest-point initialization
+    centroids = [list(X[0])]
+    while len(centroids) < k:
+        best_idx = max(
+            range(n),
+            key=lambda i: min(dist2(X[i], c) for c in centroids),
+        )
+        centroids.append(list(X[best_idx]))
+
+    labels = [0] * n
+    for _ in range(max_iter):
+        new_labels = [
+            min(range(k), key=lambda c_idx: dist2(X[i], centroids[c_idx]))
+            for i in range(n)
+        ]
+        if new_labels == labels:
+            break
+        labels = new_labels
+        for c_idx in range(k):
+            members = [X[i] for i in range(n) if labels[i] == c_idx]
+            if members:
+                centroids[c_idx] = [
+                    sum(m[j] for m in members) / len(members) for j in range(dim)
+                ]
+
+    # Silhouette score
+    sil_vals = []
+    for i in range(n):
+        ci = labels[i]
+        same = [math.sqrt(dist2(X[i], X[j])) for j in range(n) if j != i and labels[j] == ci]
+        a_i = sum(same) / len(same) if same else 0.0
+        b_i = None
+        for c_other in range(k):
+            if c_other == ci:
+                continue
+            others = [math.sqrt(dist2(X[i], X[j])) for j in range(n) if labels[j] == c_other]
+            if others:
+                mean_d = sum(others) / len(others)
+                if b_i is None or mean_d < b_i:
+                    b_i = mean_d
+        if b_i is None or max(a_i, b_i) == 0:
+            sil_vals.append(0.0)
+        else:
+            sil_vals.append((b_i - a_i) / max(a_i, b_i))
+    silhouette = round(sum(sil_vals) / len(sil_vals), 3) if sil_vals else None
+
+    # Build cluster summaries and rank them by engagement score for semantic naming
+    cluster_rows = []
+    for c_idx in range(k):
+        idxs = [i for i in range(n) if labels[i] == c_idx]
+        if not idxs:
+            continue
+        avg_views = round(sum(raw_feats[i][0] for i in idxs) / len(idxs), 1)
+        avg_dur = round(sum(raw_feats[i][1] for i in idxs) / len(idxs), 1)
+        avg_scroll = round(sum(raw_feats[i][2] for i in idxs) / len(idxs), 1)
+        avg_comp = round(sum(raw_feats[i][3] for i in idxs) / len(idxs), 1)
+        score = avg_scroll + 0.5 * min(avg_dur, 300) + 10.0 * avg_comp
+        cluster_rows.append({
+            "rawId": c_idx,
+            "score": score,
+            "count": len(idxs),
+            "avgViews": avg_views,
+            "avgDurationSec": avg_dur,
+            "avgScrollPct": avg_scroll,
+            "avgCompletions": avg_comp,
+            "pages": [items[i]["page"] for i in idxs],
+        })
+
+    cluster_rows.sort(key=lambda r: r["score"], reverse=True)
+    semantic_names = ["High Engagement", "Steady / Reference", "Low Engagement / Bottleneck"]
+    raw_to_name = {}
+    clusters_out = []
+    for rank, row in enumerate(cluster_rows):
+        name = semantic_names[min(rank, len(semantic_names) - 1)]
+        raw_to_name[row["rawId"]] = name
+        clusters_out.append({
+            "cluster": name,
+            "count": row["count"],
+            "avgViews": row["avgViews"],
+            "avgDurationSec": row["avgDurationSec"],
+            "avgScrollPct": row["avgScrollPct"],
+            "avgCompletions": row["avgCompletions"],
+            "samplePages": row["pages"][:5],
+        })
+
+    assignments = [
+        {"page": items[i]["page"], "cluster": raw_to_name.get(labels[i], "Other")}
+        for i in range(n)
+    ]
+    return {
+        "k": len(clusters_out),
+        "silhouette": silhouette,
+        "clusters": clusters_out,
+        "assignments": assignments,
+    }
 
 
 def main():

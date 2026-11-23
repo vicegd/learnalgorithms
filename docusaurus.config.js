@@ -147,6 +147,11 @@ const config = {
             position: 'left',
           },
           {
+            to: '/benchmark',
+            label: 'Benchmark',
+            position: 'left',
+          },
+          {
             href: 'https://github.com/vicegd/learnalgorithms',
             label: 'GitHub',
             position: 'right',

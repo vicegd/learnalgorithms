@@ -92,7 +92,7 @@ POPULAR_TTL = 900               # seconds the Matomo answer is cached
 
 PAGE_RE = re.compile(r"^/concepts(/[a-z0-9][a-z0-9-]{0,80}){1,3}/?$")
 TELEMETRY_PAGE_RE = re.compile(
-    r"^/(?:(?:concepts|algorithms)(?:/[a-z0-9][a-z0-9-]{0,80}){0,3}|cheat-sheet|knowledge-graph|flashcards|survey|stats)?/?$"
+    r"^/(?:(?:concepts|algorithms)(?:/[a-z0-9][a-z0-9-]{0,80}){0,3}|cheat-sheet|knowledge-graph|flashcards|benchmark|survey|stats)?/?$"
 )
 ALLOWED_EVENT_TYPES = frozenset({
     "page_view",
@@ -106,6 +106,8 @@ ALLOWED_EVENT_TYPES = frozenset({
     "details_open",
     "resource_click",
     "web_vitals",
+    "ab_exposure",
+    "ab_conversion",
 })
 CONTROL_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
 CLIENT_RE = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")
@@ -718,7 +720,8 @@ PII_EMAIL_RE = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
 PII_PHONE_RE = re.compile(r"(?<!\d)(?:\+?\d{1,3}[\s.-]?)?(?:\(?\d{2,4}\)?[\s.-]?)?\d{3}[\s.-]?\d{3,4}(?!\d)")
 PII_DNI_RE = re.compile(r"\b[0-9XYZ]\d{7}[A-Za-z]\b")
 INJECTION_RE = re.compile(
-    r"(?i)(ignore\s+(?:all\s+)?(?:previous|above)\s+instructions|disregard\s+(?:previous|all)|"
+    r"(?i)((?:ignore|forget|disregard)\s+(?:all\s+)?(?:previous|prior|above)\s+(?:instructions|rules|prompts)|"
+    r"disregard\s+(?:previous|all)|"
     r"you\s+are\s+now\s+|</?untrusted_data>|^\s*(?:system|assistant)\s*:)",
     re.MULTILINE,
 )

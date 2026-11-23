@@ -278,6 +278,9 @@ function Intro({
         <Link className={clsx('button button--lg', styles.btnGhost)} to="/flashcards">
           Flashcards
         </Link>
+        <Link className={clsx('button button--lg', styles.btnGhost)} to="/benchmark">
+          WASM / HPC Lab
+        </Link>
         <Link className={clsx('button button--lg', styles.btnGhost)} to="/concepts/glossary">
           Glossary
         </Link>
