@@ -114,6 +114,7 @@ export default function AdminDashboardPage() {
   const [aiCopied, setAiCopied] = useState(false);
   const [readabilitySort, setReadabilitySort] = useState({key: 'fkGrade', dir: 'desc'});
   const [readabilityPage, setReadabilityPage] = useState(0);
+  const [isPrinting, setIsPrinting] = useState(false);
   const [metricsText, setMetricsText] = useState('');
   const [metricsUpdatedAt, setMetricsUpdatedAt] = useState(null);
   const [metricsAutoRefresh, setMetricsAutoRefresh] = useState(true);
@@ -144,6 +145,30 @@ export default function AdminDashboardPage() {
   const sortedFeedback = useMemo(() => sortRows(feedback, feedbackSort), [feedback, feedbackSort]);
   const sortedIssues = useMemo(() => sortRows(issues, issuesSort), [issues, issuesSort]);
   const sortedEvents = useMemo(() => sortRows(events, eventsSort), [events, eventsSort]);
+
+  useEffect(() => {
+    function handleBeforePrint() {
+      setIsPrinting(true);
+    }
+    function handleAfterPrint() {
+      setIsPrinting(false);
+    }
+    window.addEventListener('beforeprint', handleBeforePrint);
+    window.addEventListener('afterprint', handleAfterPrint);
+    return () => {
+      window.removeEventListener('beforeprint', handleBeforePrint);
+      window.removeEventListener('afterprint', handleAfterPrint);
+    };
+  }, []);
+
+  function handlePrintPdf() {
+    setIsPrinting(true);
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        window.print();
+      });
+    });
+  }
 
   useEffect(() => {
     try {
@@ -615,9 +640,9 @@ export default function AdminDashboardPage() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => window.print()}
+                  onClick={handlePrintPdf}
                   className={styles.secondaryBtn}
-                  title="Print or save the Teaching Report, AI summary, and Survey results as PDF">
+                  title="Print or save the complete dashboard (all table rows, AI summary, and Survey results) as PDF">
                   🖨️ Print / PDF
                 </button>
                 <button type="button" onClick={handleLogout} className={styles.secondaryBtn}>
@@ -721,9 +746,10 @@ export default function AdminDashboardPage() {
                           </tr>
                         </thead>
                         <tbody>
-                          {sortedTopPages
-                            .slice(topPagesPage * PAGE_SIZE, (topPagesPage + 1) * PAGE_SIZE)
-                            .map((p) => (
+                          {(isPrinting
+                            ? sortedTopPages
+                            : sortedTopPages.slice(topPagesPage * PAGE_SIZE, (topPagesPage + 1) * PAGE_SIZE)
+                          ).map((p) => (
                             <tr key={p.page}>
                               <td className={styles.mono}>{p.page}</td>
                               <td>{p.views}</td>
@@ -761,9 +787,10 @@ export default function AdminDashboardPage() {
                           </tr>
                         </thead>
                         <tbody>
-                          {sortedCompletions
-                            .slice(completionsPage * PAGE_SIZE, (completionsPage + 1) * PAGE_SIZE)
-                            .map((c) => (
+                          {(isPrinting
+                            ? sortedCompletions
+                            : sortedCompletions.slice(completionsPage * PAGE_SIZE, (completionsPage + 1) * PAGE_SIZE)
+                          ).map((c) => (
                             <tr key={c.page}>
                               <td className={styles.mono}>{c.page}</td>
                               <td>{c.completed}</td>
@@ -858,9 +885,10 @@ export default function AdminDashboardPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {sortedFeedback
-                        .slice(feedbackPage * PAGE_SIZE, (feedbackPage + 1) * PAGE_SIZE)
-                        .map((f, idx) => (
+                      {(isPrinting
+                        ? sortedFeedback
+                        : sortedFeedback.slice(feedbackPage * PAGE_SIZE, (feedbackPage + 1) * PAGE_SIZE)
+                      ).map((f, idx) => (
                         <tr key={`${f.day}-${f.page}-${idx}`}>
                           <td className={styles.mono}>{f.day}</td>
                           <td className={styles.mono}>{f.page}</td>
@@ -928,7 +956,7 @@ export default function AdminDashboardPage() {
                           </tr>
                         </thead>
                         <tbody>
-                          {survey.entries.slice(0, 15).map((e, idx) => (
+                          {(isPrinting ? survey.entries : survey.entries.slice(0, 15)).map((e, idx) => (
                             <tr key={`${e.day}-${idx}`}>
                               <td className={styles.mono}>{e.day}</td>
                               <td>{e.clarity}/5</td>
@@ -966,9 +994,10 @@ export default function AdminDashboardPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {sortedIssues
-                        .slice(issuesPage * PAGE_SIZE, (issuesPage + 1) * PAGE_SIZE)
-                        .map((it) => (
+                      {(isPrinting
+                        ? sortedIssues
+                        : sortedIssues.slice(issuesPage * PAGE_SIZE, (issuesPage + 1) * PAGE_SIZE)
+                      ).map((it) => (
                         <tr key={it.delivery}>
                           <td className={styles.mono}>{it.received.slice(0, 19).replace('T', ' ')}</td>
                           <td>{it.action}</td>
@@ -1064,9 +1093,10 @@ export default function AdminDashboardPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {readabilityRows
-                          .slice(readabilityPage * PAGE_SIZE, (readabilityPage + 1) * PAGE_SIZE)
-                          .map((r) => (
+                        {(isPrinting
+                          ? readabilityRows
+                          : readabilityRows.slice(readabilityPage * PAGE_SIZE, (readabilityPage + 1) * PAGE_SIZE)
+                        ).map((r) => (
                             <tr key={r.url}>
                               <td>
                                 <a href={r.url} target="_blank" rel="noopener noreferrer">{r.title}</a>
