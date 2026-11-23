@@ -49,7 +49,7 @@ const GROUPS = [
         summary: 'Submit anonymous lesson feedback',
         auth: 'Origin: learnalgorithms.dev',
         details:
-          'Stores a helpful/not-helpful vote with an optional comment (max 500 chars). Protected against bots with a honeypot field, minimum time on page (3 s), and one vote per page, client, and day.',
+          'Stores a helpful/not-helpful vote with an optional comment (max 500 chars). Protected against bots with a honeypot field, minimum time on page (1 s), and one row per page, client, and day (same-day vote/comment updates allowed).',
         payload: `{
   "page": "/concepts/sorting/quicksort",
   "helpful": true,
@@ -73,7 +73,7 @@ const GROUPS = [
         summary: 'Record anonymous student/usage telemetry events',
         auth: 'Origin: learnalgorithms.dev',
         details:
-          'Accepts a single event or a batch (max 20 events, 4 KB body). Allowed eventType values: page_view, page_leave, lesson_complete, lesson_uncomplete, cheat_sheet_filter, cheat_sheet_compare, visualizer_interact, search, details_open, resource_click.',
+          'Accepts a single event or a batch (max 20 events, 4 KB body). Allowed eventType values: page_view, page_leave, lesson_complete, lesson_uncomplete, cheat_sheet_filter, cheat_sheet_compare, visualizer_interact, search, details_open, resource_click, web_vitals.',
         payload: `{
   "events": [
     {
@@ -86,6 +86,24 @@ const GROUPS = [
   ]
 }`,
         responses: ['201 Created — {"status":"stored","count":1}', '400 Bad Request', '403 Forbidden', '429 Too Many Requests'],
+      },
+      {
+        method: 'POST',
+        path: '/survey',
+        summary: 'Submit anonymous course satisfaction survey (1–5)',
+        auth: 'Origin: learnalgorithms.dev',
+        details:
+          'Records four 1–5 ratings (clarity, usefulness, tools, overall) plus an optional comment. One updatable row per client and day; no personal data or IPs stored.',
+        payload: `{
+  "clarity": 5,
+  "usefulness": 5,
+  "tools": 4,
+  "overall": 5,
+  "comment": "The Cheat Sheet and Knowledge Graph are super useful.",
+  "elapsed": 8000,
+  "website": ""
+}`,
+        responses: ['201 Created — {"status":"saved"}', '202 Accepted — bot check', '400 Bad Request', '403 Forbidden'],
       },
     ],
   },
@@ -143,6 +161,42 @@ const GROUPS = [
         details: 'Returns the latest 200 GitHub issue events recorded via POST /webhooks/github.',
         responses: ['200 OK — {"issues":[...]}', '401 Unauthorized'],
         example: `curl -H "Authorization: Bearer <ADMIN_TOKEN>" "${API_BASE}/admin/issues"`,
+      },
+      {
+        method: 'GET',
+        path: '/admin/survey',
+        summary: 'Aggregated course satisfaction survey results',
+        auth: 'Bearer Token',
+        details: 'Query parameter: days (0 = all time, 1–3650, default 30). Returns total responses, 1–5 averages, score distribution, and recent comments.',
+        responses: ['200 OK — JSON summary', '401 Unauthorized'],
+        example: `curl -H "Authorization: Bearer <ADMIN_TOKEN>" "${API_BASE}/admin/survey?days=30"`,
+      },
+      {
+        method: 'GET',
+        path: '/admin/report',
+        summary: 'Consolidated ETL teaching report (JSON or Markdown)',
+        auth: 'Bearer Token',
+        details: 'Query parameters: days (0–3650, default 30), format (json | md). Consolidates telemetry, daily activity, devices, Matomo, NLP, feedback, survey, Core Web Vitals, and Green Software (SWDM).',
+        responses: ['200 OK — JSON or text/markdown', '401 Unauthorized'],
+        example: `curl -H "Authorization: Bearer <ADMIN_TOKEN>" "${API_BASE}/admin/report?days=30&format=md"`,
+      },
+      {
+        method: 'POST',
+        path: '/admin/report/interpret',
+        summary: 'AI-assisted pedagogical interpretation of the ETL report',
+        auth: 'Bearer Token',
+        details: 'Query parameters: days (0–3650), lang (en | es), detail (brief | detailed). Protected with OWASP LLM guardrails (PII redaction, indirect prompt-injection sanitization, dedicated rate limit).',
+        responses: ['200 OK — {"analysis":"...","model":"..."}', '401 Unauthorized', '429 Too Many Requests', '502/503 Upstream/Config error'],
+        example: `curl -X POST -H "Authorization: Bearer <ADMIN_TOKEN>" "${API_BASE}/admin/report/interpret?days=30&lang=en&detail=detailed"`,
+      },
+      {
+        method: 'GET',
+        path: '/admin/metrics',
+        summary: 'Prometheus text exposition metrics (0.0.4)',
+        auth: 'Bearer Token',
+        details: 'Live process uptime, HTTP request count, SQLite DB size, all-time telemetry/feedback totals, and rolling 30-day Web Vitals p95.',
+        responses: ['200 OK — text/plain; version=0.0.4', '401 Unauthorized'],
+        example: `curl -H "Authorization: Bearer <ADMIN_TOKEN>" "${API_BASE}/admin/metrics"`,
       },
     ],
   },

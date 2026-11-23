@@ -345,6 +345,22 @@ class ApiTest(unittest.TestCase):
             self.assertIn("learnalgorithms_http_requests_total", metrics_text)
             self.assertIn("learnalgorithms_db_size_bytes", metrics_text)
 
+        # Course satisfaction survey endpoint (POST /survey + GET /admin/survey)
+        s, _, _ = self.req("GET", "/admin/survey")
+        self.assertEqual(s, 401)
+        s, _, _ = self.req(
+            "POST",
+            "/survey",
+            {"clarity": 5, "usefulness": 4, "tools": 5, "overall": 5, "comment": "Super helpful course!", "elapsed": 2500},
+            headers={"X-Real-IP": "6.6.6.6"},
+        )
+        self.assertEqual(s, 201)
+        s, sv_json, _ = self.req("GET", "/admin/survey?days=0", headers={"Authorization": "Bearer admintoken"})
+        self.assertEqual(s, 200)
+        self.assertEqual(sv_json["total"], 1)
+        self.assertEqual(sv_json["averages"]["overall"], 5.0)
+        self.assertEqual(sv_json["entries"][0]["comment"], "Super helpful course!")
+
 
 if __name__ == "__main__":
     unittest.main()

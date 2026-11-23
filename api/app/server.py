@@ -9,10 +9,12 @@ Endpoints
 GET  /health                    Liveness check.
 POST /feedback                  "Was this page helpful?" vote, with an optional comment.
 GET  /feedback/summary?page=... Aggregated votes of one page.
+POST /survey                    Anonymous course satisfaction survey (1-5 ratings + optional comment).
 GET  /popular                   Most read lessons of the last 7 days (from Matomo).
 POST /events                    Anonymous student/usage telemetry events.
 POST /webhooks/github           GitHub "issues" events, verified with HMAC-SHA256.
 GET  /admin/feedback            Latest votes and comments (Bearer token).
+GET  /admin/survey              Aggregated course satisfaction survey results (Bearer token).
 GET  /admin/stats               Aggregated telemetry for teaching innovation (Bearer token).
 GET  /admin/events              Raw anonymized telemetry events in JSON or CSV (Bearer token).
 GET  /admin/report              ETL teaching report & Core Web Vitals in JSON or Markdown (Bearer token).
@@ -80,7 +82,7 @@ MAX_COMMENT = 500               # characters
 MAX_META = 512                  # bytes, serialized event metadata
 MAX_EVENT_BATCH = 20            # events per POST /events request
 MAX_DURATION_MS = 3_600_000     # 1 hour cap per page_leave event
-MIN_TIME_ON_PAGE_MS = 3000      # faster submissions are treated as bots
+MIN_TIME_ON_PAGE_MS = 1000      # faster submissions are treated as bots
 RATE_LIMIT = 60                 # votes per window and IP (a campus may share one IP)
 EVENT_RATE_LIMIT = 1200         # telemetry events per window and IP
 READ_RATE_LIMIT = 600           # read requests per window and IP
@@ -152,6 +154,18 @@ CREATE TABLE IF NOT EXISTS telemetry_events (
 CREATE INDEX IF NOT EXISTS telemetry_day ON telemetry_events (day);
 CREATE INDEX IF NOT EXISTS telemetry_type ON telemetry_events (event_type);
 CREATE INDEX IF NOT EXISTS telemetry_page ON telemetry_events (page);
+CREATE TABLE IF NOT EXISTS course_survey (
+    id         INTEGER PRIMARY KEY,
+    day        TEXT    NOT NULL,
+    voter      TEXT    NOT NULL,
+    clarity    INTEGER NOT NULL CHECK (clarity BETWEEN 1 AND 5),
+    usefulness INTEGER NOT NULL CHECK (usefulness BETWEEN 1 AND 5),
+    tools      INTEGER NOT NULL CHECK (tools BETWEEN 1 AND 5),
+    overall    INTEGER NOT NULL CHECK (overall BETWEEN 1 AND 5),
+    comment    TEXT,
+    UNIQUE (day, voter)
+);
+CREATE INDEX IF NOT EXISTS survey_day ON course_survey (day);
 """
 
 
@@ -207,6 +221,79 @@ class Store:
                 "SELECT page, helpful, comment, day FROM feedback ORDER BY id DESC LIMIT ?", (limit,)
             ).fetchall()
         return [{"page": p, "helpful": bool(h), "comment": c, "day": d} for p, h, c, d in rows]
+
+    def add_survey(self, clarity, usefulness, tools, overall, comment, day, voter):
+        """Record or update one anonymous satisfaction survey per (day, voter)."""
+        with self.lock:
+            try:
+                self.db.execute(
+                    """INSERT INTO course_survey (day, voter, clarity, usefulness, tools, overall, comment)
+                       VALUES (?, ?, ?, ?, ?, ?, ?)""",
+                    (day, voter, clarity, usefulness, tools, overall, comment),
+                )
+                self.db.commit()
+                return True
+            except sqlite3.IntegrityError:
+                self.db.execute(
+                    """UPDATE course_survey
+                       SET clarity = ?, usefulness = ?, tools = ?, overall = ?,
+                           comment = COALESCE(?, comment)
+                       WHERE day = ? AND voter = ?""",
+                    (clarity, usefulness, tools, overall, comment, day, voter),
+                )
+                self.db.commit()
+                return True
+
+    def survey_summary(self, days=30, limit=200):
+        since = (
+            None
+            if days == 0
+            else (dt.datetime.now(dt.timezone.utc).date() - dt.timedelta(days=days - 1)).isoformat()
+        )
+        where = "" if since is None else "WHERE day >= ?"
+        params = () if since is None else (since,)
+        with self.lock:
+            agg = self.db.execute(
+                f"""SELECT COUNT(*), AVG(clarity), AVG(usefulness), AVG(tools), AVG(overall)
+                    FROM course_survey {where}""",
+                params,
+            ).fetchone()
+            dist_rows = self.db.execute(
+                f"SELECT overall, COUNT(*) FROM course_survey {where} GROUP BY overall",
+                params,
+            ).fetchall()
+            entries = self.db.execute(
+                f"""SELECT day, clarity, usefulness, tools, overall, comment
+                    FROM course_survey {where} ORDER BY id DESC LIMIT ?""",
+                (*params, limit),
+            ).fetchall()
+        total = agg[0] or 0
+        dist = {str(k): 0 for k in range(1, 6)}
+        for score, cnt in dist_rows:
+            dist[str(score)] = cnt
+        return {
+            "days": days,
+            "since": since,
+            "total": total,
+            "averages": {
+                "clarity": round(agg[1], 2) if agg[1] is not None else None,
+                "usefulness": round(agg[2], 2) if agg[2] is not None else None,
+                "tools": round(agg[3], 2) if agg[3] is not None else None,
+                "overall": round(agg[4], 2) if agg[4] is not None else None,
+            },
+            "distribution": dist,
+            "entries": [
+                {
+                    "day": d,
+                    "clarity": cl,
+                    "usefulness": us,
+                    "tools": tl,
+                    "overall": ov,
+                    "comment": cm,
+                }
+                for d, cl, us, tl, ov, cm in entries
+            ],
+        }
 
     def add_issue_event(self, delivery, action, number, title, url):
         with self.lock:
@@ -728,11 +815,12 @@ def build_full_report(app, days):
     events, _ = app.store.latest_events(days=days, limit=50000, offset=0)
     feedback = app.store.latest(limit=500)
     issues = app.store.latest_issues(limit=200)
+    survey = app.store.survey_summary(days=days, limit=200)
     try:
         popular = app.popular.get(app.popular_fetch)
     except Exception:
         popular = []
-    report = etl_report.transform(events, feedback=feedback, issues=issues, popular=popular)
+    report = etl_report.transform(events, feedback=feedback, issues=issues, popular=popular, survey=survey)
     markdown = etl_report.render_markdown(report)
     return report, markdown
 
@@ -903,6 +991,17 @@ def make_handler(app):
                 if not ADMIN_TOKEN or not hmac.compare_digest(auth, "Bearer " + ADMIN_TOKEN):
                     return self.send_json(401, {"error": "unauthorized"}, {"WWW-Authenticate": "Bearer"})
                 return self.send_json(200, {"feedback": app.store.latest()}, {"Cache-Control": "no-store"})
+            if url.path == "/admin/survey":
+                auth = self.headers.get("Authorization", "")
+                if not ADMIN_TOKEN or not hmac.compare_digest(auth, "Bearer " + ADMIN_TOKEN):
+                    return self.send_json(401, {"error": "unauthorized"}, {"WWW-Authenticate": "Bearer"})
+                qs = urllib.parse.parse_qs(url.query)
+                raw_days = qs.get("days", ["30"])[0]
+                try:
+                    days = 0 if raw_days == "all" else max(0, min(3650, int(raw_days)))
+                except ValueError:
+                    return self.send_json(400, {"error": "invalid days"})
+                return self.send_json(200, app.store.survey_summary(days=days), {"Cache-Control": "no-store"})
             if url.path == "/admin/issues":
                 auth = self.headers.get("Authorization", "")
                 if not ADMIN_TOKEN or not hmac.compare_digest(auth, "Bearer " + ADMIN_TOKEN):
@@ -1012,6 +1111,8 @@ def make_handler(app):
             path = urllib.parse.urlparse(self.path).path
             if path == "/feedback":
                 return self.post_feedback()
+            if path == "/survey":
+                return self.post_survey()
             if path == "/events":
                 return self.post_events()
             if path == "/webhooks/github":
@@ -1019,6 +1120,38 @@ def make_handler(app):
             if path == "/admin/report/interpret":
                 return self.post_report_interpret()
             self.send_json(404, {"error": "not found"})
+
+        def post_survey(self):
+            if self.headers.get("Origin") != ALLOWED_ORIGIN:
+                return self.send_json(403, {"error": "origin not allowed"})
+            if self.rate_limited():
+                return
+            data = self.read_json()
+            if data is None:
+                return self.send_json(400, {"error": "invalid request"})
+            ratings = {}
+            for field in ("clarity", "usefulness", "tools", "overall"):
+                v = data.get(field)
+                if isinstance(v, bool) or not isinstance(v, int) or not (1 <= v <= 5):
+                    return self.send_json(400, {"error": f"invalid {field}"})
+                ratings[field] = v
+            try:
+                comment = clean_comment(data.get("comment"))
+            except ValueError as e:
+                return self.send_json(400, {"error": str(e)})
+            client = data.get("client")
+            if client is not None and (not isinstance(client, str) or not CLIENT_RE.match(client)):
+                return self.send_json(400, {"error": "invalid client"})
+            elapsed = data.get("elapsed")
+            if data.get("website") or (isinstance(elapsed, (int, float)) and elapsed < MIN_TIME_ON_PAGE_MS):
+                return self.send_json(202, {"status": "accepted"})
+            day = dt.datetime.now(dt.timezone.utc).date().isoformat()
+            voter = app.hasher.key(client or self.client_ip())
+            app.store.add_survey(
+                ratings["clarity"], ratings["usefulness"], ratings["tools"], ratings["overall"],
+                comment, day, voter,
+            )
+            return self.send_json(201, {"status": "saved"})
 
         def post_report_interpret(self):
             auth = self.headers.get("Authorization", "")

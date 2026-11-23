@@ -207,7 +207,7 @@ def percentile(values, p):
     return s[idx]
 
 
-def transform(events, feedback=None, issues=None, popular=None):
+def transform(events, feedback=None, issues=None, popular=None, survey=None):
     sessions = set()
     days = set()
     by_type = Counter()
@@ -373,6 +373,7 @@ def transform(events, feedback=None, issues=None, popular=None):
             "byPage": fb_by_page,
             "recentComments": fb_comments[:25],
         },
+        "survey": survey or {"total": 0, "averages": {}, "distribution": {}, "entries": []},
         "nlp": nlp,
         "issues": issues_list[:20],
         "webVitals": {
@@ -500,6 +501,25 @@ def render_markdown(report):
             for c in fb["recentComments"]:
                 tag = "Helpful" if c["helpful"] else "Not helpful"
                 lines.append(f"- [{c['day']}] `{c['page']}` ({tag}): {c['comment']}")
+
+    sv = report.get("survey") or {}
+    if sv.get("total", 0) > 0:
+        avg = sv.get("averages") or {}
+        lines.extend([
+            "",
+            "## Student Satisfaction Survey (1–5 Scale)",
+            "",
+            f"- **Total responses:** {sv['total']}",
+            f"- **Clarity of explanations:** {avg.get('clarity')} / 5",
+            f"- **Usefulness for studying:** {avg.get('usefulness')} / 5",
+            f"- **Interactive tools (Cheat Sheet, Knowledge Graph, Audio):** {avg.get('tools')} / 5",
+            f"- **Overall satisfaction:** {avg.get('overall')} / 5",
+        ])
+        sv_comments = [e for e in (sv.get("entries") or []) if e.get("comment")][:15]
+        if sv_comments:
+            lines.extend(["", "### Recent Survey Comments", ""])
+            for c in sv_comments:
+                lines.append(f"- [{c['day']}] (overall {c['overall']}/5): {c['comment']}")
 
     nlp = report.get("nlp") or {}
     if nlp.get("analyzedComments", 0) > 0 or nlp.get("topTerms"):

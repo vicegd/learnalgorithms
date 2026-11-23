@@ -344,3 +344,98 @@ paths:
           description: Invalid query parameter
         '401':
           description: Unauthorized
+
+  /survey:
+    post:
+      summary: Submit anonymous course satisfaction survey (1-5 scale)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [clarity, usefulness, tools, overall]
+              properties:
+                clarity: { type: integer, minimum: 1, maximum: 5 }
+                usefulness: { type: integer, minimum: 1, maximum: 5 }
+                tools: { type: integer, minimum: 1, maximum: 5 }
+                overall: { type: integer, minimum: 1, maximum: 5 }
+                comment: { type: string, maxLength: 500, nullable: true }
+                elapsed: { type: number }
+                website: { type: string }
+                client: { type: string, format: uuid }
+      responses:
+        '201': { description: Survey response saved or updated }
+        '202': { description: Silently discarded by bot protection }
+        '400': { description: Invalid ratings or comment }
+        '403': { description: Origin not allowed }
+
+  /admin/survey:
+    get:
+      summary: Aggregated course satisfaction survey results
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: days
+          in: query
+          required: false
+          schema: { type: integer, minimum: 0, maximum: 3650, default: 30 }
+      responses:
+        '200': { description: Averages (1-5), distribution, and recent entries }
+        '401': { description: Unauthorized }
+
+  /admin/report:
+    get:
+      summary: Consolidated ETL teaching report (JSON or Markdown)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: days
+          in: query
+          required: false
+          schema: { type: integer, minimum: 0, maximum: 3650, default: 30 }
+        - name: format
+          in: query
+          required: false
+          schema: { type: string, enum: [json, md], default: json }
+      responses:
+        '200': { description: Structured ETL JSON + Markdown report including NLP, Core Web Vitals, Green Software (SWDM), feedback, and survey }
+        '401': { description: Unauthorized }
+
+  /admin/report/interpret:
+    post:
+      summary: AI-assisted pedagogical interpretation of the anonymized ETL report
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: days
+          in: query
+          required: false
+          schema: { type: integer, minimum: 0, maximum: 3650, default: 30 }
+        - name: lang
+          in: query
+          required: false
+          schema: { type: string, enum: [en, es], default: en }
+        - name: detail
+          in: query
+          required: false
+          schema: { type: string, enum: [brief, detailed], default: brief }
+      responses:
+        '200': { description: Structured Markdown pedagogical analysis }
+        '401': { description: Unauthorized }
+        '429': { description: LLM rate limit exceeded }
+        '502': { description: Upstream LLM error }
+        '503': { description: LLM_API_KEY not configured }
+
+  /admin/metrics:
+    get:
+      summary: Prometheus text exposition metrics (0.0.4)
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Live process uptime, HTTP request count, SQLite size, telemetry/feedback totals, and rolling 30-day Web Vitals p95
+          content:
+            text/plain:
+              schema: { type: string }
+        '401': { description: Unauthorized }

@@ -95,6 +95,7 @@ export default function AdminDashboardPage() {
   const [error, setError] = useState('');
   const [stats, setStats] = useState(null);
   const [feedback, setFeedback] = useState([]);
+  const [survey, setSurvey] = useState(null);
   const [issues, setIssues] = useState([]);
   const [events, setEvents] = useState([]);
   const [eventsTotal, setEventsTotal] = useState(0);
@@ -177,11 +178,12 @@ export default function AdminDashboardPage() {
 
     try {
       const healthStart = performance.now();
-      const [healthRes, popularRes, statsRes, fbRes, issuesRes, eventsRes, reportRes, metricsRes] = await Promise.all([
+      const [healthRes, popularRes, statsRes, fbRes, surveyRes, issuesRes, eventsRes, reportRes, metricsRes] = await Promise.all([
         fetch(`${API_BASE}/health`, {mode: 'cors'}).catch(() => null),
         fetch(`${API_BASE}/popular`, {mode: 'cors'}).catch(() => null),
         fetch(`${API_BASE}/admin/stats?days=${periodDays}`, {headers, mode: 'cors'}),
         fetch(`${API_BASE}/admin/feedback`, {headers, mode: 'cors'}),
+        fetch(`${API_BASE}/admin/survey?days=${periodDays}`, {headers, mode: 'cors'}).catch(() => null),
         fetch(`${API_BASE}/admin/issues`, {headers, mode: 'cors'}),
         fetch(`${API_BASE}/admin/events?days=${periodDays}&limit=${EVENTS_PAGE_SIZE}&offset=0`, {
           headers,
@@ -211,6 +213,7 @@ export default function AdminDashboardPage() {
       const popularJson = popularRes && popularRes.ok ? await popularRes.json() : {pages: []};
       const statsJson = await statsRes.json();
       const fbJson = fbRes.ok ? await fbRes.json() : {feedback: []};
+      const surveyJson = surveyRes && surveyRes.ok ? await surveyRes.json() : null;
       const issuesJson = issuesRes.ok ? await issuesRes.json() : {issues: []};
       const eventsJson = eventsRes.ok ? await eventsRes.json() : {events: [], total: 0};
       const reportJson = reportRes && reportRes.ok ? await reportRes.json() : null;
@@ -220,6 +223,7 @@ export default function AdminDashboardPage() {
       setPopular(popularJson.pages || []);
       setStats(statsJson);
       setFeedback(fbJson.feedback || []);
+      setSurvey(surveyJson);
       setIssues(issuesJson.issues || []);
       setEvents(eventsJson.events || []);
       setEtlReport(reportJson?.report || null);
@@ -289,6 +293,7 @@ export default function AdminDashboardPage() {
     setToken('');
     setStats(null);
     setFeedback([]);
+    setSurvey(null);
     setIssues([]);
     setEvents([]);
     setEtlReport(null);
@@ -770,6 +775,72 @@ export default function AdminDashboardPage() {
                 pageSize={PAGE_SIZE}
                 onPageChange={setFeedbackPage}
               />
+            </section>
+
+            <section className={styles.section}>
+              <h2 className={styles.sectionTitle}>
+                Course satisfaction survey ({survey?.total ?? 0}){' '}
+                <code className={styles.endpointTag}>GET /admin/survey</code>
+              </h2>
+              <p className={styles.sectionHint}>
+                Public anonymous survey at <a href="/survey">/survey</a> (1–5 scale, filtered by the top time window selector).
+              </p>
+              {!survey || survey.total === 0 ? (
+                <p className={styles.empty}>No course satisfaction survey responses recorded in this window yet.</p>
+              ) : (
+                <>
+                  <div className={styles.vitalsGrid}>
+                    <div className={styles.vitalCard}>
+                      <div className={styles.vitalLabel}>Overall satisfaction</div>
+                      <div className={styles.vitalValue}>{survey.averages?.overall ?? '—'} / 5</div>
+                      <div className={styles.vitalHint}>{survey.total} anonymous responses.</div>
+                    </div>
+                    <div className={styles.vitalCard}>
+                      <div className={styles.vitalLabel}>Clarity</div>
+                      <div className={styles.vitalValue}>{survey.averages?.clarity ?? '—'} / 5</div>
+                      <div className={styles.vitalHint}>Explanations, proofs &amp; examples.</div>
+                    </div>
+                    <div className={styles.vitalCard}>
+                      <div className={styles.vitalLabel}>Usefulness</div>
+                      <div className={styles.vitalValue}>{survey.averages?.usefulness ?? '—'} / 5</div>
+                      <div className={styles.vitalHint}>Study, labs &amp; exam prep.</div>
+                    </div>
+                    <div className={styles.vitalCard}>
+                      <div className={styles.vitalLabel}>Interactive tools</div>
+                      <div className={styles.vitalValue}>{survey.averages?.tools ?? '—'} / 5</div>
+                      <div className={styles.vitalHint}>Cheat Sheet, Knowledge Graph, audio.</div>
+                    </div>
+                  </div>
+                  {(survey.entries || []).length > 0 && (
+                    <div className={styles.tableWrap}>
+                      <table className={styles.table}>
+                        <thead>
+                          <tr>
+                            <th scope="col">Day</th>
+                            <th scope="col">Clarity</th>
+                            <th scope="col">Usefulness</th>
+                            <th scope="col">Tools</th>
+                            <th scope="col">Overall</th>
+                            <th scope="col">Comment</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {survey.entries.slice(0, 15).map((e, idx) => (
+                            <tr key={`${e.day}-${idx}`}>
+                              <td className={styles.mono}>{e.day}</td>
+                              <td>{e.clarity}/5</td>
+                              <td>{e.usefulness}/5</td>
+                              <td>{e.tools}/5</td>
+                              <td><strong>{e.overall}/5</strong></td>
+                              <td>{e.comment || '—'}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </>
+              )}
             </section>
 
             <section className={styles.section}>
