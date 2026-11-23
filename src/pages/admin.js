@@ -1332,7 +1332,10 @@ export default function AdminDashboardPage() {
                         Unsupervised ML — Lesson Engagement Clusters (K-Means, k={etlReport.mlClustering.k} · Silhouette: {etlReport.mlClustering.silhouette ?? '—'})
                       </div>
                       <p className={styles.aiDisclaimer}>
-                        Standardized K-Means clustering on views, median reading time, scroll depth, and completions (Python stdlib). Silhouette closer to 1.0 indicates stronger cluster separation.
+                        Automatically groups <code>/concepts/</code> lessons by behavior using z-score standardized K-Means on views, median time, scroll depth, and completions.{' '}
+                        <strong>Silhouette score</strong> (<code>-1</code> to <code>+1</code>):{' '}
+                        <code>≥ 0.5</code> strong separation, <code>0.25–0.5</code> moderate, <code>&lt; 0.25</code> overlapping profiles.{' '}
+                        <strong>High Engagement</strong> = strong anchor lessons; <strong>Steady / Reference</strong> = quick lookups; <strong>Low Engagement / Bottleneck</strong> = priority for pedagogical review.
                       </p>
                       <div className={styles.tableWrap}>
                         <table className={styles.table}>
@@ -1344,17 +1347,41 @@ export default function AdminDashboardPage() {
                               <th scope="col">Avg Time (s)</th>
                               <th scope="col">Avg Scroll</th>
                               <th scope="col">Avg Completions</th>
+                              <th scope="col">Representative Lessons</th>
                             </tr>
                           </thead>
                           <tbody>
                             {etlReport.mlClustering.clusters.map((cl) => (
                               <tr key={cl.cluster}>
-                                <td><strong>{cl.cluster}</strong></td>
+                                <td>
+                                  <span
+                                    className={
+                                      cl.cluster.includes('High')
+                                        ? styles.badgeOk
+                                        : cl.cluster.includes('Low')
+                                        ? styles.badgeDanger
+                                        : styles.badgeWarn
+                                    }>
+                                    {cl.cluster}
+                                  </span>
+                                </td>
                                 <td className={styles.mono}>{cl.count}</td>
                                 <td className={styles.mono}>{cl.avgViews}</td>
                                 <td className={styles.mono}>{cl.avgDurationSec}s</td>
                                 <td className={styles.mono}>{cl.avgScrollPct}%</td>
                                 <td className={styles.mono}>{cl.avgCompletions}</td>
+                                <td className={styles.mono}>
+                                  {(cl.samplePages || []).length > 0
+                                    ? cl.samplePages.slice(0, 4).map((p, idx) => (
+                                        <span key={p}>
+                                          {idx > 0 ? ', ' : ''}
+                                          <a href={p} target="_blank" rel="noopener noreferrer">
+                                            {p.replace('/concepts/', '')}
+                                          </a>
+                                        </span>
+                                      ))
+                                    : '—'}
+                                </td>
                               </tr>
                             ))}
                           </tbody>
