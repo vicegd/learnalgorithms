@@ -155,6 +155,16 @@
   background: color-mix(in srgb, var(--ifm-color-primary) 9%, var(--ifm-background-surface-color));
 }
 
+.cardMastered {
+  border-color: var(--ifm-color-primary);
+  background: color-mix(in srgb, var(--ifm-color-primary) 13%, var(--ifm-background-surface-color));
+  box-shadow: inset 6px 0 0 var(--ifm-color-primary), 0 6px 20px rgba(46, 133, 85, 0.12);
+}
+
+.cardMastered.cardFlipped {
+  background: color-mix(in srgb, var(--ifm-color-primary) 18%, var(--ifm-background-surface-color));
+}
+
 .cardTop {
   display: flex;
   justify-content: space-between;
