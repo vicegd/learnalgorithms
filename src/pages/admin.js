@@ -940,7 +940,7 @@ export default function AdminDashboardPage() {
                     <div className={styles.vitalCard}>
                       <div className={styles.vitalLabel}>Interactive tools</div>
                       <div className={styles.vitalValue}>{survey.averages?.tools ?? '—'} / 5</div>
-                      <div className={styles.vitalHint}>Cheat Sheet, Knowledge Graph, Flashcards, audio.</div>
+                      <div className={styles.vitalHint}>Cheat Sheet, Knowledge Graph, Flashcards, Benchmark, audio.</div>
                     </div>
                   </div>
                   {(survey.entries || []).length > 0 && (
