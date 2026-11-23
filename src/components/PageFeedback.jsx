@@ -71,7 +71,8 @@ export default function PageFeedback({permalink}) {
   }
 
   async function handleVote(helpfulVal) {
-    if (submitting || voteSaved) return;
+    if (submitting || choice === helpfulVal) return;
+    const wasVoted = voteSaved;
     setChoice(helpfulVal);
     setSubmitting(true);
     setErrorMessage('');
@@ -79,9 +80,10 @@ export default function PageFeedback({permalink}) {
       const resp = await sendPayload(helpfulVal, null);
       if (resp.status === 201 || resp.status === 202) {
         setVoteSaved(true);
+        setAlreadyVoted(false);
       } else if (resp.status === 200) {
         setVoteSaved(true);
-        setAlreadyVoted(true);
+        setAlreadyVoted(!wasVoted);
       } else {
         setErrorMessage('Could not record your vote right now. Please try again later.');
       }
@@ -135,7 +137,7 @@ export default function PageFeedback({permalink}) {
         <div className={styles.actions}>
           <button
             type="button"
-            disabled={submitting || voteSaved}
+            disabled={submitting || choice === true}
             onClick={() => handleVote(true)}
             className={`${styles.voteBtn} ${choice === true ? styles.voteBtnActive : ''}`}
             aria-pressed={choice === true}>
@@ -143,7 +145,7 @@ export default function PageFeedback({permalink}) {
           </button>
           <button
             type="button"
-            disabled={submitting || voteSaved}
+            disabled={submitting || choice === false}
             onClick={() => handleVote(false)}
             className={`${styles.voteBtn} ${choice === false ? styles.voteBtnActive : ''}`}
             aria-pressed={choice === false}>

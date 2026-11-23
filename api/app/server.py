@@ -164,26 +164,34 @@ class Store:
         self.db.commit()
 
     def add_vote(self, page, helpful, comment, day, voter):
-        """Record a vote once per (page, day, voter). If the voter already submitted a
-        vote without a comment today, a follow-up request with a comment attaches it
-        to that existing vote without counting a second vote."""
+        """Record a vote once per (page, day, voter). A follow-up request from the same
+        voter on the same day can change helpful (Yes <-> No) or attach a comment if
+        none was saved yet, always keeping a single row per (page, day, voter)."""
+        helpful_int = 1 if helpful else 0
         with self.lock:
             try:
                 self.db.execute(
                     "INSERT INTO feedback (page, helpful, comment, day, voter) VALUES (?, ?, ?, ?, ?)",
-                    (page, 1 if helpful else 0, comment, day, voter),
+                    (page, helpful_int, comment, day, voter),
                 )
                 self.db.commit()
                 return True
             except sqlite3.IntegrityError:
-                if comment:
-                    cur = self.db.execute(
-                        "UPDATE feedback SET comment = ? WHERE page = ? AND day = ? AND voter = ? AND comment IS NULL",
-                        (comment, page, day, voter),
+                row = self.db.execute(
+                    "SELECT helpful, comment FROM feedback WHERE page = ? AND day = ? AND voter = ?",
+                    (page, day, voter),
+                ).fetchone()
+                if not row:
+                    return False
+                prev_helpful, prev_comment = row
+                new_comment = prev_comment if prev_comment is not None else comment
+                if helpful_int != prev_helpful or (comment and prev_comment is None):
+                    self.db.execute(
+                        "UPDATE feedback SET helpful = ?, comment = ? WHERE page = ? AND day = ? AND voter = ?",
+                        (helpful_int, new_comment, page, day, voter),
                     )
-                    if cur.rowcount == 1:
-                        self.db.commit()
-                        return True
+                    self.db.commit()
+                    return True
                 return False
 
     def summary(self, page):
