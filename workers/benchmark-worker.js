@@ -39,10 +39,17 @@ self.onmessage = async (e) => {
     }
 
     if (data.task === 'primes') {
-      const {start, end, step = 1} = data;
+      const {start, end, step = 1, mod = 0, modMin = 0, modMax = 0} = data;
       let count = 0;
-      for (let x = start; x <= end; x += step) {
-        if (isPrime(x)) count += 1;
+      if (mod > 0) {
+        for (let x = start; x <= end; x += step) {
+          const r = ((x - 3) >> 1) % mod;
+          if (r >= modMin && r < modMax && isPrime(x)) count += 1;
+        }
+      } else {
+        for (let x = start; x <= end; x += step) {
+          if (isPrime(x)) count += 1;
+        }
       }
       self.postMessage({ok: true, count});
       return;
