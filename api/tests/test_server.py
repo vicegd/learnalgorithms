@@ -79,13 +79,17 @@ class ApiTest(unittest.TestCase):
 
     def test_vote_once_per_day(self):
         self.assertEqual(self.vote(ip="2.2.2.2")[0], 201)
-        self.assertEqual(self.vote(ip="2.2.2.2")[0], 200)  # already voted without comment
+        self.assertEqual(self.vote(ip="2.2.2.2")[0], 200)  # already voted same value without comment
         # Attaching an optional comment after voting succeeds once without duplicating the vote
         self.assertEqual(self.vote(ip="2.2.2.2", comment="Very clear explanation!")[0], 201)
         self.assertEqual(self.vote(ip="2.2.2.2", comment="Second comment rejected")[0], 200)
+        # Changing mind (Yes -> No) updates the existing row without duplicating it
+        self.assertEqual(self.vote(ip="2.2.2.2", helpful=False)[0], 201)
         status, data, _ = self.req("GET", "/feedback/summary?page=/concepts/sorting/quicksort")
         self.assertEqual(status, 200)
-        self.assertEqual(data["helpful"], 1)
+        self.assertEqual((data["helpful"], data["notHelpful"]), (0, 1))
+        # Change back to Yes so downstream checks see helpful >= 1
+        self.assertEqual(self.vote(ip="2.2.2.2", helpful=True)[0], 201)
 
     def test_validation(self):
         for page in ["/etc/passwd", "/concepts/../x", "/concepts/a'; DROP TABLE feedback;--", 42, None]:
