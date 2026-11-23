@@ -137,13 +137,13 @@
   padding: 1.5rem 1.75rem;
   border-radius: 14px;
   border: 2px solid var(--ifm-color-emphasis-200);
-  background: var(--ifm-background-surface-color);
+  background: color-mix(in srgb, var(--ifm-color-emphasis-200) 28%, var(--ifm-background-surface-color));
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
   cursor: pointer;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  transition: border-color 0.18s ease, transform 0.12s ease;
+  transition: border-color 0.18s ease, background-color 0.18s ease, transform 0.12s ease;
 }
 
 .card:hover {
@@ -152,7 +152,7 @@
 
 .cardFlipped {
   border-color: var(--ifm-color-primary);
-  background: color-mix(in srgb, var(--ifm-color-primary) 5%, var(--ifm-background-surface-color));
+  background: color-mix(in srgb, var(--ifm-color-primary) 9%, var(--ifm-background-surface-color));
 }
 
 .cardTop {
@@ -197,8 +197,39 @@
 .answer {
   font-size: 1.05rem;
   font-weight: 600;
-  line-height: 1.55;
+  line-height: 1.6;
   margin: 0;
+}
+
+.complexityGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.65rem;
+}
+
+.complexityCell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 10px;
+  border: 1px solid var(--ifm-color-emphasis-200);
+  background: var(--ifm-background-surface-color);
+}
+
+.complexityLabel {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ifm-color-emphasis-600);
+}
+
+.complexityVal {
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.96rem;
+  font-weight: 700;
+  color: var(--ifm-font-color-base);
 }
 
 .flipHint {

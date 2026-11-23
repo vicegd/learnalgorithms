@@ -13,7 +13,7 @@ const THEORY_CARDS = [
     front: 'What is the difference between O(g(n)), Ω(g(n)), and Θ(g(n))?',
     answer:
       'O(g(n)) is an asymptotic upper bound (at most), Ω(g(n)) is an asymptotic lower bound (at least), and Θ(g(n)) is a tight bound meaning f(n) ∈ O(g(n)) AND f(n) ∈ Ω(g(n)).',
-    lessonUrl: '/concepts/asymptotic-analysis/asymptotic-notation',
+    lessonUrl: '/concepts/principles-of-algorithmics/asymptotic-notation',
   },
   {
     id: 'theory-master-theorem',
@@ -21,7 +21,7 @@ const THEORY_CARDS = [
     front: 'For T(n) = a·T(n/b) + Θ(n^d), what are the 3 cases of the Master Theorem?',
     answer:
       'Compare d with log_b(a): (1) if d < log_b(a) → Θ(n^(log_b a)); (2) if d = log_b(a) → Θ(n^d log n); (3) if d > log_b(a) → Θ(n^d).',
-    lessonUrl: '/concepts/divide-and-conquer/master-theorem',
+    lessonUrl: '/concepts/divide-and-conquer/analysis',
   },
   {
     id: 'theory-comparison-sort-lb',
@@ -29,7 +29,7 @@ const THEORY_CARDS = [
     front: 'Why is Ω(n log n) the lower bound for comparison-based sorting?',
     answer:
       'Any comparison sort corresponds to a binary decision tree with at least n! leaves (one per permutation). Its minimum height is ⌈log₂(n!)⌉ = Ω(n log n) by Stirling’s approximation.',
-    lessonUrl: '/concepts/sorting/sorting-lower-bound',
+    lessonUrl: '/concepts/sorting/efficient-sorting',
   },
   {
     id: 'theory-greedy-properties',
@@ -37,7 +37,7 @@ const THEORY_CARDS = [
     front: 'What two properties guarantee that a Greedy algorithm finds the global optimum?',
     answer:
       '1) Greedy-choice property: a locally optimal choice can always be extended to a globally optimal solution. 2) Optimal substructure: an optimal solution contains optimal solutions to its subproblems.',
-    lessonUrl: '/concepts/greedy-algorithms/greedy-strategy',
+    lessonUrl: '/concepts/greedy-algorithms/greedy-method',
   },
   {
     id: 'theory-dp-vs-dc',
@@ -45,7 +45,7 @@ const THEORY_CARDS = [
     front: 'When should you use Dynamic Programming instead of Divide & Conquer?',
     answer:
       'When subproblems overlap (the same subproblems are solved repeatedly) and the problem has optimal substructure. Divide & Conquer assumes independent subproblems.',
-    lessonUrl: '/concepts/dynamic-programming/dynamic-programming-principles',
+    lessonUrl: '/concepts/dynamic-programming/dynamic-programming-method',
   },
   {
     id: 'theory-memo-vs-tab',
@@ -53,7 +53,7 @@ const THEORY_CARDS = [
     front: 'Memoization (top-down) vs. Tabulation (bottom-up) in Dynamic Programming?',
     answer:
       'Memoization uses recursion + cache and only computes reachable subproblems. Tabulation fills a table iteratively in topological order, avoiding recursion stack overhead and enabling space optimization.',
-    lessonUrl: '/concepts/dynamic-programming/dynamic-programming-principles',
+    lessonUrl: '/concepts/dynamic-programming/dynamic-programming-method',
   },
   {
     id: 'theory-knapsack-01-vs-frac',
@@ -61,7 +61,7 @@ const THEORY_CARDS = [
     front: 'Why does Greedy solve Fractional Knapsack optimally but fails on 0/1 Knapsack?',
     answer:
       'In Fractional Knapsack you can take any fraction of the highest value/weight item without wasting capacity. In 0/1 Knapsack indivisible items can leave unused capacity where a different combination yields higher total value.',
-    lessonUrl: '/concepts/greedy-algorithms/knapsack-problem',
+    lessonUrl: '/concepts/greedy-algorithms/classic-problems',
   },
   {
     id: 'theory-backtracking-pruning',
@@ -69,7 +69,7 @@ const THEORY_CARDS = [
     front: 'What makes Backtracking faster than naive Exhaustive Search?',
     answer:
       'Feasibility pruning: partial candidate solutions are checked as soon as a choice is made; whenever a constraint is violated, the entire subtree rooted at that partial state is pruned immediately.',
-    lessonUrl: '/concepts/backtracking/backtracking-paradigm',
+    lessonUrl: '/concepts/backtracking/backtracking-scheme',
   },
   {
     id: 'theory-bt-vs-bb',
@@ -77,7 +77,7 @@ const THEORY_CARDS = [
     front: 'How does Branch & Bound differ from Backtracking?',
     answer:
       'Backtracking uses DFS and prunes infeasible branches. Branch & Bound solves optimization problems using Best-First Search (priority queue) and prunes subtrees whose optimistic bound cannot beat the best incumbent solution.',
-    lessonUrl: '/concepts/branch-and-bound/branch-and-bound-paradigm',
+    lessonUrl: '/concepts/branch-and-bound/branch-and-bound-scheme',
   },
   {
     id: 'theory-admissible-heuristic',
@@ -85,7 +85,7 @@ const THEORY_CARDS = [
     front: 'What is an admissible heuristic in A* / Branch & Bound?',
     answer:
       'A bound function h(n) that never overestimates the true remaining cost (for minimization) — or never underestimates it (for maximization). Admissibility guarantees optimality of the first goal node expanded.',
-    lessonUrl: '/concepts/branch-and-bound/a-star-and-heuristics',
+    lessonUrl: '/concepts/branch-and-bound/branch-and-bound-scheme',
   },
   {
     id: 'theory-amdahl',
@@ -101,16 +101,48 @@ const THEORY_CARDS = [
     front: 'What distinguishes P, NP, NP-Hard, and NP-Complete?',
     answer:
       'P: solvable in polynomial time. NP: verifiable in polynomial time. NP-Hard: at least as hard as every problem in NP (via polynomial reduction). NP-Complete: in both NP and NP-Hard.',
-    lessonUrl: '/concepts/synthesis/choosing-a-paradigm',
+    lessonUrl: '/concepts/synthesis/choosing-a-technique',
   },
 ];
+
+function renderMathText(text, keyPrefix = 'm') {
+  if (!text) return null;
+  const parts = [];
+  // Matches: ^(group), ^token, _(group), _token
+  const re = /(\^\([^)]+\)|\^[A-Za-z0-9]+|_\([^)]+\)|_[A-Za-z0-9]+)/g;
+  let last = 0;
+  let m;
+  let idx = 0;
+  while ((m = re.exec(text)) !== null) {
+    if (m.index > last) parts.push(text.slice(last, m.index));
+    const tok = m[0];
+    const key = `${keyPrefix}-${idx++}`;
+    if (tok.startsWith('^(')) {
+      parts.push(<sup key={key}>{renderMathText(tok.slice(2, -1), `${key}-s`)}</sup>);
+    } else if (tok.startsWith('^')) {
+      parts.push(<sup key={key}>{tok.slice(1)}</sup>);
+    } else if (tok.startsWith('_(')) {
+      parts.push(<sub key={key}>{renderMathText(tok.slice(2, -1), `${key}-b`)}</sub>);
+    } else if (tok.startsWith('_')) {
+      parts.push(<sub key={key}>{tok.slice(1)}</sub>);
+    }
+    last = re.lastIndex;
+  }
+  if (last < text.length) parts.push(text.slice(last));
+  return parts;
+}
 
 function buildDeck() {
   const algoCards = ALGORITHMS.map((alg) => ({
     id: `alg-${alg.id}`,
     paradigm: alg.paradigm,
     front: `What are the time & space complexities and key properties of ${alg.name}?`,
-    answer: `Best: ${alg.best} · Average: ${alg.average} · Worst: ${alg.worst} · Space: ${alg.space}`,
+    complexities: {
+      best: alg.best,
+      average: alg.average,
+      worst: alg.worst,
+      space: alg.space,
+    },
     props: alg.props || [],
     notes: alg.notes || '',
     lessonUrl: alg.lessonUrl,
@@ -316,7 +348,9 @@ export default function FlashcardsPage() {
         ) : (
           <>
             <div className={styles.cardCounter}>
-              Card <strong>{safeIndex + 1}</strong> of <strong>{visibleCards.length}</strong>
+              <span>
+                Card <strong>{safeIndex + 1}</strong> of <strong>{visibleCards.length}</strong>
+              </span>
               {mastered.has(currentCard.id) && (
                 <span className={styles.masteredTag}>✓ Mastered</span>
               )}
@@ -342,12 +376,33 @@ export default function FlashcardsPage() {
 
               {!flipped ? (
                 <div className={styles.cardBody}>
-                  <p className={styles.question}>{currentCard.front}</p>
+                  <p className={styles.question}>{renderMathText(currentCard.front, 'q')}</p>
                   <span className={styles.flipHint}>Click card or press Space to reveal answer</span>
                 </div>
               ) : (
                 <div className={styles.cardBody}>
-                  <p className={styles.answer}>{currentCard.answer}</p>
+                  {currentCard.complexities ? (
+                    <div className={styles.complexityGrid}>
+                      <div className={styles.complexityCell}>
+                        <span className={styles.complexityLabel}>Best</span>
+                        <span className={styles.complexityVal}>{renderMathText(currentCard.complexities.best, 'cb')}</span>
+                      </div>
+                      <div className={styles.complexityCell}>
+                        <span className={styles.complexityLabel}>Average</span>
+                        <span className={styles.complexityVal}>{renderMathText(currentCard.complexities.average, 'ca')}</span>
+                      </div>
+                      <div className={styles.complexityCell}>
+                        <span className={styles.complexityLabel}>Worst</span>
+                        <span className={styles.complexityVal}>{renderMathText(currentCard.complexities.worst, 'cw')}</span>
+                      </div>
+                      <div className={styles.complexityCell}>
+                        <span className={styles.complexityLabel}>Space</span>
+                        <span className={styles.complexityVal}>{renderMathText(currentCard.complexities.space, 'cs')}</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className={styles.answer}>{renderMathText(currentCard.answer, 'a')}</p>
+                  )}
                   {currentCard.props && currentCard.props.length > 0 && (
                     <div className={styles.propRow}>
                       {currentCard.props.map((pr) => (
@@ -355,7 +410,7 @@ export default function FlashcardsPage() {
                       ))}
                     </div>
                   )}
-                  {currentCard.notes && <p className={styles.notes}>{currentCard.notes}</p>}
+                  {currentCard.notes && <p className={styles.notes}>{renderMathText(currentCard.notes, 'n')}</p>}
                   {currentCard.lessonUrl && (
                     <Link
                       to={currentCard.lessonUrl}
