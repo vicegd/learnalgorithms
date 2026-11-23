@@ -1071,7 +1071,11 @@ export default function AdminDashboardPage() {
                 Readability vs. Engagement (NLP × Telemetry) ({readabilityRows.length})
               </h2>
               <p className={styles.sectionHint}>
-                Cross-checks build-time NLP readability metrics (Flesch-Kincaid Grade, Flesch Reading Ease, lexical richness TTR) against live telemetry and negative feedback to flag dense lessons with low scroll depth (&lt; 60%) or negative votes.
+                Cross-checks build-time NLP readability metrics against live telemetry and negative feedback to flag dense lessons with low scroll depth (&lt; 60%) or negative votes.
+                {' '}<strong>FK Grade</strong> (Flesch-Kincaid Grade Level): estimated years of schooling needed (<code>8–11</code> accessible, <code>≥ 12</code> dense/university).
+                {' '}<strong>Flesch Ease</strong> (0–100, higher = easier): <code>60+</code> plain, <code>45–60</code> technical, <code>&lt; 45</code> dense.
+                {' '}<strong>TTR</strong> (Type-Token Ratio, 0–1): vocabulary diversity (<code>unique / total words</code>; higher = denser terminology).
+                {' '}<strong>Status</strong>: <em>High friction</em> = dense + low scroll or negative votes; <em>Dense</em> = high reading level with healthy engagement.
               </p>
               {readabilityRows.length === 0 ? (
                 <p className={styles.empty}>No lesson readability metadata available.</p>
