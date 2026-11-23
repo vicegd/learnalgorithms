@@ -184,8 +184,8 @@ class Store:
                 if not row:
                     return False
                 prev_helpful, prev_comment = row
-                new_comment = prev_comment if prev_comment is not None else comment
-                if helpful_int != prev_helpful or (comment and prev_comment is None):
+                new_comment = comment if comment else prev_comment
+                if helpful_int != prev_helpful or (comment and comment != prev_comment):
                     self.db.execute(
                         "UPDATE feedback SET helpful = ?, comment = ? WHERE page = ? AND day = ? AND voter = ?",
                         (helpful_int, new_comment, page, day, voter),
