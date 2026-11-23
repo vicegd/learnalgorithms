@@ -61,9 +61,9 @@ self.onmessage = async (e) => {
     }
 
     if (data.task === 'primes') {
-      const {start, end} = data;
+      const {start, end, step = 1} = data;
       let count = 0;
-      for (let x = start; x <= end; x += 1) {
+      for (let x = start; x <= end; x += step) {
         if (isPrime(x)) count += 1;
       }
       self.postMessage({ok: true, count});

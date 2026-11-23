@@ -67,17 +67,14 @@ function runWasmSandboxWorker(mode, n) {
   });
 }
 
-function runPrimeSliceWorker(start, end) {
+function runPrimeWorker(worker, start, end, step) {
   return new Promise((resolve, reject) => {
-    const worker = new Worker(WORKER_URL);
     const timer = window.setTimeout(() => {
-      worker.terminate();
       reject(new Error(`Parallel worker timed out after ${SANDBOX_TIMEOUT_MS / 1000} s.`));
     }, SANDBOX_TIMEOUT_MS);
 
     worker.onmessage = (e) => {
       window.clearTimeout(timer);
-      worker.terminate();
       if (e.data && e.data.ok) {
         resolve(e.data.count);
       } else {
@@ -86,26 +83,26 @@ function runPrimeSliceWorker(start, end) {
     };
     worker.onerror = (err) => {
       window.clearTimeout(timer);
-      worker.terminate();
       reject(new Error(err.message || 'Parallel worker failed'));
     };
-    worker.postMessage({task: 'primes', start, end});
+    worker.postMessage({task: 'primes', start, end, step});
   });
 }
 
 async function runParallelPrimeBenchmark(limit, threads) {
-  const t0 = performance.now();
-  const chunk = Math.ceil((limit - 1) / threads);
-  const tasks = [];
-  for (let i = 0; i < threads; i += 1) {
-    const start = 2 + i * chunk;
-    const end = Math.min(limit, start + chunk - 1);
-    if (start <= end) tasks.push(runPrimeSliceWorker(start, end));
+  // Pre-spawn workers so we measure parallel compute time rather than thread-creation overhead,
+  // and use cyclic (strided) scheduling so every worker gets an equal mix of small & large numbers.
+  const workers = Array.from({length: threads}, () => new Worker(WORKER_URL));
+  try {
+    const t0 = performance.now();
+    const tasks = workers.map((w, i) => runPrimeWorker(w, 2 + i, limit, threads));
+    const counts = await Promise.all(tasks);
+    const elapsedMs = performance.now() - t0;
+    const totalPrimes = counts.reduce((a, b) => a + b, 0);
+    return {threads, elapsedMs, totalPrimes};
+  } finally {
+    for (const w of workers) w.terminate();
   }
-  const counts = await Promise.all(tasks);
-  const elapsedMs = performance.now() - t0;
-  const totalPrimes = counts.reduce((a, b) => a + b, 0);
-  return {threads, elapsedMs, totalPrimes};
 }
 
 export default function BenchmarkPage() {
@@ -117,7 +114,7 @@ export default function BenchmarkPage() {
   const [wasmError, setWasmError] = useState('');
 
   const [cores, setCores] = useState(4);
-  const [primeLimit, setPrimeLimit] = useState(600000);
+  const [primeLimit, setPrimeLimit] = useState(2000000);
   const [seqFraction, setSeqFraction] = useState(10); // % sequential for Amdahl's Law
   const [hpcRunning, setHpcRunning] = useState(false);
   const [hpcRows, setHpcRows] = useState([]);
@@ -334,9 +331,9 @@ export default function BenchmarkPage() {
               Upper bound <code>N</code>: <strong>{primeLimit.toLocaleString()}</strong>
               <input
                 type="range"
-                min={200000}
-                max={1500000}
-                step={100000}
+                min={500000}
+                max={6000000}
+                step={500000}
                 value={primeLimit}
                 onChange={(e) => setPrimeLimit(Number(e.target.value))}
                 className={styles.slider}
