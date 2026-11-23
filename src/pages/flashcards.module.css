@@ -101,17 +101,61 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: space-between;
   gap: 0.65rem;
 }
 
-.checkboxLabel {
-  display: inline-flex;
-  align-items: center;
+.statusPills {
+  display: flex;
+  flex-wrap: wrap;
   gap: 0.4rem;
-  font-size: 0.85rem;
+}
+
+.toolBtns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.statusPill {
+  padding: 0.34rem 0.72rem;
+  border-radius: 8px;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  background: var(--ifm-background-surface-color);
+  color: var(--ifm-font-color-base);
+  font-size: 0.8rem;
   font-weight: 600;
-  margin-right: auto;
   cursor: pointer;
+}
+
+.statusPillActive {
+  background: var(--ifm-color-emphasis-800);
+  border-color: var(--ifm-color-emphasis-800);
+  color: var(--ifm-background-color);
+}
+
+.statusPillReview {
+  border-color: rgba(217, 119, 6, 0.5);
+  color: #b45309;
+  background: rgba(217, 119, 6, 0.08);
+}
+
+.statusPillReviewActive {
+  background: #d97706;
+  border-color: #d97706;
+  color: #ffffff;
+}
+
+.statusPillMastered {
+  border-color: rgba(46, 133, 85, 0.5);
+  color: var(--ifm-color-primary-darkest);
+  background: rgba(46, 133, 85, 0.08);
+}
+
+.statusPillMasteredActive {
+  background: var(--ifm-color-primary);
+  border-color: var(--ifm-color-primary);
+  color: #ffffff;
 }
 
 .cardCounter {
