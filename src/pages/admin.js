@@ -2,6 +2,7 @@ import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import Head from '@docusaurus/Head';
 import Layout from '@theme/Layout';
 import {usePluginData} from '@docusaurus/useGlobalData';
+import MarkdownView from '@site/src/components/MarkdownView';
 import styles from './admin.module.css';
 
 const API_BASE = 'https://api.learnalgorithms.dev';
@@ -1274,7 +1275,7 @@ export default function AdminDashboardPage() {
                       <p className={styles.aiDisclaimer}>
                         Generated exclusively from the anonymized ETL metrics below. Review before including in official teaching reports (human-in-the-loop).
                       </p>
-                      <pre className={styles.reportPre}>{aiAnalysis.analysis}</pre>
+                      <MarkdownView content={aiAnalysis.analysis} />
                     </div>
                   )}
                   {aiHistory.length > 0 && (
@@ -1325,7 +1326,7 @@ export default function AdminDashboardPage() {
                       </div>
                     </div>
                   )}
-                  <pre className={styles.reportPre}>{etlMarkdown}</pre>
+                  <MarkdownView content={etlMarkdown} />
                 </>
               )}
             </section>

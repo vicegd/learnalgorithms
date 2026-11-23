@@ -1,0 +1,120 @@
+.markdown {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--ifm-font-color-base);
+  padding: 1rem 1.25rem;
+  border-radius: 10px;
+  border: 1px solid var(--ifm-color-emphasis-200);
+  background: var(--ifm-background-surface-color);
+  max-height: 520px;
+  overflow-y: auto;
+}
+
+.h1 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin: 0.2rem 0 0.75rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--ifm-color-emphasis-200);
+}
+
+.h2 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 1.15rem 0 0.45rem;
+  color: var(--ifm-color-primary-darkest);
+}
+
+.h3 {
+  font-size: 0.96rem;
+  font-weight: 700;
+  margin: 0.9rem 0 0.35rem;
+}
+
+.h4 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin: 0.75rem 0 0.3rem;
+}
+
+.p {
+  margin: 0 0 0.6rem;
+}
+
+.list {
+  margin: 0 0 0.75rem;
+  padding-left: 1.35rem;
+}
+
+.list li {
+  margin-bottom: 0.25rem;
+}
+
+.blockquote {
+  margin: 0.65rem 0;
+  padding: 0.45rem 0.85rem;
+  border-left: 3px solid var(--ifm-color-primary);
+  background: var(--ifm-color-emphasis-100);
+  border-radius: 0 6px 6px 0;
+  font-size: 0.86rem;
+}
+
+.hr {
+  border: 0;
+  border-top: 1px solid var(--ifm-color-emphasis-200);
+  margin: 0.9rem 0;
+}
+
+.tableWrap {
+  overflow-x: auto;
+  margin: 0.65rem 0 0.85rem;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.83rem;
+}
+
+.table th,
+.table td {
+  padding: 0.42rem 0.6rem;
+  border: 1px solid var(--ifm-color-emphasis-200);
+  text-align: left;
+  vertical-align: top;
+}
+
+.table th {
+  background: var(--ifm-color-emphasis-100);
+  font-weight: 700;
+}
+
+.markdown code {
+  font-size: 0.84em;
+  padding: 0.08rem 0.3rem;
+  border-radius: 4px;
+  background: var(--ifm-color-emphasis-100);
+}
+
+@media print {
+  .markdown {
+    max-height: none !important;
+    overflow: visible !important;
+    border: none !important;
+    padding: 0.25rem 0 !important;
+    background: transparent !important;
+  }
+
+  .tableWrap {
+    overflow: visible !important;
+  }
+
+  .table thead {
+    display: table-header-group;
+  }
+
+  .table tr {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
