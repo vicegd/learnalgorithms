@@ -18,7 +18,7 @@ const FIB_WASM_BYTES = [
 ];
 
 const SANDBOX_TIMEOUT_MS = 30000;
-const WORKER_URL = '/workers/benchmark-worker.js?v=4';
+const WORKER_URL = '/workers/benchmark-worker.js?v=5';
 
 function runWasmSandboxWorker(n) {
   return new Promise((resolve, reject) => {
@@ -46,7 +46,7 @@ function runWasmSandboxWorker(n) {
   });
 }
 
-function runPrimeWorker(worker, start, end, step) {
+function runPrimeWorker(worker, payload) {
   return new Promise((resolve, reject) => {
     const timer = window.setTimeout(() => {
       reject(new Error(`Parallel worker timed out after ${SANDBOX_TIMEOUT_MS / 1000} s.`));
@@ -64,7 +64,7 @@ function runPrimeWorker(worker, start, end, step) {
       window.clearTimeout(timer);
       reject(new Error(err.message || 'Parallel worker failed'));
     };
-    worker.postMessage({task: 'primes', start, end, step});
+    worker.postMessage({task: 'primes', ...payload});
   });
 }
 
@@ -83,17 +83,45 @@ function waitWorkerReady(worker) {
   });
 }
 
-async function runParallelPrimeBenchmark(limit, threads) {
-  // Pre-spawn workers and wait for ping/ready handshake so V8 isolate boot time is excluded
-  // from the parallel compute measurement; distribute odd candidates cyclically for load balance.
+async function runParallelPrimeBenchmark(limit, threads, seqPct) {
+  // Pre-spawn workers and run a ping/ready handshake + short JIT warm-up before timing.
+  // Actually executes seqPct% of odd candidates sequentially on 1 worker and the remaining
+  // (100 - seqPct)% in parallel across `threads` workers so Amdahl's Law holds empirically!
   const workers = Array.from({length: threads}, () => new Worker(WORKER_URL));
   try {
     await Promise.all(workers.map((w) => waitWorkerReady(w)));
+    // Short JIT warm-up on worker 0 so p=1 isn't penalized by cold compilation
+    await runPrimeWorker(workers[0], {start: 3, end: Math.min(limit, 50000), step: 2});
+
     const t0 = performance.now();
-    const tasks = workers.map((w, i) => runPrimeWorker(w, 3 + 2 * i, limit, 2 * threads));
-    const counts = await Promise.all(tasks);
+    let seqCount = 0;
+    if (seqPct > 0) {
+      seqCount = await runPrimeWorker(workers[0], {
+        start: 3,
+        end: limit,
+        step: 2,
+        mod: 100,
+        modMin: 0,
+        modMax: seqPct,
+      });
+    }
+    let parCounts = [];
+    if (seqPct < 100) {
+      const tasks = workers.map((w, i) =>
+        runPrimeWorker(w, {
+          start: 3 + 2 * i,
+          end: limit,
+          step: 2 * threads,
+          mod: seqPct > 0 ? 100 : 0,
+          modMin: seqPct,
+          modMax: 100,
+        }),
+      );
+      parCounts = await Promise.all(tasks);
+    }
     const elapsedMs = performance.now() - t0;
-    const totalPrimes = (limit >= 2 ? 1 : 0) + counts.reduce((a, b) => a + b, 0);
+    const totalPrimes =
+      (limit >= 2 ? 1 : 0) + seqCount + parCounts.reduce((a, b) => a + b, 0);
     return {threads, elapsedMs, totalPrimes};
   } finally {
     for (const w of workers) w.terminate();
@@ -151,7 +179,7 @@ export default function BenchmarkPage() {
       const out = [];
       let baseMs = null;
       for (const p of threadCounts) {
-        const res = await runParallelPrimeBenchmark(primeLimit, p);
+        const res = await runParallelPrimeBenchmark(primeLimit, p, seqFraction);
         if (baseMs === null) baseMs = res.elapsedMs;
         const speedup = baseMs / res.elapsedMs;
         const efficiency = (speedup / p) * 100;
