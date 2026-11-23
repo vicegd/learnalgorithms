@@ -129,9 +129,15 @@
 }
 
 .statusPillActive {
-  background: var(--ifm-color-emphasis-800);
-  border-color: var(--ifm-color-emphasis-800);
-  color: var(--ifm-background-color);
+  background: #1f2937;
+  border-color: #1f2937;
+  color: #ffffff;
+}
+
+:global([data-theme='dark']) .statusPillActive {
+  background: #e5e7eb;
+  border-color: #e5e7eb;
+  color: #111827;
 }
 
 .statusPillReview {
