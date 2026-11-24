@@ -227,11 +227,22 @@ class Store:
             ).fetchone()
         return {"page": page, "helpful": row[0], "notHelpful": row[1] - row[0]}
 
-    def latest(self, limit=200):
+    def latest(self, limit=200, days=0):
+        since = (
+            None
+            if days == 0
+            else (dt.datetime.now(dt.timezone.utc).date() - dt.timedelta(days=days - 1)).isoformat()
+        )
         with self.lock:
-            rows = self.db.execute(
-                "SELECT page, helpful, comment, day FROM feedback ORDER BY id DESC LIMIT ?", (limit,)
-            ).fetchall()
+            if since is None:
+                rows = self.db.execute(
+                    "SELECT page, helpful, comment, day FROM feedback ORDER BY id DESC LIMIT ?", (limit,)
+                ).fetchall()
+            else:
+                rows = self.db.execute(
+                    "SELECT page, helpful, comment, day FROM feedback WHERE day >= ? ORDER BY id DESC LIMIT ?",
+                    (since, limit),
+                ).fetchall()
         return [{"page": p, "helpful": bool(h), "comment": c, "day": d} for p, h, c, d in rows]
 
     def add_survey(self, clarity, usefulness, tools, overall, comment, day, voter):
@@ -352,12 +363,23 @@ class Store:
             )
             self.db.commit()
 
-    def latest_issues(self, limit=200):
+    def latest_issues(self, limit=200, days=0):
+        since = (
+            None
+            if days == 0
+            else (dt.datetime.now(dt.timezone.utc).date() - dt.timedelta(days=days - 1)).isoformat()
+        )
         with self.lock:
-            rows = self.db.execute(
-                "SELECT delivery, action, number, title, url, received FROM github_issues ORDER BY received DESC LIMIT ?",
-                (limit,),
-            ).fetchall()
+            if since is None:
+                rows = self.db.execute(
+                    "SELECT delivery, action, number, title, url, received FROM github_issues ORDER BY received DESC LIMIT ?",
+                    (limit,),
+                ).fetchall()
+            else:
+                rows = self.db.execute(
+                    "SELECT delivery, action, number, title, url, received FROM github_issues WHERE substr(received, 1, 10) >= ? ORDER BY received DESC LIMIT ?",
+                    (since, limit),
+                ).fetchall()
         return [
             {
                 "delivery": d,
@@ -863,8 +885,8 @@ def interpret_report_with_llm(markdown_report, lang="en", detail="brief"):
 
 def build_full_report(app, days):
     events, _ = app.store.latest_events(days=days, limit=50000, offset=0)
-    feedback = app.store.latest(limit=500)
-    issues = app.store.latest_issues(limit=200)
+    feedback = app.store.latest(limit=500, days=days)
+    issues = app.store.latest_issues(limit=200, days=days)
     survey = app.store.survey_summary(days=days, limit=200)
     try:
         popular = app.popular.get(app.popular_fetch)
@@ -1040,7 +1062,13 @@ def make_handler(app):
                 auth = self.headers.get("Authorization", "")
                 if not ADMIN_TOKEN or not hmac.compare_digest(auth, "Bearer " + ADMIN_TOKEN):
                     return self.send_json(401, {"error": "unauthorized"}, {"WWW-Authenticate": "Bearer"})
-                return self.send_json(200, {"feedback": app.store.latest()}, {"Cache-Control": "no-store"})
+                qs = urllib.parse.parse_qs(url.query)
+                raw_days = qs.get("days", ["0"])[0]
+                try:
+                    days = 0 if raw_days == "all" else max(0, min(3650, int(raw_days)))
+                except ValueError:
+                    return self.send_json(400, {"error": "invalid days"})
+                return self.send_json(200, {"feedback": app.store.latest(days=days)}, {"Cache-Control": "no-store"})
             if url.path == "/admin/survey":
                 auth = self.headers.get("Authorization", "")
                 if not ADMIN_TOKEN or not hmac.compare_digest(auth, "Bearer " + ADMIN_TOKEN):
@@ -1056,7 +1084,13 @@ def make_handler(app):
                 auth = self.headers.get("Authorization", "")
                 if not ADMIN_TOKEN or not hmac.compare_digest(auth, "Bearer " + ADMIN_TOKEN):
                     return self.send_json(401, {"error": "unauthorized"}, {"WWW-Authenticate": "Bearer"})
-                return self.send_json(200, {"issues": app.store.latest_issues()}, {"Cache-Control": "no-store"})
+                qs = urllib.parse.parse_qs(url.query)
+                raw_days = qs.get("days", ["0"])[0]
+                try:
+                    days = 0 if raw_days == "all" else max(0, min(3650, int(raw_days)))
+                except ValueError:
+                    return self.send_json(400, {"error": "invalid days"})
+                return self.send_json(200, {"issues": app.store.latest_issues(days=days)}, {"Cache-Control": "no-store"})
             if url.path == "/admin/stats":
                 auth = self.headers.get("Authorization", "")
                 if not ADMIN_TOKEN or not hmac.compare_digest(auth, "Bearer " + ADMIN_TOKEN):
