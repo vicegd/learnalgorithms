@@ -181,6 +181,30 @@ CREATE INDEX IF NOT EXISTS ai_reports_created ON ai_reports (created_at);
 """
 
 
+def parse_days_param(raw_days):
+    """Parse ?days= query parameter. Returns 0 (all time), -24 (rolling 24h), or 1..3650."""
+    val = (raw_days or "").strip().lower()
+    if val == "all":
+        return 0
+    if val == "24h":
+        return -24
+    return max(0, min(3650, int(val)))
+
+
+def cutoff_for_days(days, use_ts=False):
+    """Return (sql_expr, param) for day/timestamp filtering, or (None, None) for all time."""
+    if days == 0:
+        return None, None
+    now_utc = dt.datetime.now(dt.timezone.utc)
+    if days == -24:
+        since_dt = now_utc - dt.timedelta(hours=24)
+        if use_ts:
+            return "ts >= ?", since_dt.isoformat()
+        return "day >= ?", since_dt.date().isoformat()
+    since_day = (now_utc.date() - dt.timedelta(days=max(1, days) - 1)).isoformat()
+    return "day >= ?", since_day
+
+
 class Store:
     def __init__(self, path):
         self.path = path
@@ -228,20 +252,16 @@ class Store:
         return {"page": page, "helpful": row[0], "notHelpful": row[1] - row[0]}
 
     def latest(self, limit=200, days=0):
-        since = (
-            None
-            if days == 0
-            else (dt.datetime.now(dt.timezone.utc).date() - dt.timedelta(days=days - 1)).isoformat()
-        )
+        cond, param = cutoff_for_days(days, use_ts=False)
         with self.lock:
-            if since is None:
+            if cond is None:
                 rows = self.db.execute(
                     "SELECT page, helpful, comment, day FROM feedback ORDER BY id DESC LIMIT ?", (limit,)
                 ).fetchall()
             else:
                 rows = self.db.execute(
-                    "SELECT page, helpful, comment, day FROM feedback WHERE day >= ? ORDER BY id DESC LIMIT ?",
-                    (since, limit),
+                    f"SELECT page, helpful, comment, day FROM feedback WHERE {cond} ORDER BY id DESC LIMIT ?",
+                    (param, limit),
                 ).fetchall()
         return [{"page": p, "helpful": bool(h), "comment": c, "day": d} for p, h, c, d in rows]
 
@@ -268,13 +288,9 @@ class Store:
                 return True
 
     def survey_summary(self, days=30, limit=200):
-        since = (
-            None
-            if days == 0
-            else (dt.datetime.now(dt.timezone.utc).date() - dt.timedelta(days=days - 1)).isoformat()
-        )
-        where = "" if since is None else "WHERE day >= ?"
-        params = () if since is None else (since,)
+        cond, since = cutoff_for_days(days, use_ts=False)
+        where = "" if cond is None else f"WHERE {cond}"
+        params = () if cond is None else (since,)
         with self.lock:
             agg = self.db.execute(
                 f"""SELECT COUNT(*), AVG(clarity), AVG(usefulness), AVG(tools), AVG(overall)
@@ -364,21 +380,24 @@ class Store:
             self.db.commit()
 
     def latest_issues(self, limit=200, days=0):
-        since = (
-            None
-            if days == 0
-            else (dt.datetime.now(dt.timezone.utc).date() - dt.timedelta(days=days - 1)).isoformat()
-        )
+        if days == 0:
+            cond, param = None, None
+        elif days == -24:
+            cond = "received >= ?"
+            param = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(hours=24)).isoformat()
+        else:
+            cond = "substr(received, 1, 10) >= ?"
+            param = (dt.datetime.now(dt.timezone.utc).date() - dt.timedelta(days=max(1, days) - 1)).isoformat()
         with self.lock:
-            if since is None:
+            if cond is None:
                 rows = self.db.execute(
                     "SELECT delivery, action, number, title, url, received FROM github_issues ORDER BY received DESC LIMIT ?",
                     (limit,),
                 ).fetchall()
             else:
                 rows = self.db.execute(
-                    "SELECT delivery, action, number, title, url, received FROM github_issues WHERE substr(received, 1, 10) >= ? ORDER BY received DESC LIMIT ?",
-                    (since, limit),
+                    f"SELECT delivery, action, number, title, url, received FROM github_issues WHERE {cond} ORDER BY received DESC LIMIT ?",
+                    (param, limit),
                 ).fetchall()
         return [
             {
@@ -420,11 +439,10 @@ class Store:
         return len(rows)
 
     def stats_summary(self, days=30):
-        all_time = days == 0
-        cutoff = None if all_time else (dt.date.today() - dt.timedelta(days=max(1, days) - 1)).isoformat()
-        where = "" if all_time else "WHERE day >= ?"
-        and_where = "" if all_time else "AND day >= ?"
-        params = () if all_time else (cutoff,)
+        cond, cutoff = cutoff_for_days(days, use_ts=True)
+        where = "" if cond is None else f"WHERE {cond}"
+        and_where = "" if cond is None else f"AND {cond}"
+        params = () if cond is None else (cutoff,)
         with self.lock:
             totals = self.db.execute(
                 f"""SELECT COUNT(*), COUNT(DISTINCT session_id), COUNT(DISTINCT day)
@@ -507,10 +525,9 @@ class Store:
         }
 
     def latest_events(self, days=30, limit=500, offset=0):
-        all_time = days == 0
-        cutoff = None if all_time else (dt.date.today() - dt.timedelta(days=max(1, days) - 1)).isoformat()
-        where = "" if all_time else "WHERE day >= ?"
-        params = () if all_time else (cutoff,)
+        cond, cutoff = cutoff_for_days(days, use_ts=True)
+        where = "" if cond is None else f"WHERE {cond}"
+        params = () if cond is None else (cutoff,)
         with self.lock:
             total = self.db.execute(
                 f"SELECT COUNT(*) FROM telemetry_events {where}",
@@ -1065,7 +1082,7 @@ def make_handler(app):
                 qs = urllib.parse.parse_qs(url.query)
                 raw_days = qs.get("days", ["0"])[0]
                 try:
-                    days = 0 if raw_days == "all" else max(0, min(3650, int(raw_days)))
+                    days = parse_days_param(raw_days)
                 except ValueError:
                     return self.send_json(400, {"error": "invalid days"})
                 return self.send_json(200, {"feedback": app.store.latest(days=days)}, {"Cache-Control": "no-store"})
@@ -1076,7 +1093,7 @@ def make_handler(app):
                 qs = urllib.parse.parse_qs(url.query)
                 raw_days = qs.get("days", ["30"])[0]
                 try:
-                    days = 0 if raw_days == "all" else max(0, min(3650, int(raw_days)))
+                    days = parse_days_param(raw_days)
                 except ValueError:
                     return self.send_json(400, {"error": "invalid days"})
                 return self.send_json(200, app.store.survey_summary(days=days), {"Cache-Control": "no-store"})
@@ -1087,7 +1104,7 @@ def make_handler(app):
                 qs = urllib.parse.parse_qs(url.query)
                 raw_days = qs.get("days", ["0"])[0]
                 try:
-                    days = 0 if raw_days == "all" else max(0, min(3650, int(raw_days)))
+                    days = parse_days_param(raw_days)
                 except ValueError:
                     return self.send_json(400, {"error": "invalid days"})
                 return self.send_json(200, {"issues": app.store.latest_issues(days=days)}, {"Cache-Control": "no-store"})
@@ -1098,7 +1115,7 @@ def make_handler(app):
                 qs = urllib.parse.parse_qs(url.query)
                 raw_days = qs.get("days", ["30"])[0]
                 try:
-                    days = 0 if raw_days == "all" else max(0, min(3650, int(raw_days)))
+                    days = parse_days_param(raw_days)
                 except ValueError:
                     return self.send_json(400, {"error": "invalid days"})
                 return self.send_json(200, app.store.stats_summary(days), {"Cache-Control": "no-store"})
@@ -1111,7 +1128,7 @@ def make_handler(app):
                 raw_days = qs.get("days", ["30"])[0]
                 max_limit = 50000 if fmt == "csv" else 5000
                 try:
-                    days = 0 if raw_days == "all" else max(0, min(3650, int(raw_days)))
+                    days = parse_days_param(raw_days)
                     limit = max(1, min(max_limit, int(qs.get("limit", ["500"])[0])))
                     offset = max(0, int(qs.get("offset", ["0"])[0]))
                 except ValueError:
@@ -1146,7 +1163,7 @@ def make_handler(app):
                 fmt = qs.get("format", ["json"])[0]
                 raw_days = qs.get("days", ["30"])[0]
                 try:
-                    days = 0 if raw_days == "all" else max(0, min(3650, int(raw_days)))
+                    days = parse_days_param(raw_days)
                 except ValueError:
                     return self.send_json(400, {"error": "invalid days"})
                 report, markdown = build_full_report(app, days)
