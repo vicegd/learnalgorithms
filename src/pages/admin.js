@@ -92,7 +92,7 @@ export default function AdminDashboardPage() {
   const siteData = usePluginData('docusaurus-plugin-site-data');
   const [token, setToken] = useState('');
   const [tokenInput, setTokenInput] = useState('');
-  const [days, setDays] = useState(30);
+  const [days, setDays] = useState('30');
   const [loading, setLoading] = useState(false);
   const [eventsLoading, setEventsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -362,7 +362,7 @@ export default function AdminDashboardPage() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `learnalgorithms-events-${days === 0 ? 'all' : `${days}d`}.csv`;
+      a.download = `learnalgorithms-events-${days === '0' ? 'all' : days === '24h' ? '24h' : `${days}d`}.csv`;
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -391,7 +391,7 @@ export default function AdminDashboardPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `learnalgorithms-report-${days === 0 ? 'all' : `${days}d`}.${ext}`;
+    a.download = `learnalgorithms-report-${days === '0' ? 'all' : days === '24h' ? '24h' : `${days}d`}.${ext}`;
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -432,7 +432,7 @@ export default function AdminDashboardPage() {
     const blob = new Blob([item.analysis], {type: 'text/markdown;charset=utf-8'});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    const winLabel = item.days === 0 ? 'all' : `${item.days}d`;
+    const winLabel = item.days === 0 ? 'all' : item.days === -24 ? '24h' : `${item.days}d`;
     const stamp = (item.createdAt || new Date().toISOString()).slice(0, 10);
     a.href = url;
     a.download = `learnalgorithms-ai-${item.detail || 'brief'}-${item.lang || 'en'}-${winLabel}-${stamp}.md`;
@@ -616,18 +616,19 @@ export default function AdminDashboardPage() {
                 <select
                   className={styles.select}
                   value={days}
-                  onChange={(e) => setDays(Number(e.target.value))}
+                  onChange={(e) => setDays(e.target.value)}
                   aria-label="Time window">
-                  <option value={1}>Last day</option>
-                  <option value={7}>Last 7 days</option>
-                  <option value={30}>Last 30 days</option>
-                  <option value={90}>Last 90 days</option>
-                  <option value={120}>Last 120 days</option>
-                  <option value={150}>Last 150 days</option>
-                  <option value={180}>Last 180 days</option>
-                  <option value={210}>Last 210 days</option>
-                  <option value={365}>Last 365 days</option>
-                  <option value={0}>All time</option>
+                  <option value="1">Today (UTC)</option>
+                  <option value="24h">Last 24 hours</option>
+                  <option value="7">Last 7 days</option>
+                  <option value="30">Last 30 days</option>
+                  <option value="90">Last 90 days</option>
+                  <option value="120">Last 120 days</option>
+                  <option value="150">Last 150 days</option>
+                  <option value="180">Last 180 days</option>
+                  <option value="210">Last 210 days</option>
+                  <option value="365">Last 365 days</option>
+                  <option value="0">All time</option>
                 </select>
                 <button
                   type="button"
@@ -1186,7 +1187,14 @@ export default function AdminDashboardPage() {
               {reportUpdatedAt && (
                 <p className={styles.sectionHint}>
                   Computed live on every load / refresh (no server cache).{' '}
-                  <strong>Window:</strong> {days === 0 ? 'All time' : days === 1 ? 'Last day' : `Last ${days} days`}
+                  <strong>Window:</strong>{' '}
+                  {days === '0'
+                    ? 'All time'
+                    : days === '1'
+                    ? 'Today (UTC)'
+                    : days === '24h'
+                    ? 'Last 24 hours'
+                    : `Last ${days} days`}
                   {' · '}
                   <strong>Last generated:</strong> {reportUpdatedAt.toLocaleString()}
                 </p>
@@ -1294,7 +1302,7 @@ export default function AdminDashboardPage() {
                                 {item.detail === 'detailed' ? '📄 Detailed' : '✨ Summary'} ({item.lang.toUpperCase()})
                               </strong>
                               {' · '}
-                              <span>{item.days === 0 ? 'All time' : `${item.days}d`}</span>
+                              <span>{item.days === 0 ? 'All time' : item.days === -24 ? '24h' : `${item.days}d`}</span>
                               {' · '}
                               <span className={styles.mono}>{item.createdAt?.slice(0, 19).replace('T', ' ')} UTC</span>
                               {' · '}
