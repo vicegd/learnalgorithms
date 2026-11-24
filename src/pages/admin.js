@@ -213,9 +213,9 @@ export default function AdminDashboardPage() {
         fetch(`${API_BASE}/health`, {mode: 'cors'}).catch(() => null),
         fetch(`${API_BASE}/popular`, {mode: 'cors'}).catch(() => null),
         fetch(`${API_BASE}/admin/stats?days=${periodDays}`, {headers, mode: 'cors'}),
-        fetch(`${API_BASE}/admin/feedback`, {headers, mode: 'cors'}),
+        fetch(`${API_BASE}/admin/feedback?days=${periodDays}`, {headers, mode: 'cors'}),
         fetch(`${API_BASE}/admin/survey?days=${periodDays}`, {headers, mode: 'cors'}).catch(() => null),
-        fetch(`${API_BASE}/admin/issues`, {headers, mode: 'cors'}),
+        fetch(`${API_BASE}/admin/issues?days=${periodDays}`, {headers, mode: 'cors'}),
         fetch(`${API_BASE}/admin/events?days=${periodDays}&limit=${EVENTS_PAGE_SIZE}&offset=0`, {
           headers,
           mode: 'cors',
@@ -1072,7 +1072,7 @@ export default function AdminDashboardPage() {
                 Readability vs. Engagement (NLP × Telemetry) ({readabilityRows.length})
               </h2>
               <p className={styles.sectionHint}>
-                Cross-checks build-time NLP readability metrics against live telemetry and negative feedback to flag dense lessons with low scroll depth (&lt; 60%) or negative votes.
+                Cross-checks static build-time NLP readability metrics against telemetry and negative feedback filtered by the top time window selector to flag dense lessons with low scroll depth (&lt; 60%) or negative votes.
                 {' '}<strong>FK Grade</strong> (Flesch-Kincaid Grade Level): estimated years of schooling needed (<code>8–11</code> accessible, <code>≥ 12</code> dense/university).
                 {' '}<strong>Flesch Ease</strong> (0–100, higher = easier): <code>60+</code> plain, <code>45–60</code> technical, <code>&lt; 45</code> dense.
                 {' '}<strong>TTR</strong> (Type-Token Ratio, 0–1): vocabulary diversity (<code>unique / total words</code>; higher = denser terminology).
