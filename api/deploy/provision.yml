@@ -9,7 +9,7 @@
     repo_url: "https://github.com/vicegd/learnalgorithms.git"
     repo_dir: "/opt/learnalgorithms"
     api_domain: "api.learnalgorithms.dev"
-    api_host_port: "8081"
+    api_host_port: "8083"
 
   tasks:
     - name: Install required packages (Docker, Compose v2, nginx, Certbot, git)

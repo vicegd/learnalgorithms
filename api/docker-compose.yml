@@ -1,14 +1,14 @@
 # Production stack for api.learnalgorithms.dev.
 #
 #   docker compose --profile caddy up -d   # when ports 80/443 are free (Caddy does HTTPS)
-#   docker compose up -d                   # when another web server already proxies to 127.0.0.1:8080
+#   docker compose up -d                   # when another web server already proxies to 127.0.0.1:8083
 services:
   api:
     build: .
     restart: unless-stopped
     env_file: .env
     ports:
-      - "127.0.0.1:${API_HOST_PORT:-8080}:8080"  # only reachable from the server itself
+      - "127.0.0.1:${API_HOST_PORT:-8083}:8080"  # only reachable from the server itself
     volumes:
       - api-data:/data
     read_only: true                  # immutable container file system
