@@ -414,7 +414,7 @@ The names change, but the trade-offs remain the same: dynamic arrays for positio
 
 Many problems in this course are naturally modelled as **graphs**: road networks, social networks, dependencies between tasks, states of a game...
 
-A **graph** is a set of **nodes** (or vertices) connected by a set of **edges** (or arcs). Formally, a graph is a pair $G = \langle N, A \rangle$, where $N$ is a set of nodes and $A$ is a set of edges, each connecting two nodes.
+A **graph** is a set of **vertices** (or nodes) connected by a set of **edges** (or arcs). Formally, a graph is a pair $G = \langle V, E \rangle$, where $V$ is a set of vertices and $E$ is a set of edges, each connecting two vertices.
 
 - In a **directed graph**, edges have a direction: an edge from $u$ to $v$ does not imply an edge from $v$ to $u$ (for example, one-way streets, or "follows" in a social network).
 - In an **undirected graph**, edges have no direction (for example, two-way roads, or friendship).
@@ -426,8 +426,8 @@ A sequence of consecutive edges forms a **path**. A path that starts and ends at
 
 The two classical representations have different costs, which is another example of how the data structure affects the algorithm:
 
-- **Adjacency matrix:** an $|N| \times |N|$ matrix where cell $(u, v)$ indicates whether there is an edge (or its weight). Checking whether two nodes are connected is immediate, but the memory grows with $|N|^2$, even if the graph has few edges.
-- **Adjacency lists:** for each node, a list of its neighbours. The memory grows with $|N| + |A|$, which is much better for **sparse** graphs (few edges), and traversing the neighbours of a node is efficient. Checking whether a specific edge exists, however, requires searching a list.
+- **Adjacency matrix:** a $|V| \times |V|$ matrix where cell $(u, v)$ indicates whether there is an edge (or its weight). Checking whether two vertices are connected is immediate, but the memory grows with $|V|^2$, even if the graph has few edges.
+- **Adjacency lists:** for each vertex, a list of its neighbours. The memory grows with $|V| + |E|$, which is much better for **sparse** graphs (few edges), and traversing the neighbours of a vertex is efficient. Checking whether a specific edge exists, however, requires searching a list.
 
 <Figure caption="The same undirected graph stored as an adjacency matrix (every pair of nodes has a cell) and as adjacency lists (each node keeps only its neighbors).">
   <FigGraphRepresentations />
