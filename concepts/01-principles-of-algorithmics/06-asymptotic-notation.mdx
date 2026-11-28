@@ -48,15 +48,24 @@ Two details of the definition are important:
 
 ### Proving a bound: an example
 
-Let us prove that $T(n) = 5n^4 + 4n^3$ is $O(n^4)$. We need constants $c$ and $n_0$ such that $5n^4 + 4n^3 \le c \cdot n^4$ for every $n \ge n_0$.
-
-The simplest way is to bound the lower-order term by the dominant one: since $n^3 \le n^4$ for every $n \ge 1$, we have $4n^3 \le 4n^4$, and therefore:
+Let us prove that $T(n) = 5n^4 + 4n^3$ is $O(n^4)$. We need constants $c$ and $n_0$ such that:
 
 $$
-5n^4 + 4n^3 \le 5n^4 + 4n^4 = 9n^4 \qquad \text{for all } n \ge 1
+5n^4 + 4n^3 \le c \cdot n^4 \qquad \text{for every } n \ge n_0
 $$
 
-So the definition holds with $c = 9$ and $n_0 = 1$. The pair $(c, n_0)$ is not unique—for instance, $c = 6$ and $n_0 = 4$ also work—but we only need to show that **some** valid pair exists.
+If we pick $c = 6$, the inequality becomes $5n^4 + 4n^3 \le 6n^4$, which simplifies to $4n^3 \le n^4$, and (dividing by $n^3 > 0$) to $n \ge 4$. So it holds mathematically for every $n \ge 4$, i.e. with $c = 6$ and $n_0 = 4$. We can see the crossing point directly in a table:
+
+| $n$ | $5n^4 + 4n^3$ | $6n^4$ | $5n^4 + 4n^3 \le 6n^4$? |
+| ---: | ---: | ---: | :---: |
+| 1 | 9 | 6 | ✗ |
+| 2 | 112 | 96 | ✗ |
+| 3 | 513 | 486 | ✗ |
+| **4** | **1,536** | **1,536** | **✓ ($n_0 = 4$)** |
+| 5 | 3,625 | 3,750 | ✓ |
+| 10 | 54,000 | 60,000 | ✓ |
+
+The pair $(c, n_0)$ is not unique—for example, with $c = 9$ the inequality already holds from $n_0 = 1$—we only need to show that **some** valid pair exists.
 
 :::tip A quicker test with limits
 When the limit exists, we can compare growth rates with:
