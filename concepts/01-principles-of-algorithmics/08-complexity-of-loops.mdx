@@ -66,14 +66,14 @@ In general, if the variable must travel a distance proportional to $n$ with a co
 When the loop variable is **multiplied or divided** by a constant at each step, it reaches its limit very quickly:
 
 ```java
-for (i = 1; i <= n; i *= 2) { O(1) }           // log2(n) + 1 iterations  → O(log n)
-for (i = n; i >= 1; i /= 2) { O(1) }           // log2(n) + 1 iterations  → O(log n)
-for (i = 1; i <= n; i *= c) { O(1) }           // logc(n) + 1 iterations  → O(log n)
-for (i = 1; i <= n*n; i *= 2) { O(1) }         // log2(n²) = 2·log2(n)    → O(log n)
-for (i = 1; i <= n*n*n/2; i *= c) { O(1) }     // logc(n³/2)              → O(log n)
+for (i = 1; i <= n; i *= 2) { O(1) }           // ⌊log2(n)⌋ + 1 iterations          → O(log n)
+for (i = n; i >= 1; i /= 2) { O(1) }           // ⌊log2(n)⌋ + 1 iterations          → O(log n)
+for (i = 1; i <= n; i *= c) { O(1) }           // ⌊logc(n)⌋ + 1 iterations          → O(log n)
+for (i = 1; i <= n*n; i *= 2) { O(1) }         // ⌊log2(n²)⌋ + 1 = ⌊2·log2(n)⌋ + 1  → O(log n)
+for (i = 1; i <= n*n*n/2; i *= c) { O(1) }     // ⌊logc(n³/2)⌋ + 1 (for n ≥ 2)      → O(log n)
 ```
 
-**Why?** After $k$ iterations of the first loop, $i = 2^k$. The loop stops when $2^k \gt n$, that is, when $k \gt \log_2 n$. So it runs $\lfloor \log_2 n \rfloor + 1$ times. The same reasoning with base $c$ gives $\log_c n$ iterations for the third loop.
+**Why?** After $k$ iterations of the first loop, $i = 2^k$. The loop stops when $2^k \gt n$, that is, when $k \gt \log_2 n$. So it runs $\lfloor \log_2 n \rfloor + 1$ times. The same reasoning with base $c \gt 1$ gives $\lfloor \log_c n \rfloor + 1$ iterations for the third loop.
 
 <Figure caption="Doubling the counter: the jumps grow so fast that only 7 iterations fit below n = 100. Doubling n adds just one more jump.">
   <FigDoublingLoop />
