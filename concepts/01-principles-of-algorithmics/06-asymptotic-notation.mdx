@@ -50,13 +50,13 @@ Two details of the definition are important:
 
 Let us prove that $T(n) = 5n^4 + 4n^3$ is $O(n^4)$. We need constants $c$ and $n_0$ such that $5n^4 + 4n^3 \le c \cdot n^4$ for every $n \ge n_0$.
 
-The idea is to bound the lower-order term by the dominant one. For $n \ge 4$ we have $4n^3 \le n \cdot n^3 = n^4$, therefore:
+The simplest way is to bound the lower-order term by the dominant one: since $n^3 \le n^4$ for every $n \ge 1$, we have $4n^3 \le 4n^4$, and therefore:
 
 $$
-5n^4 + 4n^3 \le 5n^4 + n^4 = 6n^4 \qquad \text{for all } n \ge 4
+5n^4 + 4n^3 \le 5n^4 + 4n^4 = 9n^4 \qquad \text{for all } n \ge 1
 $$
 
-So the definition holds with $c = 6$ and $n_0 = 4$ (or any larger $n_0$, such as $n_0 = 5$). The values of $c$ and $n_0$ are not unique: with $c = 9$, for example, the inequality holds from $n_0 = 1$, because $4n^3 \le 4n^4$ for $n \ge 1$. We only need to show that **some** pair exists.
+So the definition holds with $c = 9$ and $n_0 = 1$. The pair $(c, n_0)$ is not unique—for instance, $c = 6$ and $n_0 = 4$ also work—but we only need to show that **some** valid pair exists.
 
 :::tip A quicker test with limits
 When the limit exists, we can compare growth rates with:
