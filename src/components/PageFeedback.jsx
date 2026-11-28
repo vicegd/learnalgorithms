@@ -3,6 +3,7 @@ import {normalizePermalink} from '@site/src/utils/studyProgress';
 import styles from './PageFeedback.module.css';
 
 const API_URL = 'https://api.learnalgorithms.dev/feedback';
+const SUMMARY_URL = 'https://api.learnalgorithms.dev/feedback/summary';
 const CLIENT_KEY = 'learnalgorithms:feedback-client:v1';
 const MAX_COMMENT = 500;
 
@@ -38,6 +39,7 @@ export default function PageFeedback({permalink}) {
   const [submitting, setSubmitting] = useState(false);
   const [commentSent, setCommentSent] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [helpfulCount, setHelpfulCount] = useState(null);
 
   useEffect(() => {
     enteredAt.current = Date.now();
@@ -49,6 +51,22 @@ export default function PageFeedback({permalink}) {
     setSubmitting(false);
     setCommentSent(false);
     setErrorMessage('');
+    setHelpfulCount(null);
+
+    let cancelled = false;
+    fetch(`${SUMMARY_URL}?page=${encodeURIComponent(page)}`, {mode: 'cors'})
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!cancelled && data && typeof data.helpful === 'number') {
+          setHelpfulCount(data.helpful);
+        }
+      })
+      .catch(() => {
+        // Degrade silently if API is unreachable
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [page]);
 
   async function sendPayload(helpfulVal, commentText) {
@@ -81,6 +99,12 @@ export default function PageFeedback({permalink}) {
       if (resp.status === 201 || resp.status === 202) {
         setVoteSaved(true);
         setAlreadyVoted(false);
+        fetch(`${SUMMARY_URL}?page=${encodeURIComponent(page)}`, {mode: 'cors'})
+          .then((r) => (r.ok ? r.json() : null))
+          .then((d) => {
+            if (d && typeof d.helpful === 'number') setHelpfulCount(d.helpful);
+          })
+          .catch(() => {});
       } else if (resp.status === 200) {
         setVoteSaved(true);
         setAlreadyVoted(!wasVoted);
@@ -142,6 +166,11 @@ export default function PageFeedback({permalink}) {
             className={`${styles.voteBtn} ${choice === true ? styles.voteBtnActive : ''}`}
             aria-pressed={choice === true}>
             <span aria-hidden="true">👍</span> Yes
+            {typeof helpfulCount === 'number' && helpfulCount > 0 && (
+              <span className={styles.countBadge} aria-label={`${helpfulCount} positive votes`}>
+                {helpfulCount}
+              </span>
+            )}
           </button>
           <button
             type="button"

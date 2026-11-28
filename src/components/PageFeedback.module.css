@@ -51,6 +51,21 @@
   color: var(--ifm-color-primary-darkest);
 }
 
+.countBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.35rem;
+  padding: 0.05rem 0.4rem;
+  margin-left: 0.15rem;
+  border-radius: 999px;
+  background: rgba(46, 133, 85, 0.14);
+  color: var(--ifm-color-primary-darkest);
+  font-size: 0.76rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
 .form {
   margin-top: 0.85rem;
   display: flex;
