@@ -40,11 +40,11 @@ Asymptotic analysis allows us:
 | $O(n \log n)$ | Linearithmic | A good complexity, typical of efficient recursive (divide and conquer) algorithms. | Mergesort; Quicksort on average. |
 | $O(n^2)$ | Quadratic | Appears with two nested loops and similar cases. Acceptable for moderate sizes. | Simple sorting algorithms (bubble, insertion, selection). |
 | $O(n^3)$ | Cubic | Grows excessively for large values. | Naive multiplication of matrices. |
-| $O(n^k)$ | Polynomial | General case of polynomial complexity, for a constant $k$. | |
+| $O(n^k)$ | Polynomial | General case of polynomial complexity, for a constant $k$. | Checking all $k$-element subsets of a set; $k$ nested loops. |
 | $O(2^n)$ | Exponential | Avoid it if possible. | Generating all the subsets of a set. |
-| $O(k^n)$ | Exponential | General case of exponential complexity, for a constant $k \gt 1$. | |
+| $O(k^n)$ | Exponential | General case of exponential complexity, for a constant $k \gt 1$. | Graph $k$-coloring by exhaustive search. |
 | $O(n!)$ | Factorial | A bad complexity; it should be avoided. | Generating all the permutations of $n$ elements. |
-| $O(n^n)$ | | A bad complexity; it should be avoided. | |
+| $O(n^n)$ | Super-exponential | A bad complexity; it should be avoided. | Generating all $n$-tuples over $n$ values (all functions from a set of size $n$ to itself). |
 
 The classes up to $O(n^k)$ are **polynomial**; from $O(2^n)$ onwards they are **not polynomial**. This border is very significant in computer science: problems that can be solved in polynomial time are usually considered **tractable**, while those that seem to require exponential time are considered **intractable** for large inputs. Some of the most famous open questions in computer science (such as whether P equals NP) are about exactly this border. Several design techniques of this course, such as backtracking and branch and bound, exist precisely to deal with problems for which no polynomial algorithm is known, trying to avoid exploring the whole exponential search space.
 
